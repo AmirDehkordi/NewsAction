@@ -111,9 +111,21 @@ def test_frozen_skeleton() -> None:
     assert f.allow_val_b is False
     assert f.frozen_requested is False
     assert f.frozen is False
-    for section in ("news", "filter", "encoding", "anchoring", "tournament", "selection", "thresholds",
+    for section in ("filter", "encoding", "anchoring", "tournament", "selection", "thresholds",
                     "calibration"):  # fmt: skip
         assert getattr(f, section) is None
+
+
+def test_frozen_news_section_from_na02() -> None:
+    """NA-02 (PRD S10) owns ``news:``; it is null before the NA-02 audit runs."""
+    news = load_frozen().news
+    if news is None:
+        return
+    keys = {"summary_variant_allowed", "excluded_sources", "leakage_audit_sha", "leakage_audit_file"}
+    assert set(news) == keys | {"parsing_allowed_none"}
+    assert isinstance(news["summary_variant_allowed"], bool)
+    assert isinstance(news["excluded_sources"], list)
+    assert len(str(news["leakage_audit_sha"])) == 64
 
 
 def test_times_are_quoted_in_yaml() -> None:

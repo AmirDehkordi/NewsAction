@@ -1,0 +1,92 @@
+id,sentence,after_fact,premarket,note
+p01,Shares of Acme Corp fell 4% in morning trading after the company cut its outlook.,1,0,move + session phrase
+p02,The stock closed up 2.1% on Tuesday.,1,0,closed up
+p03,Acme opened lower after the report.,1,0,opened lower
+p04,"As of 11:30 a.m. ET, the stock was down 3%.",1,0,as of hh:mm
+p05,Tesla is trading higher this afternoon.,1,0,trading higher
+p06,Nvidia jumps 6% after blowout earnings.,1,0,company + move + pct
+p07,Apple shares slump as iPhone demand weakens.,1,0,shares + move without number
+p08,Stocks rallied in late trading as yields eased.,1,0,market move
+p09,The Dow added 300 points on Wednesday.,1,0,index points
+p10,Boeing stock is up 5% today.,1,0,stock is up
+p11,Shares were higher at last check.,1,0,at last check
+p12,The shares hit a new 52-week high of $412.50 on Monday.,1,0,52-week high
+p13,Intel's stock tumbled to a session low before recovering.,1,0,session low
+p14,Acme Corp (NYSE:ACM) Shares Gap Up to $45.10,1,0,gap up headline
+p15,XYZ Trading Down 3.2% – Here's Why,1,0,trading down headline
+p16,Lennar Share Price Passes Below Two Hundred Day Moving Average,1,0,moving-average cross
+p17,The company's shares have gained 20% so far this year.,1,0,year-to-date gain
+p18,Shares ended the session 1.5% lower.,1,0,ended lower with pct
+p19,Microsoft rose 1.2% to $430 in midday trading.,1,0,midday
+p20,The S&P 500 slipped 0.4% by the close.,1,0,index pct
+p21,Shares of the retailer plunged more than 20% on Thursday.,1,0,plunged more than
+p22,Amazon edged higher in early deals.,1,0,edged higher early deals
+p23,The stock was last seen trading at $52.30.,1,0,trading at price
+p24,Netflix shares rose sharply today after subscriber numbers beat estimates.,1,0,rose today
+p25,The company's stock price dropped 8% following the announcement.,1,0,stock price dropped
+p26,Investors sent shares of Acme down 12% on Friday.,1,0,shares of X down pct
+p27,Wall Street closed higher on Monday.,1,0,market closed higher
+p28,Acme Inc. shares are down 4.5% at 10:45 a.m.,1,0,shares are down
+p29,"Oracle soared 36% on Wednesday, its best day since 1992.",1,0,soared pct
+p30,The shares changed hands at $88 in afternoon dealings.,1,0,changed hands at price
+p31,Stocks were mixed at midday.,1,0,mixed at midday
+p32,"In afternoon trading, the stock was off 2%.",1,0,off pct
+p33,The ETF has fallen 3% this week.,1,0,fallen pct
+p34,Shares of Acme Corp. were halted after a 15% jump.,1,0,pct jump noun
+p35,Coca-Cola dipped 0.8% Tuesday.,1,0,dipped pct
+p36,The Nasdaq Composite finished the day up 1.1%.,1,0,finished up
+p37,UnitedHealth's shares sank to their lowest level in five years on Tuesday.,1,0,shares sank
+p38,Shares rebounded from early losses to trade 1% higher.,1,0,rebounded
+p39,The stock price of Acme rallied to $150 at the opening bell.,1,0,opening bell
+p40,Why Is Celsius Stock Surging Friday?,1,0,headline question
+p41,Raymond James' Q1 Earnings Beat; Stock Up on Solid IB Business,1,0,stock up headline
+p42,Wall Street downgrades Centene after guidance pull; shares crater,1,0,shares crater
+m01,Shares of Acme rose 3% in premarket trading.,1,1,premarket move
+m02,Acme slipped 2% in pre-market trade after the report.,1,1,pre-market trade
+m03,The stock fell 6% after hours following weak guidance.,1,1,after hours
+m04,"In extended trading, Nvidia was up 4%.",1,1,extended trading
+m05,"Premarket movers: Tesla, Apple and Nike.",0,1,movers
+m06,Futures pointed to a higher open before the bell.,0,1,futures before the bell
+m07,Shares were indicated 5% lower before the opening bell.,1,1,indicated lower
+m08,Acme Corp jumped 9% in after-hours trading on Tuesday.,1,1,after-hours
+m09,"Post-market, the shares gained 1.5%.",1,1,post-market
+m10,Pre-market futures are flat ahead of CPI data.,0,1,futures flat
+m11,Shares of the chipmaker were trading higher in the premarket session.,1,1,trading higher premarket
+m12,XYZ stock surges premarket on takeover bid.,1,1,surges premarket
+n01,Morgan Stanley raised its price target on Acme to $200 from $180.,0,0,price target
+n02,"The company reported revenue of $5.2 billion, up 12% year over year.",0,0,revenue up pct
+n03,Earnings per share rose 15% to $2.10.,0,0,EPS rose
+n04,Acme will report fourth-quarter results before the bell on Thursday.,0,0,scheduling before the bell
+n05,The board declared a quarterly dividend of $0.52 per share.,0,0,dividend per share
+n06,Acme agreed to acquire Beta for $45 per share in cash.,0,0,deal price per share
+n07,Same-store sales fell 3% in the quarter.,0,0,same-store sales
+n08,The company raised its full-year guidance.,0,0,guidance
+n09,Analysts expect earnings of $1.23 a share on revenue of $4.5 billion.,0,0,EPS a share
+n10,"The firm cut 1,200 jobs, or about 5% of its workforce.",0,0,job cuts pct
+n11,Acme shares outstanding rose to 1.2 billion after the offering.,0,0,shares outstanding
+n12,The company's market share rose to 31% in Europe.,0,0,market share
+n13,Acme plans to buy back up to $10 billion of its shares.,0,0,buyback
+n14,Results will be released after the market closes on Tuesday.,0,0,scheduling after close
+n15,The stock split takes effect on Monday.,0,0,stock split
+n16,Inflation rose 0.3% in September.,0,0,macro pct
+n17,Oil prices fell 2% as inventories built.,0,0,commodity price (not the stock)
+n18,The company will host a conference call after the bell to discuss results.,0,0,call after the bell
+n19,Acme set a record for quarterly deliveries.,0,0,record deliveries
+n20,The company opened a new plant in Texas.,0,0,opened a plant
+n21,The deal closed at the end of the second quarter.,0,0,deal closed
+n22,Acme's board approved a 2-for-1 stock split.,0,0,split approval
+n23,The fund holds 1.2 million shares of Acme.,0,0,holdings
+n24,Revenue jumped 25% to a record $3 billion.,0,0,revenue jumped
+n25,Gross margin expanded 150 basis points.,0,0,margin bps
+n26,The company expects to close the transaction in early 2027.,0,0,close transaction early
+n27,Acme stock offers a 3% dividend yield.,0,0,dividend yield
+n28,Shareholders approved the merger on Tuesday.,0,0,shareholders
+n29,Acme shares will begin trading on the Nasdaq on Friday.,0,0,listing
+n30,The analyst lifted the stock's rating to buy and the price target to $95.,0,0,rating and target
+n31,"U.S. jobless claims rose to 230,000 last week.",0,0,macro level
+n32,EPS of $1.52 per share beat the consensus of $1.40.,0,0,EPS beat
+n33,Acme shares are listed on the New York Stock Exchange.,0,0,listing venue
+n34,Production rose 8% from a year earlier.,0,0,production pct
+n35,"Acme is scheduled to report earnings before the opening bell on Wednesday, with analysts expecting EPS of $2.15.",0,0,earnings preview with dollar EPS
+n36,Unemployment was up 0.2 percentage points in March.,0,0,percentage points
+n37,The company posted a 12% rise in quarterly revenue.,0,0,pct rise in revenue

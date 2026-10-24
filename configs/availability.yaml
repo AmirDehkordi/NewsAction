@@ -7,7 +7,7 @@
 #   D0 (09:15 ET):     static, t_minus_1, w0
 #   D1 (10:00 ET):     D0 + d1
 #   D2 (after close):  D1 + w2, d2_reaction
-#   "post" is visible at no decision point.
+#   "post" and "selection_only" are visible at no decision point.
 
 kinds:
   static: known at any time (identifiers, the session date itself, fixed metadata)
@@ -17,6 +17,7 @@ kinds:
   w2: derived from news with t_avail in W2(s) = (close(prev(s)), close(s)]
   d2_reaction: observed full-day reaction close(prev(s)) -> close(s) (e.g. G at D2 = z_cc,t)
   post: outcomes and labels (targets); never a model input
+  selection_only: vendor labels produced retrospectively (tags, sentiment, summaries, event clusters); may select news, never a model input (CLAUDE.md A6)
 
 columns:
   # --- identifiers and fixed metadata (NA-00 seeds + NA-01 panel)
@@ -119,3 +120,51 @@ columns:
   car_lvl_c60: post
   e5_lvl: post
   delist_within_c20: post
+  # --- NA-02 articles (work/news/articles_clean.parquet). Article-level columns are known at the article's
+  # t_avail: kind w0 means usable at D0 of session s for rows with session_w0 == s (and at D2 for rows with
+  # session_w2 == s); the row-level check is pit.assert_visible(t_avail <= decision instant).
+  id: static                  # article id (NewsWitch)
+  ticker_raw: w0
+  ts_pub_utc: w0
+  precision: w0
+  t_avail: w0
+  session_w0: w0
+  session_w2: w0
+  domain: w0
+  source_class_domain: w0     # domain only
+  title: w0                   # raw text: contains after-the-fact and pre-market price talk
+  snippet: w0
+  title_clean: w0             # scrubbed (PREREG §6.4): the Call A text
+  snippet_clean: w0
+  is_13f: w0                  # from the title text
+  is_form4: w0
+  after_fact: w0
+  premarket_talk: w0
+  has_clean_text: w0
+  non_english_hint: w0          # heuristic language flag (detectors and masking are English-only)
+  dup_group: w0               # greedy, backward-looking groups: known at the article's t_avail
+  is_representative: w0
+  dup_count_w0: w0            # group members in the representative's W0 window
+  dup_count_w2: w2            # group members in the representative's W2 window
+  dup_count: post             # total group size, including later duplicates
+  novelty: w0                 # strictly earlier representatives only (PREREG §6.5)
+  # vendor labels and the flags derived from them: selection only (CLAUDE.md A6)
+  source_class: selection_only    # domain class overridden by tag_primary_source
+  summary_present: selection_only
+  non_news: selection_only
+  junk_tag: selection_only
+  keep: selection_only            # passes PREREG §6.2 (uses non_news and the vendor tag)
+  third_party_ok: selection_only  # data-governance flag (PREREG §6.1)
+  parsing_allowed: selection_only
+  sentiment_direction: selection_only
+  sentiment_intensity: selection_only
+  tag_type: selection_only
+  tag_type2: selection_only
+  tag_scheduled: selection_only
+  tag_forward_looking: selection_only
+  tag_primary_source: selection_only
+  tag_quantified: selection_only
+  tag_rumor: selection_only
+  tag_source: selection_only
+  event_id: selection_only
+  event_age_days: selection_only

@@ -1,0 +1,71 @@
+# NA-02 news pipeline (newsaction.news). PREREG references in comments; tests/test_news_config.py checks the
+# PREREG constants against docs/PREREG.md. Hashed into the NA-11 freeze with every configs/*.yaml.
+
+load:                                  # PRD NA-02 S1
+  years: [2023, 2024, 2025, 2026]      # Data/news_YYYY.parquet files read (never the `body` column)
+  t_avail_start: 2023-07-01            # keep articles with t_avail (UTC) on or after this date ...
+  t_avail_end: 2026-07-31              # ... and on or before this date (end of the corpus = end of the test split)
+
+mapping:                               # PRD NA-02 S2
+  # News tickers are EXCH:SYM. Only these exchange codes can be US-listed common equity; US exchanges
+  # share one ticker namespace (CTA/UTP), so an exchange that differs from ATOM's (PLTR, WMT after their
+  # moves to Nasdaq) does not change the company.
+  us_exchanges: [NYSE, NASDAQ, NYSEAMERICAN, NYSEARCA, BATS, AMEX]
+  # Tickers starting with these strings are indices, currencies, crypto or macro series (whole ticker,
+  # with or without an exchange code).
+  non_equity_prefixes: ["^", "CCC", "INDEX", "DX-", "FX", "SPX ", "US10Y", "XAU", "XAG", "BTC"]
+  # Vendor tickers that ATOM's ref.symbol_ticker lacks (it has 11 rows, all open from 1990). Each row maps
+  # a normalized ticker to an ATOM symbol_id over [valid_from, valid_to) at t_avail (UTC dates, null = open).
+  # kind: rename = a former ticker of the same company; class = another share class of a member company
+  # (not itself an ATOM symbol; mapped to the member class's symbol_id); restrict = narrows the validity
+  # of an ATOM ticker that belonged to a different company before a rename.
+  aliases:
+    - {ticker: SQ, symbol_id: 1602, valid_from: null, valid_to: 2025-01-21, kind: rename,
+       note: "Block, Inc. traded as SQ until 2025-01-20, then XYZ (ATOM's ticker)"}
+    - {ticker: XYZ, symbol_id: 1602, valid_from: 2025-01-21, valid_to: null, kind: restrict,
+       note: "XYZ is Block's ticker from 2025-01-21"}
+    - {ticker: DOC, symbol_id: 440, valid_from: 2024-03-01, valid_to: null, kind: restrict,
+       note: "NYSE:DOC was Physicians Realty Trust until its 2024-03-01 merger into Healthpeak (PEAK -> DOC)"}
+    - {ticker: PEAK, symbol_id: 440, valid_from: null, valid_to: 2024-03-01, kind: rename,
+       note: "Healthpeak traded as PEAK until 2024-02-29"}
+    - {ticker: CHK, symbol_id: 516, valid_from: null, valid_to: 2024-10-01, kind: rename,
+       note: "Chesapeake Energy (CHK) became Expand Energy (EXE) on 2024-10-01"}
+    - {ticker: FB, symbol_id: 946, valid_from: null, valid_to: 2022-06-09, kind: rename,
+       note: "Meta Platforms traded as FB until 2022-06-08"}
+    - {ticker: PARAA, symbol_id: 1181, valid_from: null, valid_to: null, kind: class,
+       note: "Paramount Class A; the index member is the Class B line (PARA / PSKY)"}
+    - {ticker: BF-A, symbol_id: 168, valid_from: null, valid_to: null, kind: class,
+       note: "Brown-Forman Class A; the index member is BF-B"}
+    - {ticker: LEN-B, symbol_id: 857, valid_from: null, valid_to: null, kind: class,
+       note: "Lennar Class B; the index member is LEN"}
+
+sentiment_scale:                       # vendor sentiment_direction -> -2..+2 (PRD NA-02 S3, S10)
+  Strongly Negative: -2
+  Negative: -1
+  Neutral: 0
+  Positive: 1
+  Strongly Positive: 2
+
+junk_tags: [price_commentary, promotional_content]   # PREREG §6.2
+
+dedupe:                                # PREREG §6.2
+  cosine: 0.93
+  window_hours: 72
+
+novelty:                               # PREREG §6.5
+  window_days: 7
+
+embed:                                 # PRD NA-02 S6
+  model: BAAI/bge-small-en-v1.5
+  revision: 5c38ec7c405ec4b44b94cc5a9bb96e735b38267a
+  device: mps
+  compute_dtype: float16   # MPS fp16: 2.3x faster than fp32; cosine to fp32 vectors >= 0.9995 (NA-02 decisions)
+  batch_size: 256
+  dim: 384
+
+market_tickers: ["^GSPC", "^VIX", "DX-Y.NYB"]        # PREREG A3.5 (PRD NA-02 S14)
+
+audit:                                 # PRD NA-02 S3, S10, S13
+  min_names_per_day: 10                # daily cross-sections with fewer ticker-days are skipped
+  nw_lags: 5                           # PREREG §11.1
+  leak_t: 2.0                          # PREREG §6.4

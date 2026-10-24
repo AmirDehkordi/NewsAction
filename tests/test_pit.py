@@ -17,7 +17,7 @@ EXPECTED = {
     "D1": {"static", "t_minus_1", "w0", "d1"},
     "D2": {"static", "t_minus_1", "w0", "d1", "w2", "d2_reaction"},
 }
-ALL_KINDS = ["static", "t_minus_1", "w0", "d1", "w2", "d2_reaction", "post"]
+ALL_KINDS = ["static", "t_minus_1", "w0", "d1", "w2", "d2_reaction", "post", "selection_only"]
 
 
 @pytest.fixture

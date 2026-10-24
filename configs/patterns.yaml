@@ -1,0 +1,125 @@
+# Text patterns for NA-02 (newsaction.news.clean, newsaction.news.detect). Python `re`, case-insensitive.
+# Strings are single-quoted so backslashes reach `re` unchanged. `{NAME}` inside a rule is replaced by the
+# fragment NAME (wrapped in a non-capturing group) before compiling; fragments may use other fragments.
+# Evaluation: artifacts/NA-02/spam_judgments.csv (13F), artifacts/NA-02/detector_eval.csv (detectors).
+
+# --- PREREG §6.2: institutional-holdings (13F) auto-articles, title only ---------------------------------
+holdings_13f:
+  include:
+    # "<Fund> Has $40.55 Million Stock Holdings in", "Acquires 21,221 Shares of", "Takes $265,000 Position in"
+    - '\b(?:has|holds|buys|bought|acquires|acquired|purchases|purchased|sells|sold|takes|took|makes|invests|initiates|establishes|opens|trims|cuts|unloads|dumps)\s+(?:a\s+)?(?:new\s+)?\$?\d[\d,.]*\s*(?:million|billion|thousand|[kmb]|bn|mn)?\s+(?:shares|stake|position|holdings?|investment|stock\s+holdings|stock\s+position|worth\s+of\s+shares)\s+(?:in|of)\b'
+    # "<Fund> Raises Stock Holdings in", "Trims Stake in", "Grows Stock Position in"
+    - '\b(?:raises|raised|boosts|boosted|lowers|lowered|trims|trimmed|cuts|reduces|reduced|increases|increased|decreases|decreased|grows|grew|lifts|lifted|expands|expanded|lessens|shrinks|ups|upped|sells|adds\s+to)\s+(?:its\s+|their\s+)?(?:stock\s+|equity\s+|share\s+)?(?:position|holdings?|stake)\s+in\b'
+    # "<Fund> Buys New Stake in", "Makes New $772,000 Investment in", "Takes Position in"
+    - '\b(?:buys|acquires|purchases|takes|makes|initiates|establishes|opens|builds)\s+(?:a\s+)?new\s+(?:\$\d[\d,.]*\s*(?:million|billion|thousand|[kmb])?\s+)?(?:stake|position|investment|holdings?)\s+in\b'
+    - '\btakes\s+(?:a\s+)?position\s+in\b'
+    - '\binvests\s+\$\d[\d,.]*\s*(?:million|billion|thousand|[kmb])?\s+in\b'
+    # passive: "<Co> Shares Bought by <Fund>", "Stock Position Lowered by", "Holdings Trimmed by"
+    - '\b(?:shares|stake|position|holdings?)\s+(?:bought|sold|acquired|purchased|trimmed|lowered|raised|boosted|increased|decreased|cut|reduced|lifted|grown|expanded|unloaded|upped|sold\s+off)\s+by\b'
+    - '\b\d[\d,]*\s+shares\s+(?:in|of)\b.{0,120}?\b(?:bought|sold|acquired|purchased)\s+by\b'
+    # "<Co> is <Fund>'s 3rd Largest Position"; GuruFocus "<Fund>'s <Co> Holding History"
+    - '\bis\s+.{1,90}?[''’]s\s+(?:\d+(?:st|nd|rd|th)\s+|top\s+|biggest\s+)?largest\s+(?:position|holding)\b'
+    - '\bholding\s+history\b'
+    # round 2 (spam judgment round 1 misses): "Buys Shares of 13,441 Apple", "Acquires New Shares in",
+    # "Stock Holdings Lessened by", plural possessive "Associates' Largest Position", "Trims <Co> Stake",
+    # "Sells 210,000 BXP Shares", 13F / 13G filing articles, ownership templates, UK holdings notices
+    - '\b(?:buys|bought|acquires|acquired|purchases|purchased|sells|sold)\s+(?:new\s+)?shares\s+(?:of|in)\s+\d[\d,]*\b'
+    - '\b(?:buys|acquires|purchases|takes|initiates|establishes|opens)\s+new\s+shares\s+in\b'
+    - '\b(?:shares|stake|position|holdings?)\s+(?:lessened|slashed|raised|grown)\s+by\b'
+    - '\bis\s+.{1,90}?s[''’]\s+(?:\d+(?:st|nd|rd|th)\s+)?largest\s+(?:position|holding)\b'
+    - '\b(?:trims|reduces|raises|boosts|cuts|lifts|increases|decreases|lowers|lessens)\s+(?:its\s+)?[^:;|]{2,60}?\s+(?:stake|position|holdings)\s*$'
+    - '\b(?:buys|sells|acquires|purchases)\s+\d[\d,]*\s+[A-Z.]{1,6}\s+shares\b'
+    - '\b13F(?:-HR)?\b'
+    - '\bschedule\s+13G\b|\b13G(?:/A)?\s+filing\b'
+    - '\b(?:with\s+)?\d+%\s+ownership\b.{0,80}?\binstitution'
+    - '\binstitutional\s+(?:owners|investors|shareholders)\s+(?:who\s+)?own\s+\d+%'
+    - '\bdominated\s+by\s+institutional\s+owners\b'
+    - '\bholding\(s\)\s+in\s+company\b'
+    # round 3 (spam judgment round 2 misses): fund-move templates, UK Takeover Code dealing disclosures,
+    # institutional-ownership pages, Chinese MarketBeat translations
+    - '[''’]s\s+strategic\s+(?:moves|reduction|exit|addition)\b|\bstrategic\s+moves:'
+    - '\ba\s+significant\s+(?:addition|exit|reduction|increase)\s+(?:to|by|in)\b'
+    - '\bimpacting\s+(?:the\s+)?portfolio\s+by\b|\b-?\d+(?:\.\d+)?%\s+(?:portfolio\s+)?impact\b'
+    - '\bform\s+8\.[35]\b'
+    - '\)\s*institutional\s+confidence\s*$|\binstitutional\s+investors\s+are\s+.{1,60}?\bbiggest\s+bettors\b'
+    - '(?:收購|增持|減持|出售|買入|售出)了?.{0,40}?的?\d[\d,]*股'
+  exclude:
+    # Form-4 / Form-144 insider trades and STOCK Act (congressional) trades are not 13F holdings
+    - '(?<![:$])\b(?-i:CEO|CFO|COO|CTO|CIO|CMO|CAO|CRO|CHRO|EVP|SVP)\b|\b(?:president|director|chairman|chairwoman|insider|officer|general\s+counsel|treasurer(?!\s+of\s+the\s+state)|secretary|controller|founder|co-founder|major\s+shareholder|10%\s+owner)\b'
+    # MarketBeat insider template "<Person> Sells 10,683 Shares of <Co> (NASDAQ:AKAM) Stock"
+    - '\bshares\s+of\s+.{2,90}?\)\s+stock\s*$'
+    - '\b(?:rep\.|representative|senator|sen\.|congress(?:man|woman|ional)|lawmaker|politician)\s'
+    - '\b(?:form\s+(?:4|144)|rule\s+144)\b'
+
+# --- PREREG §6.2: Form-4 insider auto-articles (title; kept as metadata, not used as text) ---------------
+form4:
+  include:
+    - '\b(?:form\s+4|form\s+144|rule\s+144)\b'
+    - '\binsider\s+(?:buying|selling|buy|sell|trading|transaction|purchase|sale)s?\s*:'
+    - '\binsiders?\s+(?:sold|bought|sells|buys|sell|buy|files\s+to\s+sell|to\s+sell)\b'
+    - '\binsider\s+(?:sold|bought)\s+shares\s+worth\b'
+    - '\b(?:sells|sold|buys|bought|acquires|purchases)\s+\d[\d,]*\s+shares\s+of\s+.{2,90}?\)\s+stock\s*$'
+    # role + trade: "Director Sells $15,630.78 in Stock", "CEO Sanjay Mehrotra Sells 7500 Shares"
+    - '(?:(?<![:$])\b(?-i:CEO|CFO|COO|CTO|CIO|CMO|CAO|CRO|CHRO|EVP|SVP|VP)\b|\b(?:president|director|chairman|chairwoman|chair|insider|officer|general\s+counsel|treasurer(?!\s+of\s+the\s+state)|secretary|controller|founder|co-founder|major\s+shareholder|10%\s+owner|executive\s+vice\s+president|senior\s+vice\s+president|vice\s+president)\b)[^!?]{0,60}?\b(?:sells|sold|buys|bought|acquires|acquired|purchases|purchased|disposes|disposed|unloads|unloaded|offloads|dumps|exercises|exercised|gifts|gifted|was\s+granted|granted|receives|awarded|trims)\b[^!?]{0,60}?\b(?:shares|stock|units|options|stake|worth)\b'
+
+# --- PREREG §6.4: after-the-fact / price-path and pre-market price talk (sentence level, title + snippet) --
+fragments:
+  # verbs and phrases that describe a price move
+  MOVE: '\b(?:rose|rises|rising|risen|fell|falls|falling|fallen|jump(?:s|ed|ing)?|slid(?:e|es|ing)?|climb(?:s|ed|ing)?|drop(?:s|ped|ping)?|surg(?:e|es|ed|ing)|plung(?:e|es|ed|ing)|soar(?:s|ed|ing)?|tumbl(?:e|es|ed|ing)|gain(?:s|ed|ing)?|lost|los(?:e|es|ing)|sank|sink(?:s|ing)?|rall(?:y|ies|ied|ying)|slump(?:s|ed|ing)?|spik(?:e|es|ed|ing)|declin(?:e|es|ed|ing)|advanc(?:es|ed|ing)(?!\s+(?:micro|auto|drainage|energy|info|materials))|retreat(?:s|ed|ing)?|rebound(?:s|ed|ing)?|pop(?:s|ped|ping)?|crater(?:s|ed|ing)?|skyrocket(?:s|ed|ing)?|plummet(?:s|ed|ing)?|dip(?:s|ped|ping)?|tank(?:s|ed|ing)?|slip(?:s|ped|ping)?|rocket(?:s|ed|ing)?|sag(?:s|ged|ging)?|slide|nosedive[sd]?|(?:edg|tick|inch|mov|trend|head)(?:e[sd]|ing)\s+(?:up|down|higher|lower)|shed(?:s|ding)?|(?:add|shed)(?:s|ed|ding|ing)?\s+[\d,.]+\s+points)'
+  # a stock or the market as grammatical subject (not "per share", "market share", "shares outstanding")
+  SUBJ: '(?<!market\s)(?<!per\s)(?<!-)\b(?:shares?|stocks?|equities|stock\s+price|share\s+price|the\s+dow|the\s+nasdaq|the\s+s&p(?:\s+500)?|wall\s+street)\b(?![-\s]+(?:outstanding|count|repurchases?|buybacks?|offering|sale|capital|issuance|split|options?|awards?|units|based|compensation|exchange|purchase\s+plan|holders?|of\s+(?:revenue|sales|profit|the\s+market|total)))'
+  UPDOWN: '(?:up|down|higher|lower|flat|unchanged|in\s+the\s+(?:red|green))'
+  # same-session time phrases that only occur in price talk
+  T_STRONG: '(?:\b(?:in|during)\s+(?:early|morning|mid-?morning|midday|mid-day|afternoon|late|late-?morning|early-?afternoon|intraday|intra-day|regular|today[''’]?s|the\s+day[''’]?s|(?:mon|tues|wednes|thurs|fri)day[''’]?s|thin|heavy|volatile|choppy|light|active|session[''’]?s|u\.?s\.?|new\s+york|wall\s+street)\s+(?:trading|trade|session|dealings|deals)\b|\b(?:in|during)\s+the\s+(?:trading\s+)?session\b|\b(?:intraday|intra-day|midday|mid-day)\b|\bat\s+the\s+(?:open(?:ing\s+bell)?|closing\s+bell|close\s+of\s+trading|bell)\b|\bat\s+last\s+check\b|\bso\s+far\s+(?:today|this\s+session|in\s+(?:the|today[''’]?s)\s+session)\b|\bon\s+the\s+day\b|\bsession\s+(?:high|low)s?\b|\b(?:last|recently)\s+(?:traded|trading|changed\s+hands)\b|\bin\s+(?:the\s+)?(?:first|last|opening|closing|final)\s+(?:hour|minutes|half[- ]hour)\s+of\s+trading\b|\bat\s+press\s+time\b)'
+  T_WEAK: '\b(?:today|this\s+morning|this\s+afternoon|tonight|on\s+(?:mon|tues|wednes|thurs|fri)day|(?:mon|tues|wednes|thurs|fri)day\s+(?:morning|afternoon))\b'
+  PCT: '\d+(?:[.,]\d+)?\s?(?:%|percent\b|per\s+cent\b|pct\b)'
+  PREMARKET: '\b(?:pre-?market|pre\s+market|premarket|before\s+the\s+(?:opening\s+)?bell|ahead\s+of\s+the\s+(?:opening\s+)?bell|extended[- ]hours?|extended\s+trading|after[- ]hours|afterhours|after\s+the\s+(?:closing\s+)?bell|post-?market|post\s+market|overnight\s+trading)\b'
+  PM_PRICE: '(?:{MOVE}|\b{UPDOWN}\b|[+\-−]\d+(?:[.,]\d+)?\s?%|\b(?:mov(?:er|ers|es|ing)|indicated|quoted|gainers?|losers?|futures|trading\s+(?:higher|lower|up|down|flat))\b)'
+  # words that make a "<word> <MOVE> <N>%" phrase a fundamental figure, not a price move
+  FUNDAMENTAL: '\b(?:revenues?|sales|earnings|eps|profits?|income|margins?|ebitda|ebit|orders|deliveries|shipments|volumes?|bookings|backlog|traffic|comparable|comps|same-store|subscribers|users|members|membership|production|output|costs?|expenses|spending|capex|debt|cash|deposits|loans|premiums|demand|inflation|cpi|ppi|gdp|unemployment|jobless|claims|payrolls|exports|imports|yields?|rates?|wages|dividends?|payout|guidance|outlook|forecasts?|estimates?|consensus|ffo|aum|assets|nav|growth|segment|units?|division|business|enrollment|occupancy|ridership|gmv|arr|headcount|employees|workforce|jobs|cases|prescriptions|reserves|inventor(?:y|ies)|stockpiles|confidence|pmi|ism|per|homes|starts|permits|tariffs?|taxes|fees|bills|rents?|prices|vehicles|short\s+interest|short\s+percent|float)\b'
+  # to the right of a percent: a comparison period, so the percent is a fundamental change
+  FUND_RIGHT: '\b(?:year[- ]over[- ]year|y/y|yoy|q/q|qoq|sequentially|(?:from|than|versus|vs\.?)\s+(?:a|the)\s+(?:year|quarter)\s+(?:earlier|ago|before)|(?:from|than|versus|vs\.?|over)\s+(?:the\s+)?(?:previous|prior|last|same)\s+(?:year|quarter|period|time)|a\s+year\s+(?:earlier|ago)|last\s+year)\b'
+
+after_fact:
+  # a stock / the market as subject followed (within 8 words, no clause break) by a move verb
+  - '{SUBJ}(?:\s+[^\s.,;:!?]+){0,8}?\s+{MOVE}\b'
+  # ... or by up/down: adjacent ("Stock Up on ...", "shares were higher") or after "of <name> <copula>"
+  - '{SUBJ}\s+(?:(?:is|was|are|were|been|has\s+been|have\s+been|is\s+trading|was\s+trading|are\s+trading|were\s+trading|traded|trading|ended|closed|opened|finished|moved|moving|headed|heading)\s+)?{UPDOWN}\b'
+  - '{SUBJ}\s+of\s+(?:[^\s.,;:!?]+\s+){1,6}?(?:is|was|are|were|traded|trading|ended|closed|opened|finished)\s+{UPDOWN}\b'
+  # any move together with a same-session time phrase (a list = every pattern must match the sentence)
+  - ['(?:{MOVE}|\b{UPDOWN}\b|\bmixed\b)', '{T_STRONG}']
+  # closed / opened / ended up or down, or at a price
+  - '\b(?:closed|closes|closing|close)\s+(?:the\s+(?:day|session|week)\s+)?(?:(?:up|down)\s+(?:[+\-−$]?\d|by\b|on\b|for\s+the\b|slightly|sharply|modestly|fractionally|marginally)|(?:up|down)\s*[.,;]|higher|lower|flat|unchanged|at\s+\$\d|at\s+(?:a|an|its|their)\s+(?:record|new|all-time|\d+-(?:day|week|month|year))\b)'
+  - '\b(?:opened|opens|opening)\s+(?:the\s+(?:day|session)\s+)?(?:higher|lower|flat|unchanged|at\s+\$\d|up\s+\d|down\s+\d)'
+  - '\b(?:ended|finished|settled)\s+(?:the\s+(?:day|session|week)\s+)?(?:higher|lower|flat|unchanged|up\s+\d|down\s+\d)'
+  - '\b(?:closed|ended|finished|settled)\s+(?:the\s+(?:day|session|week)\s+)?{PCT}\s+(?:higher|lower|up|down)\b'
+  - '\b(?:trad(?:ing|ed|es)|chang(?:ed|ing)\s+hands|quoted)\s+(?:at|near|around)\s+\$\d'
+  - '{SUBJ}(?:\s+[^\s.,;:!?]+){0,6}?\s+(?:up|down|higher|lower|off)\s+(?:by\s+)?(?:nearly\s+|about\s+|almost\s+|more\s+than\s+)?{PCT}'
+  - '{SUBJ}(?:\s+[^\s.,;:!?]+){0,6}?\s+{PCT}\s+(?:higher|lower|up|down)\b'
+  - '{SUBJ}(?:\s+[^\s.,;:!?]+){0,4}?\s+(?:hits?|hitting|reach(?:es|ed|ing)?|touch(?:es|ed|ing)?)\s+\$\d'
+  - '\bas\s+of\s+\d{1,2}:\d{2}\b'
+  - '\b(?:stock|shares?)\s+(?:is|was|are|were)\s+(?:up|down)\s+\d'
+  - '\btrad(?:ing|ed|es)\s+(?:sharply\s+|slightly\s+|modestly\s+|significantly\s+)?(?:higher|lower|up|down|flat|in\s+the\s+(?:red|green))\b'
+  - '\b(?:gaps?|gapped)\s+(?:up|down)\b'
+  - '\b(?:crosses|crossed|passes|passed|breaks|broke|moves|moved|falls|fell|rises|rose|trades|traded|dips|dipped)\s+(?:above|below)\s+(?:its\s+)?(?:\d+|fifty|two\s+hundred|one\s+hundred)[- ](?:day|week)\s+moving\s+average'
+  - '\b(?:hits?|hitting|reach(?:es|ed|ing)?|touch(?:es|ed|ing)?|sets?|setting|notch(?:es|ed)?|mark(?:s|ed)?|new)\s+(?:a\s+)?(?:new\s+)?(?:52-week|12-month|one-year|1-year|all-time|record|multi-year)\s+(?:high|low)\b'
+  - '\b(?:up|down)\s+{PCT}\s+(?:since|so\s+far|year[- ]to[- ]date|ytd|this\s+(?:year|week|month)|in\s+(?:the\s+)?(?:past|last)|over\s+the\s+(?:past|last))'
+
+# "<word> <MOVE> <N>%" / "<word> was off 2%" with no fundamental noun among the six preceding words, and
+# "a 15% jump" with no fundamental noun among the six preceding or four following words (news.detect)
+pct_noun: '{PCT}\s+(?:jump|drop|gain|rise|fall|decline|surge|plunge|slide|rally|move|loss|pop|spike|slump|sell-?off|tumble|climb|advance|rebound|retreat|dip|slip)s?\b'
+pct_move: '(?:\b{MOVE}|\b(?:up|down|off|higher|lower))\s+(?:by\s+)?(?:as\s+much\s+as\s+|nearly\s+|about\s+|around\s+|almost\s+|more\s+than\s+|over\s+|roughly\s+|some\s+|up\s+to\s+)?{PCT}'
+
+# share-price levels removed by scrub() (PREREG §6.3); price targets and per-share fundamentals stay
+price_level:
+  - '\$\d[\d,]*(?:\.\d+)?\s*(?:a|per|/)\s*share\b'
+  - '\b(?:trading|trades|traded|trade|changing\s+hands|changed\s+hands|priced|closed|closing|opened|opening|ended|finished|settled|last|hit|hitting|reached|reaching|touched|fell\s+to|rose\s+to|dropped\s+to|climbed\s+to|jumped\s+to|slid\s+to|sank\s+to|surged\s+to|soared\s+to|plunged\s+to|share\s+price\s+of|stock\s+price\s+of|shares\s+at|stock\s+at|(?:52-week|all-time|record|year-to-date|intraday|session)\s+(?:high|low))(?:\s+(?:at|near|around|about|of))?\s+\$\d[\d,]*(?:\.\d+)?'
+price_level_keep: '\b(?:eps|earnings|profit|loss|income|dividends?|payout|distribution|ffo|affo|offer(?:ed|ing)?|deal|acquir\w*|acquisition|buyout|tender|bid|merger|consideration|cash|valu(?:e|ed|es|ing)|exercise|strike|conversion|ipo|target|guidance|forecast|estimate|consensus|book\s+value|per-share)\b'
+
+# --- non-English hint (newsaction.news.detect.non_english_hint): the detectors and NA-04 masking are English-only.
+# A text is flagged when it contains a CJK / Hangul / Cyrillic / Arabic / Thai character or at least two of
+# these function words, none of which is also common English or part of a URL ("per", "die", "le", "com").
+non_english:
+  script: '[぀-ヿ一-鿿가-힯Ѐ-ӿ؀-ۿ฀-๿]'
+  words: '\b(?:der|das|und|mit|für|auf|ist|aktie|aktien|les|une|pour|sur|dans|avec|los|las(?!\s+vegas)|del|por|para|acciones|bolsa|della|delle|che|sono|het|een|voor|naar|zijn|och|för|için|ações|não|uma)\b'
+  min_words: 2

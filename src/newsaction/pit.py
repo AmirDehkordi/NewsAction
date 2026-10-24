@@ -3,6 +3,10 @@
 ``configs/availability.yaml`` declares, for every column a state or model may consume, the kind of
 information it is. ``check_inputs`` refuses unknown columns and columns not yet known at the
 decision point; ``assert_visible`` checks row-level timestamps against the decision instant.
+
+``selection_only`` (NA-02) marks vendor labels produced retrospectively (tags, sentiment, summaries,
+event clusters; CLAUDE.md A6): they may select news but are visible at no decision point, so a state
+builder that passes one to ``check_inputs`` fails like it would for ``post``.
 """
 
 from __future__ import annotations
@@ -17,7 +21,7 @@ import pandas as pd
 from newsaction.config import load_yaml
 from newsaction.paths import CONFIGS
 
-Kind = Literal["static", "t_minus_1", "w0", "d1", "w2", "d2_reaction", "post"]
+Kind = Literal["static", "t_minus_1", "w0", "d1", "w2", "d2_reaction", "post", "selection_only"]
 DecisionPoint = Literal["D0", "D1", "D2"]
 KINDS: Final[frozenset[str]] = frozenset(get_args(Kind))
 

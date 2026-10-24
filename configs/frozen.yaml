@@ -1,7 +1,12 @@
 # Selections recorded by the protocol (docs/PREREG.md). Each section is filled by the chunk that owns it.
 # This file is hash-locked by newsaction.lock.freeze() in NA-11 (PREREG §4.4).
 
-news: null          # NA-02: parsing_allowed == None policy and text variant
+news:                # NA-02 (PRD S10): leakage audit, PREREG §6.4; §6.1 None policy
+  summary_variant_allowed: true
+  excluded_sources: []
+  leakage_audit_sha: cb82051db14c4dfd5835de3dd10bce7a239fefe7223e946ab6b06c2d699eac19
+  leakage_audit_file: artifacts/NA-02/leakage_ic.csv
+  parsing_allowed_none: pending_operator
 filter: null        # NA-03: chosen filter and threshold (PREREG §6.8)
 encoding: null      # NA-07: encoding and calls_per_event (PREREG §8.4)
 anchoring: null     # NA-07: anchoring verdict (PREREG §8.4)

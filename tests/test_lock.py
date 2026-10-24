@@ -149,7 +149,8 @@ def test_unblind_fails_after_one_character_edit_of_frozen_yaml(
     monkeypatch.setenv("NA_UNBLIND", "1")
     lock.require_unblind(frozen_layout)
     p = frozen_layout.configs / "frozen.yaml"
-    p.write_text(p.read_text(encoding="utf-8").replace("news: null", "news: nulL"), encoding="utf-8")
+    # one appended character: independent of which sections later chunks have filled
+    p.write_text(p.read_text(encoding="utf-8") + " ", encoding="utf-8")
     with pytest.raises(LockError, match=r"hash mismatch.*configs/frozen.yaml"):
         lock.require_unblind(frozen_layout)
     with pytest.raises(LockError):
