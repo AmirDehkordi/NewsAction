@@ -22,7 +22,12 @@ This program asks whether **decision models** can turn that into calibrated, loo
 
 Paper framing:
 - **AI-first:** the first use of decision models in asset pricing, plus a contamination-robust evaluation protocol and a trained, calibrated finance decision model (Laya-Fin).
-- **Finance evidence:** "explained moves persist, unexplained moves reverse"; the value of news vs. price information; size tiers.
+- **Finance evidence:**
+  - do prices **converge to the decision model's valuation of the news** (from the open to t+20), and is the price–value gap tradeable;
+  - "explained moves persist, unexplained moves reverse";
+  - how much of each stock's move its news can explain (Kelly–Su–Zhang's question at the firm level);
+  - the value of news vs. price information;
+  - size tiers.
 
 ## Execution order and budgets
 
@@ -61,7 +66,7 @@ LLM run and NA-11 use val-B after that; NA-08 and NA-09 produce val-B prediction
 ## Conventions shared by every chunk
 
 - **Repository:** `/Users/amir/Research/NewsAction` (git, created in NA-00). Branch `feat/NA-xx-<slug>` cut from `main`. Conventional Commits (`feat(NA-03): …`). Commit on the branch; **never merge yourself**.
-- **Read first, every chunk:** `CLAUDE.md`; the PREREG sections listed in the prompt; `docs/DATA_CONTRACT.md`; and the REPORT of each dependency (`artifacts/NA-yy/REPORT.md`).
+- **Read first, every chunk:** `CLAUDE.md`; the PREREG sections listed in the prompt; **PREREG §15 in full**, which holds the operative amendments (currently **A1** convergence to the news-implied value — NA-01, 03, 10, 11, 12, 13, 14; **A2** question battery v2 — NA-03, 04, 05, 06, 11, 12; **A3** explaining realized moves, Kelly–Su–Zhang style — NA-02, 04, 08, 11, 12, 14); `docs/DATA_CONTRACT.md`; and the REPORT of each dependency (`artifacts/NA-yy/REPORT.md`).
 - **Outputs:**
   - Every derived file is written with `newsaction.io.write_parquet` (sha256 in `work/MANIFEST.json`) and gets a `docs/DATA_CONTRACT.md` entry: path, producer, schema, key, availability semantics, sha256.
   - Every chunk writes `artifacts/NA-xx/REPORT.md` and `docs/decisions/NA-xx.md`.
@@ -354,6 +359,7 @@ point-in-time panel. 2026 outcomes are SEALED: no statistic, print or plot of an
 Read first:
   - CLAUDE.md (rules A, B, E especially)
   - docs/PREREG.md §3 (universe, tiers), §4 (splits, purge, blinding), §5 (prices, returns, σ, targets, placebo)
+  - docs/PREREG.md §15 Amendment A1 — you build the convergence-ladder targets of A1.2 (CAR^lvl rungs, E5^lvl)
   - docs/DATA_CONTRACT.md and artifacts/NA-00/REPORT.md
   - src/newsaction/{calendar,lock,io,pit,ledger}.py (use them; do not re-implement)
   - ATOM (read-only): packages/atom_research/src/atom_research/accessors.py:285 (get_prices_eod_by_id), :636
@@ -420,8 +426,10 @@ S5. COMPANIES + TIERS — panel/tiers.py: group symbols by CIK into companies; r
 
 S6. TARGETS + REACTIONS (code that NA-11/NA-12 will reuse, hashed at the freeze):
     - panel/targets.py: build_targets(panel, period) computes PREREG §5.6 targets (z_on, z_cc, z_id, AR(O_t→C_{t+k})
-      for k∈{1,5}, AR(O_{t+1}→C_{t+k}) for k∈{1,5,20}, AR(C_t→O_{t+1}), e5, material-label inputs) with purge
-      (§4.1: horizon must end inside the split; else NaN). For any session ≥ 2026-01-02 it must obtain prices ONLY
+      for k∈{1,5}, AR(O_{t+1}→C_{t+k}) for k∈{1,5,20}, AR(C_t→O_{t+1}), e5, the CONVERGENCE LADDER (PREREG A1.2) CAR^lvl_h from
+      the previous close in level units (÷ σ_cc,t, no √h) for h ∈ {O_t, C_t, C_{t+1}, C_{t+2}, C_{t+5}, C_{t+10},
+      C_{t+20}} (+ C_{t+60} exploratory) and E5^lvl, material-label inputs) with purge (§4.1: horizon must end
+      inside the split; else NaN). Clean-window flags need events (added in NA-03); the 10:00 rung comes in NA-10. For any session ≥ 2026-01-02 it must obtain prices ONLY
       via lock.sealed_path(..., "targets") (which raises before unblinding).
     - panel/reactions.py: build_reactions(panel, period, point) computes G for D2 (z_cc,t) and the inputs D1 needs
       later (left as a stub raising NotImplementedError until NA-10 adds bars); for 2026 it must go through
@@ -460,6 +468,9 @@ S8. QC REPORT — artifacts/NA-01/REPORT.md: companies per session (min/median/m
 - AC8 — SEALING: panel_public has no session ≥ 2026-01-02; panel_test_inputs has only columns registered as
   static or t_minus_1 (schema test against configs/availability.yaml); build_targets(…, "test") and
   build_reactions(…, "test", "D2") raise LockError and log refused attempts.
+- AC9 — CONVERGENCE LADDER: for 20 random public events, CAR^lvl at C_{t+5} equals Σ_{j=0..5} AR_cc,t+j / σ_cc,t
+  and CAR^lvl at O_t equals AR_on,t / σ_cc,t (tolerance 1e-9); the C_{t+20} rung is NaN whenever t+20 crosses the
+  split end (purge).
 
 ## Constraints
 
@@ -493,6 +504,9 @@ broken by splits (shares_basic is not split-adjusted), (iv) 2026 prices leaking 
    with numpy OLS and σ_cc from the 126 prior AR_cc; compare (tolerance 1e-6).
 5. GOLDEN CASES: GE 2024-04-02 r_on; NVDA/CMG/AVGO/WMT tiers around their splits; WBA/COIN/HOOD membership dates;
    companies-per-session range. Report the numbers.
+5b. CONVERGENCE LADDER (A1.2, AC9): for 5 random public events recompute CAR^lvl at O_t, C_t, C_{t+5} and C_{t+20}
+   from the AR columns and σ_cc,t by hand; confirm the C_{t+20} rung is NaN for an event within 20 sessions of a
+   split end.
 6. MUTATIONS (restore each): (a) remove the t−1 shift in risk.py; (b) remove split adjustment of shares in
    tiers.py; (c) make build_targets skip the lock for 2026. Run `make test`; each must turn RED.
 7. SANITY: median R² band (AC7) recomputed independently on 50 random companies.
@@ -500,7 +514,7 @@ broken by splits (shares_basic is not split-adjusted), (iv) 2026 prices leaking 
    silently "fixed" genuine move.
 9. GAC1–GAC5.
 
-Verdict: PASS / FAIL per AC1–AC8 and GAC with numbers.
+Verdict: PASS / FAIL per AC1–AC9 and GAC with numbers.
 ```
 
 **New tests to add:**
@@ -650,6 +664,10 @@ S13. RE-DERIVED DIAGNOSTICS (PREREG §14) — artifacts/NA-02/rederived_diagnost
      PREREG timing rules: overnight vs intraday variance shares by news status; vendor-sentiment IC on z_on, z_id,
      next-day and 5-day; continuation after |z_on| > 2 by tag. These are the versions the paper may cite.
 
+S14. MARKET NEWS (PREREG A3.5, optional) — keep the cleaned, scrubbed market-index articles that S2 drops from the
+     company set (tickers ^GSPC, ^VIX, DX-Y.NYB) with t_avail and session_w2 in work/news/market_articles.parquet (no
+     company mapping; same third_party_ok rule).
+
 ## Acceptance criteria
 
 - AC1 — TIMESTAMP RULES: (a) a date-only fixture stamped 2025-03-10 00:00:00Z becomes available 2025-03-10
@@ -758,7 +776,7 @@ pre-registered rule, freeze the choice, and build events for all periods. Labels
 
 Read first:
   - CLAUDE.md; docs/PREREG.md §4 (splits/purge), §5.4–5.6 (z, targets), §6.6–6.9 (filters, label, protocol, rule,
-    events), §13 (budget)
+    events), §13 (budget), §15 Amendment A1.2 (convergence clean-window flags you add to events)
   - docs/DATA_CONTRACT.md; artifacts/NA-02/REPORT.md; work/news/articles_clean.parquet; work/news/
     embeddings_ts.parquet; work/news/coverage_member_month.parquet; work/panel/panel_public.parquet
 Branch: feat/NA-03-filters.
@@ -792,12 +810,15 @@ S5. EVENTS — events/aggregate.py with the FROZEN filter for ALL periods (robus
     D0 events (W0) and D2 events (W2) per company×session: up to 6 representative articles ordered by score then
     t_avail; exclude third_party_ok=False from the article list but count them; news token count with the
     answerdotai/ModernBERT-large tokenizer (events/tokens.py; cap 600 tokens by dropping lowest-score articles,
-    then truncating the last snippet); attention features (articles, distinct stories, dup counts). Write
+    then truncating the last snippet); attention features (articles, distinct stories, dup counts); and the
+    convergence clean-window flags clean_h for h ∈ {1, 2, 5, 10, 20} sessions = no other D2 event for the same
+    company in sessions (t, t+h] (PREREG A1.2; built from events only — no returns, so allowed for test). Write
     work/events/events_d0.parquet and events_d2.parquet (event_id = f"{window}:{company_id}:{session}").
 
 S6. PROJECTIONS — artifacts/NA-03/call_projection.csv: events per split × tier × window; projected calls for the
     NA-11 production plan (Call A on D0 + Call B on D2 [+ D1 if bars]) for val-A+val-B+test; estimated tokens per call
-    = news tokens + 250 context + question tokens (measured from configs later; use 350 now); cost at $0.01, $0.02,
+    = news tokens + 250 context + question tokens (measured from configs later; use 350 for the core battery and
+    +600 for the extended battery of PREREG A2, which only the primary API instrument gets); cost at $0.01, $0.02,
     $0.042, $0.10, $0.24 per M. Flag if the $0.042 projection exceeds the NA-11 cap.
 
 ## Acceptance criteria
@@ -815,6 +836,9 @@ S6. PROJECTIONS — artifacts/NA-03/call_projection.csv: events per split × tie
   list; event_id unique.
 - AC6 — PROJECTION: call_projection.csv present; the REPORT states whether NA-11 fits its cap at $0.042/M and at
   $0.10/M.
+- AC7 — CLEAN-WINDOW FLAGS (A1.2): clean_h exists for h ∈ {1, 2, 5, 10, 20} on every D0 and D2 event; a test plants a
+  second D2 event for the same company 3 sessions later → clean_1 and clean_2 True, clean_5/10/20 False; the flag
+  code reads events only (no returns, no panel targets).
 
 ## Constraints
 
@@ -835,12 +859,14 @@ Independent verifier for NA-03 (branch feat/NA-03-filters). READ-ONLY; restore m
 4. RULE: recompute the rule from filter_comparison.csv yourself (PREREG §6.8 text) and compare with frozen.yaml.
 5. EVENTS: sample 20 test-period events; confirm ≤ 6 articles, ≤ 600 tokens (re-tokenize), all articles
    third_party_ok, all articles within the event's window (t_avail inside W0/W2 by newsaction.calendar).
+5b. CLEAN FLAGS (A1.2, AC7): for 10 random events recompute clean_h from events_d2 by hand (next D2 event of the same
+   company vs t+h); confirm the flag module imports nothing from panel/targets.
 6. LEDGERS: test_access.jsonl has no NA-03 entries; trials.jsonl has the grid points.
 7. MUTATIONS: (a) change the material label to |z_cc,t| ≥ 2 only (same-day) → delayed recall table changes and a
    test asserting the label definition turns RED; (b) let F6 fit on data through 2025-06 → the date test RED.
 8. GAC1–GAC5.
 
-Verdict: PASS / FAIL per AC1–AC6 and GAC with numbers (selection shares, recalls, chosen filter).
+Verdict: PASS / FAIL per AC1–AC7 and GAC with numbers (selection shares, recalls, chosen filter).
 ```
 
 **New tests to add:** `test_events_labels.py`, `test_events_dates.py`, `test_events_rule.py`, `test_events_constraints.py`, `test_events_no_test_outcomes.py`.
@@ -891,7 +917,8 @@ states and only for train/val now (2026 Call B states are built after the NA-11 
 
 Read first:
   - CLAUDE.md (A4, A5, A6, B9, D15); docs/PREREG.md §2.5 (decision points), §6.3 (masking), §6.9–6.11 (events,
-    state content, codebook), §7 (questions, derived quantities), §8.4 (encodings)
+    state content, codebook), §7 (questions, derived quantities), §8.4 (encodings), §15 Amendments A2 (question
+    battery v2: core / extended / explain groups) and A3.1, A3.5 (D2 news-only states; optional market states)
   - docs/DATA_CONTRACT.md; artifacts/NA-03/REPORT.md; work/events/events_{d0,d2}.parquet; work/news/
     articles_clean.parquet; work/panel/{panel_public,panel_test_inputs}.parquet; work/market/*.parquet;
     work/snapshot/{symbols,gics,estimates_fy1}.parquet
@@ -925,7 +952,8 @@ S3. MASKING — states/mask.py: per-company alias set = ATOM name with legal suf
 S4. QUESTIONS — states/questions.py + configs/questions_v1.yaml with EXACT text from PREREG §7: Call A {Q1
     justified_move (score, 9 levels with the level wording), Q2 materiality (choice, 2 neutral keys), Q3 surprise
     (score 5), Q4 tone (score 5)}; Call B adds the reaction block and asks {Q1, Q5 reaction_adequacy (choice 6),
-    Q6 continuation (choice 3)}. No noul anywhere. Instructions reference state fields in backticks (e.g.
+    Q6 continuation (choice 3)}. No noul anywhere. Add the PREREG A2 groups with EXACT text from A2.2–A2.3: `extended` (Q7–Q15, Call A) and
+    `explain` (Q16–Q17, Call B); the loader returns any combination of the groups {core, extended, explain}. Instructions reference state fields in backticks (e.g.
     `news`, `reaction_so_far`). Self-check: no option text may encode empirical findings (e.g. "legal news tends to
     continue") — list the check in the REPORT. Compute sha256 of the YAML → configs/frozen.yaml questions_v1_sha256.
 
@@ -935,6 +963,9 @@ S5. BUILD — states/build.py: canonical JSON (sorted keys, compact separators, 
     encoding parameter. check_inputs(columns, decision_point) is called for every field (raise on violation).
     Build:
       - callA_d0_E3 for robustness, train, val-A, val-B, test (test allowed: inputs only);
+      - callA_d2_E3 = news-only states on W2 news (PREREG A3.1) for robustness, train, val-A, val-B, test (inputs
+        only; when W2 adds no news to W0 the state is identical and shares the hash, so it costs nothing extra);
+      - (optional, PREREG A3.5) market_E3: one state per session from work/news/market_articles.parquet;
       - callB_d2_E3 for train, val-A, val-B (reaction_so_far = D2 reaction from panel_public: z_cc,t words + SPY
         same-day move + volume vs normal); NOT for test;
       - samples for NA-07: 1,500 val-A + 1,500 val-B D0 events (stratified tier×month, seed 2026) in E0–E4; and an
@@ -961,8 +992,8 @@ S7. LEAK SCAN — artifacts/NA-04/leak_scan.csv: residual name/ticker/date/year 
 - AC5 — TOKENS: p95(state, Call A, E3) ≤ 900 and p95(state + longest question) ≤ 1,024 (else documented
   tightening applied).
 - AC6 — NO 2026 CALL B: no callB file contains split == "test"; ledgers/test_access.jsonl has no NA-04 entries.
-- AC7 — QUESTIONS FROZEN: questions_v1.yaml text equals PREREG §7 (test compares key strings); sha256 recorded;
-  no noul type present.
+- AC7 — QUESTIONS FROZEN: questions_v1.yaml text equals PREREG §7 (group core) and A2.2–A2.3 (groups extended,
+  explain) — the test compares key strings for every group; sha256 recorded; no noul type present.
 
 ## Constraints
 
@@ -1063,7 +1094,7 @@ You are implementing NA-05 for /Users/amir/Research/NewsAction: the single sanct
 
 Read first:
   - CLAUDE.md (C12–C14, D15–D16, B8); docs/PREREG.md §7 (questions, derived quantities), §8.1 (eligibility),
-    §13 (budget + STOP)
+    §13 (budget + STOP), §15 A2 (extended battery; A2.6 cutting order)
   - docs/DATA_CONTRACT.md; artifacts/NA-04/REPORT.md; configs/questions_v1.yaml; work/states/*.parquet
   - src/newsaction/{ledger,lock,io}.py
   - API reference: https://github.com/OpenRouterTeam/skills/blob/main/skills/openrouter-decisions/references/decisions-api.md
@@ -1109,13 +1140,14 @@ S7. CANARY — dm/canary.py: 50 fixed states (30 train-period masked states + 20
 
 S8. PILOT (≤ $0.20 total; models: typesafe/jev-1.14, openai/gpt-6-luna-decisions, inception/mercury-decide,
     liquid/d1, perplexity/pplx-decider-v1.2 + local Laya). Answer with numbers in artifacts/NA-05/pilot.json:
-    1 billing basis: the same state with 1, 2 and 4 questions → input_tokens and cost (is state billed once?);
+    1 billing basis: the same state with 1, 2 and 4 questions and with the full core + extended battery (PREREG
+      A2) → input_tokens and cost (is state billed once?);
     2 usage.cost vs catalog price × input_tokens (ratio); are failed calls billed?;
     3 truncation: a sentinel sentence at the END of 2K/4K/8K-token synthetic states + a 2-option question "does the
       text mention <sentinel>?" → detected?;
     4 repeat variance: 20 states × 5 repeats (repeat_idx in the cache key) → mean/max |Δp|; does any `seed`
       parameter change it?;
-    5 question interaction: Q1 alone vs Q1 within the full battery → mean |ΔN̂|;
+    5 question interaction: Q1 alone vs Q1 within the core battery vs within core + extended (A2) → mean |ΔN̂|;
     6 latency p50/p95 and errors at concurrency 1/4/8/16 (≤ 40 calls each); observed rate-limit headers;
     7 response format: probabilities sum, legend present, score position consistent with probabilities;
     8 numeracy/anchoring (synthetic): fixed news; reaction words for 7 magnitudes × 2 directions in Call B → is
@@ -1207,7 +1239,8 @@ You are implementing NA-06 for /Users/amir/Research/NewsAction: the zero-shot to
 val-A only, with contamination probes, exactly per PREREG §8.2–8.3. Spend cap: $4.00 (hard; dry-run first).
 
 Read first:
-  - CLAUDE.md (B9, B10, C12–C14); docs/PREREG.md §7 (derived quantities), §8.1–8.3, §11.1, §11.4
+  - CLAUDE.md (B9, B10, C12–C14); docs/PREREG.md §7 (derived quantities), §8.1–8.3, §11.1, §11.4, §15 A2.5
+    (reading validity — report only)
   - docs/DATA_CONTRACT.md; artifacts/NA-05/{REPORT.md,pilot.json,catalog.json}; configs/frozen.yaml
     (eligible_models); work/states/callA_d0_E3.parquet, callB_d2_E3.parquet, samples/unmasked.parquet;
     work/events/*.parquet; work/panel/panel_public.parquet (val-A targets)
@@ -1241,6 +1274,9 @@ S4. PROBES (stage-2 models) — tournament/probes.py + edits.py:
     d. masked vs unmasked: paired IC on the 1,000 twins;
     e. shuffled news: Call A states with the `news` block replaced by another random val-A event's news →
        mean daily IC with Newey–West t.
+    f. reading validity (PREREG A2.5; REPORT ONLY, never a screen): the top stage-2 model answers the extended
+       battery on 500 stage-2 events → agreement of event_type with the vendor tag, quantified with tag_quantified,
+       scheduled with the earnings calendar, credibility = rumor with tag_rumor (confusion tables).
     Apply PREREG §8.3 screens mechanically (company-ID ≤ 0.40; flip ≥ 0.70; unmasked − masked ≤ 0.02 or paired
     |t| < 2; shuffled-news |t| < 2).
 
@@ -1444,7 +1480,7 @@ Read first:
   - CLAUDE.md (D15–D16, B9); docs/PREREG.md §4 (splits/purge), §5.6 (targets), §7 (questions), §9 (trained models),
     §11.2 (calibration metrics)
   - docs/DATA_CONTRACT.md; artifacts/NA-03/REPORT.md, artifacts/NA-04/REPORT.md, (if present) artifacts/NA-07/REPORT.md
-  - work/states/{callA_d0_E3,callB_d2_E3}.parquet; work/events/*.parquet; work/panel/panel_public.parquet
+  - work/states/{callA_d0_E3,callA_d2_E3,callB_d2_E3}.parquet; work/events/*.parquet; work/panel/panel_public.parquet
   - The official notebook (fetch and READ it before writing ours):
     https://github.com/NandhaKishorM/laya/blob/main/notebooks/laya_finetune_typed_decisions_2xT4_kaggle.ipynb
     and https://huggingface.co/convaiinnovations/laya (README: fine-tuning, calibration, noul caveat, act_probability)
@@ -1463,8 +1499,9 @@ S2. EXPORT — train/kaggle_export.py → work/kaggle/dataset/: examples as (exa
     relative to the market and its sector be today?" — add this as an internal training question documented in the
     model card, NOT used for API models), cont (Q6 wording)}; BLOCK DROPOUT: for Call B train examples also emit a
     copy with `reaction_so_far` removed (p = 0.3 sampling at export, seeded) so the model serves Call A too;
-    labels ONLY for train and val-A; val-B = Call A and Call B states with NO label column; test = Call A D0
-    states ONLY, NO label column. dataset-metadata.json with "isPrivate": true. Only third_party_ok states. Write a
+    Call A examples include D0 (W0) and D2 (W2, PREREG A3.1) news-only states (same react label e5); labels ONLY
+    for train and val-A; val-B = Call A and Call B states with NO label column; test = Call A states (D0 and D2)
+    ONLY, NO label column. dataset-metadata.json with "isPrivate": true. Only third_party_ok states. Write a
     sha256 manifest; a schema test asserts the val-B and test files lack any label column.
 
 S3. NOTEBOOK — src/newsaction/train/notebook/newsaction_laya_fin.ipynb adapted from the official one:
@@ -1698,7 +1735,8 @@ You are implementing NA-10 for /Users/amir/Research/NewsAction: 30-min bars with
 are never read in this chunk.
 
 Read first:
-  - CLAUDE.md (E18, B8); docs/PREREG.md §2.5 (D1), §5.4–5.6 (σ, G, targets)
+  - CLAUDE.md (E18, B8); docs/PREREG.md §2.5 (D1), §5.4–5.6 (σ, G, targets), §15 Amendment A1.2 (the 10:00 rung
+    of the convergence ladder and G^lvl)
   - /Users/amir/GitHub/Atom/docs/runbooks/fmp_intraday_capability.md and .json (measured vendor facts — read-only)
   - artifacts/NA-01/REPORT.md; work/panel/companies.parquet; work/snapshot/prices_raw.parquet; src/newsaction/
     {calendar,lock,ledger,io}.py; src/newsaction/states/build.py
@@ -1728,8 +1766,9 @@ S4. BASIS — bars/basis.py: if nonadjusted is honoured use as-traded levels; el
 S5. DERIVE (public) — bars/derive.py → work/panel/intraday_public.parquet: P_10:00 (close of the 09:30 bar), P_15:30
     (close of the 15:00 bar), P_pre (close of the 09:00 bar, only if extended bars exist), with the official open/close
     from EOD; AR(close_prev → 10:00) with the same β (t−1) and leave-one-out sector built from the same bars;
-    σ_30 (MAD of first-30-min ARs over 126 sessions ending t−1) and σ_rest (10:00→close); G_D1 per PREREG §5.5;
-    y1 targets for public sessions. Half days: 7 bars (09:30..12:30); handle.
+    σ_30 (MAD of first-30-min ARs over 126 sessions ending t−1) and σ_rest (10:00→close); G_D1 per PREREG §5.5 and
+    its level version G^lvl (÷ σ_cc); the 10:00 rung of the convergence ladder (CAR^lvl at 10:00); y1 targets for
+    public sessions. Half days: 7 bars (09:30..12:30); handle.
 
 S6. REACTIONS + STATES — extend panel/reactions.py with the D1 path (public: from intraday_public; 2026: via
     lock.sealed_path("bars30_2026","reactions") → raises before the freeze); extend states/build.py to produce
@@ -1746,6 +1785,8 @@ S6. REACTIONS + STATES — extend panel/reactions.py with the D1 path (public: f
 - AC4 — D1 STATES: callB_d1_E3 exists for train/val with p95 tokens ≤ 900; check_inputs passes for D1 and fails if a
   post-10:00 field is injected.
 - AC5 — ATOM UNTOUCHED: no ATOM access in this chunk (grep) — reconciliation uses the NA-01 snapshot.
+- AC6 — 10:00 RUNG (A1.2): intraday_public carries CAR^lvl at 10:00 and G^lvl for public D1 events; a test
+  recomputes both for 10 events from bars, β (t−1) and σ_cc,t (tolerance 1e-9); 2026 values do not exist yet.
 
 ## Constraints
 
@@ -1762,12 +1803,13 @@ Independent verifier for NA-10 (branch feat/NA-10-bars30). READ-ONLY; no FMP cal
 2. LEDGER: count ledgers/fmp_requests.jsonl rows (≤ 3,000); sum of rows returned vs parquet row counts.
 3. RECONCILE: for 20 random member-sessions recompute first-bar open vs EOD raw open (bp) and the bar count.
 4. SPLITS: inspect NVDA 2024-06-07/2024-06-10 bars: levels on one basis consistent with EOD.
+4b. 10:00 RUNG (A1.2, AC6): recompute CAR^lvl at 10:00 and G^lvl for 5 public events by hand.
 5. SEALING: max session in bars_public.parquet and intraday_public.parquet ≤ 2025-12-31; sealed file not opened
    by any src/ module except lock.py (grep).
 6. MUTATION: remove the FmpLedger cap check → test RED.
 7. GAC1–GAC5.
 
-Verdict: PASS / FAIL per AC1–AC5 and GAC with request count and reconciliation rates.
+Verdict: PASS / FAIL per AC1–AC6 and GAC with request count and reconciliation rates.
 ```
 
 **New tests to add:** `test_bars_cap.py`, `test_bars_basis.py`, `test_bars_counts.py`, `test_reactions_d1_sealed.py`, `test_states_d1_pit.py`.
@@ -1816,7 +1858,8 @@ You are implementing NA-11 for /Users/amir/Research/NewsAction: analysis spec �
 → production → ablations. The ORDER is mandatory and audited. Spend cap $18 for this chunk; $30 total.
 
 Read first:
-  - CLAUDE.md (all of B and C); docs/PREREG.md entirely (you implement §1, §8.5, §11 in code and freeze the rest)
+  - CLAUDE.md (all of B and C); docs/PREREG.md entirely, INCLUDING §15 Amendments A1–A3 (you implement §1, §8.5,
+    §11, A1.3–A1.6, A2.4–A2.6 and A3.2–A3.5 in code and freeze the rest)
   - artifacts/NA-03..NA-10 REPORTs; configs/frozen.yaml; artifacts/NA-06/leaderboard.csv; NA-07 decisions;
     artifacts/NA-08/model_card_*.md; artifacts/NA-09/baseline_val_metrics.csv
   - src/newsaction/{lock,dm/*,states/*,panel/{targets,reactions}.py}
@@ -1825,18 +1868,23 @@ Branch: feat/NA-11-freeze-production.
 ## Scope
 
 S1. ANALYSIS SPEC (before anything else) — analysis/spec.py implements, as pure functions parameterised by split:
-    H1–H4 tests (PREREG §1.1), secondary H5–H7 and the ≤ 6 heterogeneity cuts (§1.2), metrics (§11.1–11.2),
+    H1–H4 tests (PREREG §1.1), secondary H2-C convergence ladder (PREREG A1.4–A1.5), the A2.5 analyses (mechanism
+    cuts with the model's own labels, horizon validity, width additions), the A3 explanation analyses (ladder,
+    explained share, explanation → persistence, reasons, optional market replication), H5–H7 and the ≤ 6 heterogeneity cuts
+    (§1.2), metrics (§11.1–11.2),
     regressions with two-way clustering + Driscoll–Kraay (§11.3, analysis/inference.py), stationary block
     bootstrap (§11.4), exact Shapley over {R, N, J} (§11.5, analysis/shapley.py), the robustness list (§11.6), the
     headline-claim rule (§1.3), Holm/BH. TEST IT END-TO-END ON VAL-B DATA (and on synthetic data with known effects)
-    — tests must show it recovers planted b > 0, c < 0 and a planted Shapley interaction.
+    — tests must show it recovers planted b > 0, c < 0, a planted Shapley interaction, and a planted convergence
+    path (κ_h rising to 1 with a known half-life).
 
 S2. FINAL SELECTION (val-B) — production/select_final.py per PREREG §8.5: ensure val-B Call A outputs exist for the
     top-2 API survivors that passed the screens (run them on ALL val-B D0 events; dry-run first), Laya zero-shot,
     Laya-Fin and the anchor; compute daily IC(N̂, z_cc) on val-B; tie-break rules; write final_selection.csv and
     frozen.yaml selection: {primary_instrument, comparators, ic_table_sha}. Also freeze into frozen.yaml: filter (from
     NA-03), encoding & calls_per_event (NA-07), δ/RG thresholds, confidence gates = val-A 70th percentile per model,
-    calibration maps Ñ (isotonic N̂ → e5 fit on val-A per model; store fit ranges), strategy parameters (PREREG §12).
+    calibration maps Ñ (isotonic N̂ → e5) and the news-implied value map V (PREREG A1.3: isotonic N̂ → E5^lvl),
+    both fit on val-A per model with fit ranges stored, strategy parameters (PREREG §12 and A1.6 S-CONV).
 
 S3. FREEZE — set frozen.yaml frozen_requested: true; run production/freeze.py → lock.freeze() writes
     artifacts/NA-11/freeze.json {hash, files, git_sha, ts}; commit; create annotated tag prereg-freeze. Append to the
@@ -1849,8 +1897,11 @@ S5. CANARY — run canary_v1 for every production API model; if any probability 
     STOP (silent model update) and report.
 
 S6. PRODUCTION — production/run.py with the frozen plan: the primary instrument (and the best API comparator if the
-    primary is a trained model) on val-A, val-B and test: Call A (D0) and Call B (D2, and D1 if bars) per
-    calls_per_event. Dry-run first; abort if projection > remaining cap; apply PREREG §13 STOP rules. Re-run the
+    primary is a trained model) on val-A, val-B and test: Call A on D0 events (W0 news) AND on D2 events (W2 news,
+    PREREG A3.1; identical states hit the cache), and Call B (D2, and D1 if bars) per calls_per_event. Question
+    groups (PREREG A2.1): the PRIMARY API instrument gets core + extended on Call A and core + explain on Call B;
+    every other model gets the core battery only; apply the A2.6 cutting order if the projection exceeds the
+    remaining cap. Optional A3.5: one market state per session for the primary API instrument (≈ 400 calls). Dry-run first; abort if projection > remaining cap; apply PREREG §13 STOP rules. Re-run the
     canary at the end (report drift).
 
 S7. TRAINED-MODEL TEST CALL B — export the 2026 Call B states (masked, third_party_ok, NO labels) as a new private
@@ -1868,7 +1919,9 @@ S9. SUMMARY — production_summary.csv: coverage (share of eligible events with 
 - AC1 — ORDER: freeze.json ts precedes (a) the first cache row with a 2026 state and (b) the first "reactions"
   entry in ledgers/test_access.jsonl; spec.py and targets.py hashes are inside freeze.json; tag prereg-freeze points
   at the freeze commit.
-- AC2 — SPEC TESTED: synthetic tests recover planted effects; val-B smoke run passes.
+- AC2 — SPEC TESTED: synthetic tests recover planted effects (b > 0, c < 0; a Shapley interaction; a convergence path
+  with κ_h rising to 1 and a known half-life); the val-B smoke run passes and includes the A1 convergence ladder;
+  frozen.yaml holds the A1.3 V maps (val-A fit ranges) and the A1.6 S-CONV parameters before the freeze.
 - AC3 — COVERAGE: ≥ 99% of eligible events have valid outputs for the primary instrument per call/split.
 - AC4 — CANARY: pre-production drift < 0.02 for all production models (else STOP recorded).
 - AC5 — BUDGET: NA-11 spend ≤ $18 and total ≤ $30; ledger reconciles; dry-run within ±20%.
@@ -1891,7 +1944,8 @@ mutations; no commits. Never call load_targets.
 1. GATES: `make verify`, `make manifest`.
 2. ORDER EVIDENCE: compare freeze.json ts with the earliest 2026-state cache row and the earliest "reactions" access
    entry; confirm tag prereg-freeze; recompute lock.compute_freeze_hash() == freeze.json hash on the tagged commit.
-3. SPEC: run the synthetic-effect tests; read spec.py against PREREG §1, §11 (list any mismatch).
+3. SPEC: run the synthetic-effect tests; read spec.py against PREREG §1, §11 and Amendment A1.3–A1.6 (list any
+   mismatch); confirm frozen.yaml has the V maps with val-A fit ranges and the S-CONV parameters.
 4. SELECTION: recompute val-B IC for the top candidates from cached/imported predictions; re-apply §8.5 rules.
 5. CANARY: recompute drift from canary_check.csv and cached answers.
 6. COVERAGE + BUDGET: recompute coverage per model/call/split; reconcile spend; total ≤ $30.
@@ -1933,7 +1987,8 @@ frozen in NA-11. You must not modify docs/PREREG.md (except appending to the Dev
 src/newsaction/panel/{targets,reactions}.py or src/newsaction/analysis/spec.py — the unblinding lock checks their hash.
 
 Read first:
-  - CLAUDE.md; docs/PREREG.md (all; you execute §1, §11, §12-prep exactly); artifacts/NA-11/{REPORT.md,freeze.json};
+  - CLAUDE.md; docs/PREREG.md (all, including §15 Amendments A1–A3; you execute §1, §11, A1.4–A1.5, A2.5,
+    A3.2–A3.5 and §12-prep exactly); artifacts/NA-11/{REPORT.md,freeze.json};
     configs/frozen.yaml; src/newsaction/analysis/spec.py
   - work/dm/production/*, work/kaggle/predictions/*, work/baselines/*, work/panel/*
 Branch: feat/NA-12-analysis.
@@ -1950,8 +2005,21 @@ S2. RUN ALL — analysis/run_all.py executes spec.py on the test split for: the 
     - secondary H5–H7 and the ≤ 6 heterogeneity cuts with BH q-values;
     - the over/under regression y = a + b·N̂ + c·G + day×tier FE by decision point (D2 primary; D1 if bars; D0
       tradeable y0), and re-estimated within |G| < 1, 1–2, > 2;
-    - RG classes (Under/Fair/Over) event-time CAR paths from t−5 to t+5 (daily) and the 30-min path on day t (if
-      bars) — figure data for Figure 1 and Figure 2 (drift vs |G| by news-strength terciles);
+    - CONVERGENCE (PREREG A1.4–A1.5, H2-C) — "does the price converge to the model's value, how fast, how completely?":
+      the ladder κ_h over open, 10:00 (if bars), close, t+1, t+2, t+5, t+10, t+20; gap closure λ_h with half-life;
+      ψ_{h*}; tracking-error ratios vs naive and price-only; by tier / quantified vs story / |G| bins / model
+      (primary + anchor); clean-window and plateau robustness;
+    - V-decile and RG-class (Under/Fair/Over) CAR^lvl paths from t−5 to t+20, each with its mean V, plus the day-t
+      30-min path (if bars) — figure data for Figure 1 (convergence) and Figure 2 (drift vs |G| by news-strength
+      terciles);
+    - EXPLANATION (PREREG A3, Kelly–Su–Zhang style) — "how much of the move can the news explain?": the explanation
+      ladder (market + sector → + ex-ante news → + ex-post news → + explanation features) as out-of-sample shares of
+      stock-specific variance by tier / model event type / event vs non-event days; the explained share; θ
+      (explanation → persistence) at D2 and D1; persistence by move_reason; the optional market-level replication
+      (A3.5) — Figure 8 data;
+    - QUESTION BATTERY v2 (PREREG A2.5): mechanism cuts with the model's own event type and quantified flag next to
+      the vendor-tag cuts; horizon validity (H vs realized convergence speed); U_unc and P(no_material_effect) in the
+      H4 width test; the reading-validity table from NA-06;
     - Shapley shares {R, N, J} of test R² and IC by tier (Figure 5 data);
     - monthly IC of the best API model vs the anchor across val+test with model release dates (Figure 4 data);
     - calibration (ECE, reliability bins) for all decision models (appendix);
@@ -1972,7 +2040,10 @@ S4. REPORT — artifacts/NA-12/REPORT.md: one section per hypothesis: pre-regist
   log append; spec.py functions are called, not re-implemented.
 - AC3 — INFERENCE: clustering, Driscoll–Kraay, bootstrap parameters and Holm/BH exactly as PREREG (tests assert
   the parameters passed).
-- AC4 — COMPLETENESS: every pre-registered test has a row in the tables (including nulls and failed robustness).
+- AC4 — COMPLETENESS: every pre-registered test has a row in the tables (including nulls and failed robustness) —
+  including every A1 item: κ_h for each rung, λ_h and the half-life, ψ_{h*}, tracking-error ratios, each by the A1.5
+  cuts (tier, quantified vs story, |G| bins, model) and with the clean-window and plateau robustness. Likewise every
+  A2.5 and A3.2–A3.4 item (and A3.5 if it was run).
 - AC5 — HEADLINE RULE: each primary verdict states the anchor's result next to the primary instrument's.
 
 ## Constraints
@@ -1994,11 +2065,14 @@ mutations; no commits; no API calls.
 3. RECOMPUTE H2 for the primary instrument independently (statsmodels OLS with day×tier FE and two-way clustered
    SE written by you) and compare b, c, SEs with the table (tolerance 1e-6 on estimates, 1e-3 on SEs).
 4. RECOMPUTE one Shapley table (exact 7-subset formula) from the stored fold predictions.
+4b. CONVERGENCE (A1): independently recompute κ_h at C_t and C_{t+5} (OLS of CAR^lvl_h on V with day×tier FE,
+   two-way clustered SE) and λ for D2 → C_{t+5} (with ψ) for the primary instrument; compare with the tables.
 5. HOLM/BH: re-adjust the reported p-values.
 6. HEADLINE RULE: confirm each verdict lists the anchor result and follows PREREG §1.3.
 7. GAC1–GAC5 (GAC3: a single post-freeze targets access sequence).
 
-Verdict: PASS / FAIL per AC1–AC5 and GAC with the H1–H4 verdicts restated.
+Verdict: PASS / FAIL per AC1–AC5 and GAC with the H1–H4 verdicts restated and the convergence answer (κ_h ladder,
+half-life, ψ) for the primary instrument and the anchor.
 ```
 
 **New tests to add:** `test_unblind_lock.py`, `test_run_all_params.py`, `test_tables_keys.py`.
@@ -2037,7 +2111,8 @@ You are implementing NA-13 for /Users/amir/Research/NewsAction: the pre-register
 frozen signals, with costs, capacity and a deflated Sharpe that counts every trial in ledgers/trials.jsonl.
 
 Read first:
-  - CLAUDE.md; docs/PREREG.md §2.5 (decision/entry times), §5.6 (targets), §12 (strategies); artifacts/NA-12/REPORT.md
+  - CLAUDE.md; docs/PREREG.md §2.5 (decision/entry times), §5.6 (targets), §12 (strategies), §15 Amendment A1.6
+    (S-CONV — the primary strategy); artifacts/NA-12/REPORT.md
   - /Users/amir/GitHub/Atom/packages/atom_signals/src/atom_signals/stats.py:238 (deflated_sharpe_ratio — read-only
     reference) and /Users/amir/GitHub/Atom/packages/atom_backtest/src/atom_backtest/costs.py:99 (LinearCostModel)
   - work/analysis/targets_test.parquet, work/dm/production/*, work/kaggle/predictions/*, work/bars30 (if any)
@@ -2045,7 +2120,9 @@ Branch: feat/NA-13-strategies.
 
 ## Scope
 
-S1. PORTFOLIOS — strategy/portfolios.py: S-D0 (rank Ñ at 09:15; long top 20% / short bottom 20% within tier,
+S1. PORTFOLIOS — strategy/portfolios.py: S-CONV (PRIMARY, PREREG A1.6: at D1 10:00 and at D2 close → next open,
+    rank by the remaining gap U_τ = V − G^lvl_τ; long price-below-value, short price-above-value within tier; exits
+    C_t (D1 only), t+1, t+5, t+20); S-D0 (rank Ñ at 09:15; long top 20% / short bottom 20% within tier,
     pooled if < 10 per side; equal weight; β-hedged with SPY; enter official open, exit official close; secondary
     exit C_{t+1}); S-D1 (rank J and RG at 10:00; enter at the 10:00 bar close; exit official close, t+1, t+5);
     S-D2 (rank J and RG after the close; enter next open; exit t+1, t+5, t+20 as calendar-time portfolios);
@@ -2069,6 +2146,8 @@ S5. OUTPUTS — strategy_table (gross/net Sharpe, ann. return, vol, max DD, turn
 - AC3 — DSR golden matches ATOM within 1e-6; n_trials documented and equal to the ledger count.
 - AC4 — PLACEBO: the random-signal distribution is reported; strategy Sharpe percentiles vs placebo given.
 - AC5 — No modification of frozen files; register artifacts.
+- AC6 — S-CONV (A1.6): reported first, at D2 (and D1 if bars) for every exit horizon, ranked by U_τ = V − G^lvl_τ with
+  V from the frozen maps; a test rebuilds one day's D2 ranks from the stored inputs.
 
 ## Constraints
 
@@ -2081,13 +2160,13 @@ S5. OUTPUTS — strategy_table (gross/net Sharpe, ann. return, vol, max DD, turn
 Independent verifier for NA-13 (branch feat/NA-13-strategies). READ-ONLY; restore mutations; no commits.
 
 1. GATES: `make verify`, `make manifest`.
-2. RECOMPUTE S-D2 (t+5) net Sharpe at 10 bp from the stored daily returns; compare.
+2. RECOMPUTE S-CONV (D2 entry, t+5 exit) and S-D2 (t+5) net Sharpe at 10 bp from the stored daily returns; compare.
 3. TIMING: inspect 10 random trades: decision ts, entry ts, inputs' availability.
 4. DSR: run strategy/dsr.py on the golden inputs; compare with tests/golden/dsr_atom.json.
 5. MUTATION: shift S-D0 entry to the previous close → the timing test must RED.
 6. GAC1–GAC5.
 
-Verdict: PASS / FAIL per AC1–AC5 and GAC with the main net Sharpe numbers.
+Verdict: PASS / FAIL per AC1–AC6 and GAC with the main net Sharpe numbers (S-CONV first).
 ```
 
 **New tests to add:** `test_strategy_timing.py`, `test_strategy_costs.py`, `test_strategy_dsr_golden.py`.
@@ -2098,7 +2177,7 @@ Verdict: PASS / FAIL per AC1–AC5 and GAC with the main net Sharpe numbers.
 
 ## NA-14 — [Paper] Charts, tables, replication package
 
-**Category:** Phase 5 — publication outputs. Seven publication-quality figures plus an appendix, LaTeX tables, and a one-command rebuild from cached responses and frozen artifacts with digest checks.
+**Category:** Phase 5 — publication outputs. Eight publication-quality figures plus an appendix, LaTeX tables, and a one-command rebuild from cached responses and frozen artifacts with digest checks.
 
 **Goal:**
 - `artifacts/NA-14/figures/*.pdf|png` and the data CSV for each.
@@ -2122,7 +2201,8 @@ BEFORE WRITING ANY CHART CODE, invoke the `dataviz` skill and follow it (palette
 light/dark not needed for print — vector PDF + PNG at 300 dpi).
 
 Read first:
-  - CLAUDE.md (F22); docs/PREREG.md (figure list in the plan: §11, §12); artifacts/NA-12/{REPORT.md,figure_data/*},
+  - CLAUDE.md (F22); docs/PREREG.md (§11, §12 and §15 Amendment A1 — Figure 1 is the convergence figure);
+    artifacts/NA-12/{REPORT.md,figure_data/*},
     artifacts/NA-13/fig7_data.csv, artifacts/NA-06/fig3_data.csv, artifacts/NA-03/frontier.csv
 Branch: feat/NA-14-paper-figures.
 
@@ -2131,8 +2211,11 @@ Branch: feat/NA-14-paper-figures.
 S1. STYLE — figures/style.py: one style (from the dataviz skill), colour-blind-safe categorical palette, consistent
     fonts/sizes for a two-column paper (single-column width 3.3 in, double 6.9 in), shared helpers for CIs.
 S2. FIGURES (each reads ONLY its CSV; writes PDF + PNG; caption text with numbers pulled from the tables):
-    1 HERO: CAR in the news-implied direction from t−5 to t+5 (daily) for Under / Fair / Over, panels by tier, with
-      decision-point markers (D0 open, D1 10:00, D2 close) and the day-t 30-min path inset (if bars); bootstrap bands.
+    1 HERO — CONVERGENCE: (a) realized CAR^lvl paths from the previous close through open, 10:00 (if bars), close,
+      t+1, t+2, t+5, t+10, t+20 for deciles of the model's value V, each with its mean V as a dashed target line —
+      do prices converge to what the decision model says the news is worth?; (b) κ_h with CIs vs horizon, the
+      full-convergence line at 1 and the half-life marked; (c) Under / Fair / Over paths by tier; bootstrap bands;
+      decision-point markers (D0 open, D1 10:00, D2 close).
     2 Drift vs |initial move| (bins of |G|) split by news strength (terciles of |N̂|) — shows small-move
       underreaction.
     3 Tournament: IC (± CI) vs cost per 1,000 decisions (log x), MCS membership and contamination flags; Laya-Fin and
@@ -2141,7 +2224,11 @@ S2. FIGURES (each reads ONLY its CSV; writes PDF + PNG; caption text with number
       (2026-09-15 onward lies after the sample — annotate) — a contamination cliff would be visible.
     5 Shapley value of information (news / reaction / interaction) by tier and decision point.
     6 Filter efficiency: selection share vs material recall per filter (frontier), chosen filter marked.
-    7 Strategy cumulative net returns (10 bp) by tier vs benchmarks, with the placebo band.
+    7 Strategy cumulative net returns (10 bp) by tier — S-CONV first, then S-D0 / S-D1 / S-D2 — vs benchmarks, with
+      the placebo band.
+    8 EXPLAINING THE MOVE (PREREG A3, Kelly–Su–Zhang style): (a) stacked bars of the out-of-sample share of
+      stock-specific daily variance explained — market + sector → + ex-ante news → + ex-post news → + explanation —
+      by tier; (b) persistence θ by the model's move_reason with CIs; (c, optional) the market-level replication.
     Appendix: reliability diagrams; encoding ablation; masking/identifiability; ablations (news removed, shuffled
     news); robustness forest plot.
 S3. TABLES — copy NA-12/NA-13 LaTeX tables into artifacts/NA-14/tables with consistent formatting.
@@ -2169,7 +2256,8 @@ S5. REPLICATION — `make paper` rebuilds all figures/tables from work/ caches a
 Independent verifier for NA-14 (branch feat/NA-14-paper-figures). READ-ONLY; restore; no commits; no API calls.
 
 1. `make verify`; `make paper` → all digests OK.
-2. Open each PDF: legible at print size, colour-blind-safe palette, axis labels/units present, CIs drawn.
+2. Open each PDF: legible at print size, colour-blind-safe palette, axis labels/units present, CIs drawn. Figure 1
+   must show realized paths against each V-decile's dashed target line and the κ_h panel with the line at 1.
 3. Pick 10 caption numbers and trace each to its table cell.
 4. Confirm each figure script reads only its CSV (grep for other reads).
 5. GAC1–GAC5.

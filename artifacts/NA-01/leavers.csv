@@ -1,0 +1,63 @@
+symbol_id,ticker,name,first_member_session,last_member_session,delisting_date,is_active,adj_source
+1524,VNO,Vornado Realty Trust,2022-01-03,2023-01-04,,False,data_prices
+1308,SIVB,SVB Financial Group,2022-01-03,2023-03-13,,False,atom_total
+1274,SBNY,Signature Bank,2022-01-03,2023-03-13,,False,atom_total
+898,LUMN,Lumen Technologies Inc,2022-01-03,2023-03-16,,False,data_prices
+583,FRC,First Republic Bank,2022-01-03,2023-05-02,,False,atom_total
+427,DISH,DISH Network Corp,2022-01-03,2023-06-16,,False,atom_total
+5,AAP,Advance Auto Parts Inc,2022-01-03,2023-08-23,,False,data_prices
+880,LNC,Lincoln National Corp,2022-01-03,2023-09-14,,False,data_prices
+1075,NWL,Newell Brands Inc,2022-01-03,2023-09-14,,False,data_prices
+458,DXC,DXC Technology Co,2022-01-03,2023-09-29,,False,data_prices
+128,ATVI,Activision Blizzard Inc,2022-01-03,2023-10-16,2023-10-17,False,atom_total
+1090,OGN,Organon & Co,2022-01-03,2023-10-16,,False,data_prices
+64,ALK,Alaska Air Group Inc,2022-01-03,2023-12-14,,False,data_prices
+1287,SEE,Sealed Air Corp,2022-01-03,2023-12-14,,False,atom_total
+1286,SEDG,SolarEdge Technologies Inc,2022-01-03,2023-12-14,,False,atom_total
+1612,ZION,Zion Bancorp,2022-01-03,2024-03-14,,False,data_prices
+1561,WHR,Whirlpool Corp,2022-01-03,2024-03-14,,False,data_prices
+1517,VFC,V.F. Corp,2022-01-03,2024-04-01,,False,data_prices
+1598,XRAY,Dentsply Sirona Inc,2022-01-03,2024-04-01,,False,data_prices
+1195,PXD,Pioneer Natural Resources,2022-01-03,2024-05-07,2024-05-08,False,atom_total
+1230,RHI,Robert Half,2022-01-03,2024-06-21,,False,data_prices
+759,ILMN,"Illumina, Inc.",2022-01-03,2024-06-21,,False,data_prices
+304,CMA,Comerica,2022-01-03,2024-06-21,,False,atom_total
+1577,WRK,WestRock Co.,2022-01-03,2024-07-03,,False,atom_total
+4,AAL,American Airlines Group,2022-01-03,2024-09-20,,False,data_prices
+509,ETSY,Etsy,2022-01-03,2024-09-20,,False,data_prices
+178,BIO,Bio-Rad Laboratories,2022-01-03,2024-09-20,,False,data_prices
+154,BBWI,"Bath & Body Works, Inc.",2022-01-03,2024-10-29,,False,data_prices
+990,MRO,Marathon Oil,2022-01-03,2024-11-22,2024-11-25,False,atom_total
+86,AMTM,Amentum,2024-10-30,2024-12-20,,False,atom_total
+377,CTLT,Catalent,2022-01-03,2024-12-20,2024-12-22,False,atom_total
+1202,QRVO,Qorvo,2022-01-03,2024-12-20,,False,data_prices
+1412,TFX,Teleflex,2022-01-03,2025-03-21,,False,data_prices
+219,BWA,Borgwarner,2022-01-03,2025-03-21,,False,data_prices
+258,CE,Celanese,2022-01-03,2025-03-21,,False,data_prices
+569,FMC,FMC Corporation,2022-01-03,2025-03-21,,False,data_prices
+416,DFS,Discover Financial Services,2022-01-03,2025-05-16,2025-05-18,False,atom_total
+801,JNPR,Juniper Networks,2022-01-03,2025-07-07,2025-07-08,False,atom_total
+95,ANSS,"Ansys, Inc.",2022-01-03,2025-07-16,2025-07-17,False,atom_total
+693,HES,Hess Corporation,2022-01-03,2025-07-21,2025-07-22,False,atom_total
+1542,WBA,Walgreens Boots Alliance,2022-01-03,2025-08-26,2025-08-27,False,atom_total
+964,MKTX,MarketAxess Holdings,2022-01-03,2025-09-19,,False,data_prices
+488,ENPH,Enphase Energy,2022-01-03,2025-09-19,,False,data_prices
+399,CZR,Caesars Entertainment,2022-01-03,2025-09-19,,False,data_prices
+832,KMX,CarMax Inc.,2022-01-03,2025-10-30,,False,data_prices
+485,EMN,Eastman Chemical Co,2022-01-03,2025-11-03,,False,data_prices
+773,IPG,"The Interpublic Group of Companies, Inc.",2022-01-03,2025-11-26,,False,atom_total
+813,K,Kellanova,2022-01-03,2025-12-10,2025-12-11,False,atom_total
+870,LKQ,LKQ Corporation,2022-01-03,2025-12-19,,False,data_prices
+953,MHK,Mohawk Industries,2022-01-03,2025-12-19,,False,data_prices
+1333,SOLS,Solstice Advanced Materials,2025-10-31,2025-12-19,,False,atom_total
+404,DAY,Dayforce,2022-01-03,2026-02-06,2026-02-09,False,atom_total
+978,MOH,Molina Healthcare,2022-01-03,2026-03-20,,False,data_prices
+903,LW,Lamb Weston Holdings ,2022-01-03,2026-03-20,,False,data_prices
+1000,MTCH,Match Group ,2022-01-03,2026-03-20,,False,data_prices
+1114,PAYC,Paycom Software,2022-01-03,2026-03-20,,False,data_prices
+714,HOLX,"Hologic, Inc.",2022-01-03,2026-04-08,2026-04-09,False,atom_total
+379,CTRA,Coterra Energy Inc.,2022-01-03,2026-05-06,2026-05-07,False,atom_total
+493,EPAM,"EPAM Systems, Inc.",2022-01-03,2026-05-29,,False,data_prices
+1169,POOL,Pool Corporation,2022-01-03,2026-06-18,,False,data_prices
+344,CPB,Campbell Soup Company,2022-01-03,2026-06-18,,False,data_prices
+228,CAG,Conagra Brands,2022-01-03,2026-06-26,,False,data_prices
