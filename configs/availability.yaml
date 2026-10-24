@@ -19,21 +19,73 @@ kinds:
   post: outcomes and labels (targets); never a model input
 
 columns:
-  # identifiers
+  # --- identifiers and fixed metadata (NA-00 seeds + NA-01 panel)
   session: static
+  symbol_id: static
   company_id: static
-  # t-1 context (PREREG §5.3-5.4, §3.3)
-  tier: t_minus_1
+  ticker: static
+  member: static              # index membership at open(s) (uni.member; changes are announced in advance)
+  sector: static              # GICS level 1 (ATOM ref.symbol_sector, one open-ended range per symbol)
+  half_day: static
+  split: static
+  adj_source: static          # data_prices | atom_total (PREREG §15)
+  price_symbol: static
+  # --- t-1 context (PREREG §3.3, §5.3-5.4): computed only from data through close(prev(s))
+  tier: t_minus_1             # ranking at the last session of the previous month
+  rank: t_minus_1
+  dv_tier: t_minus_1
+  dv_rank: t_minus_1
+  tier_source: t_minus_1
+  is_rep: t_minus_1           # representative share class, chosen at the previous month end
   beta_m: t_minus_1
   beta_s: t_minus_1
+  beta_n: t_minus_1
   sigma_cc: t_minus_1
-  # news blocks
+  sigma_on: t_minus_1
+  sigma_id: t_minus_1
+  logv_med60: t_minus_1
+  logv_mad60: t_minus_1
+  adv63: t_minus_1
+  car_m5: t_minus_1
+  car_m20: t_minus_1
+  car_m60: t_minus_1
+  z_m5: t_minus_1
+  z_m20: t_minus_1
+  z_m60: t_minus_1
+  # --- news blocks
   news_w0: w0
   news_w2: w2
-  # observed reactions (PREREG §5.5)
+  # --- observed reactions (PREREG §5.5, A1.2)
   g_d1: d1
   g_d2: d2_reaction
-  # targets (PREREG §5.6); same-day quantities used as D2 inputs need their own d2_reaction column
+  g_d2_lvl: d2_reaction
+  react_r_cc: d2_reaction
+  react_r_spy_cc: d2_reaction
+  react_z_vol: d2_reaction
+  # --- same-day quantities of session s (known after close(s)); never model inputs as such
+  raw_open: post
+  raw_close: post
+  raw_volume: post
+  adj_close: post
+  adj_open: post
+  adj_factor: post
+  r_cc: post
+  r_on: post
+  r_id: post
+  r_spy_cc: post
+  r_spy_on: post
+  r_spy_id: post
+  r_sec_cc: post
+  r_sec_on: post
+  r_sec_id: post
+  r_sec_n: post
+  ar_cc: post
+  ar_on: post
+  ar_id: post
+  z_vol: post
+  qc_rule: post
+  qc_flag: post
+  # --- targets (PREREG §5.6, A1.2); same-day quantities used as D2 inputs need their own d2_reaction column
   z_on: post
   z_cc: post
   z_id: post
@@ -41,3 +93,29 @@ columns:
   y1: post
   y2: post
   e5: post
+  ar_o0_c1: post
+  z_o0_c1: post
+  ar_o0_c5: post
+  z_o0_c5: post
+  ar_c0_o1: post
+  z_c0_o1: post
+  ar_o1_c1: post
+  z_o1_c1: post
+  ar_o1_c5: post
+  z_o1_c5: post
+  ar_o1_c20: post
+  z_o1_c20: post
+  fwd_lvl_o1_c1: post
+  fwd_lvl_o1_c5: post
+  fwd_lvl_o1_c20: post
+  car6_z: post
+  car_lvl_o0: post
+  car_lvl_c0: post
+  car_lvl_c1: post
+  car_lvl_c2: post
+  car_lvl_c5: post
+  car_lvl_c10: post
+  car_lvl_c20: post
+  car_lvl_c60: post
+  e5_lvl: post
+  delist_within_c20: post
