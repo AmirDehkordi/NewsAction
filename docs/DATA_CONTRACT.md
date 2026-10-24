@@ -253,3 +253,58 @@ t-1 features of test sessions (PREREG §15, NA-00 row 2); the blinded raw prices
 - **Rows / coverage:** 565 ids: 525 mapped (Spearman ≥ 0.99 on ≥ 120 non-event days, public period only), 40 without any Data/prices candidate.
 - **Availability:** `static`
 - **sha256:** `1e96f421e0029e3466917a7e1b7b748a68477f919c692023129f32fca35973fb`
+
+## NA-02 — news: timing, member mapping, cleaning, embeddings, novelty
+
+Producer for all files: `newsaction.news.build` (NA-02), one stage per process:
+`uv run python -m newsaction.news.build --stage prepare | embed | articles | coverage`. Inputs: `Data/news_2023…2026.parquet`
+(fingerprinted; the `body` column is never read) and the registered NA-01 files `snapshot/{symbols,symbol_tickers,
+members_by_session}.parquet` and `panel/companies.parquet`. Configs: `configs/news.yaml` (constants, ticker aliases),
+`configs/patterns.yaml` (13F / Form-4 / detector regexes), `configs/sources.yaml` (domain classes). No price or return
+is read by the build; the ≤ 2025 audits (`newsaction.news.audit`, `scripts/na02_report.py`) write only to `artifacts/NA-02/`.
+Instants are UTC; session dates are XNYS-local.
+
+### `work/news/articles_stage1.parquet`
+- **Producer:** `newsaction.news.build --stage prepare` (S1–S5, S9)
+- **Inputs:** Data/news (light columns for every row; title, snippet, summary only for member and market rows), NA-01 snapshot + companies
+- **Schema:** the vendor columns of PRD S1 except `summary` (`id`, `ticker`, `date` int64 unix s, `domain`, `non_news`, `parsing_allowed` bool with nulls, `sentiment_direction`, `sentiment_intensity`, `tag_type`, `tag_type2`, `tag_{scheduled,forward_looking,primary_source,quantified,rumor}` bool, `tag_source`, `event_id`, `event_age_days` int64) + `ts_pub_utc` timestamp[us, UTC], `precision` string, `t_avail` timestamp[ns, UTC], `session_w0`, `session_w2` date32, `symbol_id`, `company_id` int64, `title`, `snippet` string, `summary_present` bool, `junk_tag`, `is_13f`, `is_form4`, `third_party_ok`, `after_fact`, `premarket_talk` bool, `title_clean`, `snippet_clean`, `source_class_domain`, `source_class` string
+- **Key:** `id` unique
+- **Rows / coverage:** 2,906,710 member articles (t_avail 2023-07-01 … 2026-07-31; company is an S&P 500 member at `session_w2`); sorted by (t_avail, id). Intermediate of NA-02 (input of the `embed` and `articles` stages); later chunks read `articles_clean`.
+- **Availability:** as `articles_clean` (no near-duplicate or novelty columns yet).
+- **sha256:** `e16c2592ab383f803c2287a974d22aabad4aaa9d24ca0144fa25314a739a1d18`
+
+### `work/news/articles_clean.parquet`
+- **Producer:** `newsaction.news.build --stage articles` (S12; S7 dedupe, S8 novelty)
+- **Inputs:** `work/news/articles_stage1.parquet`, `work/news/embeddings_ts.parquet`
+- **Schema:** `id`, `company_id`, `symbol_id` (int64; for share-class aliases PARAA / BF-A / LEN-B the member class's id), `ticker_raw` (vendor `EXCH:SYM`), `ts_pub_utc`, `precision` (date_only | hour | minute | exact, PREREG §2.2), `t_avail` (§2.3), `session_w0` (date32, null if t_avail is after 09:15 ET and up to the close), `session_w2`, `domain`, `source_class` (domain class, press_wire_primary when `tag_primary_source`), `source_class_domain` (domain only), `title`, `snippet` (raw), `title_clean`, `snippet_clean` (scrubbed, PREREG §6.3–6.4: no after-the-fact / price-path or pre-market sentences, no share-price levels), `summary_present`, flags `non_news`, `junk_tag`, `is_13f`, `is_form4`, `after_fact`, `premarket_talk`, `has_clean_text`, `non_english_hint` (bool), `third_party_ok` (= `parsing_allowed is True`), `parsing_allowed` (bool, nullable), vendor fields `sentiment_direction`, `sentiment_intensity`, `tag_type`, `tag_type2`, the five `tag_*` flags, `tag_source`, `event_id`, `event_age_days`; `dup_group` (string: id of the group's representative), `dup_count`, `dup_count_w0`, `dup_count_w2` (double, NaN outside the usable set), `is_representative` (bool), `novelty` (double, NaN outside the usable set), `keep` (bool)
+- **Key:** `id` unique; sorted by (t_avail, id)
+- **Rows / coverage:** 2,906,710 member articles of 536 companies, t_avail 2023-07-01 … 2026-07-31. Usable (passes the §6.2 filters and has clean text): 1,669,437; `keep` (usable and near-duplicate representative): 1,494,138.
+- **Availability:** per column in `configs/availability.yaml`. Article columns are `w0`: a row may enter a D0 state of session s only if `session_w0 == s` and a D2 state only if `session_w2 == s` (`pit.assert_visible(t_avail ≤ decision instant)`). `dup_group`, `is_representative` and `novelty` look only backwards (deleting later articles changes none of them; tests/test_news_novelty.py). `dup_count` includes later duplicates (`post`); `dup_count_w0` / `dup_count_w2` count the representative's own window (`w0` / `w2`). Vendor labels and the flags built from them (`source_class`, `summary_present`, `non_news`, `junk_tag`, `keep`, `third_party_ok`, `parsing_allowed`, sentiment, tags, `event_*`) are `selection_only` (CLAUDE.md A6). Contains 2026 articles (text and timestamps only; never joined to a return before unblinding).
+- **sha256:** `64eb68bd4284bf3eae36733e20dd3fd495ed9a251084551e28d3160ac3723f8e`
+
+### `work/news/embeddings_ts.parquet`
+- **Producer:** `newsaction.news.build --stage embed` (S6, `newsaction.news.embed`; written with pyarrow, no pandas metadata, registered with `io.register_file`)
+- **Inputs:** `work/news/articles_stage1.parquet` (`id`, `title_clean`, `snippet_clean`)
+- **Schema:** `id` large_string, `text_sha` large_string (first 16 hex of sha256 of the embedded text), `embedding` fixed_size_list<float16>[384]
+- **Key:** `id` unique (same order as `articles_stage1`)
+- **Rows / coverage:** 2,906,710 = every member article (so every `keep` id has exactly one row). Model `BAAI/bge-small-en-v1.5` @ `5c38ec7c405ec4b44b94cc5a9bb96e735b38267a`, sentence-transformers 6.2.0 / torch 2.14.1 on MPS, computed in float16, `normalize_embeddings=True`; text = title_clean + ". " + snippet_clean (non-empty parts). L2 norms 0.99944 … 1.00056. 1,289 s (2,255 texts/s).
+- **Availability:** `w0` per article (a function of the article's own scrubbed text). Read with `embed.read_embeddings()` (hash-checked).
+- **sha256:** `9581be35725beeda88d5f6bfe5c048ff8e227ffcc7c216cf0a1d462b05da067e`
+
+### `work/news/coverage_member_month.parquet`
+- **Producer:** `newsaction.news.build --stage coverage` (S11, `newsaction.news.coverage`)
+- **Inputs:** `work/news/articles_clean.parquet`, `snapshot/members_by_session.parquet`, `panel/companies.parquet`
+- **Schema:** `month` string (YYYY-MM), `company_id` int64, `member_sessions` int64, `n_mapped`, `n_clean` (passes §6.2 before deduplication), `n_keep`, `n_keep_w0` int64, `covered` bool (`n_keep ≥ 1`, PREREG §3.4)
+- **Key:** `(month, company_id)`
+- **Rows / coverage:** 18,555 member-months, 2023-07 … 2026-07, 556 companies; covered 91.4% (2023-H2 61%, 2024 95%, 2025 99%, 2026 98%). Articles are counted by the month of `session_w2`.
+- **Availability:** a month's count is complete at the month's last close; `covered` is a sample-definition flag (uncovered member-months are missing, never "no news").
+- **sha256:** `4402ca34f94db2e7d57037e927bc4cb77af77b220a1730d413a58ac08d5ab093`
+
+### `work/news/market_articles.parquet`
+- **Producer:** `newsaction.news.build --stage prepare` (S14, PREREG A3.5)
+- **Inputs:** Data/news rows with ticker `^GSPC`, `^VIX` or `DX-Y.NYB`
+- **Schema:** `id`, `ticker_raw`, `ts_pub_utc`, `precision`, `t_avail`, `session_w0`, `session_w2`, `domain`, `source_class_domain`, `title`, `snippet`, `title_clean`, `snippet_clean`, `summary_present`, `non_news`, `junk_tag`, `is_13f`, `after_fact`, `premarket_talk`, `third_party_ok`
+- **Key:** `id` unique; sorted by (t_avail, id)
+- **Rows / coverage:** 31,506 cleaned market-index articles (^GSPC 12,179, ^VIX 11,081, DX-Y.NYB 8,246), t_avail 2023-09-01 … 2026-07-31; no company mapping; non_news / junk-tag / 13F rows dropped; `third_party_ok` 89.8%.
+- **Availability:** as `articles_clean` (article columns `w0`, vendor flags `selection_only`).
+- **sha256:** `8816280faecf42f0dc5b0571493ceda44e091636b66731f750313938b6416dc9`

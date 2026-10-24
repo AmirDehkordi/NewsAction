@@ -1,0 +1,5 @@
+status,member_days,overnight_share,mean_abs_z_on,mean_abs_z_id
+intraday_only,18818,0.233172,0.939653,0.882937
+no_news,62446,0.215256,0.893128,0.845796
+pre_open,122556,0.274924,0.96322,0.883163
+pre_open_earnings,39395,0.547096,1.51478,1.10388

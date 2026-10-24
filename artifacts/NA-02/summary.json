@@ -1,0 +1,428 @@
+{
+  "stage1": {
+    "parsing_allowed": [
+      {
+        "scope": "all member articles",
+        "period": "2024-07..2026-07",
+        "articles": 2778253,
+        "True": 0.8604317173417971,
+        "None": 0.1296796943978824,
+        "False": 0.009888588260320425
+      },
+      {
+        "scope": "all member articles",
+        "period": "2024",
+        "articles": 608763,
+        "True": 0.37362980338818225,
+        "None": 0.5918280184571008,
+        "False": 0.034542178154717024
+      },
+      {
+        "scope": "all member articles",
+        "period": "2025",
+        "articles": 1726292,
+        "True": 0.9963957430145074,
+        "None": 0.0,
+        "False": 0.0036042569854926047
+      },
+      {
+        "scope": "all member articles",
+        "period": "2026",
+        "articles": 443198,
+        "True": 0.999496838884652,
+        "None": 0.0,
+        "False": 0.0005031611153479934
+      },
+      {
+        "scope": "cleaned (pre-dedupe)",
+        "period": "2024-07..2026-07",
+        "articles": 1591365,
+        "True": 0.8405249581334263,
+        "None": 0.15771617447914213,
+        "False": 0.0017588673874315446
+      },
+      {
+        "scope": "cleaned (pre-dedupe)",
+        "period": "2024",
+        "articles": 410791,
+        "True": 0.38614283175629455,
+        "None": 0.6109773583160293,
+        "False": 0.0028798099276761174
+      },
+      {
+        "scope": "cleaned (pre-dedupe)",
+        "period": "2025",
+        "articles": 944682,
+        "True": 0.9984756775295813,
+        "None": 0.0,
+        "False": 0.001524322470418617
+      },
+      {
+        "scope": "cleaned (pre-dedupe)",
+        "period": "2026",
+        "articles": 235892,
+        "True": 0.9992538958506435,
+        "None": 0.0,
+        "False": 0.0007461041493564852
+      }
+    ],
+    "mapping": {
+      "mapped_share": 0.9999917433105334,
+      "reference": 2906734,
+      "mapped": 2906710,
+      "by_year": {
+        "2023": {
+          "rows_in_range": 30464,
+          "ticker_class": {
+            "us_equity": 28673,
+            "non_equity": 1686,
+            "other": 105
+          },
+          "us_mapped": 18649,
+          "member": 17581,
+          "reference_member_day": 17603,
+          "reference_mapped_member": 17581
+        },
+        "2024": {
+          "rows_in_range": 1346854,
+          "ticker_class": {
+            "us_equity": 1328630,
+            "non_equity": 17557,
+            "other": 667
+          },
+          "us_mapped": 764690,
+          "member": 719639,
+          "reference_member_day": 719641,
+          "reference_mapped_member": 719639
+        },
+        "2025": {
+          "rows_in_range": 2439476,
+          "ticker_class": {
+            "us_equity": 2363649,
+            "non_equity": 65963,
+            "other": 9864
+          },
+          "us_mapped": 1802040,
+          "member": 1726292,
+          "reference_member_day": 1726292,
+          "reference_mapped_member": 1726292
+        },
+        "2026": {
+          "rows_in_range": 720717,
+          "ticker_class": {
+            "us_equity": 684685,
+            "other": 18342,
+            "non_equity": 17690
+          },
+          "us_mapped": 463765,
+          "member": 443198,
+          "reference_member_day": 443198,
+          "reference_mapped_member": 443198
+        }
+      },
+      "top": [
+        {
+          "ticker": "NYSE:GLD",
+          "n": 11737,
+          "example_title": "Investing Moves to Make at the Start of the Year"
+        },
+        {
+          "ticker": "NASDAQ:MSTR",
+          "n": 10650,
+          "example_title": "Why Is MicroStrategy Incorporated (MSTR) Among the Best Multibagger Stocks to Buy Right No"
+        },
+        {
+          "ticker": "NASDAQ:RIVN",
+          "n": 9023,
+          "example_title": "Rivian Automotive (NASDAQ:RIVN) Stock Price Down 2.1% - Time to Sell?"
+        },
+        {
+          "ticker": "NYSE:USO",
+          "n": 8910,
+          "example_title": "Permian Gas Struggles as Production Outpaces Capacity"
+        },
+        {
+          "ticker": "NYSE:XLB",
+          "n": 7520,
+          "example_title": "Should You Invest in the Vanguard Materials ETF (VAW)?"
+        },
+        {
+          "ticker": "NASDAQ:LCID",
+          "n": 7319,
+          "example_title": "2 Reasons Lucid Group Is a Long-Term Buy for 2030 and Beyond"
+        },
+        {
+          "ticker": "NYSE:XLE",
+          "n": 7189,
+          "example_title": "Sector Update: Energy Stocks Slide Late Afternoon"
+        },
+        {
+          "ticker": "NYSE:SNOW",
+          "n": 6480,
+          "example_title": "Jim Cramer on Snowflake Inc. (SNOW) in August: I\u2019m Going To Hold Off On Recommending It\u2019; "
+        },
+        {
+          "ticker": "NASDAQ:SOFI",
+          "n": 5914,
+          "example_title": "SoFi Technologies (NASDAQ:SOFI) Trading Down 1.5% - What's Next?"
+        },
+        {
+          "ticker": "NYSE:XLV",
+          "n": 5881,
+          "example_title": "ICE at Healthcare Facilities: What Should You Do"
+        },
+        {
+          "ticker": "NYSE:NET",
+          "n": 5829,
+          "example_title": "Why Cloudflare (NET) is a Top Growth Stock for the Long-Term"
+        },
+        {
+          "ticker": "NYSE:X",
+          "n": 5770,
+          "example_title": "Nippon Steel promises no cuts to U.S. Steel's output for 10 years"
+        },
+        {
+          "ticker": "NASDAQ:RKLB",
+          "n": 5745,
+          "example_title": "Rocket Lab USA Stock: Buy, Sell, or Hold?"
+        },
+        {
+          "ticker": "NYSE:JEF",
+          "n": 5722,
+          "example_title": "Jefferies Financial Group Inc. (NYSE:JEF) Might Not Be As Mispriced As It Looks After Plun"
+        },
+        {
+          "ticker": "NYSE:QGEN",
+          "n": 5357,
+          "example_title": "Buy the Dip: Comeback Chance 2025 \u2013 darum geh\u00f6rt diese Aktie auf die Watchlist (Teil 5)"
+        },
+        {
+          "ticker": "NYSE:XLF",
+          "n": 5286,
+          "example_title": "Protecting Consumers: Governor Hochul Cracks Down on Exploitative Overdraft Fees Targeting"
+        },
+        {
+          "ticker": "NASDAQ:CELH",
+          "n": 5224,
+          "example_title": "Celsius Holdings Stock Price History 2024 | StatMuse Money"
+        },
+        {
+          "ticker": "NASDAQ:MARA",
+          "n": 5210,
+          "example_title": "Marathon Digital (NASDAQ:MARA) Now Covered by Compass Point"
+        },
+        {
+          "ticker": "NYSE:SPOT",
+          "n": 5046,
+          "example_title": "Spotify Sets Q4 2024 Earnings Date: Key Financial Results Coming February 4"
+        },
+        {
+          "ticker": "NASDAQ:CG",
+          "n": 5024,
+          "example_title": "China December new home prices rise a touch faster, survey shows"
+        },
+        {
+          "ticker": "NYSE:LNG",
+          "n": 4988,
+          "example_title": "Cheniere Energy, Inc. $LNG Shares Acquired by Acadian Asset Management LLC"
+        },
+        {
+          "ticker": "NASDAQ:ZS",
+          "n": 4970,
+          "example_title": "Vanguard Group Inc. Decreases Position in Zscaler, Inc. (NASDAQ:ZS)"
+        },
+        {
+          "ticker": "NYSE:TOL",
+          "n": 4916,
+          "example_title": "Toll Brothers Breaks Ground at Lynnfield Active Adult Community in Lynnfield, Massachusett"
+        },
+        {
+          "ticker": "NYSE:GME",
+          "n": 4714,
+          "example_title": "Why GameStop (GME) Is Up 10.3% After Swinging to Profit in Q2 Earnings Report"
+        },
+        {
+          "ticker": "NYSEARCA:GLD",
+          "n": 4703,
+          "example_title": "Asia And Europe Markets Mixed, Gold Jumps On Safe-Haven Demand - Global Markets Today Whil"
+        },
+        {
+          "ticker": "NYSE:XLK",
+          "n": 4695,
+          "example_title": "Should You Invest in the Technology Select Sector SPDR ETF (XLK)?"
+        },
+        {
+          "ticker": "NYSE:JHG",
+          "n": 4663,
+          "example_title": "United Services Automobile Association Takes $300,000 Position in Janus Henderson Group pl"
+        },
+        {
+          "ticker": "NASDAQ:ASTS",
+          "n": 4595,
+          "example_title": "AST SpaceMobile, Inc. (NASDAQ:ASTS) Director Sells $614,600.00 in Stock"
+        },
+        {
+          "ticker": "NASDAQ:ROKU",
+          "n": 4503,
+          "example_title": "Roku (NASDAQ:ROKU) Trading Down 0.7% - Here's What Happened"
+        },
+        {
+          "ticker": "NASDAQ:AFRM",
+          "n": 4377,
+          "example_title": "Dynamic Technology Lab Private Ltd Sells 40,304 Shares of Affirm Holdings, Inc. $AFRM"
+        }
+      ],
+      "duplicate_ids_dropped": 0
+    },
+    "flags_by_year": [
+      {
+        "non_news": 0.030942494738638304,
+        "junk_tag": 0.08173596496217507,
+        "is_13f": 0.0017632671634150504,
+        "is_form4": 0.001080712132415676,
+        "after_fact": 0.02070416927364769,
+        "premarket_talk": 0.00034127751549968717
+      },
+      {
+        "non_news": 0.04993059019869685,
+        "junk_tag": 0.13859032098038043,
+        "is_13f": 0.10542924994337438,
+        "is_form4": 0.006194772656846002,
+        "after_fact": 0.07227373724881503,
+        "premarket_talk": 0.002838923404651499
+      },
+      {
+        "non_news": 0.016929928424623413,
+        "junk_tag": 0.14588841285251858,
+        "is_13f": 0.2846604166618394,
+        "is_form4": 0.006526126518572756,
+        "after_fact": 0.07424062673058787,
+        "premarket_talk": 0.003441480352107291
+      },
+      {
+        "non_news": 0.006737395024345777,
+        "junk_tag": 0.17266549036773632,
+        "is_13f": 0.2820274459722291,
+        "is_form4": 0.009201305060040885,
+        "after_fact": 0.10847973140673017,
+        "premarket_talk": 0.0037816055126602558
+      }
+    ]
+  },
+  "final": {
+    "dedupe_novelty": {
+      "usable_articles": 1669437,
+      "representatives": 1494138,
+      "duplicate_share": 0.10500486092017847,
+      "group_size_quantiles": {
+        "0.5": 1.0,
+        "0.9": 1.0,
+        "0.99": 3.0,
+        "1.0": 48.0
+      },
+      "novelty_quantiles": {
+        "0.01": 0.00014525651931762695,
+        "0.1": 0.06986352205276489,
+        "0.25": 0.12831425666809082,
+        "0.5": 0.20645630359649658,
+        "0.75": 0.28622281551361084,
+        "0.9": 0.35144219398498544
+      },
+      "novelty_is_one_share": 0.0037437770937148273,
+      "keep": 1494138,
+      "has_clean_text_false_among_clean": 30733
+    },
+    "embedding": {
+      "rows": 2906710,
+      "dtype": "float16",
+      "dim": 384,
+      "norm_min": 0.9994363188743591,
+      "norm_max": 1.0005637407302856,
+      "kept_ids_with_exactly_one_row": true,
+      "ids_unique": true
+    },
+    "novelty_variant": {
+      "articles": 94037,
+      "mean_abs_diff": 0.0016819136255960333,
+      "share_diff_gt_0.01": 0.0504056913767985,
+      "spearman": 0.9972842318517142
+    },
+    "coverage": {
+      "member_months": 18555,
+      "covered_share": 0.9139854486661277,
+      "uncovered_companies": [
+        1,
+        4,
+        5,
+        9,
+        13,
+        15,
+        21,
+        23,
+        29,
+        31,
+        33,
+        34,
+        36,
+        38,
+        39,
+        40,
+        43,
+        53,
+        57,
+        58,
+        59,
+        62,
+        63,
+        64,
+        65,
+        66,
+        71,
+        74,
+        75,
+        76,
+        79,
+        83,
+        85,
+        86,
+        88,
+        92,
+        95,
+        98,
+        99,
+        102,
+        107,
+        110,
+        127,
+        128,
+        130,
+        131,
+        133,
+        136,
+        138,
+        139,
+        143,
+        144,
+        145,
+        146,
+        148,
+        154,
+        155,
+        165,
+        168,
+        171
+      ],
+      "by_year": {
+        "2023": 0.6128281821203058,
+        "2024": 0.9489778959614426,
+        "2025": 0.9898654261505233,
+        "2026": 0.982051282051282
+      }
+    },
+    "leavers": {
+      "n": 61,
+      "median_ratio": 0.7557424103443136,
+      "share_zero_news": 0.26229508196721313
+    }
+  }
+}
