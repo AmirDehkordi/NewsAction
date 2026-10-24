@@ -14,8 +14,18 @@
   pseudo-splits do not change share counts and are ignored. ``share_basis`` checks the restatement
   per split; a split whose shares were not restated is handled as-reported. The share row is the
   latest with ``known_from`` <= close(m). (PREREG §15.)
-- **Fallback.** A company without shares gets the cap of the company with the nearest 63-session
-  dollar volume and is flagged.
+- **Share cross-check.** CIQ's count is compared with an independent one: the Yahoo share count of
+  the same class (work/market/shares.parquet; the latest observation dated at least 45 days before m,
+  at most 400 days, brought to m's basis through the true splits in between). If CIQ is missing or
+  differs by more than ``SHARE_TOLERANCE``x, the Yahoo count is used (``shares_source`` =
+  ``yahoo_ciq_missing`` / ``yahoo_ciq_rejected``); both counts are kept for review. ATOM's CIQ rows
+  are corrupt for some names (MRSH 1.07M shares, BNY's interleaved off-quarter rows, CBRE, CTRA,
+  ...): PREREG §15.
+- **Stale closes.** A ``stale_public`` close (test months, no usable test-period close) is paired
+  with shares on the basis of the session it comes from (``stale_basis``), so a split after it
+  cannot halve or double the cap.
+- **Fallback.** A company with neither count gets the cap of the company with the nearest
+  63-session dollar volume and is flagged.
 - **Tiers.** Companies that are index members at m are ranked by cap (ties: smaller company_id
   first): Top-100 (ranks 1-100), Mid (101-250), Rest (251+). Companies joining during M are not
   ranked; their tier compares their cap at m with the rank-100 / rank-250 caps. DV tiers rank the
@@ -35,6 +45,10 @@ TOP: Final = "top100"
 MID: Final = "mid"
 REST: Final = "rest"
 TOP_N: Final = 100
+SHARE_TOLERANCE: Final = 1.5
+YAHOO_LAG_DAYS: Final = 45
+YAHOO_MAX_AGE_DAYS: Final = 400
+YAHOO_SPLIT_SETTLE_DAYS: Final = 30
 MID_N: Final = 250
 
 
@@ -162,6 +176,77 @@ class ShareBook:
         return value, pe
 
 
+class YahooShares:
+    """Independent share counts per symbol (Yahoo, as-of dated; millions on a requested basis)."""
+
+    def __init__(
+        self,
+        shares: pd.DataFrame,
+        tickers: dict[int, list[str]],
+        splits: dict[int, list[tuple[pd.Timestamp, float]]],
+    ) -> None:
+        by_ticker = {str(t): g for t, g in shares.groupby("ticker")}
+        self._series: dict[int, tuple[str, pd.Series]] = {}
+        for sid, candidates in tickers.items():
+            for t in candidates:
+                g = by_ticker.get(t)
+                if g is not None and len(g):
+                    s = pd.Series(
+                        g["shares"].to_numpy(dtype="float64") / 1e6, index=pd.DatetimeIndex(g["date"])
+                    )
+                    self._series[sid] = (t, s.sort_index())
+                    break
+        self._splits = splits
+
+    def ticker(self, symbol_id: int) -> str | None:
+        hit = self._series.get(int(symbol_id))
+        return None if hit is None else hit[0]
+
+    def at(self, symbol_id: int, m: pd.Timestamp, basis: pd.Timestamp) -> tuple[float, pd.Timestamp | None]:
+        """Latest count dated in [m - 400d, m - 45d], expressed on ``basis``'s share basis.
+
+        Only observations at least 30 days after the last true split up to the basis session are
+        used (Yahoo's series is sometimes restated before an ex-date and updated late after it).
+        NaN when the count cannot be trusted as a reference: a true split still lies between the
+        observation and the basis session, or the count is off by more than SHARE_TOLERANCE x from
+        the median of the symbol's own observations over the previous year (a transient vendor
+        error, e.g. HST 2024-Q4).
+        """
+        hit = self._series.get(int(symbol_id))
+        if hit is None:
+            return float("nan"), None
+        s = hit[1]
+        splits = self._splits.get(int(symbol_id), [])
+        lo, hi = m - pd.Timedelta(days=YAHOO_MAX_AGE_DAYS), m - pd.Timedelta(days=YAHOO_LAG_DAYS)
+        settled = sorted(ex + pd.Timedelta(days=YAHOO_SPLIT_SETTLE_DAYS) for ex, _ in splits if ex <= basis)
+        lo = max([lo, *settled])  # observations on the basis session's side of every split
+        w = s[(s.index >= lo) & (s.index <= hi)]
+        if w.empty:
+            return float("nan"), None
+        obs, value = pd.Timestamp(w.index[-1]), float(w.iloc[-1])
+        if any(min(obs, basis) < ex <= max(obs, basis) for ex, _ in splits):
+            return float("nan"), obs
+        trail = s[(s.index > max([obs - pd.Timedelta(days=365), *settled[-1:]])) & (s.index <= obs)]
+        med = float(trail.median())
+        if not 1 / SHARE_TOLERANCE <= value / med <= SHARE_TOLERANCE:
+            return float("nan"), obs
+        return value, obs
+
+
+def cross_check(ciq: float, yahoo: float) -> tuple[float, str]:
+    """(shares used, source): CIQ unless it is missing or off by more than SHARE_TOLERANCE x."""
+    if np.isfinite(ciq) and np.isfinite(yahoo) and yahoo > 0:
+        ratio = ciq / yahoo
+        if 1 / SHARE_TOLERANCE <= ratio <= SHARE_TOLERANCE:
+            return ciq, "ciq"
+        return yahoo, "yahoo_ciq_rejected"
+    if np.isfinite(ciq):
+        return ciq, "ciq_unchecked"
+    if np.isfinite(yahoo):
+        return yahoo, "yahoo_ciq_missing"
+    return float("nan"), "missing"
+
+
 def assign_ranks(values: pd.Series, company_ids: Iterable[int]) -> pd.Series:
     """Dense 1..n ranks by value descending, ties by smaller company_id; NaN values unranked."""
     df = pd.DataFrame({"v": values, "cid": list(company_ids)}).dropna(subset=["v"])
@@ -213,6 +298,8 @@ def monthly_tiers(
     company: dict[int, int],
     book: ShareBook,
     known_by: dict[pd.Timestamp, pd.Timestamp],
+    yahoo: YahooShares | None = None,
+    stale_basis: pd.Timestamp | None = None,
 ) -> pd.DataFrame:
     """tiers_monthly: one row per (applied month, company) of companies that are members in it.
 
@@ -241,14 +328,15 @@ def monthly_tiers(
         for cid in sorted(comp_any):
             classes = classes_of[cid]
             rep_sid = int(rep_m.get(cid, classes[0]))
-            value, pe = book.at(rep_sid, m, known_by[m])
-            share_src = "rep"
-            for alt in classes:
-                if np.isfinite(value):
-                    break
-                if alt != rep_sid:
-                    value, pe = book.at(alt, m, known_by[m])
-                    share_src = "other_class"
+            source = source_m.get(rep_sid)
+            basis = stale_basis if source == "stale_public" and stale_basis is not None else m
+            ciq, pe, y, y_obs = float("nan"), None, float("nan"), None
+            for sid in [rep_sid, *(c for c in classes if c != rep_sid)]:  # company-level counts
+                if not np.isfinite(ciq):
+                    ciq, pe = book.at(sid, basis, known_by[m])
+                if yahoo is not None and not np.isfinite(y):
+                    y, y_obs = yahoo.at(sid, m, basis)
+            value, share_src = cross_check(ciq, y)
             price = float(close_m.get(rep_sid, np.nan))
             cap = price * value * 1e6 if np.isfinite(value) else np.nan  # shares_basic is in millions
             advs = [float(adv_m.get(c, np.nan)) for c in classes]
@@ -261,10 +349,13 @@ def monthly_tiers(
                     "rep_symbol_id": rep_sid,
                     "member_at_ranking": cid in comp_m,
                     "raw_close": price,
-                    "close_source": source_m.get(rep_sid),
+                    "close_source": source,
                     "shares_mn": value,
-                    "shares_period_end": pe,
-                    "shares_source": share_src if np.isfinite(value) else "missing",
+                    "shares_source": share_src,
+                    "ciq_shares_mn": ciq,
+                    "ciq_period_end": pe,
+                    "yahoo_shares_mn": y,
+                    "yahoo_obs_date": y_obs,
                     "cap_usd": cap,
                     "adv63_usd": adv,
                 }

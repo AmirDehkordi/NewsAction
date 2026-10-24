@@ -15,7 +15,7 @@ prices but not share counts, so ``is_true_split`` separates them (PREREG §15).
 from __future__ import annotations
 
 from collections.abc import Hashable
-from typing import Any, Final
+from typing import Any, Final, cast
 
 import numpy as np
 import pandas as pd
@@ -122,6 +122,54 @@ def reconstruct_raw_close(
                 prev_rc = res[i]
         out.loc[after, sid] = res
     return out
+
+
+LEVEL_MIN_EX_DATES: Final = 4
+LEVEL_MIN_JUMP: Final = 5e-4  # dividend factor jumps below this are too noisy (e.g. NVDA's $0.01)
+LEVEL_MAX_IQR: Final = 0.05
+LEVEL_TOLERANCE: Final = 1.25
+
+
+def raw_level_check(
+    f: pd.DataFrame, rc: pd.DataFrame, actions: pd.DataFrame, public: pd.Index
+) -> pd.DataFrame:
+    """Per symbol: is ATOM's raw close on the as-traded price level?
+
+    Data/prices applies a cash dividend D with ex-date e as f_{e-1} = f_e * (1 - D / C_{e-1}), where
+    C is the as-traded close. So C*_{e-1} = D / (1 - f_{e-1} / f_e) recovers the as-traded level from
+    the factor alone, and rho = C* / RC_{e-1} compares it with ATOM's raw close (rho = 1 when ATOM is
+    as traded). ``level_factor`` is the median rho for symbols with at least ``LEVEL_MIN_EX_DATES``
+    usable ex-dates, an IQR <= ``LEVEL_MAX_IQR`` and a median off by more than ``LEVEL_TOLERANCE``x
+    (HON: ATOM's 2023-2025 raw prices are half the traded prices); 1 otherwise.
+    """
+    div = actions[(actions["kind"] == "cash_dividend") & actions["ex_session"].isin(public)]
+    amounts = div.groupby(["symbol_id", "ex_session"], as_index=False).agg(cash_amount=("cash_amount", "sum"))
+    f_pub, rc_pub = f.loc[public], rc.loc[public]
+    prev_f, prev_rc = f_pub.shift(1), rc_pub.shift(1)
+    rows = []
+    for key, g in amounts.groupby("symbol_id"):
+        sid = int(cast(int, key))
+        if sid not in f_pub.columns:
+            continue
+        ex = pd.DatetimeIndex(g["ex_session"])
+        fa = f_pub[sid].reindex(ex).to_numpy(dtype="float64")
+        fb = prev_f[sid].reindex(ex).to_numpy(dtype="float64")
+        cb = prev_rc[sid].reindex(ex).to_numpy(dtype="float64")
+        jump = 1.0 - fb / fa
+        rho = (g["cash_amount"].to_numpy(dtype="float64") / jump) / cb
+        ok = np.isfinite(rho) & (jump > LEVEL_MIN_JUMP) & (jump < 0.2)
+        r = rho[ok]
+        med = float(np.median(r)) if len(r) else float("nan")
+        iqr = float(np.subtract(*np.quantile(r, [0.75, 0.25]))) if len(r) else float("nan")
+        flagged = (
+            len(r) >= LEVEL_MIN_EX_DATES
+            and iqr <= LEVEL_MAX_IQR
+            and abs(np.log(med)) > np.log(LEVEL_TOLERANCE)
+        )
+        rows.append((sid, len(r), med, iqr, med if flagged else 1.0))
+    out = pd.DataFrame(rows, columns=["symbol_id", "level_n", "level_rho", "level_iqr", "level_factor"])
+    out = out.set_index("symbol_id").reindex(pd.Index(f.columns, name="symbol_id"))
+    return out.fillna({"level_factor": 1.0, "level_n": 0})
 
 
 def unit_ratio(num: pd.DataFrame, den: pd.DataFrame, window: pd.Index) -> pd.Series:

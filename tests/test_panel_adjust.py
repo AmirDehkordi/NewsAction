@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+from collections.abc import Callable
 from datetime import date
 
 import numpy as np
@@ -173,3 +174,66 @@ def test_ac3_literal_ex_dividend_mean_difference_below_3bp(panel_public: pd.Data
     d = _ex_dividend_frame(panel_public)
     diff = d.loc[d["ex_div"], "ar_on"].mean() - d.loc[~d["ex_div"], "ar_on"].mean()
     assert abs(diff) < 3e-4
+
+
+# --- raw price level (verifier finding F2: ATOM's HON raw prices are half the traded prices) ----------
+
+
+def _dividend_case(
+    level: float, dividend: float = 1.0, n_div: int = 6
+) -> tuple[pd.DataFrame, pd.DataFrame, pd.DataFrame]:
+    idx = pd.DatetimeIndex(pd.bdate_range("2024-01-02", periods=200), name="session")
+    traded = pd.Series(100.0, index=idx)
+    ex_pos = list(range(20, 20 + 30 * n_div, 30))
+    f = pd.Series(1.0, index=idx)
+    for p in ex_pos:  # Yahoo: prices before the ex-date are scaled by (1 - D / C_{e-1})
+        f.iloc[:p] *= 1 - dividend / traded.iloc[p - 1]
+    acts = pd.DataFrame(
+        {
+            "symbol_id": [1] * n_div,
+            "action_type": ["cash_dividend"] * n_div,
+            "ex_date": [idx[p].date() for p in ex_pos],
+            "split_ratio": [np.nan] * n_div,
+            "cash_amount": [dividend] * n_div,
+        }
+    )
+    rc = pd.DataFrame({1: traded / level}, index=idx)  # ATOM raw on the wrong level when level != 1
+    return pd.DataFrame({1: f * level}, index=idx), rc, adjust.classify_actions(acts)
+
+
+@pytest.mark.parametrize(("level", "flagged"), [(1.0, False), (2.0, True), (1.1, False), (0.5, True)])
+def test_raw_level_check(level: float, flagged: bool) -> None:
+    f, rc, acts = _dividend_case(level)
+    out = adjust.raw_level_check(f, rc, acts, f.index)
+    assert out.loc[1, "level_rho"] == pytest.approx(level, rel=1e-9)
+    assert out.loc[1, "level_factor"] == (pytest.approx(level) if flagged else 1.0)
+
+
+def test_raw_level_check_ignores_tiny_dividends_and_few_ex_dates() -> None:
+    f, rc, acts = _dividend_case(2.0, dividend=0.01)  # factor jumps below LEVEL_MIN_JUMP
+    assert adjust.raw_level_check(f, rc, acts, f.index).loc[1, "level_factor"] == 1.0
+    f, rc, acts = _dividend_case(2.0, n_div=3)
+    assert adjust.raw_level_check(f, rc, acts, f.index).loc[1, "level_factor"] == 1.0
+
+
+def test_hon_raw_level_golden_through_the_code(snapshot: Callable[[str], pd.DataFrame]) -> None:
+    """HON's ATOM raw close is half its traded price (rho = 2); AAPL and JNJ are on the traded level."""
+    import pyarrow.parquet as pq
+
+    from newsaction.config import load_splits
+    from newsaction.panel.grid import session_index, wide
+
+    end = load_splits().splits["val_b"].end
+    syms = snapshot("symbols")
+    ids = {t: int(syms.loc[syms["ticker"] == t, "symbol_id"].item()) for t in ("HON", "AAPL", "JNJ")}
+    sessions = session_index(date(2023, 1, 3), end)
+    px = snapshot("prices_raw").rename(columns={"trade_date": "session"})
+    rc = wide(px[px["symbol_id"].isin(ids.values())], "close", sessions, list(ids.values()))
+    dp = pq.read_table("Data/prices/prices.parquet", filters=[("date", "<=", pd.Timestamp(end))]).to_pandas()
+    dp = dp[dp["symbol"].isin(list(ids))].rename(columns={"date": "session"})
+    ac = wide(dp, "close", sessions, list(ids), symbol_col="symbol").rename(columns=ids)
+    out = adjust.raw_level_check(
+        ac / rc, rc, adjust.classify_actions(snapshot("corporate_actions")), sessions
+    )
+    assert out.loc[ids["HON"], "level_factor"] == pytest.approx(2.0, abs=0.01)
+    assert out.loc[ids["AAPL"], "level_factor"] == 1.0 and out.loc[ids["JNJ"], "level_factor"] == 1.0

@@ -176,3 +176,118 @@ def test_fallback_count_reported(tiers_monthly: pd.DataFrame) -> None:
     ranked = tiers_monthly[tiers_monthly["tier_source"] == "ranked"]
     per_month = ranked.groupby("month")["fallback_dv"].sum()
     assert per_month.max() <= 25, per_month.to_dict()
+
+
+# --- independent share cross-check (verifier finding F1: corrupt CIQ rows) ----------------------------
+
+
+def test_cross_check_rule() -> None:
+    assert tiers.cross_check(100.0, 120.0) == (100.0, "ciq")
+    assert tiers.cross_check(1.07, 492.0) == (492.0, "yahoo_ciq_rejected")
+    assert tiers.cross_check(float("nan"), 300.0) == (300.0, "yahoo_ciq_missing")
+    assert tiers.cross_check(300.0, float("nan")) == (300.0, "ciq_unchecked")
+    v, src = tiers.cross_check(float("nan"), float("nan"))
+    assert np.isnan(v) and src == "missing"
+
+
+def _yahoo(values: dict[str, float], splits: list[tuple[str, float]] | None = None) -> tiers.YahooShares:
+    df = pd.DataFrame(
+        {"ticker": "X", "date": pd.to_datetime(list(values)), "shares": [v * 1e6 for v in values.values()]}
+    )
+    spl = [(pd.Timestamp(d), r) for d, r in (splits or [])]
+    return tiers.YahooShares(df, {1: ["NOPE", "X"]}, {1: spl})
+
+
+def test_yahoo_reference_is_lagged_and_resolved_through_candidates() -> None:
+    y = _yahoo({"2024-01-15": 100.0, "2024-05-20": 110.0})
+    v, obs = y.at(1, pd.Timestamp("2024-05-31"), pd.Timestamp("2024-05-31"))
+    assert v == 100.0 and obs == pd.Timestamp("2024-01-15")  # 2024-05-20 is inside the 45-day lag
+    assert y.ticker(1) == "X"
+
+
+def test_yahoo_reference_skips_unsettled_splits_and_transient_errors() -> None:
+    y = _yahoo({"2024-01-15": 100.0, "2024-03-01": 400.0, "2024-04-01": 400.0}, splits=[("2024-02-20", 4.0)])
+    v, _ = y.at(1, pd.Timestamp("2024-05-31"), pd.Timestamp("2024-05-31"))
+    assert v == 400.0  # only post-split observations count
+    v, _ = y.at(1, pd.Timestamp("2024-03-15"), pd.Timestamp("2024-03-15"))
+    assert np.isnan(v)  # no settled post-split observation yet
+    z = _yahoo({"2024-01-15": 100.0, "2024-02-15": 101.0, "2024-03-15": 210.0})
+    v, _ = z.at(1, pd.Timestamp("2024-05-31"), pd.Timestamp("2024-05-31"))
+    assert np.isnan(v)  # a jump away from its own trailing median is not a reference
+
+
+@pytest.fixture(scope="module")
+def inputs(panel_public: pd.DataFrame) -> object:
+    from newsaction.panel import build
+
+    return build.load_inputs()
+
+
+SHARE_GOLDENS = {  # ticker: plausible share count (millions) at the 2025-08-29 ranking session
+    "MRSH": (470.0, 510.0),  # CIQ: 1.07M from 2024-Q2
+    "BNY": (680.0, 770.0),  # CIQ: interleaved 48-57M off-quarter rows
+    "CBRE": (290.0, 320.0),  # CIQ: 43M
+    "CTRA": (740.0, 790.0),  # CIQ: 18.5bn
+    "V": (1850.0, 2050.0),  # CIQ: none
+    "GOOGL": (12000.0, 12400.0),  # control: CIQ company-level count kept
+}
+
+
+@pytest.mark.parametrize("ticker", sorted(SHARE_GOLDENS))
+def test_share_goldens_through_the_cross_check(
+    inputs: object, snapshot: Callable[[str], pd.DataFrame], ticker: str
+) -> None:
+    from newsaction import io
+    from newsaction.panel import build
+
+    assert isinstance(inputs, build.Inputs)
+    mp = io.read_parquet("panel/mapping.parquet")
+    syms = snapshot("symbols")
+    sid = int(syms.loc[syms["ticker"] == ticker, "symbol_id"].item())
+    m = pd.Timestamp("2025-08-29")
+    yahoo = build._yahoo_shares(inputs, mp, [int(s) for s in mp["symbol_id"]])
+    book = tiers.share_book(inputs.shares, inputs.actions)
+    ciq, _ = book.at(sid, m, calendar.close_utc(m.date()))
+    y, _ = yahoo.at(sid, m, m)
+    value, _ = tiers.cross_check(ciq, y)
+    lo, hi = SHARE_GOLDENS[ticker]
+    assert lo < value < hi, (ticker, ciq, y)
+
+
+@pytest.mark.parametrize(
+    ("ticker", "allowed"),
+    [
+        ("HON", {tiers.TOP}),
+        ("V", {tiers.TOP}),
+        ("BRK-B", {tiers.TOP}),
+        ("BNY", {tiers.MID}),
+        ("CTRA", {tiers.MID, tiers.REST}),
+    ],
+)
+def test_verifier_tier_goldens(
+    tiers_monthly: pd.DataFrame, companies: pd.DataFrame, ticker: str, allowed: set[str]
+) -> None:
+    from newsaction.config import load_splits
+
+    cid = int(companies.loc[companies["ticker"] == ticker, "company_id"].iloc[0])
+    end = load_splits().splits["val_b"].end
+    t = tiers_monthly[(tiers_monthly["company_id"] == cid) & (tiers_monthly["ranking_session"] <= end)]
+    assert len(t) >= 25 and set(t["tier"]) <= allowed, t["tier"].value_counts().to_dict()
+
+
+def test_hon_and_mrsh_caps(tiers_monthly: pd.DataFrame, companies: pd.DataFrame) -> None:
+    caps = tiers_monthly.merge(
+        companies.drop_duplicates("company_id")[["company_id", "ticker"]], on="company_id"
+    )
+    sep = caps[caps["month"] == "2025-09"].set_index("ticker")["cap_usd"]
+    assert 1.1e11 < sep["HON"] < 1.7e11  # verifier: $136.6bn on 2025-09-04
+    assert 8.0e10 < sep["MRSH"] < 1.3e11
+
+
+def test_test_months_carry_no_price_levels(tiers_monthly: pd.DataFrame) -> None:
+    from newsaction.config import load_splits
+
+    blind = tiers_monthly[tiers_monthly["ranking_session"] > load_splits().splits["val_b"].end]
+    assert len(blind) > 0
+    assert blind[["raw_close", "cap_usd", "cap_rank_value", "adv63_usd"]].isna().all().all()
+    assert blind["tier"].notna().mean() > 0.99

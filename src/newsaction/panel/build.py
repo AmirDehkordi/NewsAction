@@ -120,6 +120,7 @@ class Inputs:
     shares: pd.DataFrame
     dp: pd.DataFrame
     spy_close: pd.Series
+    yahoo_shares: pd.DataFrame
     public_end: date
     test_start: date
     test_end: date
@@ -152,6 +153,8 @@ def load_inputs(layout: Layout | None = None) -> Inputs:
     mp = io.read_parquet("market/market_prices.parquet", layout=layout)
     spy = mp[(mp["symbol"] == SPY) & (mp["date"] <= pd.Timestamp(test_end))]
     spy_close = pd.Series(spy["close"].to_numpy(), index=pd.to_datetime(spy["date"]).dt.normalize())
+    ys = io.read_parquet("market/shares.parquet", layout=layout)  # share counts only, no prices
+    ys = ys[ys["date"] <= pd.Timestamp(test_end)]
     return Inputs(
         members=_snap("members_by_session", layout),
         symbols=_snap("symbols", layout),
@@ -163,6 +166,7 @@ def load_inputs(layout: Layout | None = None) -> Inputs:
         shares=_snap("shares_basic", layout),
         dp=dp,
         spy_close=spy_close,
+        yahoo_shares=ys,
         public_end=splits["val_b"].end,
         test_start=splits["test"].start,
         test_end=test_end,
@@ -278,6 +282,7 @@ def _ranking_inputs(
     symbols: list[int],
     public_end: pd.Timestamp,
     actions: pd.DataFrame,
+    level: pd.Series,
 ) -> tuple[pd.DataFrame, pd.DataFrame, pd.DataFrame, pd.DataFrame]:
     """(dollar volume, raw close for ranking, its source, 63-session ADV ending at each session).
 
@@ -285,18 +290,22 @@ def _ranking_inputs(
     Data/prices (unit-matched to ATOM over the last 63 public sessions); raw close reconstructed from
     the adjusted close (``adjust.reconstruct_raw_close``); names without Data/prices keep their last
     public close and ADV (``stale_public``). PREREG §15.
+
+    ``level`` (per symbol) rescales ATOM raw closes that are not on the traded price level
+    (``adjust.raw_level_check``). Those symbols also take ``stale_public`` closes in test months,
+    because their reconstructed level would depend on how each vendor treated a later split.
     """
     sessions = pr.rc.index
     test = _rows_mask(np.asarray(sessions > public_end), pr.rc[symbols])
     public = sessions[sessions <= public_end]
     dv_yahoo = pr.ac[symbols] * pr.vol_dp
-    dv = pr.rc[symbols] * pr.rv[symbols]
+    raw = pr.rc[symbols] * _broadcast(level, pr.rc[symbols])  # raw close on the traded level
+    dv = raw * pr.rv[symbols]
     kappa = adjust.unit_ratio(dv, dv_yahoo, public[-DV_UNIT_WINDOW:])
     dv = dv.mask(test & dv.isna(), dv_yahoo * _broadcast(kappa, dv))
-    rc_hat = adjust.reconstruct_raw_close(
-        pr.ac[symbols], _row(r["f"][symbols], public_end), public_end, actions
-    )
-    raw = pr.rc[symbols]
+    f_level = r["f"][symbols] / _broadcast(level, raw)
+    rc_hat = adjust.reconstruct_raw_close(pr.ac[symbols], _row(f_level, public_end), public_end, actions)
+    rc_hat.loc[:, list(level.index[level != 1.0])] = np.nan
     close = raw.combine_first(rc_hat)
     source = pd.DataFrame(None, index=sessions, columns=symbols, dtype=object)
     source = source.mask(rc_hat.notna(), "reconstructed").mask(raw.notna(), "atom_raw")
@@ -344,6 +353,24 @@ def _volume(pr: _Prices, symbols: list[int], public_end: pd.Timestamp, actions: 
     return vol.mask(test & vol.isna(), vol_test)
 
 
+def _yahoo_shares(inp: Inputs, mp: pd.DataFrame, symbols: list[int]) -> tiers.YahooShares:
+    """Yahoo share counts per symbol: the Data/prices symbol, else the ATOM ticker or an alias."""
+    aliases: dict[int, list[str]] = {}
+    for sid, t in zip(inp.symbol_tickers["symbol_id"], inp.symbol_tickers["ticker"], strict=True):
+        aliases.setdefault(int(sid), []).append(mapping.normalize_ticker(str(t)))
+    tickers: dict[int, list[str]] = {}
+    for rec in mp.to_dict("records"):
+        sid = int(rec["symbol_id"])
+        if sid in symbols:
+            first = [str(rec["price_symbol"])] if isinstance(rec["price_symbol"], str) else []
+            tickers[sid] = [*first, mapping.normalize_ticker(str(rec["atom_ticker"])), *aliases.get(sid, [])]
+    spl = inp.actions[inp.actions["kind"] == "split"]
+    splits: dict[int, list[tuple[pd.Timestamp, float]]] = {}
+    for sid, ex, ratio in zip(spl["symbol_id"], spl["ex_session"], spl["split_ratio"], strict=True):
+        splits.setdefault(int(sid), []).append((pd.Timestamp(ex), float(ratio)))
+    return tiers.YahooShares(inp.yahoo_shares, tickers, splits)
+
+
 def assemble(inp: Inputs) -> Assembled:
     """The full grid computation (pure: no I/O)."""
     sessions = session_index(HISTORY_START, inp.test_end)
@@ -359,11 +386,14 @@ def assemble(inp: Inputs) -> Assembled:
     r = adjust.returns(pr.ac, pr.ro, pr.rc)
     mapped = pd.Series(True, index=pr.mapping.loc[pr.mapping["price_symbol"].notna(), "symbol_id"])
     qc = adjust.qc_flags(r, pr.tc, inp.actions, mapped, public)
+    lvl = adjust.raw_level_check(r["f"][symbols], pr.rc[symbols], inp.actions, public)
+    level = lvl["level_factor"].astype("float64")
+    pr.mapping = pr.mapping.merge(lvl.reset_index(), on="symbol_id", how="left")
 
     comp = tiers.companies(inp.symbols[inp.symbols["symbol_id"].isin(symbols)])
     company = {int(a): int(b) for a, b in zip(comp["symbol_id"], comp["company_id"], strict=True)}
     members = _members_wide(inp.members, sessions, symbols)
-    dv, close_rank, close_source, adv = _ranking_inputs(pr, r, symbols, public_end, inp.actions)
+    dv, close_rank, close_source, adv = _ranking_inputs(pr, r, symbols, public_end, inp.actions, level)
     ranking = tiers.month_ranking_sessions(sessions)
 
     # S3: sector and leave-one-company-out sector returns
@@ -404,7 +434,12 @@ def assemble(inp: Inputs) -> Assembled:
         company,
         tiers.share_book(inp.shares, inp.actions),
         known_by,
+        yahoo=_yahoo_shares(inp, pr.mapping, symbols),
+        stale_basis=public_end,
     )
+    # test months keep ranks and tiers; their price-level columns come from test closes and are dropped
+    blind = pd.to_datetime(tm["ranking_session"]) > public_end
+    tm.loc[blind, ["raw_close", "cap_usd", "cap_rank_value", "adv63_usd"]] = np.nan
 
     spy = {
         f"r_spy_{x}": pd.DataFrame(
@@ -566,7 +601,7 @@ def write_all(asm: Assembled, inp: Inputs, layout: Layout | None = None) -> dict
     qc = asm.qc.merge(asm.static[["symbol_id", "ticker"]], on="symbol_id", how="left")
     qc["session"] = pd.to_datetime(qc["session"]).dt.date
     tm = asm.tiers_monthly.copy()
-    for c in ("ranking_session", "shares_period_end"):
+    for c in ("ranking_session", "ciq_period_end", "yahoo_obs_date"):
         tm[c] = pd.to_datetime(tm[c]).dt.date
     files = {
         "panel/panel_public.parquet": (
