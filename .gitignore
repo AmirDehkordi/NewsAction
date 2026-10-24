@@ -1,0 +1,31 @@
+# Raw data (read-only, never committed), derived data and the response cache.
+# No trailing slash, so the paths are ignored even before the directories exist.
+/Data
+/work
+/cache
+
+# Secrets
+.env
+kaggle.json
+
+# Large binaries / databases
+*.sqlite
+*.ckpt
+*.safetensors
+
+# Python tooling
+.venv/
+__pycache__/
+*.py[cod]
+.mypy_cache/
+.ruff_cache/
+.pytest_cache/
+.hypothesis/
+.coverage
+htmlcov/
+
+# filelock sidecar files next to the committed ledgers
+*.jsonl.lock
+
+# OS
+.DS_Store

@@ -1,0 +1,28 @@
+# Project constants. Every value equals docs/PREREG.md (tests/test_configs_match_prereg.py).
+# Hashed into the NA-11 freeze (PREREG §4.4).
+
+timezone: America/New_York        # PREREG §2.1
+exchange: XNYS                    # PREREG §2.1 (exchange_calendars code)
+d0_cutoff: "09:15"                # PREREG §2.4: W0(s) = (close(prev(s)), 09:15 ET of s]
+d1_time: "10:00"                  # PREREG §2.5: D1 decision time (10:00 bar close)
+
+# Range of the session table built by newsaction.calendar (not a PREREG quantity).
+calendar:
+  start: 2010-01-01
+  end: 2027-12-31
+
+budget:                           # OpenRouter USD, PREREG §13
+  total_usd: 30.0
+  reserve_usd: 1.8
+  chunk_caps:                     # chunks not listed have a cap of $0
+    NA-05: 0.20
+    NA-06: 4.0
+    NA-07: 2.0
+    NA-09: 2.0
+    NA-11: 18.0
+    NA-15: 2.0
+
+fmp_request_cap: 3000             # PREREG §13 (NA-10 only)
+
+seeds:
+  global: 2026                    # PREREG §8.2 stratified samples, §11.4 bootstrap

@@ -1,0 +1,43 @@
+# Availability registry (CLAUDE.md A5): when each column becomes known relative to session s.
+# newsaction.pit.AvailabilityRegistry loads this file; check_inputs() refuses any column that is
+# unknown here or whose kind is not visible at the decision point. Every chunk that creates a
+# state/model input column registers it here.
+#
+# Decision points (PREREG §2.5) see these kinds (cumulative):
+#   D0 (09:15 ET):     static, t_minus_1, w0
+#   D1 (10:00 ET):     D0 + d1
+#   D2 (after close):  D1 + w2, d2_reaction
+#   "post" is visible at no decision point.
+
+kinds:
+  static: known at any time (identifiers, the session date itself, fixed metadata)
+  t_minus_1: computed only from data through close(prev(s)) (beta, sigma, tiers, momentum, market context)
+  w0: derived from news with t_avail in W0(s) = (close(prev(s)), 09:15 ET of s]
+  d1: observed reaction from close(prev(s)) to the 10:00 bar close of s (NA-10 bars)
+  w2: derived from news with t_avail in W2(s) = (close(prev(s)), close(s)]
+  d2_reaction: observed full-day reaction close(prev(s)) -> close(s) (e.g. G at D2 = z_cc,t)
+  post: outcomes and labels (targets); never a model input
+
+columns:
+  # identifiers
+  session: static
+  company_id: static
+  # t-1 context (PREREG §5.3-5.4, §3.3)
+  tier: t_minus_1
+  beta_m: t_minus_1
+  beta_s: t_minus_1
+  sigma_cc: t_minus_1
+  # news blocks
+  news_w0: w0
+  news_w2: w2
+  # observed reactions (PREREG §5.5)
+  g_d1: d1
+  g_d2: d2_reaction
+  # targets (PREREG §5.6); same-day quantities used as D2 inputs need their own d2_reaction column
+  z_on: post
+  z_cc: post
+  z_id: post
+  y0: post
+  y1: post
+  y2: post
+  e5: post
