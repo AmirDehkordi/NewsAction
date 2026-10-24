@@ -77,6 +77,69 @@ def split_adjusted_volume(rv: pd.DataFrame, split_after: pd.DataFrame) -> pd.Dat
     return rv * split_after
 
 
+VOLUME_BASIS_TOLERANCE: Final = float(np.log(1.1))
+_VOLUME_BASIS_COLUMNS: Final = [
+    "session",
+    "symbol_id",
+    "atom_volume",
+    "ref_volume",
+    "deviation",
+    "factor",
+    "volume",
+]
+
+
+def volume_basis_check(
+    rv: pd.DataFrame, ref: pd.DataFrame, actions: pd.DataFrame, public: pd.Index
+) -> tuple[pd.DataFrame, pd.DataFrame]:
+    """ATOM raw volume with the days already on a later split's share basis put back as traded.
+
+    ATOM's raw volume for the ~20 sessions before some splits is already split-adjusted while its raw
+    close is not (ORLY 2025-06-10, NOW 2025-12-18, TPL 2025-12-23; PREREG §15). Data/prices volume
+    (``ref``) is on its latest split basis, so with S_t the product of the true split ratios after t,
+    d_t = log(rv_t * S_t / ref_t) - c is 0 on a correct day, where c is the symbol's median over the
+    public sessions (a unit conversion). A day whose volume already carries the first j pending splits
+    has d_t = log P_j, P_j the product of their ratios; where |d_t - log P_j| <= log 1.1 the day is
+    divided by P_j. Days without a reference or a pending split are kept, so other vendor
+    disagreements (DD's spin-off, single-day prints) are never touched.
+
+    Returns (rv with those days corrected, one row per corrected symbol-day).
+    """
+    until = pd.Timestamp(actions["ex_session"].max())
+    cols = [int(c) for c in rv.columns if c in ref.columns]
+    split_after = true_split_factor_after(rv.index, cols, actions, until)
+    atom = rv[cols].to_numpy(dtype="float64")
+    vref = ref.reindex(index=rv.index, columns=cols).to_numpy(dtype="float64")
+    ratio = atom * split_after.to_numpy(dtype="float64") / vref
+    with np.errstate(divide="ignore", invalid="ignore"):
+        e = np.where(ratio > 0, np.log(ratio), np.nan)
+    c = pd.DataFrame(e, index=rv.index).loc[rv.index.isin(public)].median()
+    d = e - c.to_numpy(dtype="float64")
+    fixed = atom.copy()
+    sessions = rv.index.to_numpy(dtype="datetime64[ns]")
+    rows = []
+    spl = actions[(actions["kind"] == "split") & (actions["ex_session"] <= until)]
+    for key, g in spl.sort_values("ex_session").groupby("symbol_id"):
+        sid = int(cast(int, key))
+        if sid not in cols:
+            continue
+        j = cols.index(sid)
+        ex = g["ex_session"].to_numpy(dtype="datetime64[ns]")
+        ratios = g["split_ratio"].to_numpy(dtype="float64")
+        for i in np.flatnonzero(np.abs(d[:, j]) > VOLUME_BASIS_TOLERANCE).tolist():
+            products = np.cumprod(ratios[ex > sessions[i]])  # the first 1, 2, ... pending splits
+            if not len(products):
+                continue
+            miss = np.abs(d[i, j] - np.log(products))
+            if miss.min() <= VOLUME_BASIS_TOLERANCE:
+                factor = float(products[np.argmin(miss)])
+                fixed[i, j] = atom[i, j] / factor
+                rows.append((rv.index[i], sid, atom[i, j], vref[i, j], d[i, j], factor, fixed[i, j]))
+    out = rv.copy()
+    out[cols] = fixed
+    return out, pd.DataFrame(rows, columns=_VOLUME_BASIS_COLUMNS).astype({"symbol_id": "int64"})
+
+
 def reconstruct_raw_close(
     ac: pd.DataFrame, f_anchor: pd.Series, anchor: pd.Timestamp, actions: pd.DataFrame
 ) -> pd.DataFrame:

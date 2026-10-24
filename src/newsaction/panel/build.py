@@ -292,15 +292,17 @@ def _ranking_inputs(
     public close and ADV (``stale_public``). PREREG §15.
 
     ``level`` (per symbol) rescales ATOM raw closes that are not on the traded price level
-    (``adjust.raw_level_check``). Those symbols also take ``stale_public`` closes in test months,
-    because their reconstructed level would depend on how each vendor treated a later split.
+    (``adjust.raw_level_check``) and, inversely, their raw volume: ATOM's error is split-like (HON:
+    price halved, volume doubled; tests/test_panel_adjust.py). Those symbols also take
+    ``stale_public`` closes in test months, because their reconstructed level would depend on how each
+    vendor treated a later split.
     """
     sessions = pr.rc.index
     test = _rows_mask(np.asarray(sessions > public_end), pr.rc[symbols])
     public = sessions[sessions <= public_end]
     dv_yahoo = pr.ac[symbols] * pr.vol_dp
     raw = pr.rc[symbols] * _broadcast(level, pr.rc[symbols])  # raw close on the traded level
-    dv = raw * pr.rv[symbols]
+    dv = raw * (pr.rv[symbols] / _broadcast(level, pr.rv[symbols]))  # x volume on the traded level
     kappa = adjust.unit_ratio(dv, dv_yahoo, public[-DV_UNIT_WINDOW:])
     dv = dv.mask(test & dv.isna(), dv_yahoo * _broadcast(kappa, dv))
     f_level = r["f"][symbols] / _broadcast(level, raw)
@@ -383,12 +385,15 @@ def assemble(inp: Inputs) -> Assembled:
     symbols = sorted(int(x) for x in inp.symbols["symbol_id"] if int(x) != spy_id)
 
     pr = _prices(inp, sessions, symbols, spy_id)
+    pr.rv, vol_fixes = adjust.volume_basis_check(pr.rv, pr.vol_dp, inp.actions, public)
     r = adjust.returns(pr.ac, pr.ro, pr.rc)
     mapped = pd.Series(True, index=pr.mapping.loc[pr.mapping["price_symbol"].notna(), "symbol_id"])
     qc = adjust.qc_flags(r, pr.tc, inp.actions, mapped, public)
     lvl = adjust.raw_level_check(r["f"][symbols], pr.rc[symbols], inp.actions, public)
     level = lvl["level_factor"].astype("float64")
     pr.mapping = pr.mapping.merge(lvl.reset_index(), on="symbol_id", how="left")
+    fixed_days = vol_fixes.groupby("symbol_id").size()
+    pr.mapping["volume_basis_days"] = pr.mapping["symbol_id"].map(fixed_days).fillna(0).astype("int64")
 
     comp = tiers.companies(inp.symbols[inp.symbols["symbol_id"].isin(symbols)])
     company = {int(a): int(b) for a, b in zip(comp["symbol_id"], comp["company_id"], strict=True)}
@@ -466,7 +471,7 @@ def assemble(inp: Inputs) -> Assembled:
     static = comp[["symbol_id", "ticker", "company_id"]].merge(
         pr.mapping[["symbol_id", "adj_source", "price_symbol"]], on="symbol_id"
     )
-    notes: dict[str, object] = {"close_source": close_source.loc[rank_sessions]}
+    notes: dict[str, object] = {"close_source": close_source.loc[rank_sessions], "volume_basis": vol_fixes}
     return Assembled(sessions, symbols, spy_id, frames, static, pr.mapping, comp, tm, qc, notes)
 
 

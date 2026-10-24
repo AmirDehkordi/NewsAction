@@ -1,8 +1,13 @@
 # NA-01 REPORT — ATOM snapshot, adjusted daily panel, tiers, sealed 2026
 
-Date: 2026-10-24 · Branch `feat/NA-01-panel` (cut from `feat/NA-00-scaffold` @ `56e03af`; NA-00 is not yet
-merged) · Decisions: `docs/decisions/NA-01.md` · Tables: `artifacts/NA-01/*.csv`, `summary.json`
-(written by `scripts/na01_report.py`).
+Date: 2026-10-24 · Branch `feat/NA-01-panel` (cut from `feat/NA-00-scaffold` @ `56e03af`; merged into
+`main` together with NA-00 on 2026-10-24) · Decisions: `docs/decisions/NA-01.md` · Tables:
+`artifacts/NA-01/*.csv`, `summary.json` (written by `scripts/na01_report.py`).
+
+**Revision 3 (after verification round 2, PASS on the ACs).** The verifier found F3: ATOM's raw volume
+for the 20 sessions before the ORLY, NOW and TPL splits was already on the post-split basis, which put
+fake abnormal volume on 60 days. HON's volume was doubled like its price is halved. Fixed by
+`adjust.volume_basis_check` and traded-level dollar volume (§3.2); only volume-derived columns changed.
 
 **Revision 2 (after verification round 1, FAIL).** The verifier found two defects the written ACs did
 not catch: F1, corrupt CIQ share counts (MRSH, BNY, JNPR), and F2, HON's ATOM raw price at half the
@@ -71,6 +76,8 @@ byte-identical afterwards.
 | Yahoo reference without the 45-day lag | tiers.py | RED (revision 2) |
 | Yahoo stability guard removed | tiers.py | RED (revision 2) |
 | raw price-level factor never applied | adjust.py | RED (revision 2) |
+| no volume basis check | adjust.py | RED (revision 3) |
+| dollar volume without the traded-level volume | build.py | RED (revision 3) |
 
 ## 3. Numbers (public period unless stated)
 
@@ -217,6 +224,27 @@ changed by a flag.
 - **Step 3.** "sealed" appears in `src/` only in lock API calls (`lock.read_sealed`) and in `paths.py`
   (allowed in NA-00).
 
+### 3.2 Revision 3: verification finding F3 (volume share basis)
+
+ATOM and Data/prices volumes agree to 0.4% on 99% of public symbol-days. They disagree by exactly a
+pending split ratio on 60 days, where ATOM's raw volume is already split-adjusted but its raw close is
+not (`volume_basis_check.csv`):
+
+| Ticker | Split | Days restored | z_vol median on those days (before → after) | Days with z_vol > 4 |
+|---|---|---|---|---|
+| ORLY | 15:1, 2025-06-10 | 2025-05-12 … 06-09 (20) | +6.78 → −0.60 | 17 → 0 |
+| NOW | 5:1, 2025-12-18 | 2025-11-19 … 12-17 (20) | +4.28 → +0.45 | 11 → 1 |
+| TPL | 3:1, 2025-12-23 | 2025-11-24 … 12-22 (20) | +3.74 → +0.70 | 7 → 0 |
+
+- ORLY is now Mid by dollar volume in every public month (it was Top-100 in 2025-06 … 09).
+- HON's ATOM volume is 1.98× Data/prices, mirroring its halved raw price, so dollar volume now uses
+  volume on the traded level. HON's DV rank median moves from 29 to 87; its cap tier does not change.
+- Other disagreements are not touched, because no pending split explains them: DD after the Qnity
+  spin-off (Data/prices volume is the odd one), BRK-B in 2024, and single-day prints on 2023-05-30.
+- **What changed:** `raw_volume` (60 cells), `z_vol` / `logv_med60` / `logv_mad60` (ORLY, NOW, TPL),
+  `adv63` (plus HON), and DV ranks and tiers. Returns, betas, sigmas, targets, cap ranks and tiers, the
+  sector factor and the QC flags are identical to revision 2, as are `companies` and `qc_flags`.
+
 ## 4. Spend
 
 OpenRouter $0.00 this chunk, $0.00 cumulative (`ledgers/spend.jsonl` empty). FMP requests 0. No network
@@ -243,10 +271,10 @@ use other than the local ATOM Postgres.
 
 ## 6. Deviations from PREREG
 
-Eight rows appended to the §15 Deviations log (2026-10-24, NA-01), all before the freeze. They are in the
-working tree, **uncommitted** (operator instruction: PREREG / CLAUDE.md / PRD stay out of NA-01 commits).
-They sit in their own table at the end of §15, which is the append-only part outside the freeze hash
-(NA-00 row 1).
+Nine rows appended to the §15 Deviations log (2026-10-24, NA-01), all before the freeze. They are
+committed separately on `main` (operator instruction: PREREG / CLAUDE.md / PRD stay out of NA-01
+commits). They sit in their own table at the end of §15, which is the append-only part outside the
+freeze hash (NA-00 row 1).
 1. §3.2: companies grouped by issuer name when there is no CIK.
 2. §3.2–3.3: cap = representative close × company-level shares; shares de-split by later true splits;
    spin-off pseudo-splits ignored.
@@ -260,6 +288,8 @@ They sit in their own table at the end of §15, which is the append-only part ou
    CIQ is missing or > 1.5× off.
 8. §3.3 / §5.1, revision 2 (F2): raw price-level check from dividend factor jumps (HON × 2); test-month
    price levels dropped from `tiers_monthly`.
+9. §5.4 / §3.3, revision 3 (F3): ATOM raw volume days already on a later split's basis are restored;
+   dollar volume of a level-flagged id uses volume ÷ the level factor.
 
 PRD-level choices without a PREREG change: Spearman for mapping validation; non-member panel rows capped
 at 60 sessions after an exit; test inputs without σ_on / σ_id; AC2's tier clause tested as the PIT property.
@@ -270,7 +300,7 @@ No STOP condition fired. There was no spend, no FMP, no write to ATOM (equal cou
 transaction), and no read of a blinded file.
 
 Owner decisions requested:
-1. Confirm the eight PREREG §15 rows, and commit `docs/PREREG.md`.
+1. Confirm the nine PREREG §15 rows (committed on `main` at the operator's request when merging).
 2. **AC3(c):** accept the yield-slope criterion (|slope| < 0.1, factor jump = D/P) in place of the 3 bp
    bound. The +5.8 bp ex-date AR_on does not scale with the dividend.
 3. The 40 ids without Data/prices: accept the ATOM total-return fallback, or provide adjusted closes. For
@@ -297,12 +327,16 @@ Owner decisions requested:
   goldens, and blank test-month price columns.
 - **Revision-2 tables:** `share_substitutions.csv`, `raw_level_check.csv`,
   `tier_changes_vs_first_build.csv` (one-off diff against the first build's tiers).
+- **Revision 3:** `adjust.volume_basis_check`, traded-level dollar volume in `build._ranking_inputs`,
+  `mapping.volume_basis_days`, table `volume_basis_check.csv`; 5 tests in `test_panel_adjust` (pending-
+  split products, untouched non-split discrepancies, the real-data golden, traded-level dollar volume,
+  the panel result).
 - **Changed:** `configs/availability.yaml` (every panel column registered); `docs/DATA_CONTRACT.md` (NA-01
   sections, 19 artifacts); `tests/conftest.py` (artifact fixtures); `ledgers/test_access.jsonl` (2 `write`
   entries).
-- **Changed, uncommitted:** `docs/PREREG.md` (§15 rows).
+- **Changed, committed on `main` separately:** `docs/PREREG.md` (§15 rows).
 - **Derived (gitignored):** `work/snapshot/` (13 files incl. 2 blinded), `work/panel/` (6 files),
   `work/MANIFEST.json`.
 - **`make verify`:** exit 0. ruff "All checks passed!", 45 files formatted; mypy --strict "no issues found in
-  20 source files"; pytest **342 passed, 1 xfailed** (the literal AC3(c) bound); manifest OK (24
+  20 source files"; pytest **347 passed, 1 xfailed** (the literal AC3(c) bound; 342 before revision 3); manifest OK (24
   artifacts, 6 inputs); ledgers OK (test_access 2).

@@ -226,7 +226,7 @@ def reconstruction_holdout(inp: build.Inputs, asm: build.Assembled) -> tuple[dic
     company = {
         int(a): int(b) for a, b in zip(asm.companies["symbol_id"], asm.companies["company_id"], strict=True)
     }
-    dv = f["raw_close"] * full_level * f["raw_volume"]
+    dv = f["raw_close"] * full_level * (f["raw_volume"] / full_level)  # as in the build: traded level
     adv = dv.rolling(63, min_periods=40).mean().loc[rs]
     src = pd.DataFrame("reconstructed", index=rs, columns=close.columns)
     alt = tiers.monthly_tiers(
@@ -363,6 +363,16 @@ def main() -> int:
             "records"
         ),
     }
+    vb = asm.notes["volume_basis"]  # asm is built from public data only
+    assert isinstance(vb, pd.DataFrame)
+    vb = vb.merge(mp[["symbol_id", "atom_ticker"]], on="symbol_id", how="left")
+    _csv(vb, "volume_basis_check.csv")
+    summary["volume_basis_check"] = (
+        vb.groupby(["atom_ticker", "factor"])["session"]
+        .agg(["size", "min", "max"])
+        .reset_index()
+        .to_dict("records")
+    )
     (OUT / "summary.json").write_text(json.dumps(summary, indent=2, default=str) + "\n", encoding="utf-8")
     print(json.dumps(summary, indent=2, default=str))
     print(rq.round(4).to_string(index=False))
