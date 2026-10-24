@@ -479,3 +479,131 @@ These analyses **did not apply §2.2–2.3** (date-only articles were misassigne
 | | | | | | |
 | 2026-10-24 | NA-00 | §4.4 (2), §15 | The freeze hash covers this file *up to* the heading of §15; §15 itself is checked as append-only: `freeze.json` records the sha256 and byte length of the Deviations log at the freeze, and unblinding requires those bytes to be an unchanged prefix of the current log (`newsaction.lock`). | §4.4 hashes "this file", but deviations must stay appendable after the freeze (§15 heading rule; CLAUDE.md B11; PRD NA-12 permits appending to the log and makes a hash mismatch a STOP). Hashing the whole file would block unblinding after any post-freeze deviation; excluding §15 entirely would let earlier rows be edited. | Before |
 | 2026-10-24 | NA-00 | §4.3 | Clarification, no code change: 2026 adjusted closes exist outside `work/snapshot/sealed/` in `Data/prices/prices.parquet`, `Data/market/market_prices.parquet` and its NA-00 copy `work/market/market_prices.parquet` (PRD NA-00 S11). The sealed directory holds ATOM raw OHLC (and later 30-min bars); blinding of close-based 2026 outcomes (z_cc,t, e5, ...) is procedural: `tests/test_blinding.py` (no 2026 date literals or sealed-path use in `src/` outside `lock.py`), `ledgers/test_access.jsonl` and verifier greps. | `Data/` is read-only and these closes are needed for t-1 features of 2026 sessions (§6.10 context; §9.4 allows Call A test predictions before the freeze), so they cannot be sealed by file placement. Operator to confirm. | Before |
+| 2026-10-24 | post NA-00, pre NA-01 (operator request) | adds to §0, §1.1 (H2), §1.2, §5.5–5.6, §7, §11, §12 via **Amendment A1** below | v0.1: adds the convergence analysis — news-implied value V, remaining gap U_τ, level-unit CAR ladder from the open to t+20 with clean-window flags, H2-C (κ_h, λ_h, ψ, half-life, tracking error) and the S-CONV strategy. H2's primary test is unchanged. | The operator wants to see whether prices converge to the decision model's valuation of the news over the following horizons, and whether the price–value gap is tradeable. Added before any panel, target or model output exists. | Before |
+
+### Amendment A1 (v0.1, 2026-10-24) — convergence to the news-implied value
+
+A1 is operative from v0.1. It **adds** to the sections it names and never replaces them. Code and the PRD cite it as "PREREG A1.x".
+
+- **A1.1 — Question** (adds to §0 and §1.1 H2).
+  - After the news, does the price converge to the decision model's news-implied value?
+  - How fast and how completely, from the open to t+20?
+  - Is the remaining price–value gap tradeable?
+  - H2's primary test (b > 0, c < 0) is unchanged; it is the general form of convergence.
+- **A1.2 — Level units** (adds to §5.5–5.6).
+  - G^lvl_τ = AR(close(prev) → τ) / σ_cc. At D2 this equals z_cc,t.
+  - CAR^lvl_h = ΣAR from close(t−1) to h, divided by σ_cc,t with **no √h scaling**, for h ∈ {O_t, 10:00 (with NA-10 bars), C_t, C_{t+1}, C_{t+2}, C_{t+5}, C_{t+10}, C_{t+20}}. C_{t+60} is exploratory, where data allow.
+  - Forward pieces AR(τ→h) for τ ∈ {D1 entry, D2 entry}.
+  - E5^lvl = CAR^lvl at C_{t+4}.
+  - Each event carries a clean-window flag clean_h: no other D2 event for the company in sessions (t, t+h].
+  - Purge (§4.1) applies to every rung.
+- **A1.3 — Value and gap** (adds to §7).
+  - **News-implied value** V = isotonic map of Call A's N̂ → E[E5^lvl], fit on val-A per model (fit range stored). It is the model's estimate, in typical-daily-move units, of where the abnormal price settles once the news is absorbed.
+  - **Remaining gap** U_τ = V − G^lvl_τ. At D0, U = V.
+- **A1.4 — H2-C, the convergence ladder** (adds to §1.2; secondary family, Benjamini–Hochberg).
+  - **κ_h > 0 and increasing in h.** κ_h is the slope of CAR^lvl_h on V.
+  - **λ_h ∈ (0, 1].** λ_h is the fraction of U_τ closed by h, for τ ∈ {D1, D2}; the half-life is reported.
+  - **ψ_{h*} = 0.** The price converges to V itself, not to a shrunken V. h* = t+20 is the equilibrium horizon; t+5 is the short equilibrium.
+  - **Tracking error** RMSE(CAR^lvl_h − V) is below the naive (0) and price-only benchmarks.
+- **A1.5 — Specification** (adds to §11). Pooled OLS with day × tier fixed effects and two-way clustered standard errors (date, firm).
+  - **Ladder:** CAR^lvl_h = α_h + κ_h·V + ε. Full convergence by h means κ_h → 1; the share realized by h is κ_h / κ_{h*}.
+  - **Gap closure:** AR(τ→h)/σ_cc = a + λ_h·U_τ + ψ_h·V + ε, for h ∈ {C_t (D1 only), C_{t+1}, C_{t+5}, C_{t+20}}.
+  - **Half-life:** the first h with λ_h ≥ 0.5, with a block-bootstrap CI (§11.4).
+  - **Reported by:** tier; quantified vs. story news; |G| bins; model (primary instrument and the anchor).
+  - **Robustness:** clean-window events only; a plateau equilibrium (mean CAR^lvl over t+16..t+20); h* = t+10.
+- **A1.6 — S-CONV, the primary strategy for H2** (adds to §12).
+  - At D1 (10:00, with bars) and D2 (after the close; entry at the next open), rank events by U_τ.
+  - Long the top 20% (price below value) and short the bottom 20% (price above value), within each tier; equal weight; β-hedged.
+  - Exits: C_t (D1 only), t+1, t+5 and t+20, with calendar-time portfolios for overlapping horizons.
+  - Costs, DSR and benchmarks as in §12. S-D1 and S-D2 (the J/RG versions) remain as variants.
+
+| Date | Chunk | Section | Change | Reason | Before/after freeze |
+|---|---|---|---|---|---|
+| 2026-10-24 | post NA-00, pre NA-01 (operator request) | adds to §1.2 H5, §7, §8, §11, §13 via **Amendments A2 and A3** below | v0.2: (A2) an extended question battery (impact horizon, event type, numbers vs. story, scheduled, novelty, credibility, scope, uncertainty, mixed signals) plus two explanation questions; (A3) the firm-level explanation analysis inspired by Kelly–Su–Zhang: explanation R² ladder, explained share, explanation → persistence, reasons, and an optional market-level replication. No primary hypothesis changes. | Operator: decision models answer several questions per call, so ask more; and add the "can the news explain the move" analysis from Kelly–Su–Zhang (2026). Added before any panel, target or model output exists. | Before |
+
+### Amendment A2 (v0.2, 2026-10-24) — Question battery v2: more questions per call
+
+A2 is operative from v0.2. It **adds** to §7 (questions), §8 (selection uses the core battery only) and §13 (budget). Decision models answer every question in a request independently (the NA-05 pilot verifies this), so when the state is billed once per request, each extra question costs only its own tokens.
+
+- **A2.1 — Core vs. extended.**
+  - The **core** battery (§7 Q1–Q6) is unchanged. It is used everywhere: the tournament, the encoding/anchoring study, the trained models and all comparators.
+  - The **extended** battery (A2.2–A2.3) is asked only of the **primary API instrument** in production (NA-11) and on a 500-event validity sample in NA-06 stage 2.
+  - All yes/no items are two-option `choice` with neutral keys. The exact wording is frozen in `configs/questions_v1.yaml` (NA-04, groups `core` / `extended` / `explain`).
+- **A2.2 — Extended Call A questions** (news only):
+
+  | ID | Type | Question → options |
+  |---|---|---|
+  | Q7 `impact_horizon` | choice | "When will most of this news' effect on the stock price happen?" → {today, within_days (2–5 sessions), within_weeks, months_or_longer, no_material_effect} |
+  | Q8 `event_type` | choice | "Which best describes the main news?" → {earnings_results, guidance_outlook, analyst_action, deal_ma_partnership, legal_regulatory, product_operations, management_governance, capital_returns_financing, sector_or_macro, other} |
+  | Q9 `quantified` | choice | {numbers: "states concrete figures about results, guidance or deal terms", narrative: "describes developments without concrete figures"} |
+  | Q10 `scheduled` | choice | {scheduled: "a pre-announced event, e.g. an earnings release or investor day", unscheduled: "an unannounced development"} |
+  | Q11 `novelty` | choice | {new: "first report of new information", partly_known: "adds detail to something already reported", known: "repeats information investors already had"} |
+  | Q12 `credibility` | choice | {confirmed: "official company or regulator statement, or filed data", credible_report: "credible media or analyst report", rumor: "unconfirmed rumor or speculation"} |
+  | Q13 `scope` | choice | {company_specific, industry_wide, market_wide} |
+  | Q14 `uncertainty` | score, 5 | "How much does this news change the uncertainty about the company's future value?" → "no change" … "very large increase" |
+  | Q15 `mixed_signals` | choice | {one_directional: "the news points clearly one way", mixed: "it contains both positive and negative elements"} |
+
+- **A2.3 — Explanation questions** (Call B: news + reaction; used by A3):
+
+  | ID | Type | Question → options |
+  |---|---|---|
+  | Q16 `explains_move` | choice | "Does the news in `news` explain the stock's move in `reaction_so_far`?" → {fully_explains, partly_explains, unrelated: "the move is not explained by this news", contradicts: "the move goes against what the news implies"} |
+  | Q17 `move_reason` | choice | "What is the most likely main reason for the stock's move so far?" → {Q8's nine company categories (all but `other`), market_or_sector_move, no_identifiable_news} |
+
+- **A2.4 — Derived variables.**
+  - **Expected impact horizon:** H = Σ p_k·h_k over h = {1, 3, 15, 60} sessions. P(no_material_effect) is excluded and renormalized away, and reported separately.
+  - **Model-based labels:** event type, quantified, scheduled, novelty, credibility, scope.
+  - **Uncertainty score:** U_unc (Q14).
+  - **Mixed flag:** from Q15.
+  - **Explanation score:** X = P(fully) + 0.5·P(partly) − P(contradicts).
+  - **Reason:** argmax of Q17, with its probabilities.
+- **A2.5 — Uses (all secondary/BH or descriptive; no new primary hypothesis).**
+  - **Mechanism cuts:** H2/A1 results are re-run using the model's **own** event type and quantified flag. These are contemporaneous labels, so they remove the reliance on retrospective vendor tags. They are reported next to the vendor-tag cuts.
+  - **Horizon validity:** the rank correlation between H and realized convergence speed. Speed is measured per event as the share of the t+20 move realized by C_t; a longer H should mean a smaller share.
+  - **Width (H4):** U_unc and P(no_material_effect) are added to the H4 feature set.
+  - **Reading validity** (NA-06 stage 2, 500 events; reported, never a selection screen):
+    - `event_type` vs. the vendor tag;
+    - `quantified` vs. `tag_quantified`;
+    - `scheduled` vs. the earnings calendar;
+    - `credibility = rumor` vs. `tag_rumor`.
+- **A2.6 — Budget.**
+  - The extended battery adds about 500–650 question tokens per request.
+  - If the NA-05 pilot shows the state is billed per question, or the NA-11 projection with the extended battery exceeds the remaining cap, cut in this order:
+    1. drop Q10, Q13 and Q15;
+    2. use the extended battery on Call A D0 / Call A D2 / Call B D2 only (not on D1);
+    3. use a stratified 50% event sample.
+  - The core battery is never cut.
+
+### Amendment A3 (v0.2, 2026-10-24) — Explaining realized moves (firm-level "Roll's R² 40 years later")
+
+A3 is operative from v0.2. It **adds** to §1.2 H5 and §11. Kelly–Su–Zhang (2026) explain about 30–40% of **market** returns out of sample with GenAI-extracted newspaper reasons. We ask Roll's (1988) **firm-level** question: how much of a stock's own move can its news explain, and does being explained predict persistence?
+
+- **A3.1 — Inputs.**
+  - **D2 news-only reading:** Call A on **W2** news (everything published up to the close, with after-the-fact and price language scrubbed per §6.4). This gives N̂_W2, E|N̂_W2| and the A2 variables.
+  - **D2 Call B explanation answers:** Q16 and Q17.
+  - **Ex-ante D0 reading:** N̂_W0.
+  - **Factor model:** market + leave-one-out sector (§5.2–5.4).
+- **A3.2 — Explanation ladder (H5).** For covered member-days, report the **out-of-sample share of stock-specific daily variance** that each step adds:
+  1. market + sector (Roll's baseline; exploratory ≈ 0.34 of total variance);
+  2. \+ ex-ante news (D0 features);
+  3. \+ ex-post news (D2 Call A features; adds news that arrived during the day);
+  4. \+ explanation features (X, reason).
+
+  Days without a selected event contribute zero news features and are kept, as in Roll.
+
+  - **Fitting:** ridge, using the §11.5 protocol. API outputs are fit on val-B with λ chosen on val-A; trained models are fit on train with λ on val-A. Everything is evaluated on test.
+  - **Cuts:** tier; the model's event type; event vs. non-event days.
+  - **Interpretation:** step 3 − step 2 is information that arrived during the day; step 2 ÷ step 3 is the share of the explainable move that was knowable before the open.
+- **A3.3 — Explained share.** The share of event-day stock-specific variance (Σ AR²) falling on days the model judges *explained* (X ≥ 0.5) vs. *unexplained*, by tier and by reason.
+- **A3.4 — Explanation predicts persistence** (Chan 2003, Savor 2012, now measured with decision models).
+  - **Regression:** sign(G)·y = a + θ·X + controls(|G|, N̂, tier, event type) + day × tier FE.
+    - At D2: y = AR(O_{t+1}→C_{t+5}).
+    - At D1: y = AR(10:00→C_t).
+  - **θ > 0** means explained moves persist and unexplained moves reverse.
+  - Secondary (BH); standard errors two-way clustered.
+  - Persistence is also reported by `move_reason`: Kelly–Su–Zhang's "themes" at the firm level.
+- **A3.5 — Market-level replication** (optional, exploratory).
+  - One state per session from that session's market-index articles (`^GSPC`, `^VIX`, `DX-Y.NYB` tickers; dates masked).
+  - It asks Q1 (phrased for "the S&P 500 relative to its typical daily move") and Q17 with market reasons.
+  - Report the out-of-sample R² of SPY's daily return on the readings, on our corpus, as a direct analogue of Kelly–Su–Zhang.
+  - About 400 val + test sessions, so about 400 calls.

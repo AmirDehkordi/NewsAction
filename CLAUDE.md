@@ -18,6 +18,10 @@ It follows the team's AI4F'26 paper "Buy the Rumor, Sell the News" (arXiv 2608.1
 The work is delivered as chunks NA-00…NA-15 in `NewsAction PRD.md`:
 - Each chunk is one session: run its **power prompt**, then its **verification prompt** in a separate, independent session.
 - `docs/PREREG.md` is the pre-registration. Every definition, constant, split, hypothesis and selection rule lives there; read it before changing anything substantive.
+- Its §15 holds **operative amendments**. Read §15 in full in every chunk. Currently:
+  - **A1 — convergence to the news-implied value:** the model's value V, the price–value gap, the open→t+20 ladder, the S-CONV trade.
+  - **A2 — question battery v2:** core / extended / explain question groups.
+  - **A3 — explaining realized moves:** the firm-level Kelly–Su–Zhang-style analysis.
 
 ## Quick facts
 
