@@ -1,0 +1,10 @@
+# Sample splits, PREREG §4. Inclusive session-date ranges (exchange-local dates).
+splits:
+  robustness: {start: 2024-01-02, end: 2024-06-28}   # robustness-only
+  train:      {start: 2024-07-01, end: 2025-06-30}
+  val_a:      {start: 2025-07-01, end: 2025-09-30}
+  val_b:      {start: 2025-10-01, end: 2025-12-31}
+  test:       {start: 2026-01-02, end: 2026-07-31}   # blinded until NA-11/NA-12
+
+embargo_sessions: 5    # PREREG §4.2: first 5 sessions of val-A, val-B and test excluded from evaluation
+max_horizon: 20        # PREREG §5.6: longest target horizon (D2 -> C_{t+20}); purge per §4.1

@@ -1,0 +1,15 @@
+# Selections recorded by the protocol (docs/PREREG.md). Each section is filled by the chunk that owns it.
+# This file is hash-locked by newsaction.lock.freeze() in NA-11 (PREREG §4.4).
+
+news: null          # NA-02: parsing_allowed == None policy and text variant
+filter: null        # NA-03: chosen filter and threshold (PREREG §6.8)
+encoding: null      # NA-07: encoding and calls_per_event (PREREG §8.4)
+anchoring: null     # NA-07: anchoring verdict (PREREG §8.4)
+tournament: null    # NA-06: stage-1/2 survivors and screens (PREREG §8.2–8.3)
+selection: null     # NA-11: primary instrument and comparators (PREREG §8.5)
+thresholds: null    # NA-11: delta/RG thresholds and confidence gates
+calibration: null   # NA-11: calibration maps and their val-A fit ranges
+
+allow_val_b: false       # NA-06 sets true after the tournament (CLAUDE.md C13)
+frozen_requested: false  # NA-11 sets true; lock.freeze() refuses otherwise
+frozen: false            # written by lock.freeze() just before hashing; never edit by hand
