@@ -182,10 +182,11 @@ def reconstruction_holdout(inp: build.Inputs, asm: build.Assembled) -> tuple[dic
         for s, src in zip(asm.static["symbol_id"], asm.static["adj_source"], strict=True)
         if src == "data_prices"
     ]
-    ac, rc = f["adj_close"].loc[:end, mapped], f["raw_close"].loc[:end, mapped]
-    hat = adjust.reconstruct_raw_close(
-        ac, f["adj_factor"].loc[HOLDOUT_ANCHOR, mapped], HOLDOUT_ANCHOR, inp.actions
-    )
+    level = asm.mapping.set_index("symbol_id")["level_factor"].reindex(mapped).fillna(1.0)
+    ac = f["adj_close"].loc[:end, mapped]
+    rc = f["raw_close"].loc[:end, mapped] * level  # raw close on the traded level, as in the build
+    f_anchor = f["adj_factor"].loc[HOLDOUT_ANCHOR, mapped] / level
+    hat = adjust.reconstruct_raw_close(ac, f_anchor, HOLDOUT_ANCHOR, inp.actions)
     later = hat.index[hat.index > HOLDOUT_ANCHOR]
     err = (hat / rc - 1).loc[later].where(f["member"].loc[later, mapped])
     e = err.stack().dropna().abs()
@@ -205,8 +206,14 @@ def reconstruction_holdout(inp: build.Inputs, asm: build.Assembled) -> tuple[dic
     exact = asm.tiers_monthly[asm.tiers_monthly["month"].isin(months)]
     ranking = tiers.month_ranking_sessions(asm.sessions)
     rs = pd.DatetimeIndex([ranking[m] for m in months])
-    close = f["raw_close"].loc[rs].copy()
-    close[mapped] = hat.loc[rs, mapped]
+    full_level = (
+        asm.mapping.set_index("symbol_id")["level_factor"].reindex(f["raw_close"].columns).fillna(1.0)
+    )
+    close = f["raw_close"].loc[rs] * full_level  # exact closes on the traded level ...
+    unflagged = [s for s in mapped if level[s] == 1.0]
+    close[unflagged] = hat.loc[
+        rs, unflagged
+    ]  # ... replaced by reconstructions where the build would use them
     members = f["member"]
     mbm = {}
     for mo in months:
@@ -219,7 +226,7 @@ def reconstruction_holdout(inp: build.Inputs, asm: build.Assembled) -> tuple[dic
     company = {
         int(a): int(b) for a, b in zip(asm.companies["symbol_id"], asm.companies["company_id"], strict=True)
     }
-    dv = f["raw_close"] * f["raw_volume"]
+    dv = f["raw_close"] * full_level * f["raw_volume"]
     adv = dv.rolling(63, min_periods=40).mean().loc[rs]
     src = pd.DataFrame("reconstructed", index=rs, columns=close.columns)
     alt = tiers.monthly_tiers(
@@ -232,6 +239,7 @@ def reconstruction_holdout(inp: build.Inputs, asm: build.Assembled) -> tuple[dic
         company,
         tiers.share_book(inp.shares, inp.actions),
         {m: calendar.close_utc(m.date()) for m in rs},
+        yahoo=build._yahoo_shares(inp, asm.mapping, asm.symbols),
     )
     j = exact.merge(alt, on=["month", "company_id"], suffixes=("", "_hat"))
     j = j[j["tier_source"] == "ranked"]
@@ -333,6 +341,27 @@ def main() -> int:
         "no_data_company_months": int((tm["tier_source"] == "no_data").sum()),
         "joiner_company_months": int((tm["tier_source"] == "joiner_threshold").sum()),
         "close_source_counts": tm["close_source"].value_counts(dropna=False).to_dict(),
+    }
+    comp1 = companies.drop_duplicates("company_id")[["company_id", "ticker"]]
+    subs = tm[tm["shares_source"].str.startswith("yahoo")].merge(comp1, on="company_id")
+    subs = subs.groupby(["ticker", "shares_source"]).agg(
+        months=("month", "size"),
+        ciq_shares_mn=("ciq_shares_mn", "median"),
+        yahoo_shares_mn=("yahoo_shares_mn", "median"),
+        first=("month", "min"),
+        last=("month", "max"),
+    )
+    _csv(subs.reset_index(), "share_substitutions.csv")
+    summary["shares_source_counts"] = tm["shares_source"].value_counts().to_dict()
+    lvl = mp[["symbol_id", "atom_ticker", "level_n", "level_rho", "level_iqr", "level_factor"]]
+    _csv(lvl[lvl["level_n"] > 0].sort_values("level_rho"), "raw_level_check.csv")
+    checked = lvl[lvl["level_n"] >= adjust.LEVEL_MIN_EX_DATES]
+    summary["raw_level_check"] = {
+        "symbols_checked": len(checked),
+        "rho_quantiles": checked["level_rho"].quantile([0.01, 0.05, 0.5, 0.95, 0.99]).round(4).to_dict(),
+        "flagged": lvl.loc[lvl["level_factor"] != 1.0, ["atom_ticker", "level_rho", "level_n"]].to_dict(
+            "records"
+        ),
     }
     (OUT / "summary.json").write_text(json.dumps(summary, indent=2, default=str) + "\n", encoding="utf-8")
     print(json.dumps(summary, indent=2, default=str))

@@ -202,7 +202,8 @@ Export instant 2026-10-24T17:31:10Z. Session dates are XNYS-local; instants are 
 
 Producer for all panel files: `newsaction.panel.build` (NA-01 S7), `uv run python -m newsaction.panel.build`; deterministic
 (a rebuild reproduces every sha256). Inputs: the public snapshot files above, `Data/prices/prices.parquet` (adjusted close
-and volume) and `work/market/market_prices.parquet` (SPY close). Test-period closes from those two files are used only for
+and volume), `work/market/market_prices.parquet` (SPY close) and `work/market/shares.parquet` (Yahoo share counts, the
+independent reference of the share cross-check). Test-period closes from those two files are used only for
 t-1 features of test sessions (PREREG §15, NA-00 row 2); the blinded raw prices are not read.
 
 ### `work/panel/panel_public.parquet`
@@ -211,7 +212,7 @@ t-1 features of test sessions (PREREG §15, NA-00 row 2); the blinded raw prices
 - **Key:** `(session, symbol_id)` unique
 - **Rows / coverage:** 317,729 rows; sessions 2023-07-03 .. 2025-12-31; member rows 315,887 + 1,842 priced rows within 60 sessions after an exit (target horizons of leavers).
 - **Availability:** per column in `configs/availability.yaml` (kinds static / t_minus_1 / d2_reaction / post). Every t-1 statistic uses data through close(t-1) (tests/test_panel_pit.py).
-- **sha256:** `56f1e056c3438ce65dbe30b1fbc465ea147655af949799003c8ecdec673118ce`
+- **sha256:** `d8ea1983d90ed193277b1f83266ed2025381c06d4eb2ed310fb24a022d1a274e`
 
 ### `work/panel/panel_test_inputs.parquet`
 - **Producer:** `newsaction.panel.build` (NA-01 S7)
@@ -219,7 +220,7 @@ t-1 features of test sessions (PREREG §15, NA-00 row 2); the blinded raw prices
 - **Key:** `(session, symbol_id)` unique
 - **Rows / coverage:** 72,935 rows = test sessions 2026-01-02 .. 2026-07-31 × 503 members. Ids without Data/prices (40) have no test-period closes, so their close-based features become NaN once their windows need test sessions; volume baselines are NaN from a test-period true split onward.
 - **Availability:** nothing dated t or later (tests/test_panel_sealing.py checks the kinds against the registry).
-- **sha256:** `0d47b12a9c1834b6b5827f386b5a3fd416487c414199479915e86259a4c2fcaf`
+- **sha256:** `af5a1c4881a63acd721e577cdc6be4d4d9ce71ee8246f0a9f308266b5622714e`
 
 ### `work/panel/companies.parquet`
 - **Producer:** `newsaction.panel.build` (NA-01 S5)
@@ -231,11 +232,11 @@ t-1 features of test sessions (PREREG §15, NA-00 row 2); the blinded raw prices
 
 ### `work/panel/tiers_monthly.parquet`
 - **Producer:** `newsaction.panel.build` (NA-01 S5, `newsaction.panel.tiers`)
-- **Schema:** `month` string (applied month YYYY-MM), `ranking_session` date32, `company_id`, `rep_symbol_id` int64, `member_at_ranking` bool, `raw_close` double, `close_source` (atom_raw | reconstructed | stale_public), `shares_mn` double, `shares_period_end` date32, `shares_source` (rep | other_class | missing), `cap_usd`, `adv63_usd`, `cap_rank_value`, `rank`, `dv_rank` double, `fallback_dv` bool, `tier`, `dv_tier` string, `tier_source` (ranked | joiner_threshold | no_data)
+- **Schema:** `month` string (applied month YYYY-MM), `ranking_session` date32, `company_id`, `rep_symbol_id` int64, `member_at_ranking` bool, `raw_close` double (on the traded level: ATOM raw × `mapping.level_factor`), `close_source` (atom_raw | reconstructed | stale_public), `shares_mn` double (the count used), `shares_source` (ciq | ciq_unchecked | yahoo_ciq_rejected | yahoo_ciq_missing | missing), `ciq_shares_mn` double, `ciq_period_end` date32, `yahoo_shares_mn` double, `yahoo_obs_date` date32, `cap_usd`, `adv63_usd`, `cap_rank_value`, `rank`, `dv_rank` double, `fallback_dv` bool, `tier`, `dv_tier` string, `tier_source` (ranked | joiner_threshold | no_data)
 - **Key:** `(month, company_id)`
-- **Rows / coverage:** 18,557 rows; 37 months 2023-07 .. 2026-07; exactly 100 Top-100 and 150 Mid ranked companies per month. Ranking sessions in the test period use reconstructed raw closes (validated on 2025-H2: 100% tier agreement) — PREREG §15.
+- **Rows / coverage:** 18,557 rows; 37 months 2023-07 .. 2026-07; exactly 100 Top-100 and 150 Mid ranked companies per month. Shares: CIQ cross-checked against Yahoo (> 1.5× apart or CIQ missing → Yahoo; 325 + 499 company-months), DV fallback 54 company-months. Ranking sessions in the test period use reconstructed raw closes (validated on 2025-H2: 100% tier agreement); for those months `raw_close`, `cap_usd`, `cap_rank_value` and `adv63_usd` are NaN (only ranks and tiers are kept) — PREREG §15.
 - **Availability:** `t_minus_1` for every session of `month` (ranking session = last session of the previous month).
-- **sha256:** `1cea9b3cea544fe9a62fb45169c48c5749a2accb27385c04912c2d9f77dcedb4`
+- **sha256:** `6e586aebf45a4ead85e4f74781b9d5082069cd56dc5581c7c0bd2d7ed69f668d`
 
 ### `work/panel/qc_flags.parquet`
 - **Producer:** `newsaction.panel.build` (NA-01 S2, `adjust.qc_flags`)
@@ -247,8 +248,8 @@ t-1 features of test sessions (PREREG §15, NA-00 row 2); the blinded raw prices
 
 ### `work/panel/mapping.parquet`
 - **Producer:** `newsaction.panel.build` (NA-01 S2, `newsaction.panel.mapping`)
-- **Schema:** `symbol_id`, `n_obs` int64, `atom_ticker`, `price_symbol`, `candidate_source`, `status` (mapped | no_candidate | failed_corr | conflict), `adj_source` string, `corr_pearson`, `corr_spearman` double
+- **Schema:** `symbol_id`, `n_obs` int64, `atom_ticker`, `price_symbol`, `candidate_source`, `status` (mapped | no_candidate | failed_corr | conflict), `adj_source` string, `corr_pearson`, `corr_spearman`, `level_n`, `level_rho`, `level_iqr`, `level_factor` double (raw price-level check, `adjust.raw_level_check`: HON 2.0, all others 1)
 - **Key:** `symbol_id`
 - **Rows / coverage:** 565 ids: 525 mapped (Spearman ≥ 0.99 on ≥ 120 non-event days, public period only), 40 without any Data/prices candidate.
 - **Availability:** `static`
-- **sha256:** `19d7c966c1067a5f8d70b3607629176ae55db04262bf38f331ec1a2d49723324`
+- **sha256:** `48f86f07362868b48acf6b891d38ad89f65437dc2d68aa0f4a68f32be5e761c2`

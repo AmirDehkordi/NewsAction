@@ -4,6 +4,11 @@ Date: 2026-10-24 · Branch `feat/NA-01-panel` (cut from `feat/NA-00-scaffold` @ 
 merged) · Decisions: `docs/decisions/NA-01.md` · Tables: `artifacts/NA-01/*.csv`, `summary.json`
 (written by `scripts/na01_report.py`).
 
+**Revision 2 (after verification round 1, FAIL).** The verifier found two defects the written ACs did
+not catch: F1, corrupt CIQ share counts (MRSH, BNY, JNPR), and F2, HON's ATOM raw price at half the
+traded level. Both are fixed by general checks, not per-name patches (§3.1). A systematic review found
+the share problem in 23 companies, not 3, and tiers were rebuilt. AC3(c) remains an owner decision.
+
 **Blinding.** No statistic, print or plot of any test-period (≥ 2026-01-02) return appears in this
 report or was looked at. For test months, only counts are shown: membership, tier sizes, close sources.
 The blinded files were written by the export, registered by hash, and never opened.
@@ -29,7 +34,7 @@ The blinded files were written by the export, registered by hash, and never open
 | AC2 PIT rolling stats | `tests/test_panel_pit.py`. Real data: a +50σ AR_cc (ratio measured 50.0) plus 100× volume planted on (AAPL, 2025-03-14) in a copy of the public inputs. Every t−1 column of **every** symbol dated ≤ 2025-03-14 is unchanged. β_m, β_s, ADV63, car_m5 and logv_mad60 dated 2025-03-17 change. Every March 2025 tier is unchanged; April's ranking input (ADV63) moves. Synthetic version covers the median/MAD statistics deterministically. Mutations (drop any of the 5 shifts) are **RED** (§2.1). Note: AC2's "tier … for 2025-03-17 change" cannot hold under PREREG §3.3 (March tiers use the February ranking); the test checks the PIT property | PASS |
 | AC3 adjustment | (a) r_on(GE, 2024-04-02) = **+0.41%** (raw gap −19.8%). (b) Every public member-day with \|r_on\| > 25% has a qc_flags entry (0 missing). (c) Mean AR_on on cash-dividend ex-dates − other days = **+5.85 bp** (bound 3 bp; 4,045 ex-days). The adjustment is exact: factor jump 60.67 bp vs D/P 60.50 bp. The slope of AR_on on D/P is **0.013**; an adjustment error gives −1 or +1. By yield quintile: 5.8 / 6.2 / 3.7 / 7.1 / 5.7 bp, flat. This is an ex-date return pattern, not a dividend error. `tests/test_panel_adjust.py`: the slope test passes; the literal 3 bp test is a strict xfail | (a) (b) PASS · (c) **FAIL as written** (owner decision 2) |
 | AC4 calendar equality | `tests/test_panel_calendar_equality.py`: 1,207 sessions 2022-01-03 … 2026-10-23, all open/close instants equal `calendar_atom`; 2025-01-09 absent; the half days are equal | PASS |
-| AC5 tiers | Each of 37 months (2023-07 … 2026-07) has exactly **100** Top-100 and **150** Mid ranked companies (ties by company_id). NVDA Top-100 (rank 3) in 2024-06/07/08. AVGO (Top-100, ranks 8/7), CMG (Mid, ranks 104/105) and WMT (Top-100, 15/12) keep their tiers across their splits. Caps are continuous across splits: NVDA 2,707 → 3,042 bn, CMG 85.9 → 86.0 bn, AVGO 745.8 → 746.4 bn, WMT 444.9 → 473.5 bn. Golden caps are recomputed through the share code (NVDA, CMG, AVGO, WMT, GE before its spin-off). Mutation "no split adjustment of shares" is **RED**. Fallback (DV-imputed cap): **553** company-months, ≤ 16 per month | PASS |
+| AC5 tiers | Each of 37 months (2023-07 … 2026-07) has exactly **100** Top-100 and **150** Mid ranked companies (ties by company_id). NVDA Top-100 (rank 3) in 2024-06/07/08. AVGO (Top-100, ranks 9/8), CMG (Mid, ranks 106/107) and WMT (Top-100, 14/13) keep their tiers across their splits. Caps are continuous across splits: NVDA 2,707 → 3,042 bn, CMG 85.9 → 86.0 bn, AVGO 745.8 → 746.4 bn, WMT 444.9 → 473.5 bn. Golden caps are recomputed through the share code (NVDA, CMG, AVGO, WMT, GE before its spin-off). Mutation "no split adjustment of shares" is **RED**. **Revision 2 goldens** (verifier F1/F2): HON Top-100 in all 31 public months (rank 53–93; cap 2025-09 **$140.0bn**, verifier $136.6bn). MRSH Top-100 / Mid (was Rest). BNY Mid in all months (rank 135–231). CTRA Rest (was Top-100, rank 8). V (ranks 9–14) and BRK-B (7–9) Top-100 in all months. Share goldens are recomputed through the cross-check code. Fallback (DV-imputed cap): **54** company-months, ≤ 2 per month (was 553 before the cross-check) | PASS |
 | AC6 universe | Companies per session **500 / 500 / 502** (min / median / max), 897 sessions 2023-01-03 … 2026-07-31; symbols 503 / 503 / 505. WBA last member session 2025-08-26 and absent from 2025-08-27. COIN first 2025-05-19 and present through 2025-12-31. HOOD and APP first 2025-09-22 (absent 2025-09-19). `tests/test_panel_universe.py` (6) | PASS |
 | AC7 sanity | Median per-stock R² of r_cc on [SPY, sector − SPY], member days 2024-07-01 … 2025-12-31: **0.399** (IQR 0.275–0.532, 510 stocks). Inside [0.30, 0.40] but near the top: the equal-weighted leave-one-out sector factor fits better than the exploratory 0.34 | PASS |
 | AC8 sealing | panel_public max session 2025-12-31. panel_test_inputs: 29 columns, kinds {static, t_minus_1} only (`check_inputs(…, "D0")` passes), sessions 2026-01-02 … 2026-07-31. `build_targets(…, "test")` and `build_reactions(…, "test", "D2"/"D1")` raise `LockError` and log `allowed: false` (temporary ledger). Public routes and the placebo helper refuse test-period rows. The post-freeze / post-unblinding route reads through `lock.read_sealed` (tested with a real freeze record in a throwaway repo). Mutations "targets / reactions skip the lock" are **RED**. `tests/test_panel_sealing.py` (12) | PASS |
@@ -62,8 +67,60 @@ byte-identical afterwards.
 | adjusted open uses no factor | adjust.py | RED |
 | own company left in the sector factor | sector.py | RED (GREEN on the first run; LOO unit tests added) |
 | minimum of 5 other companies dropped | sector.py | RED |
+| no share cross-check (CIQ always kept) | tiers.py | RED (revision 2) |
+| Yahoo reference without the 45-day lag | tiers.py | RED (revision 2) |
+| Yahoo stability guard removed | tiers.py | RED (revision 2) |
+| raw price-level factor never applied | adjust.py | RED (revision 2) |
 
 ## 3. Numbers (public period unless stated)
+
+### 3.1 Revision 2: verification findings F1 and F2
+
+**F1, share counts.** ATOM's CIQ `shares_basic` is corrupt for some large names and missing for others.
+`tiers.YahooShares` / `tiers.cross_check` compares the CIQ count with Yahoo's count for the same class
+(`work/market/shares.parquet`). The Yahoo observation must be 45–400 days old, at least 30 days after the
+last split, and within 1.5× of its own trailing-year median. Yahoo replaces CIQ when CIQ is missing or
+more than 1.5× off (`share_substitutions.csv`). Of 18,557 company-months:
+
+| shares_source | company-months |
+|---|---|
+| ciq (cross-checked) | 17,383 |
+| ciq_unchecked (no usable Yahoo count) | 290 |
+| yahoo_ciq_rejected | 325 |
+| yahoo_ciq_missing | 499 |
+| missing → DV fallback | 60 |
+
+The rejected CIQ counts (median CIQ vs Yahoo, millions):
+- **Corrupt in CIQ:** MRSH 1.07 vs 492, BNY 38 vs 733, CBRE 43 vs 305, CTRA 18,536 vs 757, HES 18 vs
+  308, JNPR 14 vs 325, CTLT 24 vs 181, SEE 4,156 vs 144, WRK 1,272 vs 256, MRO 1,347 vs 585, CMA 44 vs
+  132, IPG 103 vs 377.
+- **Class A vs all classes:** BX 769 vs 1,218, IBKR 444 vs 1,700, ARES 219 vs 330, CVNA 138 vs 217,
+  SATS 528 vs 289.
+- **Yahoo-side errors that change no tier:** DOC (before 2024-03), UDR (2023), PSKY (2026).
+
+CIQ is missing entirely for single-letter and class tickers: V, T, C, F, D, O, A, J, K, L, CB, BRK-B, BF-B.
+
+**F2, raw price level.** `adjust.raw_level_check` takes Yahoo's dividend factor jump at each ex-date,
+which equals D / traded close, so D / jump gives the traded price level and can be compared with ATOM's
+raw close (`raw_level_check.csv`). Across 434 names with at least 4 usable ex-dates the ratio is
+1.000 (median; 1% / 99% quantiles 0.993 / 1.012). Only **HON** is flagged, at **2.000** over 16 ex-dates
+(IQR 0.0003). Its factor rescales the price levels used for caps and dollar volume; returns are ratios
+and unchanged. In test months HON keeps its last public close, with shares on that session's basis.
+
+**Impact on tiers** (`tier_changes_vs_first_build.csv`). 404 public company-months in 102 companies
+change tier. In 23 companies the company's own data changed: HON, CTRA, CB, HES, F, MRSH, D, CBRE, WRK,
+MRO, O, BNY, A, T, K, SEE, IBKR, C, BF-B, V and others. The other 79 crossed the rank-100 / 250
+boundaries because of those.
+
+The verifier's suggested check, Yahoo adjusted close × Yahoo shares, was not used as the rule: it also
+fires on NVDA, CMG, DD and AMCR around their splits, whose ATOM data are right.
+
+**Side note fixed.** `tiers_monthly` keeps no reconstructed test-period price levels: `raw_close`,
+`cap_usd`, `cap_rank_value` and `adv63_usd` are NaN for the 6 test months. Ranks and tiers remain.
+
+**Verifier note, Step 8.** HON's Solstice spin-off and CMCSA's Versant spin-off are dated 2025-10-01 and
+2025-12-08 in both vendors; the real ex-dates were 2025-10-30 and 2026-01-05. No real move was erased.
+Check CMCSA around 2026-01-05 after unblinding.
 
 **Mapping** (`mapping_failures.csv`): 525 of 565 ids map to Data/prices (Spearman ≥ 0.99 on ≥ 120 non-event
 days). Lowest Pearson: GNRC 0.981 (Spearman 0.994; one bad ATOM print), HON 0.991, CMCSA 0.993 (spin-offs
@@ -88,14 +145,14 @@ z_cc, z_on and z_id have median ≈ 0 and q10/q90 ≈ ±1.4. z_on has the fattes
 
 **Tier sizes** (`tier_sizes_by_month.csv`): 100 / 150 / 250 ranked in every month except 2026-07
 (100 / 150 / 248 plus 2 `no_data`). Joiners tiered by threshold: 56 company-months. Ranking-session closes:
-15,544 ATOM raw, 2,920 reconstructed (test months), 87 stale public (ids without Data/prices, test months),
-6 missing.
+15,544 ATOM raw, 2,914 reconstructed (test months), 93 stale public (ids without Data/prices, plus HON;
+test months), 6 missing.
 
 **Raw-close reconstruction** (test-month ranking sessions; PREREG §15), validated on public data with
-anchor 2025-06-30. Daily absolute error: median 0.0000, p99 0.23%, max 6.8%. The worst cases are CMCSA
-(6.8%) and HON (5.6%), the two spin-offs ATOM lacks, then AMCR (3.0%). Tiers rebuilt with reconstructed
-closes agree **100%** with the exact tiers in 2025-08 … 2026-01; the largest rank change is 10
-(`reconstruction_holdout_tiers.csv`).
+anchor 2025-06-30. Daily absolute error: median 0.0000, p99 0.22%, max 6.8%. The worst cases are CMCSA
+(6.8%) and HON (6.1%), the two spin-offs ATOM lacks, then AMCR (3.0%). Tiers rebuilt with reconstructed
+closes, the same share cross-check and the same level factor agree **100%** with the exact tiers in
+2025-08 … 2026-01; the largest rank change is 4 (`reconstruction_holdout_tiers.csv`).
 
 **Share basis** (`split_classification.csv`): 46 true splits plus 17 spin-off pseudo-splits since 2022 (2026 rows included: corporate actions, no prices).
 Of the 115 (symbol, true split) pairs checked against `shares_basic`, all 115 are restated, so values are
@@ -111,7 +168,7 @@ sessions after exit for target horizons (1,842 non-member rows).
 | Reason | Member days | Non-member days |
 |---|---|---|
 | genuine_large_move (\|r_on\| > 25%, factor smooth, ATOM agrees) | 19 | 162 (mostly SBNY OTC prints after its 2023 exit) |
-| cash_dividend (ATOM total-return dividend handling, e.g. HON double counting, AMCR) | 15 | 8 |
+| cash_dividend (ATOM total-return dividend handling: HON's halved raw price, which doubles its yield (F2), and AMCR) | 15 | 8 |
 | adj_factor_jump_no_atom_action (spin-offs ATOM lacks: CMCSA Versant, HON Solstice) | 5 | 10 |
 | raw_print_suspect (one bad ATOM raw close) | 1 | 6 |
 | spinoff (LEN Millrose: Yahoo 1.067 vs ATOM 1.033) | 1 | 0 |
@@ -176,6 +233,8 @@ use other than the local ATOM Postgres.
 | gics | sector | current classification applied to every session (ATOM has no history). Mild look-ahead in classification only (e.g. the 2023-03 GICS changes), not in returns |
 | corporate_actions | adjustment factors, true-split share bases, QC reasons | ex-date based. Splits after the ranking session are used only to undo CIQ's retroactive restatement, never as information about the future |
 | shares_basic | caps | row used only if known_from ≤ close(ranking session) (synthetic 45/90-day lag) |
+| work/market/shares.parquet (Yahoo share counts) | share cross-check and substitute | observation dated 45–400 days before the ranking session (its own as-of dates are retrospective, so the lag is conservative); share counts only, no prices |
+| Data/prices factor jumps at ex-dates | raw price-level check | public ex-dates only; the factor rescales levels, never returns |
 | β, σ, z_vol baseline, ADV, momentum | features | windows end at t−1 (explicit shift; planted-shock tests) |
 | tiers, representative class | features | ranking session = last session of the previous month |
 | sector factor r_sec,x,t | AR_x,t (post) | same-day peers; only enters same-day AR and t−1 betas |
@@ -184,8 +243,10 @@ use other than the local ATOM Postgres.
 
 ## 6. Deviations from PREREG
 
-Six rows appended to the §15 Deviations log (2026-10-24, NA-01), all before the freeze. They are in the
+Eight rows appended to the §15 Deviations log (2026-10-24, NA-01), all before the freeze. They are in the
 working tree, **uncommitted** (operator instruction: PREREG / CLAUDE.md / PRD stay out of NA-01 commits).
+They sit in their own table at the end of §15, which is the append-only part outside the freeze hash
+(NA-00 row 1).
 1. §3.2: companies grouped by issuer name when there is no CIK.
 2. §3.2–3.3: cap = representative close × company-level shares; shares de-split by later true splits;
    spin-off pseudo-splits ignored.
@@ -195,6 +256,10 @@ working tree, **uncommitted** (operator instruction: PREREG / CLAUDE.md / PRD st
    snapshot; GICS level 1 only.
 6. §5.4–5.6 and A1.2 clarifications: z_vol minimum, floor order, mixed-window z scale, unclipped multi-day
    z, delisting hold, warmup purge.
+7. §3.3, revision 2 (F1): CIQ shares cross-checked against Yahoo's share count, which replaces them when
+   CIQ is missing or > 1.5× off.
+8. §3.3 / §5.1, revision 2 (F2): raw price-level check from dividend factor jumps (HON × 2); test-month
+   price levels dropped from `tiers_monthly`.
 
 PRD-level choices without a PREREG change: Spearman for mapping validation; non-member panel rows capped
 at 60 sessions after an exit; test inputs without σ_on / σ_id; AC2's tier clause tested as the PIT property.
@@ -205,7 +270,7 @@ No STOP condition fired. There was no spend, no FMP, no write to ATOM (equal cou
 transaction), and no read of a blinded file.
 
 Owner decisions requested:
-1. Confirm the six PREREG §15 rows, and commit `docs/PREREG.md`.
+1. Confirm the eight PREREG §15 rows, and commit `docs/PREREG.md`.
 2. **AC3(c):** accept the yield-slope criterion (|slope| < 0.1, factor jump = D/P) in place of the 3 bp
    bound. The +5.8 bp ex-date AR_on does not scale with the dividend.
 3. The 40 ids without Data/prices: accept the ATOM total-return fallback, or provide adjusted closes. For
@@ -213,15 +278,25 @@ Owner decisions requested:
 4. NA-04: GICS industry is unavailable (level 1 only).
 5. Git: the branch is cut from `feat/NA-00-scaffold`; rebase onto `main` after the NA-00 merge.
 6. `.env` was not created. The export received the password in its environment, read from ATOM's `.env`.
+7. **Share sources (F1):** confirm Yahoo as the independent reference and substitute. Confirm the
+   all-class count where CIQ has Class A only (BX, IBKR, ARES, CVNA, SATS), in line with PREREG §3.2's
+   "sum over classes". Three known Yahoo errors (DOC before 2024-03, UDR 2023, PSKY 2026) change ranks
+   but no tier.
+8. **HON (F2):** confirm the price-level correction. ATOM's HON prices should also be reported to the
+   ATOM owner: the raw series is halved together with a 0.5 split row on 2026-06-29.
 
 ## 8. Files
 
 - **Added:** `scripts/{export_atom_snapshot,register_snapshot,na01_report}.py`;
   `src/newsaction/panel/{__init__,grid,mapping,adjust,sector,risk,tiers,targets,reactions,build}.py`;
   `docs/decisions/NA-01.md`; `artifacts/NA-01/{REPORT.md,summary.json,*.csv}`.
-- **Tests added (102):** `test_export_snapshot` 9, `test_panel_adjust` 28, `test_panel_calendar_equality`
+- **Tests added (124):** `test_export_snapshot` 9, `test_panel_adjust` 34, `test_panel_calendar_equality`
   2, `test_panel_mapping` 5, `test_panel_pit` 5, `test_panel_sealing` 12, `test_panel_sector` 3,
-  `test_panel_targets` 9, `test_panel_tiers` 23, `test_panel_universe` 6.
+  `test_panel_targets` 9, `test_panel_tiers` 39, `test_panel_universe` 6. Revision 2 added 22: the
+  level check, the cross-check rule, the Yahoo guards, share goldens through the code, verifier tier
+  goldens, and blank test-month price columns.
+- **Revision-2 tables:** `share_substitutions.csv`, `raw_level_check.csv`,
+  `tier_changes_vs_first_build.csv` (one-off diff against the first build's tiers).
 - **Changed:** `configs/availability.yaml` (every panel column registered); `docs/DATA_CONTRACT.md` (NA-01
   sections, 19 artifacts); `tests/conftest.py` (artifact fixtures); `ledgers/test_access.jsonl` (2 `write`
   entries).
@@ -229,5 +304,5 @@ Owner decisions requested:
 - **Derived (gitignored):** `work/snapshot/` (13 files incl. 2 blinded), `work/panel/` (6 files),
   `work/MANIFEST.json`.
 - **`make verify`:** exit 0. ruff "All checks passed!", 45 files formatted; mypy --strict "no issues found in
-  20 source files"; pytest **320 passed, 1 xfailed** (the literal AC3(c) bound); manifest OK (24
+  20 source files"; pytest **342 passed, 1 xfailed** (the literal AC3(c) bound); manifest OK (24
   artifacts, 6 inputs); ledgers OK (test_access 2).
