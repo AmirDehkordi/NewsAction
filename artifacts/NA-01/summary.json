@@ -1,0 +1,268 @@
+{
+  "universe": {
+    "panel_public": {
+      "companies": [
+        500,
+        500.0,
+        502
+      ],
+      "symbols": [
+        503,
+        503.0,
+        505
+      ],
+      "sessions": 628
+    },
+    "all": {
+      "companies": [
+        500,
+        500.0,
+        502
+      ],
+      "symbols": [
+        503,
+        503.0,
+        505
+      ],
+      "sessions": 897
+    }
+  },
+  "r2": {
+    "median": 0.39884267653759214,
+    "q25": 0.27503413676496574,
+    "q75": 0.532014767372402,
+    "n_stocks": 510
+  },
+  "qc_rows": 228,
+  "goldens": {
+    "GE_2024-04-02": {
+      "r_on": 0.004129089133134256,
+      "r_cc": -0.024880831181962382,
+      "r_id": -0.028890628335586754,
+      "raw_gap": -0.19807121661721072
+    },
+    "NVDA": [
+      {
+        "month": "2024-05",
+        "ranking_session": "2024-04-30",
+        "cap_bn": 2133.2,
+        "rank": 3,
+        "tier": "top100"
+      },
+      {
+        "month": "2024-06",
+        "ranking_session": "2024-05-31",
+        "cap_bn": 2706.8,
+        "rank": 3,
+        "tier": "top100"
+      },
+      {
+        "month": "2024-07",
+        "ranking_session": "2024-06-28",
+        "cap_bn": 3041.6,
+        "rank": 3,
+        "tier": "top100"
+      },
+      {
+        "month": "2024-08",
+        "ranking_session": "2024-07-31",
+        "cap_bn": 2881.0,
+        "rank": 3,
+        "tier": "top100"
+      }
+    ],
+    "CMG": [
+      {
+        "month": "2024-05",
+        "ranking_session": "2024-04-30",
+        "cap_bn": 87.1,
+        "rank": 101,
+        "tier": "mid"
+      },
+      {
+        "month": "2024-06",
+        "ranking_session": "2024-05-31",
+        "cap_bn": 85.9,
+        "rank": 104,
+        "tier": "mid"
+      },
+      {
+        "month": "2024-07",
+        "ranking_session": "2024-06-28",
+        "cap_bn": 86.0,
+        "rank": 105,
+        "tier": "mid"
+      },
+      {
+        "month": "2024-08",
+        "ranking_session": "2024-07-31",
+        "cap_bn": 74.5,
+        "rank": 125,
+        "tier": "mid"
+      }
+    ],
+    "AVGO": [
+      {
+        "month": "2024-06",
+        "ranking_session": "2024-05-31",
+        "cap_bn": 600.1,
+        "rank": 8,
+        "tier": "top100"
+      },
+      {
+        "month": "2024-07",
+        "ranking_session": "2024-06-28",
+        "cap_bn": 745.8,
+        "rank": 8,
+        "tier": "top100"
+      },
+      {
+        "month": "2024-08",
+        "ranking_session": "2024-07-31",
+        "cap_bn": 746.4,
+        "rank": 7,
+        "tier": "top100"
+      },
+      {
+        "month": "2024-09",
+        "ranking_session": "2024-08-30",
+        "cap_bn": 756.3,
+        "rank": 8,
+        "tier": "top100"
+      }
+    ],
+    "WMT": [
+      {
+        "month": "2024-01",
+        "ranking_session": "2023-12-29",
+        "cap_bn": 424.5,
+        "rank": 14,
+        "tier": "top100"
+      },
+      {
+        "month": "2024-02",
+        "ranking_session": "2024-01-31",
+        "cap_bn": 444.9,
+        "rank": 15,
+        "tier": "top100"
+      },
+      {
+        "month": "2024-03",
+        "ranking_session": "2024-02-29",
+        "cap_bn": 473.5,
+        "rank": 12,
+        "tier": "top100"
+      },
+      {
+        "month": "2024-04",
+        "ranking_session": "2024-03-28",
+        "cap_bn": 485.6,
+        "rank": 12,
+        "tier": "top100"
+      }
+    ],
+    "GE": [
+      {
+        "month": "2024-03",
+        "ranking_session": "2024-02-29",
+        "cap_bn": 170.6,
+        "rank": 46,
+        "tier": "top100"
+      },
+      {
+        "month": "2024-04",
+        "ranking_session": "2024-03-28",
+        "cap_bn": 190.8,
+        "rank": 41,
+        "tier": "top100"
+      },
+      {
+        "month": "2024-05",
+        "ranking_session": "2024-04-30",
+        "cap_bn": 176.2,
+        "rank": 45,
+        "tier": "top100"
+      }
+    ]
+  },
+  "mapping": {
+    "mapped": 525,
+    "no_candidate": 40
+  },
+  "mapping_lowest_pearson": [
+    {
+      "atom_ticker": "GNRC",
+      "corr_pearson": 0.9806749079300667,
+      "corr_spearman": 0.993867554132112
+    },
+    {
+      "atom_ticker": "HON",
+      "corr_pearson": 0.9911693420169995,
+      "corr_spearman": 0.9988555997599836
+    },
+    {
+      "atom_ticker": "CMCSA",
+      "corr_pearson": 0.9932723180377403,
+      "corr_spearman": 0.9999810939678649
+    },
+    {
+      "atom_ticker": "DVA",
+      "corr_pearson": 0.9994478654567255,
+      "corr_spearman": 0.99859880628955
+    },
+    {
+      "atom_ticker": "IQV",
+      "corr_pearson": 0.999490305630288,
+      "corr_spearman": 0.9990934134915026
+    }
+  ],
+  "share_basis": {
+    "restated": 115,
+    "as_reported_or_after_pull": 0
+  },
+  "reconstruction_holdout": {
+    "daily_abs_rel_err": {
+      "median": 5.1124044331274376e-08,
+      "p99": 0.0023189393825460147,
+      "max": 0.06760574643945305,
+      "n": 62469
+    },
+    "worst": {
+      "CMCSA": 0.0676,
+      "HON": 0.0559,
+      "AMCR": 0.0304,
+      "EG": 0.0122,
+      "JCI": 0.007
+    }
+  },
+  "ex_dividend": {
+    "n_ex_days": 4045,
+    "mean_ar_on_ex_bp": 5.685260517587441,
+    "mean_ar_on_other_bp": -0.16059611615853414,
+    "diff_bp": 5.845856633745975,
+    "median_ar_on_ex_bp": 4.0012669271527015,
+    "mean_dividend_yield_bp": 60.50168830135972,
+    "mean_factor_jump_bp": 60.67007824478634,
+    "slope_ar_on_on_yield": 0.013454716763587038,
+    "by_yield_quintile_bp": [
+      5.78,
+      6.17,
+      3.67,
+      7.14,
+      5.66
+    ]
+  },
+  "tiers": {
+    "months": 37,
+    "fallback_dv_company_months": 553,
+    "fallback_dv_per_month_max": 16,
+    "no_data_company_months": 3,
+    "joiner_company_months": 56,
+    "close_source_counts": {
+      "atom_raw": 15544,
+      "reconstructed": 2920,
+      "stale_public": 87,
+      "NaN": 6
+    }
+  }
+}
