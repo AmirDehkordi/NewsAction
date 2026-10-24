@@ -1,0 +1,217 @@
+# Source classes of news domains (newsaction.news.sources; PRD NA-02 S9; PREREG §6.6 F3, §1.2 cut).
+# Every one of the top 100 domains by member-article volume (2023-07..2026-07) is listed under `domains`
+# (tests/test_news_sources.py checks this against artifacts/NA-02/top_domains.csv). Classes:
+#   press_wire_primary  press-release wires, regulatory filings feeds, company / IR sites
+#   major_outlet        national and international news organizations and established trade press
+#   aggregator          portals that republish or syndicate other outlets' stories and wires
+#   retail_analysis     investor commentary and analysis written for retail readers
+#   auto_generated      template or machine-written articles (13F / insider / price-move bots, AI summaries,
+#                       market-research release mills)
+#   other               everything else (blogs, social media, job boards, consumer sites)
+# `source_class` additionally becomes press_wire_primary when the vendor flag tag_primary_source is True.
+
+domains:
+  press_wire_primary:
+    - prnewswire.com
+    - businesswire.com
+    - globenewswire.com
+    - accesswire.com
+    - newsfilecorp.com
+    - einpresswire.com
+    - sec.gov
+    - stocktitan.net           # verbatim press releases and SEC filings (92% vendor primary-source)
+    - quantisnow.com           # SEC filing feed (89% primary-source)
+    - markets.ft.com           # FT markets data pages hosting company announcements (95% primary-source)
+    - salesforce.com
+    - news.microsoft.com
+    - nvidianews.nvidia.com
+    - apple.com
+    - corpay.com
+  major_outlet:
+    - reuters.com
+    - bloomberg.com
+    - wsj.com
+    - ft.com
+    - cnbc.com
+    - nytimes.com
+    - washingtonpost.com
+    - apnews.com
+    - barrons.com
+    - marketwatch.com
+    - forbes.com
+    - fortune.com
+    - businessinsider.com
+    - economist.com
+    - cnn.com
+    - bbc.com
+    - bbc.co.uk
+    - theguardian.com
+    - axios.com
+    - latimes.com
+    - usatoday.com
+    - thetimes.com
+    - bnnbloomberg.ca
+    - news.bloomberglaw.com
+    - law360.com
+    - bizjournals.com
+    - techcrunch.com
+    - theverge.com
+    - wired.com
+    - crn.com
+    - hartenergy.com
+    - reinsurancene.ws
+    - fiercepharma.com
+    - fiercebiotech.com
+    - statnews.com
+    - endpts.com
+    - oilprice.com
+    - simpleflying.com
+  aggregator:
+    - finance.yahoo.com
+    - yahoo.com
+    - aol.com
+    - msn.com
+    - marketscreener.com
+    - zonebourse.com
+    - investing.com
+    - finviz.com
+    - markets.financialcontent.com
+    - markets.chroniclejournal.com
+    - news.futunn.com
+    - moomoo.com
+    - nasdaq.com
+    - tradingview.com
+    - markets.businessinsider.com
+    - inkl.com
+    - newsbreak.com
+    - google.com
+    - sahmcapital.com
+    - boursorama.com
+    - finanznachrichten.de
+    - menafn.com
+    - theglobeandmail.com      # syndicated TipRanks, Barchart, AP market wraps
+    - benzinga.com
+    - valuethemarkets.com      # syndicated AP market wraps
+    - investorshub.advfn.com
+    # language and regional editions in the top 100 (also covered by the suffix rules below)
+    - it.marketscreener.com
+    - nl.marketscreener.com
+    - de.marketscreener.com
+    - ch.marketscreener.com
+    - es.marketscreener.com
+    - ch.zonebourse.com
+    - uk.finance.yahoo.com
+    - ca.finance.yahoo.com
+    - sg.finance.yahoo.com
+    - br.investing.com
+    - uk.investing.com
+    - de.investing.com
+    - ca.investing.com
+    - it.investing.com
+    - es.investing.com
+    - au.investing.com
+    - fr.investing.com
+    - br.tradingview.com
+  retail_analysis:
+    - fool.com
+    - seekingalpha.com
+    - simplywall.st
+    - insidermonkey.com
+    - 247wallst.com
+    - zacks.com
+    - investorplace.com
+    - tipranks.com
+    - barchart.com
+    - kalkinemedia.com
+    - tikr.com
+    - smartkarma.com
+    - trefis.com
+    - tradingkey.com
+    - finbold.com
+    - proactiveinvestors.com
+    - medium.com
+    - investopedia.com
+    - sharewise.com
+    - aktiencheck.de
+    - deraktionaer.de
+    - boerse.de
+    - boerse-express.com
+    - euroinvestor.dk
+    - intellectia.ai
+  auto_generated:
+    - marketbeat.com           # 13F / insider / rating bots (83% insider_ownership)
+    - defenseworld.net         # MarketBeat network
+    - thelincolnianonline.com  # MarketBeat network
+    - tickerreport.com
+    - americanbankingnews.com
+    - etfdailynews.com
+    - themarketsdaily.com
+    - insidertrades.com
+    - news.stocktradersdaily.com
+    - ainvest.com              # machine-written briefs and chart-signal notes
+    - ad-hoc-news.de
+    - ts2.tech
+    - jomfruland.net
+    - akarninsights.com
+    - apnakal.com
+    - smartphonemagazine.nl
+    - stockstory.org
+    - gurufocus.com            # automated news briefs, price-move and 13F pages
+    - quiverquant.com          # lobbying / congressional-trade bots
+    - nationaltoday.com
+    - techdows.com
+    - knoxdaily.com
+    - coinunited.io
+    - swingtradebot.com
+    - chartmill.com
+    - marketsmojo.com
+    - ariva.de
+    - finanzen.net
+    - finanzen.ch
+    - finanzen.at
+    - proinvestor.com
+    - investments.halifax.co.uk
+    - directorstalkinterviews.com
+    - openpr.com               # market-research release mill ("X Market to reach $Y by 2032")
+    - newstrail.com
+    - industrytoday.co.uk
+    - haberradikal.com
+    - rock-news.at
+  other:
+    - linkedin.com
+    - github.com
+    - ameblo.jp
+    - forums.ea.com
+    - travelandtourworld.com
+    - sharecast.com
+
+# every subdomain of these names gets the class (language editions, regional portals)
+suffixes:
+  aggregator:
+    - finance.yahoo.com
+    - yahoo.com
+    - marketscreener.com
+    - zonebourse.com
+    - investing.com
+    - tradingview.com
+    - benzinga.com
+    - msn.com
+  major_outlet:
+    - reuters.com
+    - bloomberg.com
+    - cnbc.com
+  press_wire_primary:
+    - prnewswire.com
+    - businesswire.com
+    - globenewswire.com
+  retail_analysis:
+    - seekingalpha.com
+    - fool.com
+
+# hosts starting with these labels are company IR / newsroom sites
+prefixes:
+  press_wire_primary:
+    - investor.
+    - investors.
+    - ir.
+    - newsroom.
