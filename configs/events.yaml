@@ -1,0 +1,64 @@
+# NA-03: material label, candidate filters, comparison protocol, events and the call projection.
+# Values equal docs/PREREG.md §4, §6.6–6.9, §15 A1.2 and PRD NA-03 (tests/test_events_config.py checks them).
+# Hashed into the NA-11 freeze (PREREG §4.4).
+
+label:                            # PREREG §6.7 (material), §6.8 (delayed reaction)
+  material_on_z: 2.0              # |z_on,t| >= 2
+  material_car_days: 6            # |Σ_{j=0..5} AR_cc,t+j| / (σ_cc·√6) >= 2  (panel column car6_z)
+  material_car_z: 2.0
+  material_vol_z: 2.0             # z_vol,t >= 2
+  delayed_on_max: 1.0             # |z_on,t| < 1
+  delayed_car_days: 5             # |Σ_{j=1..5} AR_cc,t+j| / (σ_cc·√5) >= 2
+  delayed_car_z: 2.0
+
+filters:                          # PREREG §6.6
+  material_tags: [earnings_results, guidance_outlook, analyst_action, ma_deal, legal_regulatory,
+                  financing_dilution, capital_returns, leadership_governance, operations_supply,
+                  partnership_customer, product_launch, competition]
+  hard_tags: [earnings_results, guidance_outlook, analyst_action, ma_deal, legal_regulatory,
+              financing_dilution, capital_returns]
+  neutral_sentiment: Neutral
+  timely_intensity: [Immediate, Short-Term]
+  quality_sources: [press_wire_primary, major_outlet]
+  pca_components: 16              # F6: embedding principal components, fit on the fit window
+  attention_lookback: 60          # F6 / events: articles today / mean over the previous 60 sessions
+  attention_min_member_sessions: 20
+
+learned:                          # PREREG §6.8 (fit and tune windows); PRD NA-03 S3
+  fit: {start: 2024-07-01, end: 2025-03-31}
+  tune: {start: 2025-04-01, end: 2025-06-30}
+  label_horizon: 5                # the material label looks to t+5: purge so the horizon ends in the window
+  seed: 2026
+  f5:
+    max_iter: 2000
+    grid: {C: [0.001, 0.01, 0.1, 1.0]}
+  f6:
+    fixed: {learning_rate: 0.05, subsample: 0.8, subsample_freq: 1, colsample_bytree: 0.8, num_threads: 8}
+    grid: {num_leaves: [15, 63], min_child_samples: [100, 400], n_estimators: [200, 600]}
+
+compare:                          # PREREG §6.8 (val-A only)
+  budget_share: 0.30              # selected ticker-days <= 30% of covered member-days
+  tie_pp: 0.01                    # recall ties (< 1 pp) go to fewer inputs
+  tie_order: [F1, F2, F3, F4, F5, F6]
+  frontier_shares: [0.05, 0.10, 0.15, 0.20, 0.25, 0.30, 0.35, 0.40, 0.45, 0.50]
+  rule_version: prereg-6.8-v1
+
+events:                           # PREREG §6.9, A1.2; PRD NA-03 S5
+  max_articles: 6
+  max_news_tokens: 600
+  tokenizer: answerdotai/ModernBERT-large
+  tokenizer_revision: 45bb4654a4d5aaff24dd11d4781fa46d39bf8c13   # 2025-01-15; weights unchanged since Dec 2024
+  clean_horizons: [1, 2, 5, 10, 20]
+
+projection:                       # PRD NA-03 S6; PREREG §13, A2.6; NA-11 S2, S6, S8
+  context_tokens: 250
+  core_question_tokens: 350
+  extended_question_tokens: 600   # A2 extended (Call A) / explain (Call B) groups, primary API instrument only
+  usd_per_m: [0.01, 0.02, 0.042, 0.10, 0.24]
+  flag_usd_per_m: 0.042
+  chunk: NA-11
+  final_selection_models: 2       # NA-11 S2: top-2 API survivors, Call A on every val-B D0 event (core)
+  ablation_events: 12000          # NA-11 S8: Call B without news, Call B with shuffled news, unmasked Call A
+  ablation_calls_per_event: 3
+  llm_baseline_usd: 1.0           # NA-11 S8 (generative LLM subsample, its own cap)
+  market_calls: 400               # A3.5 (optional): one market state per val + test session

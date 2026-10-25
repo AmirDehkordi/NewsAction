@@ -168,3 +168,63 @@ columns:
   tag_source: selection_only
   event_id: selection_only
   event_age_days: selection_only
+  # --- NA-03 labels, scores and events (work/events/*.parquet). Window columns carry the window's suffix:
+  # *_w0 columns of events_d0 are known at D0 of the session, *_w2 columns of events_d2 at D2. The event key
+  # `event_id` shares its name with the vendor story cluster above (selection_only): an identifier, never a
+  # model input.
+  month: static
+  window: static
+  decision_point: static
+  embargo: static               # PREREG §4.2 evaluation flag (calendar)
+  horizon_end: static           # t+5 session of the label (calendar)
+  tie_u: static                 # seeded tie-breaker of the budget selection
+  material: post                # PREREG §6.7 label (returns t..t+5)
+  delayed: post                 # PREREG §6.8 delayed-reaction label
+  material_on: post
+  material_car: post
+  material_vol: post
+  car_delayed_z: post
+  label_ok: post
+  purged: post
+  f0: selection_only            # rule filters use vendor fields (PREREG §6.6)
+  f1: selection_only
+  f2: selection_only
+  f3: selection_only
+  f4: w0                        # novelty (PIT)
+  f5: selection_only            # learned on returns: a selection score, never a model input
+  f6: selection_only
+  f6_w0: selection_only
+  f6_w2: selection_only
+  n_kept: selection_only
+  n_f1: selection_only
+  n_f2: selection_only
+  n_f3: selection_only
+  filter_score_w0: selection_only
+  filter_score_w2: selection_only
+  n_articles_w0: w0             # usable articles in W0 (near-duplicates included)
+  n_stories_w0: w0              # distinct stories (representatives)
+  n_dup_w0: w0
+  attention_mean_w0: t_minus_1  # mean n_articles_w0 over the previous 60 member sessions
+  attention_ratio_w0: w0
+  n_articles_w2: w2
+  n_stories_w2: w2
+  n_dup_w2: w2
+  attention_mean_w2: t_minus_1
+  attention_ratio_w2: w2
+  n_list_w0: w0
+  n_dropped_cap_w0: w0
+  news_tokens_w0: w0
+  n_non_english_w0: w0
+  n_ok_w0: selection_only       # third-party-OK counts (data-governance flag)
+  n_not_third_party_w0: selection_only
+  n_list_w2: w2
+  n_dropped_cap_w2: w2
+  news_tokens_w2: w2
+  n_non_english_w2: w2
+  n_ok_w2: selection_only
+  n_not_third_party_w2: selection_only
+  clean_1: post                 # A1.2 clean-window flags look forward: analysis sample flags only
+  clean_2: post
+  clean_5: post
+  clean_10: post
+  clean_20: post
