@@ -111,9 +111,21 @@ def test_frozen_skeleton() -> None:
     assert f.allow_val_b is False
     assert f.frozen_requested is False
     assert f.frozen is False
-    for section in ("filter", "encoding", "anchoring", "tournament", "selection", "thresholds",
-                    "calibration"):  # fmt: skip
+    for section in ("encoding", "anchoring", "tournament", "selection", "thresholds", "calibration"):
         assert getattr(f, section) is None
+
+
+def test_frozen_filter_section_from_na03() -> None:
+    """NA-03 (PRD S4) owns ``filter:`` (PREREG §6.8); it is null before the NA-03 comparison runs."""
+    ff = load_frozen().filter
+    if ff is None:
+        return
+    keys = {"id", "threshold", "budget_share", "rule_version", "comparison_sha"}
+    assert keys <= set(ff)
+    assert ff["id"] in {"F1", "F2", "F3", "F4", "F5", "F6"}
+    assert ff["budget_share"] == 0.30 and "selected ticker-days ≤ 30% of covered member-days" in PREREG
+    assert isinstance(ff["threshold"], float) and 0.0 <= ff["tie_u_max"] <= 1.0
+    assert len(str(ff["comparison_sha"])) == 64
 
 
 def test_frozen_news_section_from_na02() -> None:
