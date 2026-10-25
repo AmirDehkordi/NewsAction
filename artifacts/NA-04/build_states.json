@@ -21,24 +21,24 @@
     }
   },
   "callA_d0_E3": {
-    "rows": 48096,
-    "events_without_text": 7,
-    "states_with_dropped_articles": 627,
-    "articles_dropped": 659,
+    "rows": 48085,
+    "events_without_text": 18,
+    "states_with_dropped_articles": 848,
+    "articles_dropped": 892,
     "texts_cut": 0
   },
   "callA_d2_E3": {
-    "rows": 62281,
-    "events_without_text": 4,
-    "states_with_dropped_articles": 6389,
-    "articles_dropped": 7111,
+    "rows": 62274,
+    "events_without_text": 11,
+    "states_with_dropped_articles": 6223,
+    "articles_dropped": 6907,
     "texts_cut": 0
   },
   "callB_d2_E3": {
-    "rows": 42362,
-    "events_without_text": 1,
-    "states_with_dropped_articles": 6095,
-    "articles_dropped": 6809,
+    "rows": 42359,
+    "events_without_text": 4,
+    "states_with_dropped_articles": 5921,
+    "articles_dropped": 6596,
     "texts_cut": 0
   },
   "market_E3": {
@@ -47,43 +47,43 @@
   "sample_E0": {
     "rows": 3000,
     "events_without_text": 0,
-    "states_with_dropped_articles": 25,
-    "articles_dropped": 25,
+    "states_with_dropped_articles": 56,
+    "articles_dropped": 56,
     "texts_cut": 0
   },
   "sample_E1": {
     "rows": 3000,
     "events_without_text": 0,
-    "states_with_dropped_articles": 25,
-    "articles_dropped": 25,
+    "states_with_dropped_articles": 56,
+    "articles_dropped": 56,
     "texts_cut": 0
   },
   "sample_E2": {
     "rows": 3000,
     "events_without_text": 0,
-    "states_with_dropped_articles": 25,
-    "articles_dropped": 25,
+    "states_with_dropped_articles": 56,
+    "articles_dropped": 56,
     "texts_cut": 0
   },
   "sample_E3": {
     "rows": 3000,
     "events_without_text": 0,
-    "states_with_dropped_articles": 25,
-    "articles_dropped": 25,
+    "states_with_dropped_articles": 56,
+    "articles_dropped": 56,
     "texts_cut": 0
   },
   "sample_E4": {
     "rows": 3000,
     "events_without_text": 0,
-    "states_with_dropped_articles": 25,
-    "articles_dropped": 25,
+    "states_with_dropped_articles": 56,
+    "articles_dropped": 56,
     "texts_cut": 0
   },
   "unmasked": {
     "rows": 1000,
     "events_without_text": 0,
-    "states_with_dropped_articles": 12,
-    "articles_dropped": 12,
+    "states_with_dropped_articles": 31,
+    "articles_dropped": 31,
     "texts_cut": 0
   }
 }

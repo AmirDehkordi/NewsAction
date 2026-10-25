@@ -4,7 +4,7 @@ Three Call A (D0) and two Call B (D2) states, drawn with seed 2026 (`newsaction.
 
 ## Call A, D0: `W0:1093:2025-07-03`
 
-4 articles · 657 state tokens · 959 with the core questions
+4 articles · 654 state tokens · 956 with the core questions
 
 ```json
 {
@@ -44,12 +44,12 @@ Three Call A (D0) and two Call B (D2) states, drawn with seed 2026 (`newsaction.
     },
     {
       "headline": "Le Congrès américain a person et budgétaire de a person",
-      "snippet": "Le projet de loi phare sur la réduction des impôts du président a person a franchi jeudi son ultime étape au Congrès américain, la Chambre des...",
+      "snippet": "Le projet de loi phare sur la réduction des impôts du président a person a franchi recently son ultime étape au Congrès américain, la Chambre des...",
       "source_type": "news aggregator",
       "timing": "early this morning (before 08:00)"
     },
     {
-      "headline": "JPMorgan Adjusts Price Target on the company to $97 From $94, Maintains Overweight Rating",
+      "headline": "JPMorgan Adjusts Price Target on the company raised by about 3%, Maintains Overweight Rating",
       "snippet": "The company is one of the leading American natural gas distributors. Sales break down by activity as follows: - gathering, processing and distribution of...",
       "source_type": "news aggregator",
       "timing": "early this morning (before 08:00)"
@@ -64,9 +64,9 @@ Three Call A (D0) and two Call B (D2) states, drawn with seed 2026 (`newsaction.
 }
 ```
 
-## Call A, D0: `W0:222:2025-07-21`
+## Call A, D0: `W0:211:2025-07-21`
 
-6 articles · 757 state tokens · 1059 with the core questions
+6 articles · 743 state tokens · 1045 with the core questions
 
 ```json
 {
@@ -77,15 +77,15 @@ Three Call A (D0) and two Call B (D2) states, drawn with seed 2026 (`newsaction.
   "company": {
     "analyst_estimates_past_month": "little changed",
     "earnings_report": "no scheduled earnings report falls in this window",
-    "market_sensitivity": "very aggressive",
+    "market_sensitivity": "market-like",
     "performance_vs_market_and_sector": {
-      "past_month": "large rise (≈2.3× a typical month's move)",
-      "past_three_months": "small rise (≈0.6× a typical three-month move)",
-      "past_week": "moderate rise (≈1.2× a typical week's move)"
+      "past_month": "negligible fall (≈0.2× a typical month's move)",
+      "past_three_months": "negligible fall (≈0.4× a typical three-month move)",
+      "past_week": "negligible rise (≈0.2× a typical week's move)"
     },
-    "sector": "Financials",
+    "sector": "Health Care",
     "size": "one of the 100 largest US companies",
-    "volatility_vs_its_past_year": "normal"
+    "volatility_vs_its_past_year": "very high"
   },
   "market": {
     "dollar_change": "small fall (≈0.5× a typical day's move)",
@@ -99,40 +99,40 @@ Three Call A (D0) and two Call B (D2) states, drawn with seed 2026 (`newsaction.
   },
   "news": [
     {
-      "headline": "What to Expect From PPL Corporation's Next Quarterly Earnings Report",
-      "snippet": "PPL Corporation will release its quarterly earnings next week, and analysts anticipate the bottom line to remain unchanged year-over-year.",
+      "headline": "Exploring Analyst Estimates for the company the quarter Earnings, Beyond Revenue and EPS",
+      "snippet": "The upcoming report from the company is expected to reveal quarterly earnings of $0.72 per share, indicating an increase of 16.1% compared to...",
+      "source_type": "automated article",
+      "timing": "after yesterday's close"
+    },
+    {
+      "headline": "What To Expect in Markets This Week: Tesla, Google Lead a String of Big Earnings Reports",
+      "snippet": "Tesla earnings are scheduled for recently as the EV maker's sales falter; other tech companies set to report this week include Google, Intel, and IBM.",
+      "source_type": "investor commentary",
+      "timing": "overnight"
+    },
+    {
+      "headline": "The company the company the quarter Earnings Preview Upside Potential on Robust Revenue Growth",
+      "snippet": "Forward-Looking Analysis the company is expected to report its quarter earnings recently. Analysts anticipate a strong performance,...",
+      "source_type": "automated article",
+      "timing": "overnight"
+    },
+    {
+      "headline": "The company Projected to Post Earnings recently",
+      "snippet": "The company is anticipated to announce its quarter earnings results before the market opens recently.",
+      "source_type": "automated article",
+      "timing": "after yesterday's close"
+    },
+    {
+      "headline": "The quarter Earnings Recap: Growth or Caution Ahead?",
+      "snippet": "Market Analysis by covering: Chevron Corp, Citigroup Inc, Intel Corporation, Walt Disney Company. Read 's Market Analysis on Investing.com.",
       "source_type": "news aggregator",
       "timing": "shortly before the open"
     },
     {
-      "headline": "Rogers Communications RCI the quarter Earnings Preview Upside Potential Amid Strategic Acquisitions and Financing Moves",
-      "snippet": "Forward-Looking Analysis Rogers Communications is expected to show a promising the quarter earnings report, driven by a combination of strategic acquisitions...",
+      "headline": "The company Stock Report: Strong Buy Ratings Signal 13.42% Potential Upside",
+      "snippet": "The company stands tall as a leader in the healthcare sector, specifically within the medical devices industry.",
       "source_type": "automated article",
-      "timing": "overnight"
-    },
-    {
-      "headline": "British BC Partners intends to sell a controlling stake in Navex for $2.5 billion",
-      "snippet": "British BC Partners intends to sell a controlling stake in Navex for $2.5 billion BC Partners plans to raise from 5-6 billion euros for the flagship fund.",
-      "source_type": "other source",
-      "timing": "after yesterday's close"
-    },
-    {
-      "headline": "The company Exits TikTok U.S. Investment Group | the company Stock News",
-      "snippet": "The company has withdrawn from a group aiming to invest in TikTok's U.S. operations, according to insights from individuals with knowledge of the...",
-      "source_type": "automated article",
-      "timing": "overnight"
-    },
-    {
-      "headline": "A person's Tariff Threat, Inflation Dynamics And Federal Reserve Updates: This Week In Economy",
-      "snippet": "The past week was a rollercoaster ride in the world of economics and finance. From President's tariff threats against Russia to the Federal Re.",
-      "source_type": "news aggregator",
-      "timing": "overnight"
-    },
-    {
-      "headline": "The company’s AI Strategy: Analysis of Dominance in Alternative Asset Management",
-      "snippet": "The company AI strategy targets dominance in alternative assets—leveraging scale, infrastructure bets, and proprietary data to shape AI's future.",
-      "source_type": "other source",
-      "timing": "overnight"
+      "timing": "early this morning (before 08:00)"
     }
   ]
 }
@@ -182,27 +182,27 @@ Three Call A (D0) and two Call B (D2) states, drawn with seed 2026 (`newsaction.
 }
 ```
 
-## Call B, D2: `W2:983:2025-07-10`
+## Call B, D2: `W2:978:2025-07-10`
 
-6 articles · 867 state tokens · 1222 with the core questions
+6 articles · 818 state tokens · 1173 with the core questions
 
 ```json
 {
   "attention": {
-    "articles_vs_usual": "normal",
-    "distinct_stories": "six"
+    "articles_vs_usual": "very heavy",
+    "distinct_stories": "more than ten"
   },
   "company": {
-    "analyst_estimates_past_month": "raised",
+    "analyst_estimates_past_month": "cut",
     "earnings_report": "no scheduled earnings report falls in this window",
     "market_sensitivity": "market-like",
     "performance_vs_market_and_sector": {
-      "past_month": "moderate rise (≈1.2× a typical month's move)",
-      "past_three_months": "large rise (≈2.7× a typical three-month move)",
-      "past_week": "moderate rise (≈1.0× a typical week's move)"
+      "past_month": "large fall (≈2.2× a typical month's move)",
+      "past_three_months": "large fall (≈2.2× a typical three-month move)",
+      "past_week": "very large fall (≈4.8× a typical week's move)"
     },
-    "sector": "Energy",
-    "size": "a large US company (size rank 101–250)",
+    "sector": "Health Care",
+    "size": "an S&P 500 company (size rank 251–500)",
     "volatility_vs_its_past_year": "high"
   },
   "market": {
@@ -217,73 +217,73 @@ Three Call A (D0) and two Call B (D2) states, drawn with seed 2026 (`newsaction.
   },
   "news": [
     {
-      "headline": "A person Annonce de Nouveaux Avis de Tarifs Douaniers alors que l'UE Pousse pour un Accord Commercial avec les États-Unis",
-      "snippet": "Le président américain a person a publié mercredi des avis finaux de tarifs douaniers visant sept partenaires commerciaux secondaires, alors que son...",
-      "source_type": "news aggregator",
-      "timing": "after yesterday's close"
+      "headline": "Cantor Fitzgerald Brokers Lower Earnings Estimates for the company",
+      "snippet": "The company - Cantor Fitzgerald decreased their fiscal year EPS estimates for shares of the company in a report issued...",
+      "source_type": "automated article",
+      "timing": "shortly before the open"
     },
     {
-      "headline": "Marathon Oil Employees: Is the Russia-Ukraine War a Threat to the Global Economy?",
-      "snippet": "Standard deduction. $15,000 single; $30,000 married filing jointly for the year, $15,750 single; $31,500 married filing jointly for the year.",
-      "source_type": "other source",
+      "headline": "JP Morgan Reduces PT on the company lowered by about 5%, Keeps a Hold Rating",
+      "snippet": "The company is one of the 13 Cheap Healthcare Stocks with Huge Upside Potential. Recently, JP Morgan analyst maintained...",
+      "source_type": "news aggregator",
+      "timing": "during today's trading session"
+    },
+    {
+      "headline": "The company Announces Preliminary Results For the quarter",
+      "snippet": "The company is one of the 10 Best Growth Stocks to Buy With Huge Upside Potential. Recently, the company...",
+      "source_type": "news aggregator",
+      "timing": "shortly before the open"
+    },
+    {
+      "headline": "The company Downgraded by Morgan Stanley | the company Stock News",
+      "snippet": "The company has been downgraded by Morgan Stanley analyst, shifting the rating from Overweight to Equal Weight.",
+      "source_type": "automated article",
       "timing": "early this morning (before 08:00)"
     },
     {
-      "headline": "The company Price Target Raised to $175.00",
-      "snippet": "The company had its price target boosted by investment analysts at Piper Sandler from $157.00 to $175.00 in a report...",
-      "source_type": "automated article",
-      "timing": "during today's trading session"
-    },
-    {
-      "headline": "The company: UBS herhaalt koopadvies",
-      "snippet": "The company is gespecialiseerd in olieraffinage, transport en distributie. De verkoop kan als volgt per activiteit worden uitgesplitst...",
+      "headline": "UnitedHealth names new chief of government programs, Medicaid unit",
+      "snippet": "Longtime insurance executive will helm the company's Medicaid division, while an executive is stepping up as CEO of government programs.",
       "source_type": "news aggregator",
-      "timing": "during today's trading session"
+      "timing": "early this morning (before 08:00)"
     },
     {
-      "headline": "Wells Fargo & Company Issues Positive Forecast for the company Stock Price",
-      "snippet": "The company had its price objective boosted by Wells Fargo & Company from $182.00 to $205.00 in a report issued on...",
-      "source_type": "automated article",
-      "timing": "during today's trading session"
-    },
-    {
-      "headline": "The company Price Target Raised by Wells Fargo | the company Stock News",
-      "snippet": "Recently, Wells Fargo analyst announced an update on the company, maintaining an \"Overweight\" rating on the stock...",
-      "source_type": "automated article",
-      "timing": "during today's trading session"
+      "headline": "The company: Morgan Stanley dégrade son opinion à neutre",
+      "snippet": "The company est spécialisé dans les prestations de services de soins de santé gérés au sein des programmes de couverture et d'assurance maladie...",
+      "source_type": "news aggregator",
+      "timing": "early this morning (before 08:00)"
     }
   ],
   "reaction_so_far": {
     "stock_market_move": "negligible rise (≈0.3× a typical day's move)",
-    "stock_move_vs_market_and_sector": "moderate rise (≈1.0× a typical day's move)",
+    "stock_move_vs_market_and_sector": "large fall (≈2.5× a typical day's move)",
     "time": "by the close",
     "volume_vs_normal": "busy"
   }
 }
 ```
 
-## Call B, D2: `W2:297:2025-08-06`
+## Call B, D2: `W2:285:2025-08-06`
 
-6 articles · 811 state tokens · 1166 with the core questions
+2 articles · 549 state tokens · 904 with the core questions
 
 ```json
 {
   "attention": {
-    "articles_vs_usual": "busy",
-    "distinct_stories": "seven"
+    "articles_vs_usual": "unusually quiet",
+    "distinct_stories": "two"
   },
   "company": {
-    "analyst_estimates_past_month": "little changed",
+    "analyst_estimates_past_month": "cut",
     "earnings_report": "no scheduled earnings report falls in this window",
     "market_sensitivity": "market-like",
     "performance_vs_market_and_sector": {
-      "past_month": "large fall (≈2.7× a typical month's move)",
-      "past_three_months": "moderate fall (≈1.1× a typical three-month move)",
-      "past_week": "large fall (≈2.1× a typical week's move)"
+      "past_month": "extreme fall (≈5.7× a typical month's move)",
+      "past_three_months": "very large fall (≈3.9× a typical three-month move)",
+      "past_week": "moderate fall (≈1.3× a typical week's move)"
     },
-    "sector": "Consumer Staples",
+    "sector": "Communication Services",
     "size": "a large US company (size rank 101–250)",
-    "volatility_vs_its_past_year": "very high"
+    "volatility_vs_its_past_year": "normal"
   },
   "market": {
     "dollar_change": "no change (≈0.0× a typical day's move)",
@@ -297,47 +297,23 @@ Three Call A (D0) and two Call B (D2) states, drawn with seed 2026 (`newsaction.
   },
   "news": [
     {
-      "headline": "",
-      "snippet": "The company closed recently, with a 0.36% decline and a trading volume of $530 million, ranking 224th among stocks.",
-      "source_type": "automated article",
-      "timing": "after yesterday's close"
-    },
-    {
-      "headline": "Hill’s delivers double-digit revenue rise in the quarter",
-      "snippet": "Hill's Pet Nutrition reported a 13% increase in revenue in the quarter compared to the same period last year. This accounted for 22.9% of the company's...",
-      "source_type": "other source",
-      "timing": "early this morning (before 08:00)"
-    },
-    {
-      "headline": "A person Target on the company to $90 From $100, Maintains Buy Rating",
-      "snippet": "A person Target on the company to $90 From $100, Maintains Buy Rating. LinkedIn X (ex-Twitter) WhatsApp a person.",
-      "source_type": "news aggregator",
-      "timing": "during today's trading session"
-    },
-    {
-      "headline": "Allstate, BP, Oracle",
-      "snippet": "TradingView India. Wall Street securities analysts revised their ratings and price targets on several U.S.-listed companies, including Allstate, BP,...",
+      "headline": "Disney tops earnings forecasts with streaming gains, raises guidance",
+      "snippet": "LOS ANGELES -Walt Disney posted better-than-expected quarterly results and raised its annual profit forecast recently, led by gains in the streaming...",
       "source_type": "news aggregator",
       "timing": "early this morning (before 08:00)"
     },
     {
-      "headline": "Wells Fargo & Company Lowers the company Price Target to $83.00",
-      "snippet": "The company had its target price dropped by stock analysts at Wells Fargo & Company from $88.00 to $83.00 in a research...",
-      "source_type": "automated article",
-      "timing": "overnight"
-    },
-    {
-      "headline": "Analysts' Mixed Views on Consumer Goods Stocks: The company and Grocery Outlet Holding.",
-      "snippet": "Analysts have conflicting sentiments on the company and Grocery Outlet Holding (GO). Goldman Sachs analyst maintained a Buy rating...",
-      "source_type": "automated article",
-      "timing": "during today's trading session"
+      "headline": "Zacks Investment Ideas feature highlights: MSCI, the company and Healthpeak Properties",
+      "snippet": "MSCI, the company, and DOC CEOs just bought millions in shares, signaling confidence despite recent stock weakness.",
+      "source_type": "news aggregator",
+      "timing": "early this morning (before 08:00)"
     }
   ],
   "reaction_so_far": {
     "stock_market_move": "moderate rise (≈1.0× a typical day's move)",
-    "stock_move_vs_market_and_sector": "moderate rise (≈1.6× a typical day's move)",
+    "stock_move_vs_market_and_sector": "small fall (≈0.9× a typical day's move)",
     "time": "by the close",
-    "volume_vs_normal": "normal"
+    "volume_vs_normal": "busy"
   }
 }
 ```
