@@ -5,8 +5,8 @@ Writes, from the registered state files only (no return is read):
   questions (the request), the state with its longest single core question plus special tokens (the Laya
   input, AC5), and the state with core + extended / explain questions, per file, call and encoding; the
   share of states within the 900-token target and within Laya's 768-token state budget;
-- ``artifacts/NA-04/leak_scan.csv``: ``scan.residual_leaks`` for every val-A state of the masked E3 files
-  (and the unmasked twin, as the reference that the scanner finds names when they are there);
+- ``artifacts/NA-04/leak_scan.csv``: the independent scanner (``scan.LeakScanner``; ``scanner``) on every
+  val-A state of the masked E3 files and the unmasked twin (the positive control);
 - ``artifacts/NA-04/examples.md``: three masked Call A (D0) and two Call B states of val-A, seed 2026;
 - ``artifacts/NA-04/summary.json``; ``configs/frozen.yaml`` ``questions_v1_sha256`` / ``codebook_v1_sha256``.
 """
@@ -23,9 +23,9 @@ from newsaction import io
 from newsaction.events import load_events_config, tokens
 from newsaction.paths import Layout, resolve_layout
 from newsaction.states import SAMPLES_DIR, STATES_DIR, load_states_config
-from newsaction.states.build import masker
+from newsaction.states.build import event_articles, extra_tickers
 from newsaction.states.questions import load_battery, write_frozen_hashes
-from newsaction.states.scan import LeakScanner
+from newsaction.states.scan import LeakScanner, harvest_names, ordinary_words
 
 ARTIFACT_DIR: Final = "NA-04"
 MAIN_FILES: Final = ("callA_d0_E3", "callA_d2_E3", "callB_d2_E3", "market_E3")
@@ -87,9 +87,22 @@ def token_stats(lay: Layout) -> pd.DataFrame:
     return pd.DataFrame(rows)
 
 
+def scanner(lay: Layout) -> LeakScanner:
+    """The independent scanner: ATOM names and tickers, ATOM / vendor former tickers, and the names
+    harvested from the unmasked event texts (``scan.harvest_names``); nothing from the masker or
+    configs/aliases.yaml."""
+    comp = io.read_parquet("panel/companies.parquet", columns=["company_id", "ticker", "name"], layout=lay)
+    extra = extra_tickers(lay)
+    tick: dict[int, set[str]] = {}
+    for cid, t in [*zip(comp["company_id"], comp["ticker"], strict=True), *extra]:
+        tick.setdefault(int(cid), set()).add(str(t))
+    arts = event_articles(lay)
+    harvested = harvest_names(arts, {c: sorted(t) for c, t in tick.items()})
+    return LeakScanner(comp, extra, harvested, ordinary_words([*arts["title"], *arts["snippet"]]))
+
+
 def leak_scan(lay: Layout) -> pd.DataFrame:
-    mk = masker(lay)
-    scanner = LeakScanner(mk.aliases, mk.cfg)
+    sc = scanner(lay)
     parts = []
     files = [(n, f"{STATES_DIR}/{n}.parquet") for n in SCAN_FILES] + [
         ("samples/unmasked", f"{SAMPLES_DIR}/unmasked.parquet")
@@ -100,7 +113,7 @@ def leak_scan(lay: Layout) -> pd.DataFrame:
         )
         df = df.loc[df["split"] == "val_a"]
         counts = [
-            scanner.residual_leaks(js, int(c)).as_dict()
+            sc.residual_leaks(js, int(c)).as_dict()
             for js, c in zip(df["state_json"], df["company_id"], strict=True)
         ]
         out = pd.concat(
@@ -115,6 +128,9 @@ def leak_rates(scan: pd.DataFrame) -> pd.DataFrame:
     g = scan.assign(
         name_or_ticker=(scan["names"] + scan["tickers"]) > 0, year_or_date=(scan["years"] + scan["dates"]) > 0
     ).groupby("file", sort=True)
+    flags = {
+        c: (c, lambda x: float((x > 0).mean())) for c in ("price_moves", "quotes", "price_levels", "people")
+    }
     return g.agg(
         states=("event_id", "size"),
         name_or_ticker_rate=("name_or_ticker", "mean"),
@@ -123,6 +139,7 @@ def leak_rates(scan: pd.DataFrame) -> pd.DataFrame:
         tickers=("tickers", "sum"),
         years=("years", "sum"),
         dates=("dates", "sum"),
+        **{f"{c}_rate": v for c, v in flags.items()},
     ).reset_index()
 
 

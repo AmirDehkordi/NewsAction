@@ -1,8 +1,9 @@
 """PRD NA-04 AC1: rebuilding reproduces state_sha256 for every row of a 2,000-row sample.
 
 The rebuild starts from the registered inputs (events, panel, market, snapshot, articles): the context is
-recomputed for the sampled keys, every article is masked again by a fresh masker (spaCy in-process), and
-the states are rendered again. The stored context rows must also match exactly.
+recomputed for the sampled keys, every article is masked again by a fresh masker (spaCy in-process; the
+corpus surname list comes from the mask stage's ``person_surnames.parquet``, since deriving it needs NER on
+the whole corpus), and the states are rendered again. The stored context rows must also match exactly.
 """
 
 from __future__ import annotations
@@ -78,7 +79,9 @@ def test_rebuild_reproduces_every_sha(sample: dict[str, pd.DataFrame]) -> None:
     msel = b.market_selection(lay, cfg)
     msessions = set(sample["states/market_E3.parquet"]["session"])
     msel = msel.loc[msel["session_w2"].isin(msessions)]
-    masked = b.mask_frame(art_frame, msel, lay, n_process=1)
+    # a fresh masker with the corpus surnames of the mask stage (deriving them needs NER on the whole corpus)
+    mk = b.masker(lay, vocabulary=True, surnames=b.load_surnames(lay))
+    masked = b.mask_frame(art_frame, msel, lay, n_process=1, mk=mk)
     inp = b.load_inputs(lay, masked_frame=masked)
     inp = b.Inputs(
         company=company, market=market, reaction=reaction, masked=inp.masked, third_party=inp.third_party

@@ -65,10 +65,17 @@ from newsaction.states import (
 from newsaction.states import context as ctx
 from newsaction.states.codebook import Codebook, Move, load_codebook
 from newsaction.states.macro import cpi_release_dates, load_macro, session_flags
-from newsaction.states.mask import Masker, build_aliases, lowercase_vocabulary, normalize_ticker
+from newsaction.states.mask import (
+    SURNAME_MIN_COUNT,
+    Masker,
+    build_aliases,
+    lowercase_vocabulary,
+    normalize_ticker,
+)
 from newsaction.states.questions import Battery, canonical_json, load_battery
 
 REACTION_D2: Final = f"{STATES_DIR}/reaction_d2.parquet"
+PERSON_SURNAMES: Final = f"{STATES_DIR}/person_surnames.parquet"
 MARKET_NEWS: Final = "news/market_articles.parquet"
 OUTPUT_COLUMNS: Final = (
     "event_id",
@@ -402,7 +409,16 @@ def run_mask(layout: Layout | None = None, n_process: int = 4) -> dict[str, Any]
     lay = resolve_layout(layout)
     arts = event_articles(lay)
     market = market_selection(lay, load_states_config())
-    masked = mask_frame(arts, market, lay, n_process=n_process)
+    mk = masker(lay, vocabulary=True)
+    masked = mask_frame(arts, market, lay, n_process=n_process, mk=mk)
+    io.write_parquet(
+        pd.DataFrame({"surname": sorted(mk.surnames)}),
+        PERSON_SURNAMES,
+        producer=PRODUCER,
+        layout=lay,
+        description="NA-04 S3: corpus surnames masked wherever they appear (last words of multi-word PERSON "
+        f"names seen >= {SURNAME_MIN_COUNT} times in the event and market articles)",
+    )
     io.write_parquet(
         masked,
         ARTICLES_MASKED,
@@ -417,15 +433,22 @@ def run_mask(layout: Layout | None = None, n_process: int = 4) -> dict[str, Any]
         "tickers": int(masked["n_tickers"].sum()),
         "dates": int(masked["n_dates"].sum()),
         "persons": int(masked["n_persons"].sum()),
+        "corpus_surnames": len(mk.surnames),
     }
 
 
 VOCAB_MIN_COUNT: Final = 20
 
 
-def masker(lay: Layout, *, vocabulary: bool = False) -> Masker:
+def load_surnames(lay: Layout) -> frozenset[str]:
+    """The corpus surnames the mask stage derived (``person_surnames.parquet``)."""
+    return frozenset(io.read_parquet(PERSON_SURNAMES, layout=lay)["surname"].astype(str))
+
+
+def masker(lay: Layout, *, vocabulary: bool = False, surnames: frozenset[str] | None = None) -> Masker:
     """The masker of every company in ``panel/companies.parquet``. ``vocabulary``: also derive the ordinary
-    lower-case words from the text of every event article (needed for person names, not for the scanner)."""
+    lower-case words from the text of every event article (needed for person names). ``surnames``: the
+    corpus surnames; None derives them from the texts the masker is given (the mask stage)."""
     comp = io.read_parquet(
         "panel/companies.parquet", columns=["symbol_id", "company_id", "ticker", "name"], layout=lay
     )
@@ -433,7 +456,7 @@ def masker(lay: Layout, *, vocabulary: bool = False) -> Masker:
     if vocabulary:
         arts = event_articles(lay)
         vocab = lowercase_vocabulary([*arts["title"], *arts["snippet"]], VOCAB_MIN_COUNT)
-    return Masker(build_aliases(comp, extra_tickers(lay)), vocabulary=vocab)
+    return Masker(build_aliases(comp, extra_tickers(lay)), vocabulary=vocab, surnames=surnames)
 
 
 def mask_frame(

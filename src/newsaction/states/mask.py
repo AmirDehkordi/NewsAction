@@ -6,18 +6,24 @@ In this order, on each title and snippet (already scrubbed by NA-02):
    headquarters cities.
 2. **Company.** The company's names and aliases (``configs/aliases.yaml``; ``CompanyAliases``) become
    "the company", with an optional legal suffix ("Apple Inc." → "the company"). Ticker forms become "the
-   company"; a parenthesized ticker ("(NASDAQ: AAPL)") is removed.
-3. **Dates.** Full dates, weekdays and months → "recently" (with a preceding preposition); years → "the
-   year"; fiscal years → "the fiscal year"; quarter labels ("Q3 FY2025", "third quarter of 2025",
-   "3Q25") → "the quarter"; half-year labels → "the half-year".
-4. **People.** spaCy ``en_core_web_sm`` PERSON entities (not matching any S&P 500 company alias): a name
-   right after a role noun ("CEO Tim Cook", "analyst Dan Ives") is dropped; otherwise it becomes "an
-   executive" when an executive title is within six words, else "a person".
-5. **Price talk.** ``news.detect`` scrub again (after-the-fact and price-path sentences, share-price levels),
-   so a sentence rewritten by masking cannot bring price talk back. Fundamental figures are kept.
+   company": $T, EXCH:T with any upper-case exchange code (BOATS:NEE), T.O, T/PR, T's, bare T outside the
+   stoplist; a parenthesized ticker ("(NASDAQ: AAPL)", "(COST 0.53%)") is removed.
+3. **Dates.** Full dates, weekdays and months, in English and in French, German, Italian, Spanish,
+   Portuguese, Dutch and Polish → "recently"; years → "the year"; fiscal years → "the fiscal year";
+   quarter labels in any case ("Q3 FY2025", "Second Quarter", "SECOND-QUARTER", "3Q25", "3. Quartal") →
+   "the quarter" / "quarterly"; half-year labels ("first half", "1H25") → "the half-year".
+4. **People.** spaCy ``en_core_web_sm`` PERSON entities (not matching any S&P 500 company alias), and every
+   capitalized occurrence of a corpus surname (the last word of a multi-word name seen at least
+   ``SURNAME_MIN_COUNT`` times; "Trump", "Powell" alone): a name right after a role noun ("CEO Tim Cook",
+   "analyst Dan Ives") is dropped; otherwise it becomes "an executive" when an executive title is within six
+   words, else "a person".
+5. **Price talk and price levels.** ``news.detect`` scrub again (after-the-fact and price-path sentences,
+   share-price levels); then sentences with a stock / share price move in percent and ticker quotes
+   ("MPC-1.32%") are dropped; price-target amounts become a relative change ("raises its price target to $622
+   from $600" → "raises its price target up by about 4%") or are dropped, and per-share deal prices become
+   "a per-share price". Fundamental figures (EPS, revenue, dividends, guidance) are kept.
 
-A replacement at the start of a sentence is capitalized. The masker is English-only (NA-02
-``non_english_hint``).
+A replacement at the start of a sentence is capitalized.
 """
 
 from __future__ import annotations
@@ -33,7 +39,7 @@ from typing import Any, Final
 import pandas as pd
 
 from newsaction.config import load_yaml
-from newsaction.news.detect import load_detector
+from newsaction.news.detect import load_detector, split_sentences
 from newsaction.states import ALIASES_PATH
 
 COMPANY: Final = "the company"
@@ -44,12 +50,76 @@ YEAR: Final = "the year"
 FISCAL_YEAR: Final = "the fiscal year"
 QUARTER: Final = "the quarter"
 HALF_YEAR: Final = "the half-year"
+SURNAME_MIN_COUNT: Final = 3
 SPACY_MODEL: Final = "en_core_web_sm"
 SPACY_EXCLUDE: Final = ("parser", "lemmatizer", "attribute_ruler", "tagger", "senter", "morphologizer")
 
 EXCHANGES: Final = (
     r"NYSE\s?Arca|NYSE\s?American|NYSE\s?MKT|NYSEARCA|NYSEAMERICAN|NYSEMKT|NYSE|NASDAQGS|NASDAQGM|NASDAQCM|"
     r"NasdaqGS|NasdaqGM|NasdaqCM|NASDAQ|Nasdaq|AMEX|BATS|CBOE|Cboe|OTC|OTCMKTS"
+)
+# any exchange-like code before a colon: NYSE:, BOATS:, OTC:, XETRA:, LSE: (NA-04 verification)
+EXCH_PREFIX: Final = rf"(?:(?<![A-Za-z])(?:{EXCHANGES}|[A-Z][A-Za-z]{{1,11}})\s*:\s*)"
+# share-class / venue suffixes: AAPL.O, NEE/PR, NEE/PT, BRK.B (the class is part of the ticker)
+TICKER_SUFFIX: Final = r"(?:[./](?:[A-Z]{1,2}|PR[A-Z]?)(?![A-Za-z]))?"
+# a quote of any ticker with a signed percent change: "MPC-1.32%", "(AAPL +0.87%)", "MSFT -1.19 %"
+_NOT_TICKERS: Final = (
+    r"(?!(?:EPS|FCF|GDP|CPI|PPI|PCE|ROE|ROI|ROA|YOY|QOQ|EBIT|ARR|NII|NIM|ARPU|AUM|RPO|FY|Q[1-4])\b)"
+)
+QUOTE: Final = re.compile(
+    rf"\s*\(\s*{_NOT_TICKERS}[A-Z]{{1,5}}(?:[.\-][A-Z])?\s*[+\-−–]?\s?\d+(?:\.\d+)?\s?%\s*\)"
+    rf"|(?<![A-Za-z0-9]){_NOT_TICKERS}[A-Z]{{1,5}}(?:\.[A-Z])?\s?[+\-−–]\s?\d+(?:\.\d+)?\s?%"
+)
+_MOVE_VERB: Final = (
+    r"(?:rise[sn]?|rose|rising|fall(?:s|en|ing)?|fell|jump(?:s|ed|ing)?|drop(?:s|ped|ping)?|gain(?:s|ed|ing)?|"
+    r"slides?|slid|slip(?:s|ped)?|climb(?:s|ed|ing)?|surg(?:e|es|ed|ing)|plung(?:e|es|ed|ing)|soar(?:s|ed|ing)?|"
+    r"tumbl(?:e|es|ed|ing)|sinks?|sinking|sank|rall(?:y|ies|ied)|declin(?:e|es|ed|ing)|advanc(?:e|es|ed|ing)|"
+    r"edg(?:e|es|ed)\s+(?:up|down|higher|lower)|trad(?:e|es|ed|ing)\s+(?:up|down|higher|lower)|"
+    r"(?:are|is|was|were)\s+(?:up|down)|higher|lower|up|down)"
+)
+# a stock / share price move in percent (PREREG §6.4), unless a fundamental noun is its subject
+_SUBJECT: Final = (
+    r"(?:shares?|stocks?|the\s+company(?:['’]s)?|premarket|pre-market|after-hours|extended\s+trading)"
+)
+_MOVE_SUBJECT: Final = re.compile(rf"(?i)\b{_SUBJECT}\b")
+PRICE_MOVE: Final = re.compile(
+    rf"(?i)\b{_SUBJECT}\b(?P<mid>[^.!?%]{{0,50}}?)\b{_MOVE_VERB}\b[^.!?]{{0,25}}?\d+(?:[.,]\d+)?\s?%"
+)
+PRICE_MOVE_AFTER: Final = re.compile(
+    r"(?i)\b\d+(?:[.,]\d+)?\s?%\s+(?:in\s+)?(?:premarket|pre-market|before\s+the\s+bell|after\s+hours|after-hours)"
+)
+_FUNDAMENTAL_SUBJECT: Final = re.compile(
+    r"(?i)\b(?:revenues?|sales|earnings|eps|income|profits?|margins?|volumes?|orders|shipments|deliveries|guidance|"
+    r"dividends?|bookings|subscribers|users|traffic|backlog|cash\s+flow|demand|output|production|compensation|"
+    r"buybacks?|repurchases?|outstanding|count|targets?|ratings?|estimates?|forecasts?|outlook|sales|costs?|"
+    r"expenses?|spending|capex|debt|assets|deposits|loans|premiums|rates?|unemployment|inflation|gdp|index|"
+    r"prices?\s+of\s+(?!the\s+company))\b"
+)
+_PT: Final = r"(?:price\s+targets?|target\s+prices?|price\s+objectives?|price\s+goals?|PTs?|targets?)"
+_AMT: Final = (
+    r"\$\s?(\d{1,3}(?:,\d{3})+(?:\.\d+)?|\d+(?:\.\d+)?)"
+    r"(?!\d|\.\d|\s*(?:million|billion|trillion|bn|mn|[mbk]\b|%))"
+)
+PT_FROM_TO: Final = re.compile(
+    rf"(?i)\b(?P<label>{_PT})\b(?P<mid>[^$.;!?]{{0,60}}?)\bfrom\s+{_AMT}\s+to\s+{_AMT}"
+)
+PT_TO_FROM: Final = re.compile(
+    rf"(?i)\b(?P<label>{_PT})\b(?P<mid>[^$.;!?]{{0,60}}?)(?:\b(?:to|at)\s+)?{_AMT}\s*,?\s*"
+    rf"(?:from|vs\.?|versus|up\s+from|down\s+from)\s+{_AMT}"
+)
+PT_AMOUNT: Final = re.compile(
+    rf"(?i)\b(?P<label>{_PT})\b(?P<mid>[^$.;!?]{{0,80}}?)"
+    rf"(?:\b(?:to|at|of|from|is)\s+)?(?:(?:the|a)\s+previous\s+)?{_AMT}"
+)
+AMOUNT_PT: Final = re.compile(rf"(?i){_AMT}\s+(?P<label>{_PT})\b")
+PER_SHARE: Final = re.compile(r"(?i)\$\s?\d[\d,]*(?:\.\d+)?\s+(?:a|per)\s+share\b")
+_DEAL: Final = re.compile(
+    r"(?i)\b(?:acquir\w*|acquisition|buy(?:out|s|ing)?|bought|offer\w*|deal|merger|merge|takeover|tender|bid|"
+    r"valu\w+|purchas\w*|sale|sell\w*|sold|pric(?:ed|ing)|consideration|premium)\b"
+)
+_FUND_LEFT: Final = re.compile(
+    r"(?i)\b(?:earnings|eps|dividends?|income|loss(?:es)?|profits?|revenues?|sales|ffo|affo|book\s+value|"
+    r"cash\s+flow|distributions?|payout|nav|net\s+asset|guidance|estimates?|consensus)\b"
 )
 _MONTHS: Final = (
     "January",
@@ -76,6 +146,26 @@ MONTH_ANY: Final = (
 )
 WEEKDAY: Final = "(?:" + "|".join([*_WEEKDAYS, *(d.upper() for d in _WEEKDAYS)]) + ")"
 YEAR_RE: Final = r"(?:19\d\d|20\d\d)"
+# French, German, Italian, Spanish, Portuguese, Dutch and Polish month and weekday names (NA-04 verification)
+F_MONTH: Final = (
+    r"(?:janvier|f[ée]vrier|avril|juin|juillet|ao[uû]t|septembre|octobre|novembre|d[ée]cembre|januar|j[äa]nner|"
+    r"februar|m[äa]rz|maerz|juni|juli|oktober|dezember|gennaio|febbraio|marzo|aprile|maggio|giugno|luglio|"
+    r"settembre|ottobre|dicembre|enero|febrero|abril|mayo|junio|julio|agosto|septiembre|setiembre|octubre|"
+    r"noviembre|diciembre|janeiro|fevereiro|mar[çc]o|junho|julho|setembro|outubro|novembro|dezembro|januari|"
+    r"februari|maart|augustus|stycznia|lutego|marca|kwietnia|maja|czerwca|lipca|sierpnia|wrze[śs]nia|"
+    r"pa[źz]dziernika|listopada|grudnia)"
+)
+F_MONTH_DAY_ONLY: Final = r"(?:mars|mai|mei|maio)"  # also ordinary words: only next to a day number or year
+F_WEEKDAY: Final = (
+    r"(?:montag|dienstag|mittwoch|donnerstag|freitag|samstag|sonntag|lundi|mardi|mercredi|jeudi|vendredi|samedi|"
+    r"dimanche|luned[iì]|marted[iì]|mercoled[iì]|gioved[iì]|venerd[iì]|sabato|domenica|lunes|martes|"
+    r"mi[ée]rcoles|jueves|viernes|s[áa]bado|segunda-feira|ter[çc]a-feira|quarta-feira|quinta-feira|sexta-feira|"
+    r"maandag|dinsdag|woensdag|donderdag|vrijdag|zaterdag|zondag)"
+)
+F_PREP: Final = (
+    r"(?:(?:am|vom|bis|zum|seit|ab|le|du|au|des|el|del|dal|il|op|de|em|no|na|w|z|ce|cette|diesen|letzten|"
+    r"vergangenen|n[äa]chsten|este|ese|questo|scorso)\s+)"
+)
 DAY: Final = r"(?:[12]\d|3[01]|0?[1-9])(?:st|nd|rd|th)?"
 PREP: Final = (
     r"(?i:(?:as\s+of|earlier\s+in|later\s+in|in|on|at|during|from|since|until|through|by|before|after|around|"
@@ -93,6 +183,7 @@ EXEC_TITLES: Final = re.compile(
     r"[Ee]xecutive|[Oo]fficer|[Cc]hief|boss|[Hh]ead|EVP|SVP|VP)\b"
 )
 _ROLE_BEFORE: Final = re.compile(rf"(?:\b(?:{ROLE_NOUNS}))\s*,?\s*$")
+_NON_PERSON_LABELS: Final = frozenset({"ORG", "PRODUCT", "GPE", "LOC", "FAC", "NORP", "WORK_OF_ART", "EVENT"})
 _NOT_PEOPLE: Final = frozenset({"recently", "the year", "a holiday", "the quarter", "the fiscal year"})
 _SPEECH_AFTER: Final = re.compile(
     r"^\s*,?\s*(?:said|says|told|wrote|writes|added|adds|noted|notes|stated|explained|commented|argued|warned|"
@@ -105,6 +196,8 @@ _WS: Final = re.compile(r"[ \t]{2,}")
 _SPACE_PUNCT: Final = re.compile(r"\s+([,.;:!?)\]])")
 _OPEN_SPACE: Final = re.compile(r"([(\[])\s+")
 _EMPTY_PARENS: Final = re.compile(r"\(\s*[,;]?\s*\)")
+_CAP_WORD: Final = re.compile(r"(?<![A-Za-z])(?P<w>[A-Z][A-Za-z]+)(?:['’]s)?(?![A-Za-z])")
+_SEP_RUN: Final = re.compile(r"\s*([;|•])(?:\s*[;|•])+\s*")
 
 
 def _cap(word: str, before: str) -> str:
@@ -126,6 +219,7 @@ class AliasConfig:
     common_words: frozenset[str]
     bare_ticker_stoplist: frozenset[str]
     companies: Mapping[str, Mapping[str, tuple[str, ...]]]
+    person_names: frozenset[str] = frozenset()
 
 
 @functools.cache
@@ -143,6 +237,7 @@ def _load_alias_config(path: Path, mtime_ns: int) -> AliasConfig:
         common_words=frozenset(str(w) for w in raw["common_words"]),
         bare_ticker_stoplist=frozenset(str(t) for t in raw["bare_ticker_stoplist"]),
         companies=comps,
+        person_names=frozenset(str(n) for n in raw.get("person_names", [])),
     )
 
 
@@ -234,8 +329,11 @@ def phrase_regex(phrase: str) -> str:
     for i, p in enumerate(parts):
         if i:
             out += r"[\s\-–]*" if parts[i - 1].endswith(".") else r"[\s\-–]+"
+        if p in ("&", "and"):
+            out += r"(?:&|and)"  # "Church & Dwight" ~ "Church and Dwight"
+            continue
         out += re.escape(p).replace(r"\.", r"\.\s*") if p.endswith(".") and len(p) > 1 else re.escape(p)
-    return out.replace(r"\.\s*\.", r"\.")
+    return re.sub("['’]", "['’]", out.replace(r"\.\s*\.", r"\."))
 
 
 _LOWER: Final = re.compile(r"(?<![A-Za-z])[a-z]{2,}(?![A-Za-z])")
@@ -275,7 +373,7 @@ def split_names(a: CompanyAliases, cfg: AliasConfig) -> tuple[list[str], list[st
     loose, strict = set(distinctive_words(a.names, cfg)), set()
     for n in a.names:
         if len(re.split(r"[\s\-–]+", n.strip())) == 1 and (n in cfg.common_words or len(n) < 4):
-            strict.update({n, n.upper()})
+            strict.update({n, n.upper(), n.capitalize()})
         else:
             loose.add(n)
     order = lambda v: (-len(v), v)  # noqa: E731
@@ -295,6 +393,9 @@ class CompanyPatterns:
     paren_ticker: re.Pattern[str] | None
     prefixed_ticker: re.Pattern[str] | None
     bare_ticker: re.Pattern[str] | None
+
+
+Candidate = tuple[int, int, list[str]]  # a PERSON entity: start, end, its words without a possessive
 
 
 @dataclass
@@ -320,6 +421,7 @@ _WIRE_DATELINE: Final = re.compile(
     r"Business Wire|BUSINESS WIRE|PRNewswire|GLOBE NEWSWIRE)\)\s*[-–—]+\s*"
 )
 _NBSP: Final = re.compile(r"[\u00a0\u2007\u202f]")
+_EMAIL_URL: Final = re.compile(r"\S+@\S+\.[A-Za-z]{2,}|\bhttps?://\S+|\bwww\.\S+")  # domains name companies
 _ISIN: Final = re.compile(r"\s*\(?\bISIN\b:?\s*[A-Z]{2}[A-Z0-9]{9}\d\)?|\b[A-Z]{2}[A-Z0-9]{9}\d\b")
 
 _I: Final = "(?i)"
@@ -327,18 +429,38 @@ _DATE_RULES: Final[tuple[tuple[re.Pattern[str], str], ...]] = tuple(
     (re.compile(p[len(_I) :], re.IGNORECASE) if p.startswith(_I) else re.compile(p), r)
     for p, r in (
         (r"\b(?:Black|Cyber|Good)\s+(?:Friday|Monday)\b", "a holiday"),
+        (
+            rf"{_I}{F_PREP}?\b\d{{1,2}}\.?\s+(?:de\s+)?(?:{F_MONTH}|{F_MONTH_DAY_ONLY})\b(?:\s+(?:de\s+)?{YEAR_RE})?",
+            RECENTLY,
+        ),
+        (rf"{_I}{F_PREP}?\b(?:{F_MONTH}|{F_MONTH_DAY_ONLY})\s+(?:de\s+)?{YEAR_RE}", RECENTLY),
+        (rf"{_I}{F_PREP}?\b{F_MONTH}\b", RECENTLY),
+        (rf"{_I}{F_PREP}?\b{F_WEEKDAY}\b", RECENTLY),
+        (r"\bam\s+\d{1,2}\.(?=[\s,;]|$)", RECENTLY),
+        (
+            rf"{_I}\b(?:im\s+)?(?:[1-4]\.\s*Quartal|[1-4](?:er|e|º|°)?\s+trimestre|T[1-4]\s*'?(?:{YEAR_RE}|\d{{2}}))\b",
+            QUARTER,
+        ),
         (rf"{PREP}?\b\d{{4}}-\d{{2}}-\d{{2}}\b", RECENTLY),
         (rf"{PREP}?\b\d{{1,2}}/\d{{1,2}}/(?:\d{{4}}|\d{{2}})\b", RECENTLY),
         (rf"{PREP}?\b\d{{1,2}}\.\d{{1,2}}\.(?:\d{{4}}|\d{{2}})\b", RECENTLY),
+        (r"(?<![\d/.$,])\b(?:1[0-2]|0?[1-9])/(?:1[3-9]|2\d|3[01])\b(?![\d/%])", RECENTLY),
+        (r"(?<![\d/.$,])\b(?:0[1-9]/(?:[0-2]\d|3[01])|1[0-2]/0[1-9])\b(?![\d/%])", RECENTLY),  # zero padding
+        (rf"{PREP}\b(?:1[0-2]|0?[1-9])/(?:[12]?\d|3[01])\b(?![\d/%])", RECENTLY),
         (rf"{PREP}?\b(?:{WEEKDAY},?\s+)?{MONTH_ANY}\s+{DAY}(?!\d)(?:,?\s*{YEAR_RE}\b)?", RECENTLY),
         (
             rf"{PREP}?\b(?:{WEEKDAY},?\s+)?(?:the\s+)?{DAY}\s+(?:of\s+)?{MONTH_ANY}(?:,?\s*{YEAR_RE}\b)?",
             RECENTLY,
         ),
         (
-            rf"\b(?:the\s+)?(?:first|second|third|fourth|1st|2nd|3rd|4th)[\s-]+(?:fiscal\s+)?quarter\s+(?:of\s+)?(?:fiscal\s+(?:year\s+)?)?(?:FY\s?)?'?(?:{YEAR_RE}|\d{{2}})\b",
+            rf"{_I}\b(?:the\s+)?(?:first|second|third|fourth|1st|2nd|3rd|4th)[\s-]+(?:fiscal\s+)?quarter\s+(?:of\s+)?(?:fiscal\s+(?:year\s+)?)?(?:FY\s?)?'?(?:{YEAR_RE}|\d{{2}})\b",
             QUARTER,
         ),
+        (
+            rf"{_I}\b(?:the\s+)?(?:first|second|1st|2nd)[\s-]+half\s+(?:of\s+)?(?:the\s+)?(?:fiscal\s+)?(?:year\s+)?'?(?:{YEAR_RE}|\d{{2}})\b",
+            HALF_YEAR,
+        ),
+        (rf"{_I}\b[12]H\s*'?(?:{YEAR_RE}|\d{{2}})\b", HALF_YEAR),
         (
             rf"{_I}\b(?:fiscal\s+)?Q[1-4]\s*(?:of\s+)?(?:fiscal\s+(?:year\s+)?)?(?:FY\s?|F)?'?(?:{YEAR_RE}|\d{{2}})\b",
             QUARTER,
@@ -346,8 +468,17 @@ _DATE_RULES: Final[tuple[tuple[re.Pattern[str], str], ...]] = tuple(
         (rf"{_I}\b(?:fiscal\s+)?[1-4]Q\s*(?:FY)?'?(?:{YEAR_RE}|\d{{2}})\b", QUARTER),
         (rf"\b(?:fiscal\s+)?[Hh][12]\s*(?:FY)?'?(?:{YEAR_RE}|\d{{2}})\b", HALF_YEAR),
         (rf"{_I}\b(?:fiscal\s+)?(?:Q[1-4]|[1-4]Q)\b", QUARTER),
-        (r"\b(?:first|second|third|fourth)-quarter\b", "quarterly"),
-        (r"\b(?:the\s+)?(?:first|second|third|fourth)\s+(?:fiscal\s+)?quarter\b", QUARTER),
+        (rf"{_I}\b(?:first|second|third|fourth|1st|2nd|3rd|4th)-quarter\b", "quarterly"),
+        (
+            rf"{_I}\b(?:the\s+)?(?:first|second|third|fourth|1st|2nd|3rd|4th)\s+(?:fiscal\s+)?quarter\b",
+            QUARTER,
+        ),
+        (rf"{_I}\b(?:first|second|1st|2nd)-half\b", "half-year"),
+        (
+            rf"{_I}\b(?:the\s+)?(?:first|second|1st|2nd)\s+half\s+of\s+(?:the\s+)?(?:fiscal\s+)?year\b",
+            HALF_YEAR,
+        ),
+        (rf"{_I}\b(?:the\s+)?(?:first|second|1st|2nd)\s+(?:fiscal\s+)?half\b", HALF_YEAR),
         (rf"\b(?:the\s+)?fiscal\s+(?:year\s+)?'?(?:{YEAR_RE}|\d{{2}})\b", FISCAL_YEAR),
         (rf"{_I}\bFY\s?'?(?:{YEAR_RE}|\d{{2}})\b", FISCAL_YEAR),
         (rf"\b{YEAR_RE}\s*[-–/]\s*(?:{YEAR_RE}|\d{{2}})\b", "the period"),
@@ -381,11 +512,15 @@ class Masker:
         cfg: AliasConfig | None = None,
         nlp: Any = None,
         vocabulary: frozenset[str] = frozenset(),
+        surnames: frozenset[str] | None = None,
     ) -> None:
         """``vocabulary``: ordinary lower-case words (``lowercase_vocabulary``); a PERSON entity made only of
-        such words ("Balance Sheet", "Soar") is not a name unless a role noun or a speech verb frames it."""
+        such words ("Balance Sheet", "Soar") is not a name unless a role noun or a speech verb frames it.
+        ``surnames``: corpus surnames masked wherever they appear; None derives them in ``mask_texts``."""
         self.cfg = load_alias_config() if cfg is None else cfg
         self.vocabulary = vocabulary
+        self._derive_surnames = surnames is None
+        self.surnames: frozenset[str] = frozenset() if surnames is None else surnames
         self.aliases = aliases
         self._nlp = nlp
         self._patterns: dict[int, CompanyPatterns] = {}
@@ -393,6 +528,9 @@ class Masker:
             t.lower() for a in aliases.values() for t in a.tickers
         }
         self._all_names = frozenset(every)
+        self._alias_words = frozenset(
+            w.lower() for a in aliases.values() for n in a.names for w in re.findall(r"[A-Za-z]+", n)
+        )
         self._detector = load_detector()
 
     # --- company -----------------------------------------------------------------------------------
@@ -413,12 +551,21 @@ class Masker:
                     return None
                 alt = "|".join(phrase_regex(v) for v in words)
                 return re.compile(
-                    rf"(?<![A-Za-z0-9&])(?:[Tt]he\s+)?(?:{alt})(?:,?\s+(?:{suffix}))?(?![A-Za-z0-9&])", flags
+                    rf"(?<![A-Za-z0-9&])(?:[Tt]he\s+)?(?:{alt})(?:,?\s+(?:{suffix}))*(?![A-Za-z0-9&])", flags
                 )
 
             tick = "|".join(ticker_regex(t) for t in a.tickers)
             bare = [t for t in a.tickers if len(t) >= 2 and t not in self.cfg.bare_ticker_stoplist]
-            exch = rf"(?:(?:{EXCHANGES})\s*:\s*)?\$?"
+            stop = [t for t in a.tickers if t in self.cfg.bare_ticker_stoplist or len(t) < 2]
+            exch = rf"(?:{EXCH_PREFIX})?\$?"
+            bare_alts = []  # bare tickers; a stoplisted (English-word) ticker only as a possessive ("NOW's")
+            if bare:
+                bare_alts.append(
+                    rf"(?<![A-Za-z0-9$&.\-/])(?:{'|'.join(map(ticker_regex, bare))}){TICKER_SUFFIX}"
+                    rf"(?![A-Za-z0-9&]|/[A-Z]{{1,2}}\b|-[A-Z]\b|-\d)"
+                )
+            if stop:
+                bare_alts.append(rf"(?<![A-Za-z0-9$&.\-/])(?:{'|'.join(map(ticker_regex, stop))})(?=['’]s\b)")
             pat = CompanyPatterns(
                 names=names_re(loose, re.IGNORECASE),
                 names_strict=names_re(strict, 0),
@@ -433,16 +580,11 @@ class Masker:
                 if tick
                 else None,
                 prefixed_ticker=re.compile(
-                    rf"(?:(?<![A-Za-z])(?:{EXCHANGES})\s*:\s*\$?|\$)(?:{tick})(?:\.[A-Z]{{1,2}})?(?![A-Za-z0-9])"
+                    rf"(?:{EXCH_PREFIX}\$?|\$)(?:{tick}){TICKER_SUFFIX}(?![A-Za-z0-9])"
                 )
                 if tick
                 else None,
-                bare_ticker=re.compile(
-                    rf"(?<![A-Za-z0-9$&.\-/])(?:{'|'.join(ticker_regex(t) for t in bare)})(?:\.[ON])?"
-                    rf"(?![A-Za-z0-9&\-/])"
-                )
-                if bare
-                else None,
+                bare_ticker=re.compile("|".join(bare_alts)) if bare_alts else None,
             )
         self._patterns[company_id] = pat
         return pat
@@ -478,7 +620,7 @@ class Masker:
         """Step 1: HTML entities decoded ("Microsoft&nbsp;" → "Microsoft "), then datelines and ISIN codes."""
         text = _NBSP.sub(" ", html.unescape(text))
         total = 0
-        for p in (_DATELINE, _WIRE_DATELINE, _ISIN):
+        for p in (_DATELINE, _WIRE_DATELINE, _ISIN, _EMAIL_URL):
             text, n = p.subn("", text)
             total += n
         return text, total
@@ -499,9 +641,9 @@ class Masker:
             self._nlp = load_spacy()
         return self._nlp
 
-    def _persons(self, doc: Any) -> list[tuple[int, int, list[str]]]:
+    def _persons(self, doc: Any) -> list[Candidate]:
         """PERSON entities that are not a company alias: (start, end, words without a possessive)."""
-        out = []
+        out: list[Candidate] = []
         for ent in doc.ents:
             if ent.label_ != "PERSON":
                 continue
@@ -518,37 +660,79 @@ class Masker:
             out.append((ent.start_char, ent.end_char, words))
         return out
 
+    def _namelike(self, words: Sequence[str]) -> bool:
+        return any(w.lower() not in self.vocabulary for w in words)
+
+    def corpus_surnames(
+        self,
+        candidates: Iterable[Sequence[Candidate]],
+        foreign: Sequence[bool] | None = None,
+        other_entities: Mapping[str, int] | None = None,
+    ) -> frozenset[str]:
+        """Last words of multi-word names in English texts seen at least ``SURNAME_MIN_COUNT`` times:
+        capitalized, 3+ ASCII letters, not an ordinary lower-case word, not a word of any company alias, and
+        tagged inside an organization / product / place entity less than half as often as it ends a name
+        ("Powell" from "Jerome Powell"; not "Oppenheimer", a broker spaCy sometimes tags as a person)."""
+        counts: dict[str, int] = {}
+        for k, cands in enumerate(candidates):
+            if foreign is not None and foreign[k]:
+                continue
+            for _, _, words in cands:
+                if len(words) >= 2 and self._namelike(words):
+                    last = words[-1]
+                    counts[last] = counts.get(last, 0) + 1
+        other = other_entities or {}
+        return frozenset(
+            w
+            for w, n in counts.items()
+            if n >= SURNAME_MIN_COUNT
+            and len(w) >= 3
+            and w[:1].isupper()
+            and w.isascii()
+            and w.isalpha()
+            and w.lower() not in self.vocabulary
+            and w.lower() not in self._alias_words
+            and other.get(w, 0) * 2 < n
+        )
+
     def _person_spans(
-        self, doc: Any, surnames: frozenset[str] = frozenset(), *, foreign: bool = False
+        self,
+        text: str,
+        candidates: Sequence[Candidate],
+        surnames: frozenset[str] = frozenset(),
+        *,
+        foreign: bool = False,
     ) -> list[tuple[int, int]]:
-        """Names of two or more words; a one-word name only if it is the last word of a longer name in the
-        same article, follows a role noun, or precedes a speech verb (title-case headline words such as
-        "Buy" or "Soar" are often tagged PERSON). In a text that looks non-English (``foreign``) only names of
-        two or more capitalized words count: the English model tags many foreign words as PERSON."""
-        spans = []
-        for start, end, words in self._persons(doc):
+        """Names of two or more words; a one-word name only if it is a known surname (of a longer name in the
+        same article, or ``self.surnames`` from the corpus), follows a role noun, or precedes a speech verb
+        (title-case headline words such as "Buy" or "Soar" are often tagged PERSON). In a text that looks
+        non-English (``foreign``) only names of two or more capitalized words count: the English model tags
+        many foreign words as PERSON. Every capitalized occurrence of a known surname is a name too."""
+        known = surnames | self.surnames | self.cfg.person_names
+        spans: list[tuple[int, int]] = []
+        for start, end, words in candidates:
             if foreign:
                 if len(words) >= 2 and all(w[:1].isupper() for w in words):
                     spans.append((start, end))
                 continue
-            framed = bool(
-                _ROLE_BEFORE.search(doc.text[:start]) or _SPEECH_AFTER.match(doc.text[end : end + 30])
-            )
-            namelike = any(w.lower() not in self.vocabulary for w in words)
-            if framed or (namelike and (len(words) >= 2 or words[0] in surnames)):
+            framed = bool(_ROLE_BEFORE.search(text[:start]) or _SPEECH_AFTER.match(text[end : end + 30]))
+            if framed or (self._namelike(words) and (len(words) >= 2 or words[0] in known)):
                 spans.append((start, end))
-        for name in sorted(surnames):  # a surname NER missed: "Elon Musk ... Musk added"
-            if len(name) < 3 or name.lower() in self.vocabulary:
-                continue
-            for m in re.finditer(rf"(?<![A-Za-z]){re.escape(name)}(?:['’]s)?(?![A-Za-z])", doc.text):
-                if not any(s < m.end() and m.start() < e for s, e in spans):
-                    spans.append(m.span())
+        for m in _CAP_WORD.finditer(text):  # a surname NER missed: "Elon Musk ... Musk added", "Trump" alone
+            name = m.group("w")
+            usable = name in self.cfg.person_names or (len(name) >= 3 and name.lower() not in self.vocabulary)
+            if name in known and usable and not any(s < m.end() and m.start() < e for s, e in spans):
+                spans.append(m.span())
         return sorted(spans)
 
-    def mask_persons(self, text: str, doc: Any, surnames: frozenset[str] = frozenset()) -> tuple[str, int]:
-        spans = self._person_spans(doc, surnames, foreign=self._detector.non_english(text))
+    def mask_persons(
+        self, text: str, candidates: Sequence[Candidate], surnames: frozenset[str] = frozenset()
+    ) -> tuple[str, int]:
+        spans = self._person_spans(text, candidates, surnames, foreign=self._detector.non_english(text))
         out, pos, n = [], 0, 0
         for start, end in spans:
+            if start < pos:
+                continue
             before = text[:start]
             if _ROLE_BEFORE.search(before):
                 out.append(text[pos:start].rstrip(" ,"))
@@ -567,6 +751,67 @@ class Masker:
         out.append(text[pos:])
         return "".join(out), n
 
+    # --- price talk and price levels ---------------------------------------------------------------
+
+    @staticmethod
+    def _relative(label: str, mid: str, old: str, new: str) -> str:
+        a, b = float(old.replace(",", "")), float(new.replace(",", ""))
+        if a <= 0 or b == a:
+            change = "unchanged" if b == a else ""
+        else:
+            pct = (b / a - 1.0) * 100.0
+            change = (
+                ("raised slightly" if pct > 0 else "lowered slightly")
+                if abs(pct) < 1
+                else f"{'raised' if pct > 0 else 'lowered'} by about {round(abs(pct))}%"
+            )
+        return f"{label}{mid.rstrip()} {change}".rstrip()
+
+    @staticmethod
+    def is_price_move(sentence: str) -> bool:
+        """A stock / share price move in percent: any subject occurrence whose stretch to the move verb holds
+        no fundamental noun ("Earnings Disappoint, Shares Fall 8.3%" is a move; "revenue rose 5%" is not)."""
+        if PRICE_MOVE_AFTER.search(sentence):
+            return True
+        for sm in _MOVE_SUBJECT.finditer(sentence):
+            m = PRICE_MOVE.match(sentence, sm.start())
+            if m and not _FUNDAMENTAL_SUBJECT.search(m.group("mid") or ""):
+                return True
+        return False
+
+    def mask_prices(self, text: str) -> tuple[str, int]:
+        """Step 5b: drop ticker quotes and price-move sentences; remove price-target and deal-price levels."""
+        n = 0
+        text, k = QUOTE.subn("", text)
+        n += k
+        for sentence in split_sentences(text):
+            if self.is_price_move(sentence):
+                text = text.replace(sentence, "", 1)
+                n += 1
+        text = _SEP_RUN.sub(lambda m: m.group(1) + " ", text).strip(" ;|")
+        text, k = PT_FROM_TO.subn(
+            lambda m: self._relative(m["label"], m["mid"], m.group(3), m.group(4)), text
+        )
+        n += k
+        text, k = PT_TO_FROM.subn(
+            lambda m: self._relative(m["label"], m["mid"], m.group(4), m.group(3)), text
+        )
+        n += k
+        for _ in range(3):
+            text, k = PT_AMOUNT.subn(lambda m: f"{m['label']}{m['mid'].rstrip()}", text)
+            n += k
+            if not k:
+                break
+        text, k = AMOUNT_PT.subn(lambda m: m["label"], text)
+        n += k
+
+        def deal(m: re.Match[str]) -> str:
+            left = text[max(0, m.start() - 80) : m.start()]
+            return "a per-share price" if _DEAL.search(left) and not _FUND_LEFT.search(left) else m.group(0)
+
+        text, k = PER_SHARE.subn(deal, text)
+        return text, n
+
     # --- one text ----------------------------------------------------------------------------------
 
     def pre_ner(self, text: str, company_id: int | None, *, is_title: bool) -> tuple[str, MaskCounts]:
@@ -581,10 +826,13 @@ class Masker:
         c.dates += n
         return text, c
 
-    def post_ner(self, text: str, doc: Any, surnames: frozenset[str] = frozenset()) -> tuple[str, int]:
+    def post_ner(
+        self, text: str, candidates: Sequence[Candidate], surnames: frozenset[str] = frozenset()
+    ) -> tuple[str, int]:
         """Steps 4–5."""
-        text, n = self.mask_persons(text, doc, surnames)
+        text, n = self.mask_persons(text, candidates, surnames)
         text = self._detector.scrub(_tidy(text))
+        text, _ = self.mask_prices(text)
         return _tidy(text), n
 
     def mask_texts(
@@ -598,27 +846,36 @@ class Masker:
         """Mask many (text, company_id, is_title) items; spaCy runs once over all pre-masked texts.
 
         ``groups`` (one label per item; items of a group are consecutive, e.g. an article's title and snippet)
-        lets a surname alone count as a person when the full name appears elsewhere in the group.
+        lets a surname alone count as a person when the full name appears elsewhere in the group. Without
+        ``surnames`` at construction, the corpus surnames are derived from these items (``corpus_surnames``)
+        and kept in ``self.surnames``.
         """
         pre = [self.pre_ner(t, cid, is_title=title) for t, cid, title in items]
         labels = list(range(len(items))) if groups is None else list(groups)
         docs = self.nlp.pipe([p[0] for p in pre], batch_size=batch_size, n_process=n_process)
+        cands: list[list[Candidate]] = []
+        other: dict[str, int] = {}
+        for d in docs:
+            cands.append(self._persons(d))
+            for ent in d.ents:
+                if ent.label_ in _NON_PERSON_LABELS:
+                    for w in ent:
+                        other[w.text] = other.get(w.text, 0) + 1
+        if self._derive_surnames:
+            foreign = [self._detector.non_english(p[0]) for p in pre]
+            self.surnames = self.corpus_surnames(cands, foreign, other)
         out: list[tuple[str, MaskCounts]] = []
-        buf: list[tuple[str, MaskCounts, Any]] = []
-
-        def flush() -> None:
-            surnames = frozenset(w[-1] for _, _, d in buf for _, _, w in self._persons(d) if len(w) >= 2)
-            for text, counts, d in buf:
-                masked, n = self.post_ner(text, d, surnames)
+        i = 0
+        while i < len(pre):
+            j = i + 1
+            while j < len(pre) and labels[j] == labels[i]:
+                j += 1
+            local = frozenset(w[-1] for c in cands[i:j] for _, _, w in c if len(w) >= 2 and self._namelike(w))
+            for (text, counts), c in zip(pre[i:j], cands[i:j], strict=True):
+                masked, n = self.post_ner(text, c, local)
                 counts.persons += n
                 out.append((masked, counts))
-            buf.clear()
-
-        for i, ((text, counts), doc) in enumerate(zip(pre, docs, strict=True)):
-            if buf and labels[i] != labels[i - 1]:
-                flush()
-            buf.append((text, counts, doc))
-        flush()
+            i = j
         return out
 
     def mask(self, text: str, company_id: int | None, *, is_title: bool = False) -> str:
