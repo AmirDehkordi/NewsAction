@@ -23,22 +23,22 @@
   "callA_d0_E3": {
     "rows": 48085,
     "events_without_text": 18,
-    "states_with_dropped_articles": 848,
-    "articles_dropped": 892,
+    "states_with_dropped_articles": 818,
+    "articles_dropped": 854,
     "texts_cut": 0
   },
   "callA_d2_E3": {
     "rows": 62274,
     "events_without_text": 11,
-    "states_with_dropped_articles": 6223,
-    "articles_dropped": 6907,
+    "states_with_dropped_articles": 6035,
+    "articles_dropped": 6653,
     "texts_cut": 0
   },
   "callB_d2_E3": {
     "rows": 42359,
     "events_without_text": 4,
-    "states_with_dropped_articles": 5921,
-    "articles_dropped": 6596,
+    "states_with_dropped_articles": 5737,
+    "articles_dropped": 6347,
     "texts_cut": 0
   },
   "market_E3": {
@@ -47,43 +47,43 @@
   "sample_E0": {
     "rows": 3000,
     "events_without_text": 0,
-    "states_with_dropped_articles": 56,
-    "articles_dropped": 56,
+    "states_with_dropped_articles": 55,
+    "articles_dropped": 55,
     "texts_cut": 0
   },
   "sample_E1": {
     "rows": 3000,
     "events_without_text": 0,
-    "states_with_dropped_articles": 56,
-    "articles_dropped": 56,
+    "states_with_dropped_articles": 55,
+    "articles_dropped": 55,
     "texts_cut": 0
   },
   "sample_E2": {
     "rows": 3000,
     "events_without_text": 0,
-    "states_with_dropped_articles": 56,
-    "articles_dropped": 56,
+    "states_with_dropped_articles": 55,
+    "articles_dropped": 55,
     "texts_cut": 0
   },
   "sample_E3": {
     "rows": 3000,
     "events_without_text": 0,
-    "states_with_dropped_articles": 56,
-    "articles_dropped": 56,
+    "states_with_dropped_articles": 55,
+    "articles_dropped": 55,
     "texts_cut": 0
   },
   "sample_E4": {
     "rows": 3000,
     "events_without_text": 0,
-    "states_with_dropped_articles": 56,
-    "articles_dropped": 56,
+    "states_with_dropped_articles": 55,
+    "articles_dropped": 55,
     "texts_cut": 0
   },
   "unmasked": {
     "rows": 1000,
     "events_without_text": 0,
-    "states_with_dropped_articles": 31,
-    "articles_dropped": 31,
+    "states_with_dropped_articles": 30,
+    "articles_dropped": 30,
     "texts_cut": 0
   }
 }

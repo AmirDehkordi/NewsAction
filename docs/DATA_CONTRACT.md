@@ -461,16 +461,25 @@ its sha256 on a rerun.
 - **Key:** `id` unique
 - **Rows / coverage:** 299,144 rows: 296,082 event articles, 3,062 market articles
 - **Availability:** `w0` per article (a function of the article's own text; `title_masked` / `snippet_masked` registered `w0`). Third-party OK articles only (NA-03 lists); contains 2026 article text, no return.
-- **sha256:** `13a812788485d1550e80bc2ed358322cabbed533e4aefd9dd619643c005dcdeb`
+- **sha256:** `5795e5956ab2d7bc40e5aa6858f06a2a63ffa7c78a7c3c8e75770f10c2d35162`
 
 ### `work/states/person_surnames.parquet`
 - **Producer:** `newsaction.states.build --stage mask` (S3; `states.mask.Masker.corpus_surnames`)
 - **Inputs:** the spaCy PERSON entities of every event and market article text
 - **Schema:** `surname` string
 - **Key:** `surname` unique (sorted)
-- **Rows / coverage:** 1,778 surnames: last words of multi-word PERSON names in English texts seen ≥ 3 times, capitalized ASCII, 3+ letters, not an ordinary lower-case word of the event texts, not a word of any company alias, and not tagged inside an organization, product or place name at least half as often
+- **Rows / coverage:** 1,777 surnames: last words of multi-word PERSON names in English texts seen ≥ 3 times, capitalized ASCII, 3+ letters, not an ordinary lower-case word of the event texts, not a word of any company alias, and not tagged inside an organization, product or place name at least half as often
 - **Availability:** a lexicon of the article texts (`w0`); the masker masks each surname wherever it appears capitalized (PREREG §6.3 person names, also used alone). The determinism test reuses it instead of re-running NER on the corpus.
-- **sha256:** `81c45b47b777d95b50bf41802c3c6ed5594c84011a8716f6aa7a3a3e6b116e3d`
+- **sha256:** `126be977aa73b7e7ec3733f83750c69e60619b75c14c50f2c7fa73b977cebb08`
+
+### `work/states/company_cjk_names.parquet`
+- **Producer:** `newsaction.states.build --stage mask` (S3; `states.mask.cjk_company_names`)
+- **Inputs:** the event articles of `work/events/events_{d0,d2}.parquet` (title_clean / snippet_clean as capped by NA-03), the company tickers (`work/panel/companies.parquet`, `work/snapshot/symbol_tickers.parquet`, `configs/{aliases,news}.yaml`)
+- **Schema:** `company_id` int64, `name` string
+- **Key:** `(company_id, name)` unique
+- **Rows / coverage:** 572 Chinese, Japanese and Korean names of 254 companies: the CJK words right before the company's own ticker in parentheses ("迪爾股份（紐交所：DE）"), leading verbs / function words and corporate suffixes removed (a Korean name seen twice)
+- **Availability:** a lexicon of the article texts (`w0`); the masker replaces each name in the company's own texts (PREREG §6.3). The masker and the determinism test derive the same list from the event articles; this file records it.
+- **sha256:** `9a966b772831ee6b5ad0e124853f1e03e39369c2f71ab054b274a12c4a1d2993`
 
 ### State files (schema shared by the ten files below)
 - **Producer:** `newsaction.states.build --stage states` (S5; `states.build.build_event_states`, `build_market_states`)
@@ -485,67 +494,67 @@ its sha256 on a rerun.
 - **Contents:** Call A on D0 (W0 news), E3, masked: every D0 event with text after masking (robustness, train, val-A, val-B, test; 18 events have none, artifacts/NA-04/build_states.json)
 - **Schema / key / availability:** as "State files" above
 - **Rows:** 48,085
-- **sha256:** `b7fdeddda7992f98ff4e6c0c23cc27d1acf68b04e0f26d76af63848d26a1c2e1`
+- **sha256:** `11a3bc8b2bcc582780ef02a3cc25a869ecdb038db848029357189038cc64215b`
 
 ### `work/states/callA_d2_E3.parquet`
 - **Producer:** `newsaction.states.build --stage states` (S5)
 - **Contents:** Call A on D2 (W2 news, PREREG A3.1), E3, masked: every D2 event with text after masking (all splits; 11 have none)
 - **Schema / key / availability:** as "State files" above
 - **Rows:** 62,274
-- **sha256:** `cb4bbaa527dad85acd378671c2385f36e34db651112c0fcd4bcef07ce1686534`
+- **sha256:** `ed1b912d80195d8c746707b8ae6eff1e9bb062d5a550e86765349d43bbbd566b`
 
 ### `work/states/callB_d2_E3.parquet`
 - **Producer:** `newsaction.states.build --stage states` (S5)
 - **Contents:** Call B on D2 (W2 news + reaction_so_far), E3, masked: the D2 events of train, val-A and val-B with text (4 have none); same articles as callA_d2_E3
 - **Schema / key / availability:** as "State files" above
 - **Rows:** 42,359
-- **sha256:** `0ef35310f7e5eb84680f670ff00604e39219cb7f3e39996f7f2cf1f6d979499d`
+- **sha256:** `cfce6f5e2c1665327e48b2f3f90cd30d0655115e74915a7b791a3c15ddeb9fd0`
 
 ### `work/states/market_E3.parquet`
 - **Producer:** `newsaction.states.build --stage states` (S5)
 - **Contents:** A3.5 (optional) market states: one per session with third-party-OK market-index articles, E3, masked
 - **Schema / key / availability:** as "State files" above
 - **Rows:** 595
-- **sha256:** `6b4c69ab55ef6aa02d135c3aa50380c594e3dc4ee4ad7a8be4e8785eefa78849`
+- **sha256:** `a971035c125c6060d174d379ece37c7adc5bcd4c2774ba38de71ec16d2682aad`
 
 ### `work/states/samples/callA_d0_E0.parquet`
 - **Producer:** `newsaction.states.build --stage states` (S5)
 - **Contents:** NA-07 encoding sample: 1,500 val-A + 1,500 val-B D0 events (tier × month, seed 2026), Call A, E0, masked
 - **Schema / key / availability:** as "State files" above
 - **Rows:** 3,000
-- **sha256:** `c9bbc1f4f75239e0dcabd958605efe6eba578476cfbb64e4a7bd6fdbb2e171f2`
+- **sha256:** `60a20df9ba2e48eb53ea6c635cf3880208e9b23f7b2b25650b63986ae0a1dfc3`
 
 ### `work/states/samples/callA_d0_E1.parquet`
 - **Producer:** `newsaction.states.build --stage states` (S5)
 - **Contents:** NA-07 encoding sample: 1,500 val-A + 1,500 val-B D0 events (tier × month, seed 2026), Call A, E1, masked
 - **Schema / key / availability:** as "State files" above
 - **Rows:** 3,000
-- **sha256:** `a1d86b2c5e78edfde4c2b3531abf017fc5b8c8be88dce28a86083fa3b097eac6`
+- **sha256:** `564326ceda27e048501511796febc3e61385385c1348b6385aa314dd6761f9ef`
 
 ### `work/states/samples/callA_d0_E2.parquet`
 - **Producer:** `newsaction.states.build --stage states` (S5)
 - **Contents:** NA-07 encoding sample: 1,500 val-A + 1,500 val-B D0 events (tier × month, seed 2026), Call A, E2, masked
 - **Schema / key / availability:** as "State files" above
 - **Rows:** 3,000
-- **sha256:** `be618b4f1fe4fbf13527a5a11cdb2c4451f4f3ce3302c4b0a94f55c9297f018c`
+- **sha256:** `201bdeb86af599020a39b2e0bccf8047f5d2625349d88f26023e32dae4eb6807`
 
 ### `work/states/samples/callA_d0_E3.parquet`
 - **Producer:** `newsaction.states.build --stage states` (S5)
 - **Contents:** NA-07 encoding sample: 1,500 val-A + 1,500 val-B D0 events (tier × month, seed 2026), Call A, E3, masked
 - **Schema / key / availability:** as "State files" above
 - **Rows:** 3,000
-- **sha256:** `a0d20ff1cb78e54a89aa661edd990c0bfe2da0c7251be69532c723780c0a3810`
+- **sha256:** `7215492c11f2343f6b130e5d599ee7ebd246318eba1a3a7daff81afec5a32217`
 
 ### `work/states/samples/callA_d0_E4.parquet`
 - **Producer:** `newsaction.states.build --stage states` (S5)
 - **Contents:** NA-07 encoding sample: 1,500 val-A + 1,500 val-B D0 events (tier × month, seed 2026), Call A, E4, masked
 - **Schema / key / availability:** as "State files" above
 - **Rows:** 3,000
-- **sha256:** `0c33b5618d93c849c0fe5b0e75c2def6a8dcdae70fbff31bbd506c9e1b2af611`
+- **sha256:** `c119ee85dc13b7118d60beee58576d9c3b2be9f4723d43ada9edda4883eb3ad5`
 
 ### `work/states/samples/unmasked.parquet`
 - **Producer:** `newsaction.states.build --stage states` (S5)
 - **Contents:** NA-06 probe: unmasked twin of 1,000 val-A D0 events (tier × month, seed 2026), Call A, E3; the masked twin is the same event_id in callA_d0_E3
 - **Schema / key / availability:** as "State files" above
 - **Rows:** 1,000
-- **sha256:** `6039b3d5a907c78321fc68a9ce8e97ab797d0c04e23f771cadf962cd52e65c1f`
+- **sha256:** `71b951fc376b3fbd8daf6c097f75601339691a6baa86a445a668ababf68f67d0`

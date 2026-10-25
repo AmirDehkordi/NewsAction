@@ -66,7 +66,7 @@ Three Call A (D0) and two Call B (D2) states, drawn with seed 2026 (`newsaction.
 
 ## Call A, D0: `W0:211:2025-07-21`
 
-6 articles · 743 state tokens · 1045 with the core questions
+6 articles · 741 state tokens · 1043 with the core questions
 
 ```json
 {
@@ -111,7 +111,7 @@ Three Call A (D0) and two Call B (D2) states, drawn with seed 2026 (`newsaction.
       "timing": "overnight"
     },
     {
-      "headline": "The company the company the quarter Earnings Preview Upside Potential on Robust Revenue Growth",
+      "headline": "The company the quarter Earnings Preview Upside Potential on Robust Revenue Growth",
       "snippet": "Forward-Looking Analysis the company is expected to report its quarter earnings recently. Analysts anticipate a strong performance,...",
       "source_type": "automated article",
       "timing": "overnight"
