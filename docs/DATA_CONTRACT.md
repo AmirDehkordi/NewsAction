@@ -308,3 +308,112 @@ Instants are UTC; session dates are XNYS-local.
 - **Rows / coverage:** 31,506 cleaned market-index articles (^GSPC 12,179, ^VIX 11,081, DX-Y.NYB 8,246), t_avail 2023-09-01 … 2026-07-31; no company mapping; non_news / junk-tag / 13F rows dropped; `third_party_ok` 89.8%.
 - **Availability:** as `articles_clean` (article columns `w0`, vendor flags `selection_only`).
 - **sha256:** `8816280faecf42f0dc5b0571493ceda44e091636b66731f750313938b6416dc9`
+
+## NA-03 — material labels, importance filters, events
+
+Producer for all files: `newsaction.events.build` (NA-03), one stage per process:
+`uv run python -m newsaction.events.build --stage labels | counts | fit | scores | compare | events | project`.
+Configuration: `configs/events.yaml` (PREREG §6.6–6.9, A1.2 constants) and the `filter:` section of
+`configs/frozen.yaml` (written by `compare`). Only `labels` reads returns (`panel_public`, sessions ≤ 2025-12-31,
+asserted); `learned` and `select` read the labels; the `scores`, `events` and `project` stages read articles,
+frozen models, counts and t−1 tiers only. No module in `newsaction.events` imports `panel.targets` or the lock
+(tests/test_events_no_test_outcomes.py). Every stage reproduces its sha256 on a rerun.
+
+### `work/events/labels_public.parquet`
+- **Producer:** `newsaction.events.build --stage labels` (`events.labels`, S1)
+- **Inputs:** `work/panel/panel_public.parquet` (representative member rows), `work/news/coverage_member_month.parquet`
+- **Schema:** `session` date32, `company_id`, `symbol_id` int64, `split`, `month`, `tier` string, `embargo`, `purged` bool, `horizon_end` date32 (t+5), `z_on`, `z_cc`, `z_vol`, `ar_cc`, `sigma_cc`, `car6_z` (panel), `car_delayed_z` = (car6_z·σ_cc·√6 − AR_cc,t)/(σ_cc·√5) double, `label_ok` bool, `material_on`, `material_car`, `material_vol`, `material`, `delayed` boolean (NA when not `label_ok`)
+- **Key:** `(company_id, session)` unique
+- **Rows / coverage:** 186,002 covered member company-days: train 122,734 (120,005 labelled), val-A 31,694 (29,215), val-B 31,574 (29,114); sessions 2024-07-01 … 2025-12-31. Purge: the last 5 sessions of each split (`purged`, label NA); `embargo` marks the first 5 sessions of val-A / val-B.
+- **Availability:** `post` (labels look at returns t … t+5; never a model input). Val-B rows exist for later chunks; NA-03 computes no val-B statistic from them.
+- **sha256:** `6bb810887292c9cb60da50a104c622733658c2229daea0de0a5a64230c589220`
+
+### `work/events/window_counts.parquet`
+- **Producer:** `newsaction.events.build --stage counts` (`events.attention`)
+- **Inputs:** `work/news/articles_clean.parquet` (company, sessions, keep, novelty), `work/snapshot/members_by_session.parquet`, `work/panel/companies.parquet`
+- **Schema:** `session` date32, `company_id` int64; per window w ∈ {w0, w2}: `n_articles_w` (usable articles incl. near-duplicates), `n_stories_w` (representatives), `n_dup_w` int64, `attention_mean_w` (mean n_articles_w over the company's member sessions among the previous 60; ≥ 20 needed), `attention_ratio_w` = n_articles_w / max(mean, 1/60) double
+- **Key:** `(session, company_id)` unique
+- **Rows / coverage:** 448,505 member company-sessions 2023-01-03 … 2026-07-31, 562 companies.
+- **Availability:** counts `w0` / `w2` of the session; `attention_mean_*` `t_minus_1`. Articles only.
+- **sha256:** `10ac21439c009c04270f3623feeda4350029eaa2b9941076af3b6ef6a85c96c7`
+
+### `work/events/models/f5_logreg.model.json`
+- **Producer:** `newsaction.events.build --stage fit` (`events.learned`, S3)
+- **Inputs:** kept W0 articles of labelled covered member-days in the fit window; `work/news/embeddings_ts.parquet`
+- **Schema:** JSON {mean, scale, coef (384 each), intercept}: p = σ(((x − mean)/scale)·coef + intercept) on the bge-small embedding
+- **Key:** n/a
+- **Rows / coverage:** one model (C = 0.1, the best of 4 grid points on the tune window)
+- **Availability:** frozen; fit labels end ≤ 2025-03-31 (see the meta file). Selection score only (`f5` is `selection_only`).
+- **sha256:** `2d7a11134e4110bbb30baf2767e4875b91686976ae7704e00a20fa24fb80353c`
+
+### `work/events/models/f5_logreg.meta.json`
+- **Producer:** `newsaction.events.build --stage fit`
+- **Inputs:** as the model
+- **Schema:** JSON {fit_range {start, end, min_session, max_session, max_horizon_end, ticker_days, material_ticker_days}, tune_range {…}, fit_articles, tune_articles, label, tuning_metric, seed, embedding, events_config_sha256, filter, model_file, features, params, grid [{params, tune recall}], sha256 {model file}}
+- **Key:** n/a
+- **Rows / coverage:** fit 89,253 ticker-days / 359,302 articles (sessions 2024-07-01 … 2025-03-24, horizons ≤ 2025-03-31); tune 28,272 / 172,145 (2025-04-01 … 2025-06-23, horizons ≤ 2025-06-30)
+- **Availability:** provenance record
+- **sha256:** `69f509f1c7bccef63a2fa2ef36436b6ef177ad7e3463651c886feca17e0e9bc0`
+
+### `work/events/models/f6_lgbm.model.txt`
+- **Producer:** `newsaction.events.build --stage fit` (`events.learned`, S3)
+- **Inputs:** as F5, plus `work/events/window_counts.parquet` (W0 attention ratio)
+- **Schema:** LightGBM 4.7 booster (text, `model_to_string`), binary objective, deterministic, seed 2026
+- **Key:** n/a
+- **Rows / coverage:** one model (15 leaves, min_child_samples 400, 200 rounds; best of 8 grid points)
+- **Availability:** frozen; selection score only (`f6_*` are `selection_only`: vendor features).
+- **sha256:** `b9973a7c07439dd7bbfdfd49e27ffb2a349b40a412b4affc5b7dec5a6c3c7db5`
+
+### `work/events/models/f6_lgbm.prep.json`
+- **Producer:** `newsaction.events.build --stage fit`
+- **Inputs:** fit-window articles
+- **Schema:** JSON {features (27, in order), vocab {tag_type, sentiment_intensity, source_class}, sentiment_scale, pca {mean (384), components (16×384)}}
+- **Key:** n/a
+- **Rows / coverage:** PCA fit on the 359,302 fit-window article embeddings
+- **Availability:** frozen with the booster
+- **sha256:** `c3e70f5481761de641d4f8e347756f375e1d9447c04e2201f8d687b277d30e87`
+
+### `work/events/models/f6_lgbm.meta.json`
+- **Producer:** `newsaction.events.build --stage fit`
+- **Inputs:** as the model
+- **Schema:** as the F5 meta, with `prep_file`, `categorical`, `pca` and sha256 of both F6 files
+- **Key:** n/a
+- **Rows / coverage:** as F5
+- **Availability:** provenance record
+- **sha256:** `d11e9b50781b6f7967fbb0777abe8614b3d06bd6e19977ce557f7029a0d8995f`
+
+### `work/events/article_scores.parquet`
+- **Producer:** `newsaction.events.build --stage scores` (`events.scores`, S2)
+- **Inputs:** `work/news/articles_clean.parquet` (kept rows), `work/news/embeddings_ts.parquet`, `work/events/window_counts.parquet`, the frozen F5/F6 files
+- **Schema:** `id` string, `company_id` int64, `t_avail` timestamp[ns, UTC], `session_w0`, `session_w2` date32, `f0`–`f3` (0/1 rule scores), `f4` (novelty), `f5`, `f6_w0`, `f6_w2` (NaN outside the window) double
+- **Key:** `id` unique
+- **Rows / coverage:** 1,494,138 kept articles (all periods; 1,035,098 in a W0 window), sessions 2023-07-03 … 2026-07-31
+- **Availability:** article scores are known at the article's t_avail; all are `selection_only` except `f4` (novelty, `w0`).
+- **sha256:** `c4fe428b5fc34cd320ea42c6c4e6e93810f08dcc0861fc5a04b66b3491f62e37`
+
+### `work/events/ticker_days.parquet`
+- **Producer:** `newsaction.events.build --stage scores` (`events.scores`, S2)
+- **Inputs:** `work/events/article_scores.parquet`
+- **Schema:** `window` (W0 | W2), `company_id` int64, `session` date32, `n_kept`, `f0`–`f6` (max over the window's kept articles), `n_f1`, `n_f2`, `n_f3` (articles passing the rule), `split` string, `tie_u` double (sha256 tie-breaker, seed 2026)
+- **Key:** `(window, company_id, session)` unique
+- **Rows / coverage:** W0 219,749 and W2 249,252 company-sessions with ≥ 1 kept article, 2023-07-03 … 2026-07-31
+- **Availability:** `selection_only` (scores and counts); `tie_u` `static`. No return.
+- **sha256:** `96f1cd8b791b47df6dfc2a3f26ff896ac7b2020f25b6f16f722059e37abbbb31`
+
+### `work/events/events_d0.parquet`
+- **Producer:** `newsaction.events.build --stage events` (`events.aggregate`, S5; written with pyarrow, registered with `io.register_file`)
+- **Inputs:** `work/events/{ticker_days,article_scores,window_counts}.parquet`, `work/news/articles_clean.parquet` (text and descriptive fields of kept articles), `work/panel/tiers_monthly.parquet` (t−1 tier, representative class), `configs/frozen.yaml` `filter:`
+- **Schema:** `event_id` ("W0:{company_id}:{session}"), `window`, `decision_point` string, `company_id` int64, `session` date32, `n_list_w0` (1–6), `n_ok_w0`, `n_not_third_party_w0`, `n_dropped_cap_w0`, `news_tokens_w0` (≤ 600, ModernBERT-large @ 45bb4654), `n_non_english_w0` int64, `filter_score_w0` double, `n_articles_w0`, `n_stories_w0`, `n_dup_w0` int64, `attention_mean_w0`, `attention_ratio_w0` double, `month`, `tier` string, `symbol_id` int64, `split` string, `embargo` bool, `clean_1`, `clean_2`, `clean_5`, `clean_10`, `clean_20` boolean (NA when the window runs past 2026-07-31), `news_w0` list<struct{id, rank int32, score double, t_avail timestamp[us, UTC], precision, source_class, source_class_domain string, non_english_hint bool, novelty, dup_count double, title, snippet string, title_truncated, snippet_truncated bool}> (no pandas metadata: `pd.read_parquet` gives arrays of dicts)
+- **Key:** `event_id` unique (= `(company_id, session)`)
+- **Rows / coverage:** 48,103 events 2024-01-02 … 2026-07-31, 523 companies: robustness 689, train 17,759, val-A 9,079, val-B 6,149, test 14,427. 7,385 selected ticker-days have no third-party-OK article and no event (robustness 2,205, train 5,180).
+- **Availability:** `w0` for the news and count columns (registry suffix `_w0`); `filter_score_w0`, `n_ok_w0`, `n_not_third_party_w0` `selection_only`; `clean_*` `post` (look forward; sample flags). No price, return or target is read; test-period rows come from articles only.
+- **sha256:** `6279bd6227a7f097931efa2b498912e6064e15b36a513eb8450b412bb80f17af`
+
+### `work/events/events_d2.parquet`
+- **Producer:** as `events_d0` (window W2)
+- **Inputs:** as `events_d0`
+- **Schema:** as `events_d0` with the `_w2` suffix (`event_id` "W2:{company_id}:{session}")
+- **Key:** `event_id` unique
+- **Rows / coverage:** 62,285 events 2024-01-02 … 2026-07-31, 524 companies: robustness 971, train 23,199, val-A 11,252, val-B 7,912, test 18,951; 9,258 selected ticker-days without a third-party-OK article.
+- **Availability:** `w2` (D2 decision point); otherwise as `events_d0`.
+- **sha256:** `2acf769d5803f2d90dfcc9445bf0156c17c044b29ebd780ee3f9474e07010002`
