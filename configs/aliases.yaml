@@ -23,7 +23,7 @@ legal_suffixes: ["& Co", "& Company", and Company, Hldgs, Inc, Incorporated, Cor
 # Public figures masked as people wherever they appear capitalized, also alone (PREREG §6.3 person names;
 # NA-04 verification): heads of state and government, central bankers and officials, and executives often
 # named by surname only. Corpus surnames of multi-word names are added automatically (mask.SURNAME_MIN_COUNT).
-person_names: [Trump, Biden, Obama, Harris, Vance, Powell, Yellen, Bessent, Lutnick, Navarro, Greer, Miran,
+person_names: [Trump, Biden, Obama, Harris, Vance, Powell, Yellen, Bessent, Lutnick, Navarro, Greer, Miran, Leyen,
                Waller, Bowman, Lagarde, Ueda, Bailey, Xi, Jinping, Putin, Zelensky, Modi, Erdogan, Netanyahu,
                Macron, Merz, Scholz, Starmer, Sunak, Meloni, Carney, Trudeau, Sheinbaum, Ishiba, Takaichi, Musk,
                Bezos, Buffett, Dimon, Zuckerberg, Altman, Nadella, Pichai, Jassy, Huang, Ackman, Icahn, Dalio]
@@ -73,12 +73,15 @@ common_words: [Booking, Delta, Match, Discover, Quest, Camden, Hartford, Prudent
                Warner, Bros, Invitation, Mellon, Marsh, Wells, Morgan, Stanley, Johnson, Williams, Phillips,
                Martin, Parker, Fisher, Brown, Campbell, Ross, Clark, Kimberly, Simon, Charles, Arthur, Philip,
                Morris, John, Jacobs, Ford, Duke, Apollo, Marathon, Gap, Lauren, Ralph, Las, Vegas, Penn, Eli,
-               Walt, Dickinson, Emerson, Gallagher, Eaton, Hess, Lowe, Coca, Cola, Fargo]
+               Walt, Dickinson, Emerson, Gallagher, Eaton, Hess, Lowe, Coca, Cola]
 
-# Tickers that are also English words or common upper-case abbreviations. They are masked only with $, an
-# exchange prefix, parentheses, a possessive ("NOW's") or before "stock" / "shares"; every other ticker is
-# masked bare too (NA-04 verification: ODFL, PAYC, IQV, ... were wrongly listed here before).
-bare_ticker_stoplist: [ON, IT, SO, DE, ES, EL, ED, IP, IR, PM, MA, MS, HD, PG, BR, CI, CE, GL, FE, NI, CF,
+# Tickers that are also English words or common upper-case abbreviations. In a text that is mostly in capitals
+# they are masked only with $, an exchange prefix, parentheses, a possessive ("NOW's") or before "stock" /
+# "shares"; in mixed-case text they are masked in upper case too ("MET earnings per share", second NA-04
+# verification), except a clock time ("4:30 PM") and IT before an IT noun. Every other ticker is masked bare in
+# any text (first NA-04 verification: ODFL, PAYC, IQV, ... were wrongly listed here before). "ON" is quoted:
+# YAML reads a bare ON as the boolean true.
+bare_ticker_stoplist: ["ON", IT, SO, DE, ES, EL, ED, IP, IR, PM, MA, MS, HD, PG, BR, CI, CE, GL, FE, NI, CF,
                        ALL, NOW, KEY, KEYS, LOW, COST, CAT, ARE, DASH, COIN, HOOD, APP, POOL, WELL, BALL,
                        PEAK, DAY, FAST, HAS, TECH, DOW, USB, MAR, TAP, RE, AI, WAT, CPU, EXE, DOC, BRO, HUM,
                        MET, HAL, GEN, AMP, TEL, FOX, NWS, GD]
@@ -112,7 +115,7 @@ companies:
   PLTR: {names: [Palantir, Palantir Technologies]}
   HD: {names: [Home Depot, The Home Depot]}
   BAC: {names: [Bank of America, BofA, BofA Securities, Bank of America Merrill Lynch, Bankof America]}
-  AMAT: {names: [Applied Materials]}
+  AMAT: {names: [Applied Materials, Applied Matls, Applied Mat]}
   ABBV: {names: [AbbVie]}
   CSCO: {names: [Cisco, Cisco Systems]}
   LRCX: {names: [Lam Research]}
@@ -123,7 +126,7 @@ companies:
   CRM: {names: [Salesforce, Salesforce.com]}
   TMUS: {names: [T-Mobile, T-Mobile US]}
   GE: {names: [GE Aerospace, General Electric, GE]}
-  PM: {names: [Philip Morris International, Philip Morris, PMI]}
+  PM: {names: [Philip Morris International, Philip Morris, PMI, Philip Morris ČR, PMČR]}
   KLAC: {names: [KLA, KLA Corp, KLA-Tencor]}
   PEP: {names: [PepsiCo, Pepsi]}
   WFC: {names: [Wells Fargo]}
@@ -166,7 +169,7 @@ companies:
   PGR: {names: [Progressive, The Progressive Corporation]}
   APH: {names: [Amphenol]}
   UNP: {names: [Union Pacific]}
-  SCHW: {names: [Charles Schwab, Schwab, The Charles Schwab Corporation]}
+  SCHW: {names: [Charles Schwab, Schwab, The Charles Schwab Corporation, Schwab Charles Corp, Schwab Charles]}
   STX: {names: [Seagate, Seagate Technology]}
   TJX: {names: [TJX, TJX Companies, The TJX Companies]}
   CRWD: {names: [CrowdStrike]}
@@ -228,7 +231,7 @@ companies:
   PWR: {names: [Quanta Services, Quanta]}
   HWM: {names: [Howmet, Howmet Aerospace]}
   MCO: {names: [Moody's, Moody’s, Moodys, Moody's Corporation]}
-  RCL: {names: [Royal Caribbean, Royal Caribbean Cruises, Royal Caribbean Group]}
+  RCL: {names: [Royal Caribbean, Royal Caribbean Cruises, Royal Caribbean Group, Caribbean]}
   ITW: {names: [Illinois Tool Works]}
   GD: {names: [General Dynamics]}
   NOC: {names: [Northrop Grumman, Northrop, Grumman]}
@@ -261,7 +264,7 @@ companies:
   RSG: {names: [Republic Services, Republic]}
   CVNA: {names: [Carvana]}
   NXPI: {names: [NXP, NXP Semiconductors]}
-  BNY: {names: [BNY, BNY Mellon, Bank of New York Mellon, Bank of New York], tickers: [BK]}
+  BNY: {names: [BNY, BNY Mellon, NY Mellon, Bank of New York Mellon, Bank of New York], tickers: [BK]}
   LULU: {names: [Lululemon, lululemon, Lululemon Athletica]}
   EMR: {names: [Emerson Electric, Emerson]}
   ECL: {names: [Ecolab]}
@@ -287,7 +290,7 @@ companies:
   DOC: {names: [Healthpeak, Healthpeak Properties], tickers: [PEAK]}
   F: {names: [Ford, Ford Motor]}
   EA: {names: [Electronic Arts]}
-  ED: {names: [Con Edison, Consolidated Edison, ConEd, Con Ed]}
+  ED: {names: [Con Edison, Consolidated Edison, Consolidated. Edison, ConEd, Con Ed]}
   BF-B: {names: [Brown-Forman, Brown–Forman], tickers: [BF-A]}
   LEN: {names: [Lennar], tickers: [LEN-B]}
   EL: {names: [Estée Lauder, Estee Lauder]}
@@ -300,12 +303,12 @@ companies:
   A: {names: [Agilent, Agilent Technologies]}
   WBD: {names: [Warner Bros. Discovery, Warner Bros Discovery, Warner Bros., Warner Bros, Warner Brothers]}
   KHC: {names: [Kraft Heinz]}
-  HPE: {names: [Hewlett Packard Enterprise, HPE]}
+  HPE: {names: [Hewlett Packard Enterprise, HPE, HP Enterprise]}
   HPQ: {names: [HP Inc, HP]}
   GOOG: {names: [Alphabet, Google]}
   FOXA: {names: [Fox Corporation, Fox Corp]}
   NWSA: {names: [News Corp, News Corporation, Realtor.com]}
-  ON: {names: [ON Semiconductor, onsemi]}
+  "ON": {names: [ON Semiconductor, onsemi]}
   SW: {names: [Smurfit WestRock, Smurfit Westrock, WestRock]}
   Q: {names: [Qnity, Qnity Electronics]}
   SOLS: {names: [Solstice Advanced Materials]}
@@ -344,7 +347,7 @@ companies:
   YUM: {names: [Yum! Brands, Yum Brands, Yum!, Yum]}
   BXP: {names: [Boston Properties, BXP]}
   PRU: {names: [Prudential Financial, Prudential]}
-  CPB: {names: [The Campbell's Company, Campbell's, Campbell Soup]}
+  CPB: {names: [The Campbell's Company, Campbell's, Campbell Soup, Campbell]}
   PPG: {names: [PPG Industries, PPG]}
   UDR: {names: [United Dominion Realty Trust, United Dominion Realty]}
   HII: {names: [Huntington Ingalls Industries, Huntington Ingalls, HII]}
@@ -380,7 +383,11 @@ companies:
   INVH: {names: [Invitation Homes, Invitation Home]}
   HBAN: {names: [Huntington Bancshares, Huntington Bank, Huntington]}
   BRO: {names: [Brown & Brown, Brown and Brown, Brown]}
-  AOS: {names: [A. O. Smith, A.O. Smith, A O Smith, AO Smith]}
+  AOS: {names: [A. O. Smith, A.O. Smith, A O Smith, AO Smith, Smith AO, Smith A.O.]}
+  # second NA-04 verification: names left in val-A states
+  NCLH: {names: [Norwegian Cruise Line Holdings, Norwegian Cruise Line, Norwegian Cruise, Norwegian]}
+  PFG: {names: [Principal Financial Group, Principal Financial, Principal Finl Gr, Principal Finl]}
+  SWK: {names: [Stanley Black & Decker, Stanley Black and Decker, StanleyBlack&Decker]}
   RL: {names: [Ralph Lauren, Ralph]}
   CHD: {names: [Church & Dwight, Church and Dwight]}
   ALB: {names: [Albemarle, Albermarle]}

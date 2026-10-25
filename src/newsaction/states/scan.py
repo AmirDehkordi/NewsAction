@@ -4,16 +4,23 @@ The scanner is **independent of the masker**: it imports nothing from ``states.m
 ``configs/aliases.yaml`` (tests/test_states_mask.py checks the imports). Its references are:
 - **names**: the company's ATOM names (every share class; legal suffixes and class designations removed by
   its own rule), their distinctive words, and the names **harvested** from the unmasked event texts, i.e. the
-  words right before the company's own "(TICKER)" / "(EXCH: TICKER)" (``harvest_names``, seen ≥ 3 times);
+  words right before the company's own "(TICKER)" / "(EXCH: TICKER)" (``harvest_names``, seen ≥ 3 times),
+  and the Chinese / Japanese / Korean strings that end the CJK text right before it (``harvest_cjk_names``:
+  every 2–6 character ending seen ≥ 2 times; a different rule from the masker's);
 - **tickers**: the company's tickers in any form: $T, any upper-case code + ":" + T (NYSE:, BOATS:), "(T",
-  T's, T.O, T/PR, and bare T unless T is an English word (``ENGLISH_TICKERS``);
-- **dates**: English, French, German, Italian, Spanish, Portuguese, Dutch and Polish month and weekday names,
-  numeric dates, and period labels in any case (Q3, 3Q25, H1 25, FY25, fiscal 2025, "second quarter",
-  "first half", "3. Quartal"); **years**: 1900–2099 as a standalone number ("Russell 2000" excepted).
+  "（紐交所：T）", T US, T.US, T's, option codes (T250703C305000), and **bare T in upper case** in any text
+  that is not mostly in capitals, whatever the ticker (COST, MET, MS, IT), except a clock time ("4:30 PM");
+  in a text mostly in capitals, bare T only if T is not an ordinary word of the corpus;
+- **dates**: English, French, German, Italian, Spanish, Portuguese, Dutch, Polish, Chinese, Japanese and
+  Korean month and weekday names and dates, numeric dates, option expiries, period labels in any case and
+  glued to text (Q3, 3Q25, H1 25, FY25, fiscal 2025, "second quarter", "first half", "3. Quartal", 第二季度,
+  "yearQ2", "quarter-25") and the remnants of masked day ranges ("recently-18"); **years**: 1900–2099 not
+  inside a larger number ("CY2025", "EHA2025", "2025年" count; "Russell 2000" excepted).
 
 AC2 counts names + tickers and years + dates. The scanner also counts, for the REPORT, price-move sentences,
-ticker quotes ("MPC-1.32%"), dollar price levels (price targets, "shares at $X") and a sentinel list of
-public figures. It reads the ``news`` items of a state (the only free text).
+ticker quotes ("MPC-1.32%", "· IP. -0.58%", "Chg%"), dollar price levels (price targets, "shares at $X",
+"Price:49.32") and public figures (a sentinel list and Chinese transliterated names, "薩姆·阿爾特曼"). It
+reads the ``news`` items of a state (the only free text), one headline or snippet at a time.
 """
 
 from __future__ import annotations
@@ -22,7 +29,7 @@ import json
 import re
 from collections import Counter
 from collections.abc import Iterable, Mapping, Sequence
-from dataclasses import asdict, dataclass
+from dataclasses import asdict, dataclass, fields
 from typing import Final
 
 import pandas as pd
@@ -37,16 +44,22 @@ GENERIC: Final = frozenset(
     realty properties residential brands foods products materials chemicals motors motor auto automotive
     parts insurance life markets exchange management new york north south east west southern western
     northern pacific texas royal universal stock stocks shares share news report reports update analyst
-    rating price target class earnings flash unusually large options volume sees""".split()  # noqa: SIM905
+    rating price target class series earnings flash unusually large options volume sees bancshares
+    bancorporation""".split()  # noqa: SIM905
 )
-ENGLISH_TICKERS: Final = frozenset(
-    """A C D F J K L O T V X Q ON IT SO DE ES EL ED IP IR PM MA MS HD PG BR CI CE GL FE NI CF ALL NOW KEY KEYS
-    LOW COST CAT ARE DASH COIN HOOD APP POOL WELL BALL PEAK DAY FAST HAS TECH DOW USB MAR TAP RE AI WAT CPU
-    EXE DOC BRO HUM MET HAL GEN AMP TEL FOX NWS GD""".split()  # noqa: SIM905
+# CJK words that never make a company name on their own (the scanner's own list)
+CJK_GENERIC: Final = frozenset(
+    (  # noqa: SIM905
+        "公司 股份 集團 集团 控股 有限 銀行 银行 科技 能源 美國 美国 中國 中国 股票 그룹 회사 "
+        "ホールディングス グループ コーポレーション カンパニー インク"
+    ).split()
 )
-SENTINEL_PEOPLE: Final = re.compile(
+LATIN: Final = r"A-Za-z0-9\u00C0-\u024F"
+CJK: Final = "\u3040-\u30ff\u3400-\u4dbf\u4e00-\u9fff\uac00-\ud7af"
+PEOPLE: Final = re.compile(
     r"\b(?:Trump|Powell|Biden|Bessent|Lutnick|Yellen|Lagarde|Musk|Buffett|Zuckerberg|Bezos|Dimon|Altman|Nadella|"
     r"Pichai|Jassy|Huang|Putin|Zelensky|Harris|Vance|Xi)\b"
+    r"|[\u4e00-\u9fff]{1,4}[·•][\u4e00-\u9fff]{1,6}"
 )
 _SUFFIX: Final = re.compile(
     r"(?:,?\s+(?:&\s*Co\.?|&\s*Company|Inc\.?|Incorporated|Corp\.?|Corporation|Co\.?|Company|Companies|Ltd\.?|"
@@ -55,7 +68,7 @@ _SUFFIX: Final = re.compile(
 _CLASS: Final = re.compile(r"\s*\((?:Class|Series)\s+[A-Z0-9]+\)\s*$|\s+(?:Class|Series)\s+[A-Z0-9]+$")
 _PAREN: Final = re.compile(r"^(?P<base>.+?)\s*\((?P<head>[A-Z][a-z]+)\)\s*$")
 
-_YEAR: Final = re.compile(r"(?<!\d[.,])(?<![\w$])(?<!Russell\s)(?:19\d\d|20\d\d)(?![\d%]|\.\d)")
+_YEAR: Final = re.compile(r"(?<!\d[.,])(?<![0-9$€£¥])(?<!Russell\s)(?:19\d\d|20\d\d)(?![\d%]|[.,]\d)")
 _EN_MONTHS: Final = "January|February|March|April|June|July|August|September|October|November|December"
 _F_MONTHS: Final = (
     "janvier|février|fevrier|avril|juin|juillet|août|aout|septembre|octobre|novembre|décembre|decembre|januar|"
@@ -77,9 +90,19 @@ _DATE: Final = re.compile(
     rf"|\b(?i:{_F_MONTHS}|{_F_WEEKDAYS})\b|\b\d{{1,2}}\.?\s+(?i:mai|mars|mei)\b"
     r"|\b\d{4}-\d{2}-\d{2}\b|\b\d{1,2}/\d{1,2}/\d{2,4}\b|\b\d{1,2}\.\d{1,2}\.\d{2,4}\b"
     r"|(?<![\d/.$,])\b(?:1[0-2]|0?[1-9])/(?:1[3-9]|2\d|3[01])\b(?![\d/%])"
-    r"|\b(?i:Q[1-4]|[1-4]Q\d{2}|FY\s?'?\d{2,4}|fiscal\s+(?:year\s+)?\d{4}|[1-4]\.\s*Quartal)\b"
+    # period labels with ASCII boundaries (CJK characters are word characters: "年Q2"), and glued ("yearQ2")
+    r"|(?<![A-Za-z0-9])(?i:Q[1-4]|[1-4]Q\d{2}|FY\s?'?\d{2,4}|fiscal\s+(?:year\s+)?\d{4}|[1-4]\.\s*Quartal)"
+    r"(?![A-Za-z0-9])|(?<=[a-z])Q[1-4](?![A-Za-z0-9])"
     r"|\b(?i:(?:first|second|third|fourth|1st|2nd|3rd|4th)[\s-]+quarter|(?:first|second|1st|2nd)[\s-]+half)\b"
-    r"|\b[Hh][12]\s?'?\d{2,4}\b|\b[12]H\s?'?\d{2}\b"
+    r"|\b[Hh][12]\s?'?\d{2,4}\b|\b[12]H\s?'?\d{2}\b|\b(?i:quarter|half|year)\s?[-–'’/]\s?\d{2}\b"
+    # Chinese, Japanese, Korean
+    r"|\d{1,2}\s?[月월]|(?<!\d)\d{1,2}\s?[日号일](?![本元])"
+    r"|(?:星期|週|周|禮拜|礼拜)[一二三四五六日天]|[月火水木金土日]曜|[월화수목금토일]요일"
+    r"|第\s?[一二三四1-4１-４]\s?[財财]?(?:季度|季|四半期)|[上下]半(?:年|期)"
+    # option expiries and masked day ranges
+    r"|\b\d{6}\s+\$?\d+(?:\.\d+)?\s?[CP]\b|\b[A-Z]{1,6}\d{6}[CP]\d{3,9}\b"
+    r"|\b(?i:recently)\s?[–\-]\s?\d{1,2}\b(?!:)"  # not a time: "Recently - 08:30 AM"
+    r"|\b\d{1,2}\s?[–\-]\s?(?i:recently)\b"
 )
 _PRICE_MOVE: Final = re.compile(
     r"(?i)\b(?:shares?|stock|premarket|pre-market|after-hours|extended trading)\b[^.!?]{0,50}?"
@@ -89,12 +112,20 @@ _PRICE_MOVE: Final = re.compile(
     r"higher|lower)\b[^.!?]{0,25}?\d+(?:[.,]\d+)?\s?%"
     r"|\b\d+(?:[.,]\d+)?\s?%\s+(?:premarket|pre-market|in premarket|before the bell|after hours)"
 )
-_QUOTE: Final = re.compile(r"(?<![A-Za-z0-9])[A-Z]{2,5}\s?[+\-−–]\s?\d+(?:\.\d+)?\s?%")
-_PRICE_LEVEL: Final = re.compile(
-    r"(?i)(?:price\s+target|target\s+price|price\s+objective|\bPT\b)[^.!?]{0,60}?\$\s?\d"
-    r"|\$\s?\d[\d,]*(?:\.\d+)?\s+(?:price\s+target|PT)\b"
-    r"|(?<!per\s)\b(?:shares?|stock)\s+(?:at|to|closed\s+at|trading\s+at)\s+\$\s?\d"
+_QUOTE: Final = re.compile(
+    r"(?<![A-Za-z0-9])[A-Z]{2,5}\s?[+\-−–]\s?\d+(?:\.\d+)?\s?%|(?<![A-Za-z0-9])[A-Z]{2,5}\d+\.\d+\s?%"
+    r"|(?:·\s*\S{1,8}?|[Tt]he company)\.?\s+[+\-−–]\s?\d+(?:\.\d+)?\s?%|Chg%"
 )
+_NOT_AMOUNT: Final = r"(?![\d,.]*\s*(?:[MBK]\b|million|billion|bn|trillion))"  # "$35 Billion" is no price
+_PRICE_LEVEL: Final = re.compile(
+    rf"(?i)(?:price\s+target|target\s+price|price\s+objective|\bPT\b)[^.!?]{{0,60}}?\$\s?\d{_NOT_AMOUNT}"
+    r"|\$\s?\d[\d,]*(?:\.\d+)?\s+(?:price\s+target|PT)\b"
+    rf"|(?<!per\s)(?<!diluted\s)(?<!basic\s)\b(?:shares?|stock)\s+(?:at|to|closed\s+at|trading\s+at)\s+\$\s?\d"
+    rf"{_NOT_AMOUNT}"
+    r"|\bPrice:\s?\$?\d"
+)
+_CLOCK: Final = re.compile(r"\d\s?$")
+_SEGMENTS: Final = re.compile(r"\n| \|\| ")
 
 
 @dataclass(frozen=True)
@@ -118,6 +149,15 @@ class LeakCounts:
 
     def as_dict(self) -> dict[str, int]:
         return asdict(self)
+
+    def __add__(self, other: LeakCounts) -> LeakCounts:
+        return LeakCounts(**{f.name: getattr(self, f.name) + getattr(other, f.name) for f in fields(self)})
+
+
+def caps_share(text: str) -> float:
+    """Share of upper-case letters among the letters of ``text`` (CJK characters count as letters)."""
+    letters = [ch for ch in text if ch.isalpha()]
+    return sum(ch.isupper() for ch in letters) / max(len(letters), 1)
 
 
 def core_name(name: str) -> list[str]:
@@ -179,6 +219,38 @@ def harvest_names(
     return {cid: sorted(p for p, n in c.items() if n >= min_count) for cid, c in counts.items()}
 
 
+def harvest_cjk_names(
+    articles: pd.DataFrame, tickers: Mapping[int, Sequence[str]], min_count: int = 2
+) -> dict[int, list[str]]:
+    """Per company: every 2–6 character CJK ending of the CJK word right before its own ticker in
+    parentheses ("迪爾股份（紐交所：DE）" gives 迪爾股份, 爾股份, …) in the unmasked texts, seen ≥
+    ``min_count`` times, generic words (``CJK_GENERIC``) excepted."""
+    has_cjk = re.compile(f"[{CJK}]")
+    counts: dict[int, Counter[str]] = {}
+    patterns: dict[int, re.Pattern[str]] = {}
+    for cid, title, snippet in zip(
+        articles["company_id"], articles["title"], articles["snippet"], strict=True
+    ):
+        text = f"{title} {snippet}"
+        if int(cid) not in tickers or not has_cjk.search(text):
+            continue
+        rx = patterns.get(int(cid))
+        if rx is None:
+            alt = "|".join(_ticker_alt(t) for t in tickers[int(cid)])
+            rx = patterns[int(cid)] = re.compile(
+                rf"([{CJK}]+)\s*[（(][^()（）\n]{{0,20}}?(?<![A-Za-z])(?:{alt})(?![A-Za-z])[^()（）\n]{{0,6}}[)）]"
+            )
+        for m in rx.finditer(text):
+            word = m.group(1).rstrip("的の의")
+            for k in range(2, min(6, len(word)) + 1):
+                counts.setdefault(int(cid), Counter())[word[-k:]] += 1
+
+    def keep(w: str) -> bool:  # not a fragment: no small-kana / long-vowel start, not a generic word's end
+        return w[0] not in "ァィゥェォッャュョヮーヶ・" and not any(g.endswith(w) for g in CJK_GENERIC)
+
+    return {cid: sorted(w for w, n in c.items() if n >= min_count and keep(w)) for cid, c in counts.items()}
+
+
 class LeakScanner:
     """Residual leaks of one company's state (module docstring)."""
 
@@ -188,16 +260,19 @@ class LeakScanner:
         extra_tickers: Iterable[tuple[int, str]] = (),
         harvested: Mapping[int, Sequence[str]] | None = None,
         ordinary: frozenset[str] = frozenset(),
+        cjk: Mapping[int, Sequence[str]] | None = None,
     ) -> None:
         """``companies``: company_id, ticker, name (NA-01 ``companies.parquet``); ``extra_tickers``:
         (company_id, ticker) of former / vendor tickers; ``harvested``: ``harvest_names`` output;
-        ``ordinary``: ``ordinary_words`` of the unmasked texts. A one-word name counts as written or in
-        capitals: a whole ATOM name always ("Target"), a word of a longer name or a harvested word only if
-        it is not an ordinary word ("Grumman" counts, "Research" does not)."""
+        ``ordinary``: ``ordinary_words`` of the unmasked texts; ``cjk``: ``harvest_cjk_names`` output. A
+        one-word name counts as written or in capitals: a whole ATOM name always ("Target"), a word of a
+        longer name or a harvested word only if it is not an ordinary word ("Grumman" counts, "Research" does
+        not)."""
         self.ordinary = ordinary
         self.atom: dict[int, set[str]] = {}
         self.names: dict[int, set[str]] = {}
         self.tickers: dict[int, set[str]] = {}
+        self.cjk = {int(c): sorted(v, key=lambda s: (-len(s), s)) for c, v in (cjk or {}).items() if v}
         rows = zip(companies["company_id"], companies["ticker"], companies["name"], strict=True)
         for cid, ticker, name in rows:
             self.names.setdefault(int(cid), set()).update(core_name(str(name)))
@@ -207,9 +282,10 @@ class LeakScanner:
             self.tickers.setdefault(int(cid), set()).add(t.upper())
         for cid, phrases in (harvested or {}).items():
             self.names.setdefault(int(cid), set()).update(phrases)
-        self._cache: dict[int, tuple[re.Pattern[str] | None, re.Pattern[str] | None]] = {}
+        self._cache: dict[int, tuple[re.Pattern[str] | None, ...]] = {}
 
-    def _patterns(self, cid: int) -> tuple[re.Pattern[str] | None, re.Pattern[str] | None]:
+    def _patterns(self, cid: int) -> tuple[re.Pattern[str] | None, ...]:
+        """(names, ticker forms, bare upper-case tickers) of a company."""
         hit = self._cache.get(cid)
         if hit is not None:
             return hit
@@ -219,7 +295,11 @@ class LeakScanner:
         def distinctive(w: str) -> bool:
             return w.lower() not in GENERIC and w.lower() not in self.ordinary
 
-        multi = {p for p in phrases if len(p.split()) > 1}
+        multi = {  # a harvested phrase of ordinary words is not a name ("Customer Relationship Management")
+            p
+            for p in phrases
+            if len(p.split()) > 1 and (p in atom or any(distinctive(w) for w in re.findall(r"[A-Za-z]+", p)))
+        }
         single = {
             p for p in phrases if len(p.split()) == 1 and ((p in atom and len(p) >= 3) or distinctive(p))
         }
@@ -231,35 +311,78 @@ class LeakScanner:
             )
         parts = []
         if multi:
-            alt = "|".join(r"[\s\-–]+".join(map(re.escape, re.split(r"[\s\-–]+", p))) for p in sorted(multi))
+            alt = "|".join(r"[\s\-–]*".join(map(re.escape, re.split(r"[\s\-–]+", p))) for p in sorted(multi))
             parts.append(rf"(?i:(?<![A-Za-z0-9])(?:{alt})(?![A-Za-z0-9]))")
         if single:
             words = sorted(single | {w.upper() for w in single})
             parts.append(rf"(?<![A-Za-z0-9])(?:{'|'.join(map(re.escape, words))})(?![A-Za-z0-9])")
+        if self.cjk.get(cid):
+            parts.append("|".join(map(re.escape, self.cjk[cid])))
+        glued = sorted(p for p in multi | single if p[:1].isupper() and len(p) >= 5)
+        if glued:  # a capitalized name glued to the previous word: "Key TakeawaysHumana aims"
+            parts.append(rf"(?<=[a-z0-9])(?:{'|'.join(map(re.escape, glued))})(?![a-z])")
         names = re.compile("|".join(parts)) if parts else None
         ts = sorted(self.tickers.get(cid, set()))
-        tickers = None
+        forms = bare = None
         if ts:
             alt = "|".join(_ticker_alt(t) for t in ts)
-            bare = [t for t in ts if len(t) >= 2 and t not in ENGLISH_TICKERS]
-            forms = [
-                rf"(?:\$|(?<![A-Za-z])[A-Z][A-Za-z]{{1,11}}\s?:\s?|\(\s*)(?:{alt})(?![A-Za-z0-9])",
-                rf"(?<![A-Za-z0-9$&.\-/:(])(?:{alt})(?=['’]s\b)",
+            several = "|".join(_ticker_alt(t) for t in ts if len(t) >= 2)
+            one = "|".join(_ticker_alt(t) for t in ts if len(t) == 1)
+            prefixed = [  # a one-letter ticker only after an upper-case exchange ("Erden: A person" is none)
+                rf"(?:\$|(?<![A-Za-z])[A-Z][A-Za-z]{{1,11}}\s?:\s?|\(\s*)(?:{several})(?![A-Za-z0-9])"
+                if several
+                else "",
+                rf"(?:\$|(?<![A-Za-z])[A-Z]{{2,12}}\s?:\s?|\(\s*)(?:{one})(?![A-Za-z0-9])" if one else "",
             ]
-            if bare:
-                forms.append(
-                    rf"(?<![A-Za-z0-9$&.\-/:(])(?:{'|'.join(_ticker_alt(t) for t in bare)})(?![A-Za-z0-9&'’])"
+            forms = re.compile(
+                "|".join(
+                    [
+                        *(f for f in prefixed if f),
+                        rf"(?<![{LATIN}$&.\-/:(])(?:{alt})(?=['’]s\b)",
+                        rf"[（(][^()（）:：\n]{{0,16}}[:：]\s*(?:{alt})(?![A-Za-z0-9])",
+                        rf"[\u3400-\u9fff][:：]\s*(?:{alt})(?![A-Za-z])",  # "紐交所:CTRA1年"
+                        rf"(?<![A-Za-z0-9])(?:{alt})(?:\.US|\s+U[SNWQA])(?![A-Za-z])",
+                        rf"(?<![A-Za-z])(?:{alt})\d{{6}}[CP]\d{{3,9}}",
+                    ]
                 )
-            tickers = re.compile("|".join(forms))
-        self._cache[cid] = (names, tickers)
+            )
+            long = [t for t in ts if len(t) >= 2]
+            if long:
+                bare = re.compile(  # also "WMT/TGT", "Omnicom-IPG", "Inc.ANET", "ABBV19"
+                    rf"(?:(?<![{LATIN}$&.\-/:(])|(?<=[A-Za-z][/\-])|(?<=[a-z]\.))"
+                    rf"(?:{'|'.join(_ticker_alt(t) for t in long)})(?![A-Za-z\u00C0-\u024F&'’])"
+                )
+        self._cache[cid] = (names, forms, bare)
         return self._cache[cid]
 
+    def _bare(self, pattern: re.Pattern[str], text: str) -> int:
+        """Bare upper-case tickers: in mixed-case text any, but not a clock time ("4:30 PM"); in a text
+        mostly in capitals only one that is not an ordinary word."""
+        shouting = caps_share(text) > 0.5
+        n = 0
+        for m in pattern.finditer(text):
+            word = m.group(0)
+            if word in ("AM", "PM") and _CLOCK.search(text[: m.start()]):
+                continue
+            if shouting and word.lower() in self.ordinary:
+                continue
+            n += 1
+        return n
+
     def scan_text(self, text: str, company_id: int | None) -> LeakCounts:
+        """Leaks of a text; a headline or snippet at a time (split at newlines and " || ")."""
+        total = LeakCounts(0, 0, 0, 0)
+        for segment in _SEGMENTS.split(text):
+            total = total + self._scan_segment(segment, company_id)
+        return total
+
+    def _scan_segment(self, text: str, company_id: int | None) -> LeakCounts:
         names = tickers = 0
         if company_id is not None and company_id >= 0:
-            n_re, t_re = self._patterns(company_id)
+            n_re, f_re, b_re = self._patterns(company_id)
             names = len(n_re.findall(text)) if n_re is not None else 0
-            tickers = len(t_re.findall(text)) if t_re is not None else 0
+            tickers = len(f_re.findall(text)) if f_re is not None else 0
+            tickers += self._bare(b_re, text) if b_re is not None else 0
         return LeakCounts(
             names=names,
             tickers=tickers,
@@ -268,7 +391,7 @@ class LeakScanner:
             price_moves=sum(1 for m in _PRICE_MOVE.finditer(text) if "volume" not in m.group(0).lower()),
             quotes=len(_QUOTE.findall(text)),
             price_levels=len(_PRICE_LEVEL.findall(text)),
-            people=len(SENTINEL_PEOPLE.findall(text)),
+            people=len(PEOPLE.findall(text)),
         )
 
     def residual_leaks(self, state_json: str, company_id: int | None) -> LeakCounts:

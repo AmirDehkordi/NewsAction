@@ -25,7 +25,7 @@ from newsaction.paths import Layout, resolve_layout
 from newsaction.states import SAMPLES_DIR, STATES_DIR, load_states_config
 from newsaction.states.build import event_articles, extra_tickers
 from newsaction.states.questions import load_battery, write_frozen_hashes
-from newsaction.states.scan import LeakScanner, harvest_names, ordinary_words
+from newsaction.states.scan import LeakScanner, harvest_cjk_names, harvest_names, ordinary_words
 
 ARTIFACT_DIR: Final = "NA-04"
 MAIN_FILES: Final = ("callA_d0_E3", "callA_d2_E3", "callB_d2_E3", "market_E3")
@@ -89,16 +89,18 @@ def token_stats(lay: Layout) -> pd.DataFrame:
 
 def scanner(lay: Layout) -> LeakScanner:
     """The independent scanner: ATOM names and tickers, ATOM / vendor former tickers, and the names
-    harvested from the unmasked event texts (``scan.harvest_names``); nothing from the masker or
-    configs/aliases.yaml."""
+    harvested from the unmasked event texts (``scan.harvest_names``, ``scan.harvest_cjk_names``); nothing
+    from the masker or configs/aliases.yaml."""
     comp = io.read_parquet("panel/companies.parquet", columns=["company_id", "ticker", "name"], layout=lay)
     extra = extra_tickers(lay)
     tick: dict[int, set[str]] = {}
     for cid, t in [*zip(comp["company_id"], comp["ticker"], strict=True), *extra]:
         tick.setdefault(int(cid), set()).add(str(t))
     arts = event_articles(lay)
-    harvested = harvest_names(arts, {c: sorted(t) for c, t in tick.items()})
-    return LeakScanner(comp, extra, harvested, ordinary_words([*arts["title"], *arts["snippet"]]))
+    by_company = {c: sorted(t) for c, t in tick.items()}
+    harvested = harvest_names(arts, by_company)
+    cjk = harvest_cjk_names(arts, by_company)
+    return LeakScanner(comp, extra, harvested, ordinary_words([*arts["title"], *arts["snippet"]]), cjk)
 
 
 def leak_scan(lay: Layout) -> pd.DataFrame:

@@ -3,23 +3,30 @@
 In this order, on each title and snippet (already scrubbed by NA-02):
 1. **Datelines and identifiers.** A leading press-release dateline ("JACKSONVILLE, Fla., Oct. 16, 2025
    /PRNewswire/ --", "NEW YORK (Reuters) -") and ISIN codes are removed: they carry dates and
-   headquarters cities.
+   headquarters cities. Option contracts ("250703 305.00C (ADI250703C305000)": expiry, strike, ticker)
+   become "option".
 2. **Company.** The company's names and aliases (``configs/aliases.yaml``; ``CompanyAliases``) become
    "the company", with an optional legal suffix ("Apple Inc." → "the company"). Ticker forms become "the
-   company": $T, EXCH:T with any upper-case exchange code (BOATS:NEE), T.O, T/PR, T's, bare T outside the
-   stoplist; a parenthesized ticker ("(NASDAQ: AAPL)", "(COST 0.53%)") is removed.
-3. **Dates.** Full dates, weekdays and months, in English and in French, German, Italian, Spanish,
-   Portuguese, Dutch and Polish → "recently"; years → "the year"; fiscal years → "the fiscal year";
-   quarter labels in any case ("Q3 FY2025", "Second Quarter", "SECOND-QUARTER", "3Q25", "3. Quartal") →
-   "the quarter" / "quarterly"; half-year labels ("first half", "1H25") → "the half-year".
+   company": $T, EXCH:T with any upper-case exchange code (BOATS:NEE), T.O, T.N, T/PR, T.US, T's, bare T; a
+   parenthesized ticker ("(NASDAQ: AAPL)", "(COST 0.53%)", "（紐交所：DE）", "（HOOD US）") is removed. A
+   stoplisted ticker (an English word: COST, MET, ALL, MS) goes in upper case unless the whole text is in
+   capitals, except a clock time ("4:30 PM") and IT before an IT noun ("IT spending"). Chinese, Japanese and
+   Korean names harvested before the company's own ticker ("迪爾股份（紐交所：DE）"; ``cjk_company_names``)
+   go too.
+3. **Dates.** Full dates, day ranges, weekdays and months, in English, French, German, Italian, Spanish,
+   Portuguese, Dutch, Polish, Chinese, Japanese and Korean → "recently"; years, also glued to letters or
+   CJK ("EHA2025", "2025年") → "the year"; fiscal years → "the fiscal year"; quarter labels in any case
+   ("Q3 FY2025", "2025Q2", "Q2-25", "Second Quarter", "3Q25", "3. Quartal", "第二季度") → "the quarter" /
+   "quarterly"; half-year labels ("first half", "1H25", "上半年") → "the half-year".
 4. **People.** spaCy ``en_core_web_sm`` PERSON entities (not matching any S&P 500 company alias), and every
    capitalized occurrence of a corpus surname (the last word of a multi-word name seen at least
    ``SURNAME_MIN_COUNT`` times; "Trump", "Powell" alone): a name right after a role noun ("CEO Tim Cook",
    "analyst Dan Ives") is dropped; otherwise it becomes "an executive" when an executive title is within six
-   words, else "a person".
+   words, else "a person". Chinese transliterations of Western names ("薩姆·阿爾特曼") become "a person".
 5. **Price talk and price levels.** ``news.detect`` scrub again (after-the-fact and price-path sentences,
    share-price levels); then sentences with a stock / share price move in percent and ticker quotes
-   ("MPC-1.32%") are dropped; price-target amounts become a relative change ("raises its price target to $622
+   ("MPC-1.32%", "· IP. -0.58%", "FSLR0.00%", "|Price:49.32|Chg%:-0.60") are dropped; price-target amounts
+   become a relative change ("raises its price target to $622
    from $600" → "raises its price target up by about 4%") or are dropped, and per-share deal prices become
    "a per-share price". Fundamental figures (EPS, revenue, dividends, guidance) are kept.
 
@@ -59,17 +66,73 @@ EXCHANGES: Final = (
     r"NasdaqGS|NasdaqGM|NasdaqCM|NASDAQ|Nasdaq|AMEX|BATS|CBOE|Cboe|OTC|OTCMKTS"
 )
 # any exchange-like code before a colon: NYSE:, BOATS:, OTC:, XETRA:, LSE: (NA-04 verification)
-EXCH_PREFIX: Final = rf"(?:(?<![A-Za-z])(?:{EXCHANGES}|[A-Z][A-Za-z]{{1,11}})\s*:\s*)"
-# share-class / venue suffixes: AAPL.O, NEE/PR, NEE/PT, BRK.B (the class is part of the ticker)
-TICKER_SUFFIX: Final = r"(?:[./](?:[A-Z]{1,2}|PR[A-Z]?)(?![A-Za-z]))?"
+EXCH_PREFIX: Final = (  # ... or a Chinese exchange name: "紐交所:CTRA", "納斯達克：COIN"
+    rf"(?:(?<![A-Za-z])(?:{EXCHANGES}|[A-Z][A-Za-z]{{1,11}}|[\u3400-\u9fff]{{2,10}})\s*[:：]\s*)"
+)
+# a bare ticker starts after a non-word character, after "X/" or "x-" in a list or pair ("WMT/TGT/TJX",
+# "Omnicom-IPG", "$NYSE-LYV") or after "x." ("Arista Networks, Inc.ANET"), and may carry digits ("ABBV19",
+# "GE9X", "HCA2)")
+BARE_BEFORE: Final = r"(?:(?<![A-Za-z0-9$&.\-/])|(?<=[A-Za-z][/\-])|(?<=[a-z]\.))"
+# share-class / venue suffixes: AAPL.O, MS.N, COIN.US, NEE/PR, NEE/PT, BRK.B (the class is part of the ticker)
+# ... and Reuters' exchange letter: AAPL-Q, NKE-N
+TICKER_SUFFIX: Final = r"(?:[./](?:[A-Z]{1,2}|PR[A-Z]?)(?![A-Za-z])|-[A-Z](?![A-Za-z0-9]))?"
+# Latin letters and digits: a ticker is a word only between other characters (CJK may touch it:
+# "（紐交所：DE）")
+LATIN: Final = r"A-Za-z0-9\u00C0-\u024F"
+# an upper-case stoplisted ticker that is not the company: a clock time ("4:30 PM"), IT before an IT noun
+_CLOCK: Final = re.compile(r"\d\s?$")
+_LIST_BEFORE: Final = re.compile(r"\b[A-Z]{2,5},\s*$")  # a list of tickers: "ALC, KEYS, TOL"
+_LIST_AFTER: Final = re.compile(r"^,\s*[A-Z]{2,5}\b")
+# a ticker right after the company's (masked) name: "MARRIOTT INTERNATIONAL INC /MD/ MAR:"
+_COMPANY_BEFORE: Final = re.compile(r"(?i)the company(?:\s*/[A-Z]{2}/)?\s*$")
+# a ticker before a period label or an earnings word: "MAR Q2 2025 TRANSCRIPT"
+_CUE_AFTER: Final = re.compile(
+    r"^\s+(?:Q[1-4]|[1-4]Q|FY|H[12]|EPS|Earnings|EARNINGS|Stock|STOCK|Shares|SHARES)\b"
+)
+_IT_NOUN: Final = re.compile(
+    r"-|\s+(?:[Ss]ervices?|[Ss]pending|[Ss]ector|[Ii]ndustry|[Bb]udgets?|[Ss]ecurity|[Ii]nfrastructure|"
+    r"[Dd]epartments?|[Tt]eams?|[Ll]eaders|[Pp]rofessionals|[Ss]ystems|[Ss]upport|[Oo]perations|[Oo]utsourcing|"
+    r"[Cc]onsulting|[Ss]olutions|[Mm]odernization|[Ee]nvironments?|[Mm]anagers|[Oo]rganizations|[Ii]nvestments?|"
+    r"[Ll]andscape|[Ss]tacks?|[Cc]osts?|[Ss]pend)\b"
+)
+# option contracts: "250703 305.00C" (expiry yymmdd, strike) → "option"; "(ADI250703C305000)" → removed
+_OPTION_TERMS: Final = re.compile(r"\b\d{6}\s+\$?\d+(?:\.\d+)?\s?[CP]\b")
+_OPTION_CODE: Final = re.compile(r"\s*\(?\b[A-Z]{1,6}\d{6}[CP]\d{3,9}\b\)?")
 # a quote of any ticker with a signed percent change: "MPC-1.32%", "(AAPL +0.87%)", "MSFT -1.19 %"
 _NOT_TICKERS: Final = (
     r"(?!(?:EPS|FCF|GDP|CPI|PPI|PCE|ROE|ROI|ROA|YOY|QOQ|EBIT|ARR|NII|NIM|ARPU|AUM|RPO|FY|Q[1-4])\b)"
 )
 QUOTE: Final = re.compile(
     rf"\s*\(\s*{_NOT_TICKERS}[A-Z]{{1,5}}(?:[.\-][A-Z])?\s*[+\-−–]?\s?\d+(?:\.\d+)?\s?%\s*\)"
-    rf"|(?<![A-Za-z0-9]){_NOT_TICKERS}[A-Z]{{1,5}}(?:\.[A-Z])?\s?[+\-−–]\s?\d+(?:\.\d+)?\s?%"
+    rf"|(?<![A-Za-z0-9]){_NOT_TICKERS}[A-Z]{{1,5}}(?:[.\-][A-Z])?\s?[+\-−–]\s?\d+(?:\.\d+)?\s?%(?:increase|decrease)?"
+    rf"|(?<![A-Za-z0-9]){_NOT_TICKERS}[A-Z]{{2,5}}\d+\.\d+\s?%"  # "FSLR0.00%"
+    # a quote after the company's masked name: "the company. -0.01%", "the company -1.05%decrease" (quote
+    # widgets, "Tesla · TSLA. +3.52%.", go in the lead step: ``_WIDGET``)
+    r"|(?<=[Tt]he company)\.?\s*[+\-−–]\s?\d+(?:\.\d+)?\s?%(?:increase|decrease)?\.?"
+    r"|\|?\s*Price:\s?\$?[\d.,]+\s*\|\s*Chg%:\s?[+\-−–]?[\d.,]+%?"  # "FE|…|Price:49.320|Chg%:-0.600"
+    # "Price: 236.34, Change: +4.08, Percent Change: +2.11"
+    r"|\bPrice:\s?\$?\d[\d.,]*(?:,?\s*Change:\s?[+\-−–]?[\d.,]*)?"
+    r"(?:,?\s*Percent Change:\s?[+\-−–]?[\d.,]*\s?%?)?"
 )
+# a quote widget inside a name ("Constellation · CEG. +3.58%. Energy's"): removed before the company step
+_WIDGET: Final = re.compile(
+    rf"\s*·\s*{_NOT_TICKERS}[A-Z][A-Za-z.\-]{{0,7}}?\.?\s*(?:[+\-−–]?\s?\d+(?:\.\d+)?\s?%|-{{2,}})\.?"
+)
+# a wire dateline inside the text, after a time: "08:30 AM. CHICAGO --(BUSINESS WIRE)--" (the headquarters
+# city)
+_WIRE_MID: Final = re.compile(
+    r"(?:\b\d{1,2}:\d{2}\s?[AaPp]\.?[Mm]\.?(?:\s?(?:ET|EST|EDT|CET|CEST|PT|PST|PDT|GMT|UTC))?\.?\s*)?"
+    r"(?:[A-Z][A-Za-z.'\-]*(?:[ ,]+[A-Z][A-Za-z.'\-]*){0,3}\s*)?-{1,2}\s*\(\s*(?:BUSINESS WIRE|Business Wire|"
+    r"PRNewswire|PR Newswire|GLOBE NEWSWIRE|GlobeNewswire|ACCESSWIRE|ACCESS Newswire|Newsfile)\s*\)\s*-{0,2}"
+)
+# a share-price level ("boosts stock to $102.89", "shares at $120"), not a per-share figure or an amount
+_LEVEL: Final = re.compile(
+    r"(?i)\b(?:stock|shares?)\s+(?:to|at|closed\s+at|trading\s+at|hits?|reached|reaches)\s+\$\s?\d[\d,]*(?:\.\d+)?"
+    r"(?![\d.,]*\s*(?:[MBK]\b|million|billion|bn|trillion))(?!\s*(?:per|a|/)\s*share)"
+)
+_PER_BEFORE: Final = re.compile(r"(?i)\bper\s+(?:\w+\s+)?$|dividend|distribution")
+# a footnote mark after an amount ("a previous target of $49.00.1;")
+_FOOTNOTE: Final = re.compile(r"(\$\s?\d[\d,]*\.\d{2})\.\d(?!\d)")
 _MOVE_VERB: Final = (
     r"(?:rise[sn]?|rose|rising|fall(?:s|en|ing)?|fell|jump(?:s|ed|ing)?|drop(?:s|ped|ping)?|gain(?:s|ed|ing)?|"
     r"slides?|slid|slip(?:s|ped)?|climb(?:s|ed|ing)?|surg(?:e|es|ed|ing)|plung(?:e|es|ed|ing)|soar(?:s|ed|ing)?|"
@@ -167,6 +230,22 @@ F_PREP: Final = (
     r"vergangenen|n[äa]chsten|este|ese|questo|scorso)\s+)"
 )
 DAY: Final = r"(?:[12]\d|3[01]|0?[1-9])(?:st|nd|rd|th)?"
+DAY_RANGE: Final = rf"{DAY}(?:\s?[–\-]\s?{DAY}(?![\d%]))?"  # "July 17-18", "4–5 August"
+# Chinese, Japanese and Korean dates and periods (NA-04 verification 2): 2025年8月7日（星期四）, 8月7日, 週一,
+# 木曜日, 第二季度, 上半年
+CJK_YEAR: Final = rf"{YEAR_RE}\s?(?:[財财]?年度?|년)"
+CJK_WEEKDAY: Final = (
+    r"(?:(?:星期|週|周|禮拜|礼拜)[一二三四五六日天]|[月火水木金土日]曜日?|[월화수목금토일]요일)"
+)
+CJK_DAY: Final = (
+    rf"\d{{1,2}}\s?[月월]\s?\d{{1,2}}\s?[日号일](?:\s?[（(]\s?(?:{CJK_WEEKDAY}|[月火水木金土日])\s?[）)])?"
+)
+CJK_QUARTER: Final = r"第\s?[一二三四1-4１-４]\s?[財财]?(?:季度|季|四半期)"
+CJK_HALF: Final = r"[上下]半(?:年|期)"
+# a year glued to a currency code is an amount ("USD2025")
+_NOT_CURRENCY: Final = (
+    r"(?<!USD)(?<!EUR)(?<!GBP)(?<!JPY)(?<!CHF)(?<!CAD)(?<!AUD)(?<!HKD)(?<!CNY)(?<!RMB)(?<!Rs)"
+)
 PREP: Final = (
     r"(?i:(?:as\s+of|earlier\s+in|later\s+in|in|on|at|during|from|since|until|through|by|before|after|around|"
     r"ahead\s+of|starting|beginning|effective|dated)\s+)"
@@ -193,6 +272,10 @@ _ROLE_AFTER: Final = re.compile(r"\s+(?:CEO|CFO|COO|CTO|Chairman|chief|Chief|Pre
 _SENT_START: Final = re.compile(r"(?:^|[.!?:]\s+|\n\s*|^[\"“‘(\[]\s*)$")
 _DOUBLE_DET: Final = re.compile(r"\b(its|their|our|his|her|the|this|that|a|an|The|Its|Their|Our)\s+the\s+")
 _WS: Final = re.compile(r"[ \t]{2,}")
+# a placeholder glued to the next word ("2025Principal" → "the yearthe company"): a space
+_GLUED_PLACEHOLDER: Final = re.compile(r"\b(the year|recently|the quarter)(?=[A-Za-z])")
+# a name next to its ticker: "Apple Inc. AAPL" → "the company the company" → "the company"
+_SAME_COMPANY: Final = re.compile(r"\b([Tt]he company)(?:[\s.·:\-]+the company\b)+")
 _SPACE_PUNCT: Final = re.compile(r"\s+([,.;:!?)\]])")
 _OPEN_SPACE: Final = re.compile(r"([(\[])\s+")
 _EMPTY_PARENS: Final = re.compile(r"\(\s*[,;]?\s*\)")
@@ -200,12 +283,20 @@ _CAP_WORD: Final = re.compile(r"(?<![A-Za-z])(?P<w>[A-Z][A-Za-z]+)(?:['’]s)?(?
 _SEP_RUN: Final = re.compile(r"\s*([;|•])(?:\s*[;|•])+\s*")
 
 
+def caps_ratio(text: str) -> float:
+    """Share of upper-case letters among the letters of ``text`` (CJK characters count as letters)."""
+    letters = [ch for ch in text if ch.isalpha()]
+    return sum(ch.isupper() for ch in letters) / max(len(letters), 1)
+
+
 def _cap(word: str, before: str) -> str:
     return word[:1].upper() + word[1:] if _SENT_START.search(before) else word
 
 
 def _tidy(text: str) -> str:
-    out = _DOUBLE_DET.sub(r"\1 ", text)
+    out = _GLUED_PLACEHOLDER.sub(r"\1 ", text)
+    out = _SAME_COMPANY.sub(r"\1", out)
+    out = _DOUBLE_DET.sub(r"\1 ", out)
     out = _EMPTY_PARENS.sub("", out)
     out = _SPACE_PUNCT.sub(r"\1", out)
     out = _OPEN_SPACE.sub(r"\1", out)
@@ -225,19 +316,29 @@ class AliasConfig:
 @functools.cache
 def _load_alias_config(path: Path, mtime_ns: int) -> AliasConfig:
     raw = load_yaml(path)
+
+    def words(values: Iterable[object], where: str) -> tuple[str, ...]:
+        """Every entry must be a string: YAML reads a bare ON / NO / YES as a boolean."""
+        out = tuple(values)
+        bad = [v for v in out if not isinstance(v, str)]
+        if bad:
+            raise ValueError(f"{path}: {where} has non-string entries {bad}; quote them")
+        return tuple(str(v) for v in out)
+
     comps: dict[str, dict[str, tuple[str, ...]]] = {}
     for ticker, spec in (raw.get("companies") or {}).items():
+        (key,) = words([ticker], "companies")
         spec = spec or {}
-        comps[str(ticker)] = {
-            "names": tuple(str(n) for n in spec.get("names", [])),
-            "tickers": tuple(str(t) for t in spec.get("tickers", [])),
+        comps[key] = {
+            "names": words(spec.get("names", []), f"companies.{key}.names"),
+            "tickers": words(spec.get("tickers", []), f"companies.{key}.tickers"),
         }
     return AliasConfig(
-        legal_suffixes=tuple(str(s) for s in raw["legal_suffixes"]),
-        common_words=frozenset(str(w) for w in raw["common_words"]),
-        bare_ticker_stoplist=frozenset(str(t) for t in raw["bare_ticker_stoplist"]),
+        legal_suffixes=words(raw["legal_suffixes"], "legal_suffixes"),
+        common_words=frozenset(words(raw["common_words"], "common_words")),
+        bare_ticker_stoplist=frozenset(words(raw["bare_ticker_stoplist"], "bare_ticker_stoplist")),
         companies=comps,
-        person_names=frozenset(str(n) for n in raw.get("person_names", [])),
+        person_names=frozenset(words(raw.get("person_names", []), "person_names")),
     )
 
 
@@ -328,7 +429,7 @@ def phrase_regex(phrase: str) -> str:
     out = ""
     for i, p in enumerate(parts):
         if i:
-            out += r"[\s\-–]*" if parts[i - 1].endswith(".") else r"[\s\-–]+"
+            out += r"[\s\-–]*"  # also written together: "MolsonCoors", "HomeDepot"
         if p in ("&", "and"):
             out += r"(?:&|and)"  # "Church & Dwight" ~ "Church and Dwight"
             continue
@@ -380,6 +481,92 @@ def split_names(a: CompanyAliases, cfg: AliasConfig) -> tuple[list[str], list[st
     return sorted(loose, key=order), sorted(strict, key=order)
 
 
+CJK: Final = "\u3040-\u30ff\u3400-\u4dbf\u4e00-\u9fff\uac00-\ud7af"
+_HANGUL: Final = re.compile("[\uac00-\ud7af]")
+_KANA_TAIL: Final = re.compile(r"[\u30a0-\u30ff・ー]+(?:社)?$")
+# Chinese verbs and function words before a company name ("美銀證券維持施貴寶", "我們對家得寶", "爲什麼快扣")
+_CJK_LEAD: Final = re.compile(
+    r"^.*(?:維持|维持|上調|上调|下調|下调|首予|調整了|调整了|增持了|減持了|减持了|收購了|收购了|批准了|撤銷|撤销|"
+    r"速覽|速览|查看|反映了|認爲|認為|认为|關於|关于|對於|对于|什麼|什么|企業|企业|購買|购买|通過|通过|仍然|持有|"
+    r"買入|买入|賣出|卖出|[對对的了在與与和及將将讓让把被由從从向爲為为是])"
+)
+_CJK_SUFFIX: Final = re.compile(
+    r"(?:股票|股份有限公司|有限公司|集團公司|集团公司|公司|股份|集團|集团|控股|科技|技術|技术|通信|通訊|通讯|能源|銀行|"
+    r"银行|電氣|电气|保險|保险|實驗室|实验室|電腦|电脑|社|・インク|・コーポレーション|・グループ|・カンパニーズ|"
+    r"・ホールディングス|・インコーポレイテッド)$"
+)
+_CJK_GENERIC: Final = frozenset(
+    (  # noqa: SIM905
+        "公司 股份 集團 集团 控股 科技 技術 技术 通信 通訊 通讯 能源 銀行 银行 電氣 电气 保險 保险 石油 "
+        "資源 资源 美國 美国 中國 中国 國際 国际 股票 ホールディングス グループ 그룹 컴퍼니 코퍼레이션 "
+        "홀딩스 인크 뱅코프 자원 에너지 주식"
+    ).split()
+)
+CJK_NAME_MAX_LEN: Final = 20  # katakana names are long: エスティ・ローダー・カンパニーズ
+
+
+def _cjk_variants(run: str) -> list[str]:
+    """Name variants in the CJK text right before a company's ticker: Korean, the last word; Japanese, the
+    final katakana run; Chinese, the text after the last verb / function word; corporate suffixes removed."""
+    run = run.strip().rstrip("的の의")
+    last = run.split()[-1] if run.split() else ""
+    if _HANGUL.search(last):
+        name = last
+    elif m := _KANA_TAIL.search(last):
+        name = m.group(0)
+    else:
+        name = _CJK_LEAD.sub("", last)
+    out = [name, last] if len(last) <= 5 and last != name else [name]  # "奧的斯" holds a function word
+    while (stem := _CJK_SUFFIX.sub("", out[-1])) != out[-1]:
+        out.append(stem)
+    names = [v.strip("・·") for v in out]
+    return [v for v in names if 2 <= len(v) <= CJK_NAME_MAX_LEN and v not in _CJK_GENERIC]
+
+
+def cjk_company_names(
+    articles: pd.DataFrame, aliases: Mapping[int, CompanyAliases]
+) -> dict[int, tuple[str, ...]]:
+    """Chinese, Japanese and Korean names of each company (second NA-04 verification): the CJK words
+    right before its own ticker in parentheses in the unmasked texts ("迪爾股份（紐交所：DE）",
+    "アクセンチュア（NYSE：ACN）"; ``articles``: company_id, title, snippet). A Korean candidate must be seen
+    twice (its words end in verb endings as often as in names)."""
+    counts: dict[int, dict[str, int]] = {}
+    patterns: dict[int, re.Pattern[str]] = {}
+    has_cjk = re.compile(f"[{CJK}]")
+    rows = zip(articles["company_id"], articles["title"], articles["snippet"], strict=True)
+    for cid, title, snippet in rows:
+        text = f"{title} {snippet}"
+        a = aliases.get(int(cid))
+        if a is None or not a.tickers or not has_cjk.search(text):
+            continue
+        rx = patterns.get(int(cid))
+        if rx is None:
+            tick = "|".join(ticker_regex(t) for t in a.tickers)
+            rx = re.compile(
+                rf"([{CJK}・·\s]{{2,30}}?)\s*[（(]\s*(?:[^()（）:：\n]{{0,16}}[:：]\s*)?\$?(?:{tick})"
+                rf"(?:\.[A-Z]{{1,2}}|\s+US)?\s*[)）]"
+            )
+            patterns[int(cid)] = rx
+        for m in rx.finditer(text):
+            for v in _cjk_variants(m.group(1)):
+                counts.setdefault(int(cid), {})[v] = counts.setdefault(int(cid), {}).get(v, 0) + 1
+    out = {}
+    for cid, c in counts.items():
+        names = [v for v, n in c.items() if n >= 2 or not _HANGUL.search(v)]
+        if names:
+            out[cid] = tuple(sorted(names, key=lambda s: (-len(s), s)))
+    return out
+
+
+# Chinese transliterations of Western names: "薩姆·阿爾特曼" (Sam Altman), "丹·艾夫斯"; up to two characters
+# before the dot and four after, none of them a title or function character (Chinese has no spaces: "分析師
+# 丹·艾夫斯卻" keeps "分析師" and "卻")
+_NOT_NAME_CHAR: Final = r"(?![師师官長长家員员者席總总的了在和是與与對对卻却說说稱称表將将])"
+CJK_PERSON: Final = re.compile(
+    rf"(?:{_NOT_NAME_CHAR}[\u4e00-\u9fff]){{1,2}}[·•](?:{_NOT_NAME_CHAR}[\u4e00-\u9fff]){{1,4}}"
+)
+
+
 def ticker_regex(t: str) -> str:
     """A normalized ticker with any class separator: BRK-B matches BRK.B, BRK/B, BRK-B, BRKB is not."""
     return r"[.\-/]".join(re.escape(p) for p in t.split("-"))
@@ -393,6 +580,11 @@ class CompanyPatterns:
     paren_ticker: re.Pattern[str] | None
     prefixed_ticker: re.Pattern[str] | None
     bare_ticker: re.Pattern[str] | None
+    wide_ticker: re.Pattern[str] | None = None
+    caps_ticker: re.Pattern[str] | None = None
+    cjk_names: re.Pattern[str] | None = None
+    truncated: re.Pattern[str] | None = None
+    glued_names: re.Pattern[str] | None = None
 
 
 Candidate = tuple[int, int, list[str]]  # a PERSON entity: start, end, its words without a possessive
@@ -429,6 +621,16 @@ _DATE_RULES: Final[tuple[tuple[re.Pattern[str], str], ...]] = tuple(
     (re.compile(p[len(_I) :], re.IGNORECASE) if p.startswith(_I) else re.compile(p), r)
     for p, r in (
         (r"\b(?:Black|Cyber|Good)\s+(?:Friday|Monday)\b", "a holiday"),
+        (rf"{YEAR_RE}\s?[年년]\s?(?:{CJK_DAY}|\d{{1,2}}\s?[月월])", RECENTLY),
+        (rf"(?<!\d){CJK_DAY}", RECENTLY),
+        (rf"{CJK_YEAR}\s?(?:{CJK_QUARTER}|Q[1-4](?![A-Za-z0-9]))", QUARTER),
+        (rf"{CJK_YEAR}\s?{CJK_HALF}", HALF_YEAR),
+        (CJK_YEAR, YEAR),
+        (rf"[財财]?(?:年度)?{CJK_QUARTER}", QUARTER),
+        (CJK_HALF, HALF_YEAR),
+        (r"(?<!\d)\d{1,2}\s?[月월](?:份)?", RECENTLY),
+        (r"(?<!\d)\d{1,2}\s?[日号일](?![本元])", RECENTLY),
+        (rf"[（(]?\s?{CJK_WEEKDAY}\s?[）)]?", RECENTLY),
         (
             rf"{_I}{F_PREP}?\b\d{{1,2}}\.?\s+(?:de\s+)?(?:{F_MONTH}|{F_MONTH_DAY_ONLY})\b(?:\s+(?:de\s+)?{YEAR_RE})?",
             RECENTLY,
@@ -442,52 +644,71 @@ _DATE_RULES: Final[tuple[tuple[re.Pattern[str], str], ...]] = tuple(
             QUARTER,
         ),
         (rf"{PREP}?\b\d{{4}}-\d{{2}}-\d{{2}}\b", RECENTLY),
+        (  # 2025/08/08, 2025/08
+            rf"(?<![0-9.]){YEAR_RE}[/.](?:0?[1-9]|1[0-2])(?:[/.](?:[12]\d|3[01]|0?[1-9]))?(?![\d/])",
+            RECENTLY,
+        ),
         (rf"{PREP}?\b\d{{1,2}}/\d{{1,2}}/(?:\d{{4}}|\d{{2}})\b", RECENTLY),
         (rf"{PREP}?\b\d{{1,2}}\.\d{{1,2}}\.(?:\d{{4}}|\d{{2}})\b", RECENTLY),
         (r"(?<![\d/.$,])\b(?:1[0-2]|0?[1-9])/(?:1[3-9]|2\d|3[01])\b(?![\d/%])", RECENTLY),
         (r"(?<![\d/.$,])\b(?:0[1-9]/(?:[0-2]\d|3[01])|1[0-2]/0[1-9])\b(?![\d/%])", RECENTLY),  # zero padding
         (rf"{PREP}\b(?:1[0-2]|0?[1-9])/(?:[12]?\d|3[01])\b(?![\d/%])", RECENTLY),
-        (rf"{PREP}?\b(?:{WEEKDAY},?\s+)?{MONTH_ANY}\s+{DAY}(?!\d)(?:,?\s*{YEAR_RE}\b)?", RECENTLY),
+        (rf"{PREP}?\b(?:{WEEKDAY},?\s+)?{MONTH_ANY}\s+{DAY_RANGE}(?!\d)(?:,?\s*{YEAR_RE}\b)?", RECENTLY),
         (
-            rf"{PREP}?\b(?:{WEEKDAY},?\s+)?(?:the\s+)?{DAY}\s+(?:of\s+)?{MONTH_ANY}(?:,?\s*{YEAR_RE}\b)?",
+            rf"{PREP}?\b(?:{WEEKDAY},?\s+)?(?:the\s+)?{DAY_RANGE}\s+(?:of\s+)?{MONTH_ANY}(?:,?\s*{YEAR_RE}\b)?",
             RECENTLY,
         ),
+        # a year and a period glued together: FY2025Q2, 2025Q2, 2025-Q2, 2025H1
+        (rf"{_I}(?<![A-Za-z0-9])FY\s?'?(?:{YEAR_RE}|\d{{2}})[\s\-/]?Q[1-4](?![A-Za-z0-9])", QUARTER),
+        (rf"{_I}(?<![A-Za-z0-9]){YEAR_RE}[\s\-/]?Q[1-4](?![A-Za-z0-9])", QUARTER),
+        (rf"{_I}(?<![A-Za-z0-9]){YEAR_RE}[\s\-/]?H[12](?![A-Za-z0-9])", HALF_YEAR),
         (
-            rf"{_I}\b(?:the\s+)?(?:first|second|third|fourth|1st|2nd|3rd|4th)[\s-]+(?:fiscal\s+)?quarter\s+(?:of\s+)?(?:fiscal\s+(?:year\s+)?)?(?:FY\s?)?'?(?:{YEAR_RE}|\d{{2}})\b",
+            rf"{_I}(?<![A-Za-z])(?:the\s+)?(?:first|second|third|fourth|1st|2nd|3rd|4th)[\s-]+(?:fiscal\s+)?quarter\s+(?:of\s+)?(?:fiscal\s+(?:year\s+)?)?(?:FY\s?)?'?(?:{YEAR_RE}|\d{{2}})\b",
             QUARTER,
         ),
         (
-            rf"{_I}\b(?:the\s+)?(?:first|second|1st|2nd)[\s-]+half\s+(?:of\s+)?(?:the\s+)?(?:fiscal\s+)?(?:year\s+)?'?(?:{YEAR_RE}|\d{{2}})\b",
+            rf"{_I}(?<![A-Za-z])(?:the\s+)?(?:first|second|1st|2nd)[\s-]+half\s+(?:of\s+)?(?:the\s+)?(?:fiscal\s+)?(?:year\s+)?'?(?:{YEAR_RE}|\d{{2}})\b",
             HALF_YEAR,
         ),
-        (rf"{_I}\b[12]H\s*'?(?:{YEAR_RE}|\d{{2}})\b", HALF_YEAR),
+        (rf"{_I}(?<![A-Za-z0-9])[12]H[\s\-/'’]*'?(?:{YEAR_RE}|\d{{2}})(?![A-Za-z0-9])", HALF_YEAR),
+        # ASCII boundaries: CJK characters are word characters ("年Q2", "Q2财报")
         (
-            rf"{_I}\b(?:fiscal\s+)?Q[1-4]\s*(?:of\s+)?(?:fiscal\s+(?:year\s+)?)?(?:FY\s?|F)?'?(?:{YEAR_RE}|\d{{2}})\b",
+            rf"{_I}(?<![A-Za-z0-9])(?:fiscal\s+)?Q[1-4][\s\-/'’]*(?:of\s+)?(?:fiscal\s+(?:year\s+)?)?"
+            rf"(?:FY\s?|CY\s?|F)?'?(?:{YEAR_RE}|\d{{2}})(?![A-Za-z0-9])",
             QUARTER,
         ),
-        (rf"{_I}\b(?:fiscal\s+)?[1-4]Q\s*(?:FY)?'?(?:{YEAR_RE}|\d{{2}})\b", QUARTER),
-        (rf"\b(?:fiscal\s+)?[Hh][12]\s*(?:FY)?'?(?:{YEAR_RE}|\d{{2}})\b", HALF_YEAR),
-        (rf"{_I}\b(?:fiscal\s+)?(?:Q[1-4]|[1-4]Q)\b", QUARTER),
-        (rf"{_I}\b(?:first|second|third|fourth|1st|2nd|3rd|4th)-quarter\b", "quarterly"),
         (
-            rf"{_I}\b(?:the\s+)?(?:first|second|third|fourth|1st|2nd|3rd|4th)\s+(?:fiscal\s+)?quarter\b",
+            rf"{_I}(?<![A-Za-z0-9])(?:fiscal\s+)?[1-4]Q[\s\-/'’]*(?:FY|CY)?'?(?:{YEAR_RE}|\d{{2}})(?![A-Za-z0-9])",
             QUARTER,
         ),
-        (rf"{_I}\b(?:first|second|1st|2nd)-half\b", "half-year"),
         (
-            rf"{_I}\b(?:the\s+)?(?:first|second|1st|2nd)\s+half\s+of\s+(?:the\s+)?(?:fiscal\s+)?year\b",
+            rf"(?<![A-Za-z0-9])(?:fiscal\s+)?[Hh][12][\s\-/'’]*(?:FY|CY)?'?(?:{YEAR_RE}|\d{{2}})(?![A-Za-z0-9])",
             HALF_YEAR,
         ),
-        (rf"{_I}\b(?:the\s+)?(?:first|second|1st|2nd)\s+(?:fiscal\s+)?half\b", HALF_YEAR),
+        (rf"{_I}(?<![A-Za-z0-9])(?:fiscal\s+)?(?:Q[1-4]|[1-4]Q)(?![A-Za-z0-9])", QUARTER),
+        (rf"{_I}(?<![A-Za-z])(?:first|second|third|fourth|1st|2nd|3rd|4th)-quarter\b", "quarterly"),
+        (
+            rf"{_I}(?<![A-Za-z])(?:the\s+)?(?:first|second|third|fourth|1st|2nd|3rd|4th)\s+(?:fiscal\s+)?quarter\b",
+            QUARTER,
+        ),
+        (rf"{_I}(?<![A-Za-z])(?:first|second|1st|2nd)-half\b", "half-year"),
+        (
+            rf"{_I}(?<![A-Za-z])(?:the\s+)?(?:first|second|1st|2nd)\s+half\s+of\s+(?:the\s+)?(?:fiscal\s+)?year\b",
+            HALF_YEAR,
+        ),
+        (rf"{_I}(?<![A-Za-z])(?:the\s+)?(?:first|second|1st|2nd)\s+(?:fiscal\s+)?half\b", HALF_YEAR),
         (rf"\b(?:the\s+)?fiscal\s+(?:year\s+)?'?(?:{YEAR_RE}|\d{{2}})\b", FISCAL_YEAR),
-        (rf"{_I}\bFY\s?'?(?:{YEAR_RE}|\d{{2}})\b", FISCAL_YEAR),
+        (rf"{_I}(?<![A-Za-z0-9])FY\s?'?(?:{YEAR_RE}|\d{{2}})(?![A-Za-z0-9])", FISCAL_YEAR),
+        (rf"{_I}(?<![A-Za-z0-9])CY\s?'?(?:{YEAR_RE}|\d{{2}})(?![A-Za-z0-9])", YEAR),
         (rf"\b{YEAR_RE}\s*[-–/]\s*(?:{YEAR_RE}|\d{{2}})\b", "the period"),
         (rf"{PREP}?\b(?:early|mid|late)[\s-]+{MONTH_ANY}(?:\s+(?:of\s+)?{YEAR_RE}\b)?", RECENTLY),
         (rf"{PREP}?\b{MONTH_ANY}\s+(?:of\s+)?{YEAR_RE}", RECENTLY),
         (rf"{_I}\bfull[\s-]year\s+{YEAR_RE}\b", "full-year"),
         (rf"\b(?:early|mid|late)[\s-]+{YEAR_RE}\b", YEAR),
         (rf"\bsince\s+{YEAR_RE}\b", "for years"),
-        (rf"(?<!\d[.,])(?<![\w$€£¥])(?<!Russell\s){YEAR_RE}(?!\d|[%,.]\d|\s?%)", YEAR),
+        # a year glued to letters ("EHA2025") or after CJK ("於2025") is a year too
+        (rf"(?<=[A-Za-z\u00C0-\u024F]){_NOT_CURRENCY}{YEAR_RE}(?!\d|[%,.]\d|\s?%)", " " + YEAR),
+        (rf"(?<!\d[.,])(?<![0-9_$€£¥])(?<!Russell\s){YEAR_RE}(?!\d|[%,.]\d|\s?%)", YEAR),
         (rf"{PREP}?\b(?:early|mid|late)[\s-]+{MONTH}\b", RECENTLY),
         (rf"(?:{PREP}|\b(?:last|this|next|early|late)\s+){MONTH}\b", RECENTLY),
         (
@@ -499,6 +720,15 @@ _DATE_RULES: Final[tuple[tuple[re.Pattern[str], str], ...]] = tuple(
         (rf"{_I}(?:\bon\s+)?\b{WEEKDAY}(?:'s|’s)", "the recent"),
         (rf"{_I}(?:{PREP}|\b(?:last|this|next|early|late)\s+){WEEKDAY}s?\b", RECENTLY),
         (rf"{_I}\b{WEEKDAY}s?\b", RECENTLY),
+        # remnants of a day range or a period whose other end was masked: "recently-18", "17–recently",
+        # "the quarter-25"
+        (r"(?<=[Rr]ecently)\s?[–\-]\s?(?:[12]\d|3[01]|0?[1-9])(?:st|nd|rd|th)?(?![\d.,%:/A-Za-z])", ""),
+        (r"(?<![\d.,])\b(?:[12]\d|3[01]|0?[1-9])(?:st|nd|rd|th)?\s?[–\-]\s?(?=[Rr]ecently\b)", ""),
+        (
+            r"(?:(?<=the quarter)|(?<=the year)|(?<=fiscal year)|(?<=half-year))"
+            r"\s?[\-–'’/]\s?\d{2}(?![\d%]|[.,]\d)",
+            "",
+        ),  # "the fiscal year/27" (FY26/27); not "2-year/10-year"
     )
 )
 
@@ -513,11 +743,14 @@ class Masker:
         nlp: Any = None,
         vocabulary: frozenset[str] = frozenset(),
         surnames: frozenset[str] | None = None,
+        cjk_names: Mapping[int, Sequence[str]] | None = None,
     ) -> None:
         """``vocabulary``: ordinary lower-case words (``lowercase_vocabulary``); a PERSON entity made only of
         such words ("Balance Sheet", "Soar") is not a name unless a role noun or a speech verb frames it.
-        ``surnames``: corpus surnames masked wherever they appear; None derives them in ``mask_texts``."""
+        ``surnames``: corpus surnames masked wherever they appear; None derives them in ``mask_texts``.
+        ``cjk_names``: Chinese, Japanese and Korean company names (``cjk_company_names``)."""
         self.cfg = load_alias_config() if cfg is None else cfg
+        self.cjk_names: Mapping[int, Sequence[str]] = cjk_names or {}
         self.vocabulary = vocabulary
         self._derive_surnames = surnames is None
         self.surnames: frozenset[str] = frozenset() if surnames is None else surnames
@@ -557,12 +790,18 @@ class Masker:
             tick = "|".join(ticker_regex(t) for t in a.tickers)
             bare = [t for t in a.tickers if len(t) >= 2 and t not in self.cfg.bare_ticker_stoplist]
             stop = [t for t in a.tickers if t in self.cfg.bare_ticker_stoplist or len(t) < 2]
+            caps = [t for t in stop if len(t) >= 2]
+            firsts = sorted({w[0] for n in a.names if len(w := n.split()) > 1 and len(w[0]) >= 4})
+            # a capitalized name glued to the previous word ("Key TakeawaysHumana"): as written, 5+ letters
+            glued = sorted(
+                {n for n in a.names if n[:1].isupper() and len(n) >= 5}, key=lambda s: (-len(s), s)
+            )
             exch = rf"(?:{EXCH_PREFIX})?\$?"
             bare_alts = []  # bare tickers; a stoplisted (English-word) ticker only as a possessive ("NOW's")
             if bare:
                 bare_alts.append(
-                    rf"(?<![A-Za-z0-9$&.\-/])(?:{'|'.join(map(ticker_regex, bare))}){TICKER_SUFFIX}"
-                    rf"(?![A-Za-z0-9&]|/[A-Z]{{1,2}}\b|-[A-Z]\b|-\d)"
+                    rf"{BARE_BEFORE}(?:{'|'.join(map(ticker_regex, bare))}){TICKER_SUFFIX}"
+                    rf"(?![A-Za-z&]|/[A-Z]{{1,2}}\b)"  # "ABBV-400", "AAPL-2.96%" are the company
                 )
             if stop:
                 bare_alts.append(rf"(?<![A-Za-z0-9$&.\-/])(?:{'|'.join(map(ticker_regex, stop))})(?=['’]s\b)")
@@ -579,12 +818,35 @@ class Masker:
                 )
                 if tick
                 else None,
-                prefixed_ticker=re.compile(
-                    rf"(?:{EXCH_PREFIX}\$?|\$)(?:{tick}){TICKER_SUFFIX}(?![A-Za-z0-9])"
-                )
+                prefixed_ticker=re.compile(rf"(?:{EXCH_PREFIX}\$?|\$)(?:{tick}){TICKER_SUFFIX}(?![A-Za-z])")
                 if tick
                 else None,
                 bare_ticker=re.compile("|".join(bare_alts)) if bare_alts else None,
+                wide_ticker=re.compile(
+                    rf"\s*[（(]\s*[^()（）:：\n]{{0,16}}[:：]\s*\$?(?:{tick})(?:\.[A-Z]{{1,2}})?\s*[)）]"
+                    rf"|\s*[（(]\s*(?:{tick})(?:\.US|\s+U[SNWQA])\s*[)）]"
+                )
+                if tick
+                else None,
+                caps_ticker=re.compile(
+                    rf"(?<![{LATIN}$&.\-/])(?:{'|'.join(map(ticker_regex, caps))}){TICKER_SUFFIX}"
+                    rf"(?![{LATIN}&]|-[{LATIN}])"
+                )
+                if caps
+                else None,
+                cjk_names=re.compile("|".join(map(re.escape, self.cjk_names[company_id])))
+                if self.cjk_names.get(company_id)
+                else None,
+                truncated=re.compile(  # a name cut by the vendor at the end of a snippet: "for Warner..."
+                    rf"(?<![A-Za-z0-9&])(?:{'|'.join(map(re.escape, firsts))})(?=\s*(?:\.{{2,}}|…)\s*$)"
+                )
+                if firsts
+                else None,
+                glued_names=re.compile(
+                    rf"(?<=[a-z0-9])(?:{'|'.join(phrase_regex(v) for v in glued)})(?![a-z])"
+                )
+                if glued
+                else None,
             )
         self._patterns[company_id] = pat
         return pat
@@ -601,29 +863,62 @@ class Masker:
     def mask_company(self, text: str, company_id: int) -> tuple[str, MaskCounts]:
         c = MaskCounts()
         pat = self.patterns(company_id)
-        if pat.paren_ticker is not None:
-            text, n = pat.paren_ticker.subn("", text)
-            c.tickers += n
+        for p in (pat.paren_ticker, pat.wide_ticker):
+            if p is not None:
+                text, n = p.subn("", text)
+                c.tickers += n
         for p in (pat.prefixed_ticker, pat.stock_ticker):
             text, n = self._replace(p, text, COMPANY)
             c.tickers += n
-        for p in (pat.names, pat.names_strict):
+        for p in (pat.names, pat.names_strict, pat.cjk_names, pat.truncated, pat.glued_names):
             text, n = self._replace(p, text, COMPANY)
             c.names += n
         text, n = self._replace(pat.bare_ticker, text, COMPANY)
         c.tickers += n
+        if pat.caps_ticker is not None:
+            text, n = self._mask_caps(pat.caps_ticker, text)
+            c.tickers += n
         return text, c
+
+    def _mask_caps(self, pattern: re.Pattern[str], text: str) -> tuple[str, int]:
+        """An upper-case stoplisted ticker is the company ("MET earnings per share", "View the latest DASH
+        revenue", "MS.N"), except a clock time ("4:30 PM") and IT before an IT noun. In a text mostly in
+        capitals only a ticker that is not an ordinary lower-case word ("IR: … ACCELERATES") or that stands in
+        a list of tickers ("ALC, KEYS, TOL")."""
+        n = 0
+        shouting = caps_ratio(text) > 0.6  # the scanner says 0.5: the masker errs on the side of masking
+
+        def repl(m: re.Match[str]) -> str:
+            nonlocal n
+            word = m.group(0)
+            before, after = text[: m.start()], text[m.end() :]
+            if (word in ("AM", "PM") and _CLOCK.search(before)) or (word == "IT" and _IT_NOUN.match(after)):
+                return word
+            listed = bool(
+                _LIST_BEFORE.search(before)
+                or _LIST_AFTER.match(after)
+                or _CUE_AFTER.match(after)
+                or _COMPANY_BEFORE.search(before)
+            )
+            if shouting and word.lower() in self.vocabulary and not listed:
+                return word
+            n += 1
+            return _cap(COMPANY, before)
+
+        return pattern.sub(repl, text), n
 
     # --- dates -------------------------------------------------------------------------------------
 
     def mask_lead(self, text: str) -> tuple[str, int]:
-        """Step 1: HTML entities decoded ("Microsoft&nbsp;" → "Microsoft "), then datelines and ISIN codes."""
+        """Step 1: HTML entities decoded ("Microsoft&nbsp;" → "Microsoft "), then datelines, ISIN codes,
+        e-mails / URLs, option contracts and quote widgets."""
         text = _NBSP.sub(" ", html.unescape(text))
         total = 0
-        for p in (_DATELINE, _WIRE_DATELINE, _ISIN, _EMAIL_URL):
+        for p in (_DATELINE, _WIRE_DATELINE, _WIRE_MID, _ISIN, _EMAIL_URL, _OPTION_CODE, _WIDGET):
             text, n = p.subn("", text)
             total += n
-        return text, total
+        text, n = _OPTION_TERMS.subn("option", text)
+        return text, total + n
 
     def mask_dates(self, text: str) -> tuple[str, int]:
         """Step 3: dates, weekdays, months, years, fiscal periods."""
@@ -779,13 +1074,23 @@ class Masker:
                 return True
         return False
 
+    @staticmethod
+    def is_price_level(sentence: str) -> bool:
+        """A share-price level ("boosts stock to $102.89"), not a per-share figure ("per diluted share at
+        $0.23") or a dividend."""
+        return any(
+            not _PER_BEFORE.search(sentence[max(0, m.start() - 40) : m.start()])
+            for m in _LEVEL.finditer(sentence)
+        )
+
     def mask_prices(self, text: str) -> tuple[str, int]:
         """Step 5b: drop ticker quotes and price-move sentences; remove price-target and deal-price levels."""
         n = 0
+        text = _FOOTNOTE.sub(r"\1", text)
         text, k = QUOTE.subn("", text)
         n += k
         for sentence in split_sentences(text):
-            if self.is_price_move(sentence):
+            if self.is_price_move(sentence) or self.is_price_level(sentence):
                 text = text.replace(sentence, "", 1)
                 n += 1
         text = _SEP_RUN.sub(lambda m: m.group(1) + " ", text).strip(" ;|")
@@ -831,6 +1136,8 @@ class Masker:
     ) -> tuple[str, int]:
         """Steps 4–5."""
         text, n = self.mask_persons(text, candidates, surnames)
+        text, k = CJK_PERSON.subn(PERSON, text)
+        n += k
         text = self._detector.scrub(_tidy(text))
         text, _ = self.mask_prices(text)
         return _tidy(text), n

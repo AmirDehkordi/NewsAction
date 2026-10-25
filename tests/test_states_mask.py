@@ -1,10 +1,12 @@
 """PRD NA-04 S3 / AC2: masking and the residual-leak scanner.
 
 Golden cases cover the curated aliases (Google for Alphabet, Facebook for Meta, …), ticker forms, people,
-dates, fiscal periods, price talk and price levels, including every leak the NA-04 verification found
-(BOATS:NEE/PT, ODFL's, MSFT-1.19%, "Second Quarter", "25 septembre", "4/15", Super Micro Computer, …). The
-mutation "empty the alias list" turns the curated-alias cases red. The scanner is checked to be independent
-of the masker (its imports), and the val-A leak rates of the built states are read from
+dates, fiscal periods, price talk and price levels, including every leak the two NA-04 verifications found
+(BOATS:NEE/PT, ODFL's, MSFT-1.19%, "Second Quarter", "25 septembre", "4/15", Super Micro Computer; then
+"MET earnings per share", MS.N, "（紐交所：DE）", CY2025, "2025年8月7日（星期四）", "recently-18", option
+codes, "· IP. -0.58%", Chinese company names, …). The mutation "empty the alias list" turns the
+curated-alias cases red. The scanner is checked to be independent of the masker (its imports, and it counts
+every stoplisted ticker), and the val-A leak rates of the built states are read from
 artifacts/NA-04/leak_scan.csv.
 """
 
@@ -14,18 +16,29 @@ import ast
 import re
 from dataclasses import replace
 from functools import cache
+from pathlib import Path
 
 import pandas as pd
 import pytest
 
 from newsaction import io
 from newsaction.paths import ROOT
-from newsaction.states.mask import CompanyAliases, Masker, build_aliases, load_alias_config, name_variants
-from newsaction.states.scan import LeakScanner, harvest_names
+from newsaction.states.mask import (
+    CompanyAliases,
+    Masker,
+    build_aliases,
+    cjk_company_names,
+    load_alias_config,
+    name_variants,
+)
+from newsaction.states.scan import LeakScanner, harvest_cjk_names, harvest_names
 
 AAPL, GOOGL, META, LLY, HD, PANW, JPM, BAC = 6, 649, 946, 876, 691, 1111, 808, 145
 NEE, ODFL, MSFT, SPGI, WFC, PGR, SMCI, WAB, DD, PEG, DAL, CPB, DASH, NOW = (
     1033, 1088, 996, 1340, 1555, 1147, 1320, 1537, 405, 1136, 401, 344, 403, 1057
+)  # fmt: skip
+ADI, ALL, COIN, COST, DE, EL, FE, GL, HOOD, IP, IT, MET, MS, PM, TSLA = (
+    31, 65, 330, 337, 408, 480, 541, 632, 717, 772, 781, 945, 993, 1159, 1448
 )  # fmt: skip
 
 
@@ -39,7 +52,11 @@ def aliases() -> dict[int, CompanyAliases]:
 
 @cache
 def masker() -> Masker:
-    return Masker(aliases(), surnames=frozenset({"Bessent"}))
+    return Masker(aliases(), surnames=frozenset({"Bessent"}), vocabulary=ORDINARY)
+
+
+# ordinary lower-case words: in a text mostly in capitals, a stoplisted ticker that is one of them stays
+ORDINARY = frozenset({"all", "now", "eyes", "keys", "cost"})
 
 
 @cache
@@ -51,7 +68,7 @@ def companies() -> pd.DataFrame:
 def scanner() -> LeakScanner:
     """The independent scanner with a small hand-made harvest (the report stage harvests the corpus)."""
     return LeakScanner(
-        companies(), [(META, "FB")], {GOOGL: ["Google"], META: ["Facebook"]}, frozenset({"price"})
+        companies(), [(META, "FB")], {GOOGL: ["Google"], META: ["Facebook"]}, frozenset({"price", "all"})
     )
 
 
@@ -94,9 +111,10 @@ def test_tickers_in_every_form() -> None:
 
 
 def test_bare_ticker_rules() -> None:
-    out = m("ServiceNow (NYSE: NOW) beats; NOW is the time", NOW)
-    assert out.count("NOW") == 1 and "ServiceNow" not in out  # a stoplisted bare word stays, the form goes
-    assert "NOW's" not in m("NOW's guidance", NOW)  # ... but not as a possessive
+    out = m("ServiceNow (NYSE: NOW) beats; Now is the time", NOW)
+    assert "NOW" not in out and "Now is" in out and "ServiceNow" not in out  # the word "Now" stays
+    assert "NOW" in m("SERVICENOW AND NOW: ALL EYES ON EARNINGS", NOW, title=True)  # a text in capitals
+    assert "NOW's" not in m("NOW's guidance", NOW)
     assert "AAPL" not in m("APPLE AND AAPL TO REPORT RESULTS", AAPL, title=True)
     assert "AAPLX" in m("AAPLX fund", AAPL)  # whole words only
     assert (
@@ -337,3 +355,215 @@ def test_zero_padded_month_day() -> None:
         "Stock Market Week in Review – 07/07 - 07/11; up 20 1/2 cents; a 1/4,000th interest; 5/8-inch", AAPL
     )
     assert "07/" not in out and "1/2 cents" in out and "1/4,000th" in out and "5/8-inch" in out
+
+
+@pytest.mark.parametrize(
+    ("cid", "text", "gone"),
+    [
+        (MET, "MET earnings per share for the last quarter; View the latest MET revenue; MET/PF", ["MET"]),
+        (MS, "Recently, the company's MS.N profit beat estimates; MS initiates coverage", ["MS"]),
+        (ALL, "The company ALL, ALL is expected to show a rise in quarterly revenue", ["ALL"]),
+        (COST, "Brokers Issue Forecasts for COST the quarter Earnings", ["COST"]),
+        (IT, "IT earnings per share; View IT operating, investing, and financing activities", ["IT "]),
+        (PM, "PM Dividend Announcement; Marlboro maker PM missed revenue expectations", ["PM"]),
+    ],
+)
+def test_upper_case_stoplisted_tickers(cid: int, text: str, gone: list[str]) -> None:
+    """Second NA-04 verification: a stoplisted ticker in upper case in mixed-case text is the company."""
+    out = m(text, cid)
+    for g in gone:
+        assert g not in out, out
+
+
+def test_upper_case_words_that_are_not_the_company() -> None:
+    assert "IT Spending" in m("Global IT Spending to Grow; IT services firms; IT- en communicatie", IT)
+    assert "4:30 PM ET" in m("Call at 4:30 PM ET", PM)
+    caps = masker().patterns(MET).caps_ticker
+    assert caps is not None and caps.search("METÁL") is None  # an accented letter continues the word
+    assert "PMČR" not in m("PMČR: Firma uvedla", PM)  # Philip Morris ČR, PMI's Czech unit (a curated alias)
+    assert "ALL EYES" in m("ALL EYES ON THE FED AS ALLSTATE REPORTS", ALL, title=True)
+    assert "KEYS" not in m("AFTER-HOURS EARNINGS: ALC, KEYS, TOL, JHX", 820, title=True)  # a list of tickers
+    assert "IR:" not in m("IR: INGERSOLL RAND ACCELERATES VALUE CREATION", 778, title=True)  # not a word
+
+
+def test_quote_widget_inside_a_name() -> None:
+    """ "Constellation · CEG. +3.58%. Energy's": the widget goes before the company step."""
+    out = m("Constellation · CEG. +3.58%. Energy's stock price over the past year has sparked debate", 259)
+    assert "Constellation" not in out and "CEG" not in out and "%" not in out
+
+
+def test_price_change_lines_codes_and_levels() -> None:
+    text = "mean price target of $334.69, per FactSet. Price: 152.75, Change: -15.87, Percent Change: -9.4%"
+    out = m(text, AAPL)
+    assert "152.75" not in out and "15.87" not in out and "Price:" not in out
+    out = m("The company Advances ABBV-400 Study; Apple Inc. AAPL-2.96%. Get Free Report.", AAPL)
+    assert "AAPL" not in out and "2.96" not in out
+    assert "ABBV" not in m("AbbVie Advances ABBV-400 Phase 2 Study", 9)
+    out = m("Citi's seven-session winning streak boosts stock to $102.89. Revenue rose 5%.", 226)
+    assert "$102.89" not in out and "Revenue rose 5%" in out
+    assert "$0.23" in m("Net income per diluted share at $0.23, up from $0.17", AAPL)  # a per-share figure
+    out = m("raised the price target for the company shares from $280.00.1; the company signed", AAPL)
+    assert "$280" not in out
+    assert "/27" not in m("We cut the FY26/27 earnings per share by 7%", AAPL)
+    out = m("Jul 15, 2025 - 08:30 AM. CHICAGO --(BUSINESS WIRE)-- Apple announced", AAPL)
+    assert "CHICAGO" not in out and "BUSINESS WIRE" not in out
+
+
+def test_cjk_name_with_a_function_character() -> None:
+    """ "奧的斯" (Otis) holds 的: the whole short word before the ticker is a name too."""
+    otis = 1104
+    title = "奧的斯（紐交所：OTIS）穩健的收益已被保守地計入賬目。"
+    arts = pd.DataFrame({"company_id": [otis], "title": [title], "snippet": [""]})
+    names = cjk_company_names(arts, aliases())
+    assert "奧的斯" in names[otis]
+    mk = Masker(aliases(), surnames=frozenset(), cjk_names=names)
+    out = mk.mask("市場似乎對奧的斯（紐交所:OTIS）最近公佈的穩健收益反應平淡", otis)
+    assert "奧的斯" not in out and "OTIS" not in out and "紐交所" not in out
+
+
+def test_cjk_and_venue_ticker_forms_and_option_codes() -> None:
+    out = m("多位分析師上調了對迪爾股份（紐交所：DE）的價格預期", DE)
+    assert "DE" not in out and "紐交所" not in out and "（" not in out  # the whole parenthesis goes
+    assert "HOOD" not in m("入門：ロビンフッド・マーケッツ（HOOD US）", HOOD)
+    assert "COIN" not in m("Coinbase（納斯達克：COIN）和 COIN.US", COIN)
+    out = m("Analog Devices 250703 305.00C (ADI250703C305000) Stock Options Chain", ADI)
+    assert "ADI" not in out and "250703" not in out and "305.00" not in out and "option" in out
+
+
+def test_glued_years_and_periods() -> None:
+    out = m("2025Q2 preview; FY2025Q2; Q2-25 EPS; Q1 CY2025 results; EHA2025 data; 於2025年; 3Q25", GL)
+    assert not re.search(r"(?:19|20)\d{2}|Q[1-4]|-25", out), out
+    assert "the quarter results" in out
+
+
+def test_cjk_dates_and_periods() -> None:
+    text = "將於2025年8月7日（星期四）舉行；8月7日；週一的動向；木曜日に；2025年第二季度；上半年；2025年度"
+    out = m(text, AAPL)
+    assert not re.search(r"\d|星期|週一|曜|季度|半年", out), out
+
+
+def test_day_ranges() -> None:
+    out = m("minutes of the July 17-18 meeting; floods on July 4–5, 2025, killed; week of July 7-11", AAPL)
+    assert not re.search(r"\d", out), out
+
+
+def test_quote_widgets() -> None:
+    out = m("Tesla · TSLA. +3.52%. plans to launch; FSLR0.00%. Top News", AAPL)
+    assert "%" not in out and "TSLA" not in out and "plans to launch" in out
+    assert "%" not in m("The company · IP. -0.58%. has sparked a debate", IP)
+    assert "49.32" not in m("FE|FirstEnergy|Price:49.320|Chg%:-0.600", FE)
+
+
+def test_cjk_company_names_and_people() -> None:
+    arts = pd.DataFrame(
+        {
+            "company_id": [DE, DE, DE, EL],
+            "title": [
+                "多位分析師上調了對迪爾股份（紐交所：DE）的價格預期",
+                "我們認爲迪爾(紐約證券交易所代碼：DE）正在冒一些債務風險",
+                "迪爾（紐交所：DE）公佈業績",
+                "エスティ・ローダー・カンパニーズ（NYSE：EL）とM·A·Cコスメティックスは",
+            ],
+            "snippet": [""] * 4,
+        }
+    )
+    names = cjk_company_names(arts, aliases())
+    assert {"迪爾股份", "迪爾"} <= set(names[DE]) and "エスティ・ローダー・カンパニーズ" in names[EL]
+    mk = Masker(aliases(), surnames=frozenset(), cjk_names=names)
+    assert "迪爾" not in mk.mask("迪爾股份公佈業績，迪爾表示", DE)
+    out = mk.mask("但Wedbush證券分析師丹·艾夫斯卻持不同看法", AAPL)
+    assert "艾夫斯" not in out and "分析師" in out and "a person" in out
+    got = harvest_cjk_names(arts, {DE: ["DE"], EL: ["EL"]})
+    assert "迪爾" in got[DE]  # the scanner's own harvest (every ending seen twice)
+
+
+def test_alias_config_refuses_yaml_booleans(tmp_path: Path) -> None:
+    """A bare ON in YAML is the boolean true: the stoplist held "True", not "ON" (second verification)."""
+    path = tmp_path / "aliases.yaml"
+    path.write_text(
+        "legal_suffixes: [Inc]\ncommon_words: [the]\nbare_ticker_stoplist: [ON, IT]\ncompanies: {}\n",
+        encoding="utf-8",
+    )
+    with pytest.raises(ValueError, match="non-string"):
+        load_alias_config(path)
+    assert "ON" in load_alias_config().bare_ticker_stoplist and "ON" in load_alias_config().companies
+
+
+def test_scanner_counts_every_stoplisted_ticker() -> None:
+    """The scanner has no list of English-word tickers of its own: every stoplisted ticker of the masker
+    counts in upper case in mixed-case text (the test reads the alias file; the scanner does not)."""
+    sc = scanner()
+    stop = load_alias_config().bare_ticker_stoplist
+    checked = 0
+    for cid, t in zip(companies()["company_id"], companies()["ticker"], strict=True):
+        if t in stop and len(t) >= 2:  # ATOM tickers (the scanner does not know the curated ones)
+            assert sc.scan_text(f"Analysts expect {t} earnings per share to rise", int(cid)).tickers >= 1, t
+            checked += 1
+    assert checked >= 45
+
+
+def test_scanner_sees_the_second_verification_forms() -> None:
+    sc = scanner()
+    assert sc.scan_text("MET earnings per share for the last quarter", MET).tickers == 1
+    assert sc.scan_text("the company's MS.N profit beat", MS).tickers == 1
+    assert sc.scan_text("多位分析師上調了對the company（紐交所：DE）的價格預期", DE).tickers >= 1
+    assert sc.scan_text("the company 250703 305.00C (ADI250703C305000)", ADI).tickers == 1
+    assert sc.scan_text("the quarter CY2025 results; EHA2025 data", AAPL).years == 2
+    c = sc.scan_text("阿克邁科技將於2025年8月7日（星期四）; the yearQ2; the quarter-25; recently-18", AAPL)
+    assert c.years == 1 and c.dates >= 5
+    quotes = sc.scan_text("The company · the company. +0.05%. presents; FE|x|Price:49.3|Chg%:-0.6", FE)
+    assert quotes.quotes >= 2
+    assert sc.scan_text("Results at 4:30 PM ET", PM).tickers == 0  # a clock time
+    assert sc.scan_text("ALL EYES ON THE FED", ALL).tickers == 0  # a text in capitals, an ordinary word
+    assert sc.scan_text("分析師薩姆·阿爾特曼", AAPL).people == 1
+    assert sc.scan_text("Recently - 08:30 AM. the company announced", AAPL).dates == 0  # a time
+    assert sc.scan_text("Price Target Raised Amidst $35 Billion Acquisition", AAPL).price_levels == 0
+    assert sc.scan_text("Seltene Erden: A person droht", 1).tickers == 0  # Agilent's ticker is A
+    assert sc.scan_text("the company: price: Price: 152.75, Change: -1.2", AAPL).price_levels == 1
+
+
+def test_exchange_letters_truncated_names_and_slashed_dates() -> None:
+    nke, wbd = 1046, 1543
+    out = m("Nike NKE-N reported; Apple Inc. AAPL-Q -1.05%decrease. forecast revenue", nke)
+    assert "NKE" not in out
+    out = m("Apple Inc. AAPL-Q -1.05%decrease. forecast revenue well above estimates", AAPL)
+    assert "AAPL" not in out and "1.05" not in out and "decrease" not in out
+    assert "Warner" not in m("analysts lowered their Q3 EPS estimates for Warner...", wbd)
+    assert "Warner" in m("Warner Music signed a deal", AAPL)  # another company's name stays
+    assert not re.search(r"\d", m("本新聞稿由Insight發佈於2025/08/08，由發布之企業", AAPL))
+    assert "-25" not in m("operating profit rose for Q4 2024-25, with revenue up", AAPL)
+
+
+def test_tickers_glued_listed_or_with_digits() -> None:
+    anet, ctra, abbv, tgt, ipg, ge = 92, 379, 9, 1416, 773, 612
+    assert "ANET" not in m("Arista Networks, Inc.ANET is witnessing solid demand", anet)
+    assert "CTRA" not in m("紐交所:CTRA1年股價與公允價值對比", ctra)
+    assert "ABBV" not in m("Earnings and Revenue – SET:ABBV19; ABBV19 earnings per share", abbv)
+    assert "TGT" not in m("mixed WMT/TGT/TJX earnings", tgt)
+    assert "IPG" not in m("paves the way for the Omnicom-IPG merger", ipg)
+    assert "GE9X" not in m("orders for GE9X engines", ge)
+    assert m("Apple Inc. AAPL reported", AAPL).lower().count("the company") == 1  # name + ticker: one mention
+
+
+def test_glued_names() -> None:
+    hum = 733
+    out = m("Key TakeawaysHumana aims to streamline prior authorizations", hum)
+    assert "Humana" not in out and "Takeaways" in out
+    assert "Stanford" in m("a Stanford study of Ford drivers", 520)  # case-sensitive: Stanford stays
+    assert scanner().scan_text("Key TakeawaysHumana aims to streamline", hum).names == 1
+
+
+def test_names_written_together_or_after_a_number() -> None:
+    assert "Molson" not in m("MolsonCoors Brewing raises prices", 1392)
+    assert "Depot" not in m("HomeDepot$ is a ticker on social media", HD)
+    out = m("Jul 28, 2025Principal Financial Group® announced", 1143)
+    assert "Principal" not in out and "the year the company" in out.lower()
+    assert "Fargo" not in m("Wells Fargo & Co Fargo Investment Research raised", WFC)
+    assert "MAR" not in m("MARRIOTT INTERNATIONAL : MAR Q2 2025 TRANSCRIPT FINAL", 917, title=True)
+
+
+def test_ordinal_period_after_a_number_and_caps_ticker_labels() -> None:
+    out = m("Results from 2025Second quarter results show growth", AAPL)
+    assert "Second quarter" not in out and "2025" not in out
+    assert "MAR" not in m("MARRIOTT INTERNATIONAL INC /MD/ MAR: MARRIOTT DECLARES DIVIDEND", 917, title=True)
+    assert "Edison" not in m("Consolidated. Edison, one of the largest utilities", 472)

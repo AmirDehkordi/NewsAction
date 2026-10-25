@@ -69,6 +69,7 @@ from newsaction.states.mask import (
     SURNAME_MIN_COUNT,
     Masker,
     build_aliases,
+    cjk_company_names,
     lowercase_vocabulary,
     normalize_ticker,
 )
@@ -76,6 +77,7 @@ from newsaction.states.questions import Battery, canonical_json, load_battery
 
 REACTION_D2: Final = f"{STATES_DIR}/reaction_d2.parquet"
 PERSON_SURNAMES: Final = f"{STATES_DIR}/person_surnames.parquet"
+COMPANY_CJK_NAMES: Final = f"{STATES_DIR}/company_cjk_names.parquet"
 MARKET_NEWS: Final = "news/market_articles.parquet"
 OUTPUT_COLUMNS: Final = (
     "event_id",
@@ -420,6 +422,17 @@ def run_mask(layout: Layout | None = None, n_process: int = 4) -> dict[str, Any]
         f"names seen >= {SURNAME_MIN_COUNT} times in the event and market articles)",
     )
     io.write_parquet(
+        pd.DataFrame(
+            [(cid, n) for cid, names in sorted(mk.cjk_names.items()) for n in names],
+            columns=["company_id", "name"],
+        ).astype({"company_id": "int64"}),
+        COMPANY_CJK_NAMES,
+        producer=PRODUCER,
+        layout=lay,
+        description="NA-04 S3: Chinese / Japanese / Korean company names masked in the company's texts "
+        "(the CJK words right before its own ticker in parentheses in the event articles)",
+    )
+    io.write_parquet(
         masked,
         ARTICLES_MASKED,
         producer=PRODUCER,
@@ -434,6 +447,8 @@ def run_mask(layout: Layout | None = None, n_process: int = 4) -> dict[str, Any]
         "dates": int(masked["n_dates"].sum()),
         "persons": int(masked["n_persons"].sum()),
         "corpus_surnames": len(mk.surnames),
+        "cjk_names": sum(len(v) for v in mk.cjk_names.values()),
+        "cjk_name_companies": len(mk.cjk_names),
     }
 
 
@@ -447,16 +462,20 @@ def load_surnames(lay: Layout) -> frozenset[str]:
 
 def masker(lay: Layout, *, vocabulary: bool = False, surnames: frozenset[str] | None = None) -> Masker:
     """The masker of every company in ``panel/companies.parquet``. ``vocabulary``: also derive the ordinary
-    lower-case words from the text of every event article (needed for person names). ``surnames``: the
-    corpus surnames; None derives them from the texts the masker is given (the mask stage)."""
+    lower-case words from the text of every event article (needed for person names) and the companies'
+    Chinese, Japanese and Korean names (``cjk_company_names``). ``surnames``: the corpus surnames; None
+    derives them from the texts the masker is given (the mask stage)."""
     comp = io.read_parquet(
         "panel/companies.parquet", columns=["symbol_id", "company_id", "ticker", "name"], layout=lay
     )
+    aliases = build_aliases(comp, extra_tickers(lay))
     vocab: frozenset[str] = frozenset()
+    cjk: dict[int, tuple[str, ...]] = {}
     if vocabulary:
         arts = event_articles(lay)
         vocab = lowercase_vocabulary([*arts["title"], *arts["snippet"]], VOCAB_MIN_COUNT)
-    return Masker(build_aliases(comp, extra_tickers(lay)), vocabulary=vocab, surnames=surnames)
+        cjk = cjk_company_names(arts, aliases)
+    return Masker(aliases, vocabulary=vocab, surnames=surnames, cjk_names=cjk)
 
 
 def mask_frame(
