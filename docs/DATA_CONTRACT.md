@@ -417,3 +417,126 @@ frozen models, counts and t−1 tiers only. No module in `newsaction.events` imp
 - **Rows / coverage:** 62,285 events 2024-01-02 … 2026-07-31, 524 companies: robustness 971, train 23,199, val-A 11,252, val-B 7,912, test 18,951; 9,258 selected ticker-days without a third-party-OK article.
 - **Availability:** `w2` (D2 decision point); otherwise as `events_d0`.
 - **sha256:** `2acf769d5803f2d90dfcc9445bf0156c17c044b29ebd780ee3f9474e07010002`
+
+## NA-04 — states: context, masked text, decision-model states
+
+Producer for all files: `newsaction.states.build` (NA-04), one stage per process:
+`uv run python -m newsaction.states.build --stage context | mask | states | report`. Configuration:
+`configs/{codebook_v1,questions_v1,aliases,macro_calendar,states}.yaml`. No stage reads the sealed directory
+or calls the lock; the D2 reaction comes from `panel.reactions.build_reactions(period="public")`, which
+refuses test rows. Test-period rows exist only for Call A (t−1 context and articles). Every stage reproduces
+its sha256 on a rerun.
+
+### `work/states/context_company.parquet`
+- **Producer:** `newsaction.states.build --stage context` (S2; `states.context.company_context`, `eps_revision`, `earnings_flags`)
+- **Inputs:** `work/events/events_{d0,d2}.parquet` (keys), `work/panel/panel_public.parquet` and `panel_test_inputs.parquet` (t−1 columns; public `adj_close` shifted one session), `work/snapshot/estimates_fy1.parquet`, `work/market/earnings_dates.parquet`, `work/panel/companies.parquet`, `work/snapshot/symbol_tickers.parquet`
+- **Schema:** `session` date32, `symbol_id`, `company_id` int64, `ctx_sigma_cc_pct`, `ctx_z_m{5,20,60}_pct`, `ctx_ret_m{5,20,60}` double, `sector` string, `beta_m`, `sigma_cc`, `z_m{5,20,60}`, `logv_mad60`, `ctx_eps_fy1_now`, `ctx_eps_fy1_before`, `ctx_eps_revision` double, `ctx_earnings_w0`, `ctx_earnings_w2` bool
+- **Key:** `(session, symbol_id)` unique (the representative symbol of each D0 / D2 event)
+- **Rows / coverage:** 62,285 rows = every D0 ∪ D2 event key, 2024-01-02 … 2026-07-31. `ctx_ret_m*` are NaN for test sessions (E0 states are built for val samples only).
+- **Availability:** `t_minus_1` (earnings flags `w0` / `w2`): data through close(prev s) only; percentiles compare with the symbol's previous 252 values (tests/test_states_pit.py planted shocks). Contains test-period t−1 values: never summarized before the freeze.
+- **sha256:** `f2935d93c9079e096f742ffc8adbed0d3ec6dd9716b8e63a2f1a2c1edd963f47`
+
+### `work/states/context_market.parquet`
+- **Producer:** `newsaction.states.build --stage context` (S2; `states.context.market_context`, `states.macro`)
+- **Inputs:** `work/market/market_prices.parquet` (SPY, ^VIX, DX-Y.NYB, CL=F), `work/market/fred_daily.parquet` (DGS10, BAMLH0A0HYM2), `work/market/cpi_vintages.parquet`, `configs/macro_calendar.yaml`
+- **Schema:** `session` date32; per series n ∈ {stock_market, vix, ten_year_yield, high_yield_spread, dollar, oil}: `mkt_{n}_chg`, `mkt_{n}_z`, `mkt_{n}_pct` double; `mkt_vix_level_pct`, `mkt_stock_market_sigma_same`, `mkt_spy_ret_m{5,20,60}` double; `macro_cpi_today`, `macro_fomc_today` bool
+- **Key:** `session` unique
+- **Rows / coverage:** 647 sessions 2024-01-02 … 2026-07-31
+- **Availability:** `t_minus_1` (the change of prev(s), of t−2 for the HY OAS; σ and percentiles from the 252 changes before it); macro flags `static`. `mkt_stock_market_sigma_same` is SPY's σ through prev(s), used only to score SPY's move of s in Call B. Contains test-period t−1 values: never summarized before the freeze.
+- **sha256:** `58665927ba1a128e9a90de750d73996377496433ce96e17362897a032338d740`
+
+### `work/states/reaction_d2.parquet`
+- **Producer:** `newsaction.states.build --stage context` (S5; `panel.reactions.build_reactions(period="public", point="D2")`, `states.context.reaction_d2`)
+- **Inputs:** `work/panel/panel_public.parquet`, `work/market/market_prices.parquet` (SPY history)
+- **Schema:** `session` date32, `symbol_id` int64, `g_d2`, `g_d2_lvl`, `react_r_cc`, `react_r_spy_cc`, `react_z_vol`, `react_g_pct`, `react_spy_z`, `react_spy_pct`, `react_volume_multiple` double
+- **Key:** `(session, symbol_id)` unique
+- **Rows / coverage:** 42,363 rows = the D2 event keys of train, val-A and val-B (sessions ≤ 2025-12-31; no test row)
+- **Availability:** `d2_reaction` (the reaction of s; E4 and σ histories through t−1). Never a Call A input.
+- **sha256:** `8c2e053ba58f5fa20bdc43a4aa2b1b4aa00d02642e3ecdd1e8c68153dcd92916`
+
+### `work/states/articles_masked.parquet`
+- **Producer:** `newsaction.states.build --stage mask` (S3; `states.mask.Masker`, spaCy `en_core_web_sm` 3.8.0)
+- **Inputs:** the news lists of `work/events/events_{d0,d2}.parquet` (title_clean / snippet_clean as capped by NA-03), `work/news/market_articles.parquet` (A3.5 selection), `work/panel/companies.parquet`, `work/snapshot/symbol_tickers.parquet`, `configs/{aliases,news,patterns}.yaml`
+- **Schema:** `id` string, `kind` (company | market), `company_id` int64 (−1 for market articles), `title_masked`, `snippet_masked` string, `n_names`, `n_tickers`, `n_dates`, `n_persons` int64 (replacements made)
+- **Key:** `id` unique
+- **Rows / coverage:** 299,144 rows: 296,082 event articles, 3,062 market articles
+- **Availability:** `w0` per article (a function of the article's own text; `title_masked` / `snippet_masked` registered `w0`). Third-party OK articles only (NA-03 lists); contains 2026 article text, no return.
+- **sha256:** `882bfd89e2b7f19f3174d082ebc78514bed3425a6cec43329d42c06620fbfcce`
+
+### State files (schema shared by the ten files below)
+- **Producer:** `newsaction.states.build --stage states` (S5; `states.build.build_event_states`, `build_market_states`)
+- **Inputs:** the four files above, `work/events/events_{d0,d2}.parquet`, `work/news/articles_clean.parquet` (`id`, `third_party_ok`), `work/news/market_articles.parquet`, `configs/{codebook_v1,questions_v1,macro_calendar,states}.yaml`
+- **Schema (all ten files):** `event_id` string, `company_id` int64 (−1 for market states), `session` date32, `split`, `window` (W0 | W2), `call` (A | B | M), `encoding` (E0–E4) string, `masked` bool, `state_json` string (canonical JSON: sorted keys, compact separators, UTF-8), `state_sha256` string (sha256 of the UTF-8 `state_json`), `n_tokens_state`, `n_tokens_with_questions` int64 (ModernBERT-large @ 45bb4654, no special tokens; + the call's core questions as canonical JSON), `n_articles` int64, `third_party_ok_all` bool
+- **Key:** `event_id` unique per file (`M:{session}` for market states)
+- **Rows / coverage:** `callA_d0_E3.parquet` 48,096; `callA_d2_E3.parquet` 62,281; `callB_d2_E3.parquet` 42,362; `market_E3.parquet` 595; `samples/callA_d0_E0.parquet` 3,000; `samples/callA_d0_E1.parquet` 3,000; `samples/callA_d0_E2.parquet` 3,000; `samples/callA_d0_E3.parquet` 3,000; `samples/callA_d0_E4.parquet` 3,000; `samples/unmasked.parquet` 1,000
+- **Availability:** a state is an input at its decision point: Call A D0 (`window` W0) at 09:15 ET of `session`; Call A D2 and Call B (W2) after close(s); `pit.check_inputs` validated every block (`states.build.validate_spec`). Call B rows exist for train, val-A and val-B only. Test-period rows (Call A only) contain t−1 context words: never summarized before the freeze.
+
+### `work/states/callA_d0_E3.parquet`
+- **Producer:** `newsaction.states.build --stage states` (S5)
+- **Contents:** Call A on D0 (W0 news), E3, masked: every D0 event with text after masking (robustness, train, val-A, val-B, test; 7 events have none, artifacts/NA-04/build_states.json)
+- **Schema / key / availability:** as "State files" above
+- **Rows:** 48,096
+- **sha256:** `2fb7bb5cb6f9966d75624765efd3534709adec3b65365aaf98cb7a8a625cf30f`
+
+### `work/states/callA_d2_E3.parquet`
+- **Producer:** `newsaction.states.build --stage states` (S5)
+- **Contents:** Call A on D2 (W2 news, PREREG A3.1), E3, masked: every D2 event with text after masking (all splits; 4 have none)
+- **Schema / key / availability:** as "State files" above
+- **Rows:** 62,281
+- **sha256:** `4970306adb1e15ada7cf7c76b4fc677830b4b859ff5363e5116472d91a4acebb`
+
+### `work/states/callB_d2_E3.parquet`
+- **Producer:** `newsaction.states.build --stage states` (S5)
+- **Contents:** Call B on D2 (W2 news + reaction_so_far), E3, masked: the D2 events of train, val-A and val-B with text (1 has none); same articles as callA_d2_E3
+- **Schema / key / availability:** as "State files" above
+- **Rows:** 42,362
+- **sha256:** `52fc2645610bacc162aacb78f91fe914ec5d73617c68e575bdc410184ac0cc65`
+
+### `work/states/market_E3.parquet`
+- **Producer:** `newsaction.states.build --stage states` (S5)
+- **Contents:** A3.5 (optional) market states: one per session with third-party-OK market-index articles, E3, masked
+- **Schema / key / availability:** as "State files" above
+- **Rows:** 595
+- **sha256:** `45b4442872d49f6908354ae583f7a7860c4ffdeefc2943cacc961e5c60557f79`
+
+### `work/states/samples/callA_d0_E0.parquet`
+- **Producer:** `newsaction.states.build --stage states` (S5)
+- **Contents:** NA-07 encoding sample: 1,500 val-A + 1,500 val-B D0 events (tier × month, seed 2026), Call A, E0, masked
+- **Schema / key / availability:** as "State files" above
+- **Rows:** 3,000
+- **sha256:** `4a2f0a27b0ebbf7c876935a59f2fb2a855b9c265ea4c4a45430c77d63184eb49`
+
+### `work/states/samples/callA_d0_E1.parquet`
+- **Producer:** `newsaction.states.build --stage states` (S5)
+- **Contents:** NA-07 encoding sample: 1,500 val-A + 1,500 val-B D0 events (tier × month, seed 2026), Call A, E1, masked
+- **Schema / key / availability:** as "State files" above
+- **Rows:** 3,000
+- **sha256:** `7d354343ff1b4c6db0cec0fc3863d9c36bcbcd6e80687494e714b6645a19dee4`
+
+### `work/states/samples/callA_d0_E2.parquet`
+- **Producer:** `newsaction.states.build --stage states` (S5)
+- **Contents:** NA-07 encoding sample: 1,500 val-A + 1,500 val-B D0 events (tier × month, seed 2026), Call A, E2, masked
+- **Schema / key / availability:** as "State files" above
+- **Rows:** 3,000
+- **sha256:** `7d9debb42aeff9cdcb90889f04657e6a94eba0083c206be9739376d4a0ee8a2c`
+
+### `work/states/samples/callA_d0_E3.parquet`
+- **Producer:** `newsaction.states.build --stage states` (S5)
+- **Contents:** NA-07 encoding sample: 1,500 val-A + 1,500 val-B D0 events (tier × month, seed 2026), Call A, E3, masked
+- **Schema / key / availability:** as "State files" above
+- **Rows:** 3,000
+- **sha256:** `286cc8a0a46b7174a2d24d54db410c1605fbdd97f8dbcb268c55106bc2010e3d`
+
+### `work/states/samples/callA_d0_E4.parquet`
+- **Producer:** `newsaction.states.build --stage states` (S5)
+- **Contents:** NA-07 encoding sample: 1,500 val-A + 1,500 val-B D0 events (tier × month, seed 2026), Call A, E4, masked
+- **Schema / key / availability:** as "State files" above
+- **Rows:** 3,000
+- **sha256:** `df4f244a04bb3b74057744b14dca2483ed8dad960623998a120105cd0ed3e06a`
+
+### `work/states/samples/unmasked.parquet`
+- **Producer:** `newsaction.states.build --stage states` (S5)
+- **Contents:** NA-06 probe: unmasked twin of 1,000 val-A D0 events (tier × month, seed 2026), Call A, E3; the masked twin is the same event_id in callA_d0_E3
+- **Schema / key / availability:** as "State files" above
+- **Rows:** 1,000
+- **sha256:** `32b3e904fb29a1944d199960c7cb94a67d30421442e47f3e5dfc069774e1fff7`
