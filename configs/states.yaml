@@ -1,0 +1,47 @@
+# NA-04 state build constants (newsaction.states; PRD NA-04 S2, S5–S7). The scales themselves are in
+# configs/codebook_v1.yaml and the question text in configs/questions_v1.yaml. Hashed into the NA-11 freeze.
+
+context:                          # PREREG §6.10 company block
+  history_sessions: 252           # percentile / z history of a value: the 252 sessions before the scored one
+  history_min: 126                # fewer valid observations -> "not available"
+  perf_windows:                   # PREREG §6.10 "past 5 / 20 / 60 sessions" (panel z_m5 / z_m20 / z_m60)
+    week: 5
+    month: 20
+    three_months: 60
+  revision_days: 30               # FY1 EPS consensus revision: as of t-1 vs as of t-1 minus 30 days
+
+market:                           # PREREG §6.10 market block, all from data through t-1
+  # change: return (close / previous close - 1) or diff (level difference). value_scale converts the source
+  # unit to a decimal (FRED rates are in percent). extra_lag: sessions of publication lag on top of t-1.
+  # The ICE BofA high-yield OAS is computed after the US close and reaches FRED with a delay, so the state
+  # uses the observation of t-2 (decisions doc); Treasury publishes the constant-maturity yields
+  # the same evening, and market_prices closes are known at the close.
+  series:
+    stock_market: {source: market_prices, symbol: SPY, change: return, value_scale: 1.0, e0_unit: pct, extra_lag: 0}
+    vix: {source: market_prices, symbol: "^VIX", change: diff, value_scale: 1.0, e0_unit: points, extra_lag: 0}
+    ten_year_yield: {source: fred, symbol: DGS10, change: diff, value_scale: 0.01, e0_unit: bp, extra_lag: 0}
+    high_yield_spread: {source: fred, symbol: BAMLH0A0HYM2, change: diff, value_scale: 0.01, e0_unit: bp, extra_lag: 1}
+    dollar: {source: market_prices, symbol: DX-Y.NYB, change: return, value_scale: 1.0, e0_unit: pct, extra_lag: 0}
+    oil: {source: market_prices, symbol: CL=F, change: return, value_scale: 1.0, e0_unit: pct, extra_lag: 0}
+  level_percentile: [vix]         # level vs own 252-session history (percentile words)
+
+tokens:                           # PRD NA-04 S6, AC5 (ModernBERT-large tokenizer of configs/events.yaml)
+  state_p95_max: 900              # p95(state tokens), Call A E3
+  total_max: 1024                 # p95(state + the longest single question) for Laya typed-decisions
+  laya_state_budget: 768          # Laya model card: 1,024 context with head_max_len 256 (reported, not an AC)
+  special_tokens: 3               # [CLS] state [SEP] question [SEP]
+
+samples:                          # PRD NA-04 S5 (NA-07 encoding study, NA-06 probes)
+  seed: 2026                      # PREREG §8.2
+  encodings_val_a: 1500
+  encodings_val_b: 1500
+  unmasked_val_a: 1000
+  strata: [tier, month]           # proportional allocation, largest remainder; within a stratum by
+                                  # u = sha256("{seed}:{event_id}")
+  exclude_embargo: true           # PREREG §4.2: the first 5 sessions of a split are not evaluated
+
+market_states:                    # PREREG A3.5 (optional): one state per session from market-index articles
+  window: W2
+  max_articles: 6
+  max_news_tokens: 600
+  splits: [robustness, train, val_a, val_b, test]

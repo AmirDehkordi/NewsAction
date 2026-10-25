@@ -25,6 +25,9 @@ selection: null     # NA-11: primary instrument and comparators (PREREG §8.5)
 thresholds: null    # NA-11: delta/RG thresholds and confidence gates
 calibration: null   # NA-11: calibration maps and their val-A fit ranges
 
+questions_v1_sha256: e602c6c0a354c7309756f929c0776ec8da0d4b2d29f8c3fb6c59199317a0c85a   # NA-04: sha256 of configs/questions_v1.yaml
+codebook_v1_sha256: 934e63253ac896c39cf5640940e53456d0114ee6672d5ec1414cd34f3d67e129   # NA-04: sha256 of configs/codebook_v1.yaml
+
 allow_val_b: false       # NA-06 sets true after the tournament (CLAUDE.md C13)
 frozen_requested: false  # NA-11 sets true; lock.freeze() refuses otherwise
 frozen: false            # written by lock.freeze() just before hashing; never edit by hand

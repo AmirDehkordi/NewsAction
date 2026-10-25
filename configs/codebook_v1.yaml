@@ -1,0 +1,96 @@
+# Codebook v1: numbers as words (PREREG §6.11; PRD NA-04 S1). Every number in a model state goes through
+# these scales (CLAUDE.md A4); newsaction.states.codebook implements them as pure functions and
+# tests/test_states_codebook.py checks every bin edge. Hashed into configs/frozen.yaml (codebook_v1_sha256)
+# and into the NA-11 freeze.
+#
+# Bins are half-open [lo, hi): a value equal to an edge takes the higher bin (|z| = 2.0 is "large").
+# Items marked "NA-04" are scales or phrases that PREREG §6.10 requires but §6.11 does not spell out;
+# they are listed in docs/decisions/NA-04.md and PREREG §15.
+
+version: 1
+
+move:                       # PREREG §6.11 move words on |z|, z in typical-move units
+  edges: [0.5, 1.0, 2.0, 3.0, 5.0]
+  words: [negligible, small, moderate, large, very large, extreme]
+
+sign:                       # PREREG §6.11: stock moves are relative to "the market and its sector"
+  up: rise
+  down: fall
+  zero: no change           # z exactly 0
+  relative_to: the market and its sector
+
+encodings:                  # PREREG §6.11 / §8.4; only move values change with the encoding
+  ids: [E0, E1, E2, E3, E4]
+  default: E3               # the default before NA-07
+  e1_decimals: 1            # E1 "+2.3σ"
+  e3_decimals: 1            # E3 "(≈2.3× a typical day's move)"; the multiple is truncated, so it never
+                            # crosses a move-word edge (all edges lie on the 0.1 grid)
+  typical:                  # E3 noun phrase per horizon
+    day: a typical day's move
+    week: a typical week's move
+    month: a typical month's move
+    three_months: a typical three-month move
+  e4_period:                # E4 "larger than 97% of its daily moves in the past year"
+    day: daily
+    week: weekly
+    month: monthly
+    three_months: three-month
+  e4_article: {up: a rise, down: a fall}
+  e0_units:                 # E0 raw changes: percent for prices, basis points for rates, points for the VIX
+    pct: {format: "{:+.1f}%", scale: 100.0}
+    bp: {format: "{:+.0f} bp", scale: 10000.0}
+    points: {format: "{:+.1f} points", scale: 1.0}
+  e0_benchmark: "S&P 500"   # E0 stock moves: "+3.4% (S&P 500 +0.6%)"
+
+percentile:                 # PREREG §6.11: level vs its own 252-session history (percent below)
+  edges: [10, 30, 70, 90]
+  words: [very low, low, normal, high, very high]
+
+beta:                       # PREREG §6.11 β_m words
+  edges: [0.7, 1.2, 1.6]
+  words: [defensive, market-like, aggressive, very aggressive]
+
+attention:                  # PREREG §6.11 attention multiple (also used for volume vs normal)
+  edges: [0.5, 1.5, 3.0, 6.0]
+  words: [unusually quiet, normal, busy, very heavy, extreme]
+
+tier:                       # PREREG §6.11 tier words (keys = panel tier codes)
+  top100: one of the 100 largest US companies
+  mid: a large US company (size rank 101–250)
+  rest: an S&P 500 company (size rank 251–500)
+
+timing:                     # PREREG §6.11 timing words for news items (t_avail, America/New_York)
+  after_close: after yesterday's close        # close(prev(s)) .. end of prev(s)'s calendar day
+  overnight: overnight                        # .. early_from on s (weekends and holidays included)
+  early_morning: early this morning (before 08:00)   # early_from .. before_open_from
+  before_open: shortly before the open        # before_open_from .. open(s)
+  during_session: during today's trading session     # NA-04: open(s) .. close(s) (W2 news, A3.1)
+  early_from: "04:00"
+  before_open_from: "08:00"
+
+time_label:                 # PREREG §6.10 reaction_so_far time label
+  D1: half an hour after the open             # NA-04: PREREG's "by 10:00" without digits (AC4)
+  D2: by the close
+
+revision:                   # NA-04: FY1 EPS consensus 30-day revision, (m_now - m_30d) / max(|m_30d|, floor)
+  floor: 0.10               # USD per share
+  edges: [-0.05, -0.01, 0.01, 0.05]
+  words: [cut sharply, cut, little changed, raised, raised sharply]
+
+count:                      # NA-04: counts as words (distinct stories)
+  words: [none, one, two, three, four, five, six, seven, eight, nine, ten]
+  more: more than ten
+
+earnings:                   # PRD NA-04 S2
+  in_window: a scheduled earnings report falls in this window
+  not_in_window: no scheduled earnings report falls in this window
+
+source_type:                # NA-04: news item source type from the domain class (configs/sources.yaml)
+  press_wire_primary: press release or filing
+  major_outlet: major news outlet
+  aggregator: news aggregator
+  retail_analysis: investor commentary
+  auto_generated: automated article
+  other: other source
+
+missing: not available       # a value that cannot be computed through t-1

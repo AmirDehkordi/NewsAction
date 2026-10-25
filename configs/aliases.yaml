@@ -1,0 +1,306 @@
+# Company aliases for masking (PREREG §6.3; PRD NA-04 S3; newsaction.states.mask).
+#
+# A company's alias set is built from:
+#   1. its ATOM names (work/panel/companies.parquet, every share class), with share-class designations and
+#      legal suffixes removed, "(The)" / "(Eli)" moved to the front ("Home Depot (The)" -> "The Home Depot",
+#      "Home Depot"), every leading word prefix of two or more words ("American Airlines Group" ->
+#      "American Airlines"), and the first word alone when it has 4+ letters and is not a common word below;
+#   2. the curated `names` below: common names, short forms and former names, hand-written for every company
+#      that ranked in the top 150 by market cap in any month from 2024-01 (NA-01 tiers), plus renamed companies;
+#   3. its tickers: every class's ATOM ticker, ATOM ref.symbol_ticker rows, the NA-02 vendor ticker aliases
+#      (configs/news.yaml) and the curated `tickers` below, in the forms TICKER, $TICKER, EXCH:TICKER,
+#      "(TICKER)", "(EXCH: TICKER)", TICKER.O/.N; class separators "." "-" "/" are interchangeable.
+# Names match case-sensitively as written and in ALL CAPS; tickers match in upper case only. A bare ticker
+# (without $, an exchange or parentheses) is matched only if it has 2+ characters and is not in
+# `bare_ticker_stoplist` (tickers that are also common upper-case words or abbreviations).
+# Products and subsidiaries that are not names of the company itself (iPhone, Instagram, Keytruda) are not
+# masked: NA-06 measures what remains identifiable (PRD NA-04 risks).
+
+legal_suffixes: [Inc, Incorporated, Corp, Corporation, Co, Company, Companies, Ltd, Limited, plc, PLC, Plc,
+                 N.V., NV, S.A., SA, SE, AG, LP, L.P., LLC, L.L.C., Holdings Co, Group Inc]
+
+# Words that are never derived as one-word aliases from a longer name and that the leak scanner never counts
+# on their own (generic English words, places, given names and common surnames). Full names still match.
+common_words: [Soup, Real, Estate, Pool, Parcel, Caribbean, Equities, Alliance, Company, Companies,
+               Corporation, Incorporated, Limited, Price, Smith, Enterprise, Enterprises, Discovery,
+               Diagnostics, Chemical, Chemicals, Payments, Analytics, Automation, Airlines, Airline, Solar,
+               Restaurants, Restaurant, Flavors, Fragrances, Hunt, Sands, Transport, Transportation,
+               Logistics, Worldwide, Electronics, Gaming, Builders, Beverages, Bancshares, Infrastructure,
+               Industrial, Pharmaceutical, Biotech, Reinsurance, Rail, Railway, Railroad, Pipeline, Midstream,
+               Oil, Gas, Exploration, Production, Cloud, Mobile, Wireless, Telecom, Cable, Broadcasting,
+               Studios, Pictures, Records, Music, Publishing, Education, Dental, Vision, Senior, Living,
+               Apartment, Office, Towers, Lodging, Tobacco, Spirits, Brewing, Farms, Grocery, Retail, Outlet,
+               Tire, Rubber, Metals, Mining, Gold, Silver, Copper, Aluminum, Forest, Timber, Freight,
+               Hospitality, Leisure, Clean, Renewable, Environmental, Security, Securities, Investment,
+               Investments, Asset, Assets, Wealth, Mutual, Credit, Card, Lending, Mortgage, Savings, Commerce,
+               Trading, Supply, Distribution, Equipment, Machinery, Tools, Engineering, Construction,
+               Building, Development, Science, Precision, Defense, Aviation, Marine, Ocean, Utilities,
+               Utility, Renewables, Light, Nuclear, Packaging, Container, Containers, Specialty, Brand, Foods,
+               Kitchen, Grill, Pizza, Coffee, Beauty, Fashion, Apparel, Footwear, Sports, Outdoor, Travel,
+               Hotels, Vacations, Parks, Resorts, Casino, Casinos, Entertainment, Interactive, Games, Online,
+               Internet, Platforms, Networks, Semiconductor, Micro, Devices, Optical, Photonics, Robotics,
+               Imaging, Testing, Measurement, Sensors, Signal, Health, Hospital, Hospitals, Clinical,
+               Medicine, Therapeutic, Genetics, Genomics, Animal, Scientific, Agricultural, Fertilizer, Steel,
+               Iron, Materials, Glass, Paints, Coatings, Lumber, Homes, Residential, Commercial, Wholesale,
+               Discount, General, Stores, Dollar, Auto, Automotive, Parts, Motors, Truck, Trucks, Motorcycle,
+               Rental, Rentals, Waste, Recycling, Services, Solutions, Systems, Software, Data, Information,
+               Intelligence, Consulting, Staffing, Human, Capital, Insurance, Assurance, Life, Annuity,
+               Benefits, Financial, Bank, Banking, Bancorp, Trust, Fund, Funds, Partners, Group, Holdings,
+               American, America, Americas, United, National, International, Global, First, North, South,
+               East, West, Southern, Western, Eastern, Northern, Pacific, Atlantic, New, York, Union, Public,
+               Republic, Digital, Analog, Applied, Advanced, Texas, Boston, Chicago, Florida, California,
+               Carolina, Royal, Universal, Energy, Healthcare, Service, Technologies, Technology, Industries,
+               Resources, Natural, Realty, Income, Properties, Brands, Mills, Motor, Electric, Power, Water,
+               Medical, Sciences, Laboratories, Labs, Pharmaceuticals, Therapeutics, Semiconductors,
+               Communications, Media, Markets, Exchange, Equity, Storage, Tower, Management, Care,
+               Consolidated, Federal, Standard, Live, News, Fox, Match, Discover, Target, Progressive,
+               Booking, Carrier, Charter, Pioneer, Monster, Intuitive, Vertex, Cadence, Ball, Best, Tree,
+               Dominion, Constellation, Edison, Electronic, Arts, Old, Paper, Regions, State, Street,
+               Principal, Prudential, Hartford, Lincoln, Essex, Camden, Regency, Key, Fifth, Third, Citizens,
+               Express, Chase, Instruments, Controls, Dynamics, Products, Air, Mexican, Design, Surgical,
+               Machines, Business, Research, Aerospace, Beverage, Petroleum, Works, Tool, Home, Depot, Gamble,
+               Block, Square, Everest, Chesapeake, Meta, Visa, Delta, Southwest, Alaska, Quest, Globe,
+               Travelers, Church, Mountain, Extra, Space, Host, Line, Cruise, Cruises, Norwegian, Nation,
+               Warner, Bros, Invitation, Mellon, Marsh, Wells, Morgan, Stanley, Johnson, Williams, Phillips,
+               Martin, Parker, Fisher, Brown, Campbell, Ross, Clark, Kimberly, Simon, Charles, Arthur, Philip,
+               Morris, John, Jacobs, Ford, Duke, Apollo, Marathon, Gap, Lauren, Ralph, Las, Vegas, Penn, Eli,
+               Walt, Dickinson, Emerson, Gallagher, Eaton, Hess, Lowe, Coca, Cola, Fargo]
+
+bare_ticker_stoplist: [ON, IT, SO, DE, ES, EL, EG, ED, IP, IR, PM, RF, PH, MA, MS, CF, HD, PG, BR, TT, SW, CI, CE,
+                       GL, FE, NI, LH, LW, ALL, NOW, KEY, KEYS, LOW, COST, CAT, ARE, DASH, COIN, HOOD, APP, POOL,
+                       WELL, BALL, PEAK, DAY, FAST, HAS, TECH, DOW, USB, MAR, TAP, PSA, RE, AI, WAT, CPU, IQV, TPR,
+                       EXE, ROL, LII, DOC, BRO, HUM, MET, HAL, SNA, TRV, GEN, PNR, OTIS, ROST, PAYC, NTAP, LIN,
+                       AMP, MAS, PKG, JBL, STE, TER, CHD, BLDR, TEL, FOX, NWS, GD, VST, BG, EQT, AES, ALB, AME,
+                       CAG, CTRA, DRI, ETR, EVRG, FDS, HSY, IEX, INCY, IVZ, KIM, LKQ, MKC, MTB, NDAQ, NRG, ODFL,
+                       PODD, PPL, RVTY, SJM, TECH, UDR, VTR, WRB, ZBRA]
+
+companies:
+  # --- top 150 by market cap (any month 2024-01 .. 2026-07), in rank order
+  AAPL: {names: [Apple, Apple Computer]}
+  MSFT: {names: [Microsoft]}
+  NVDA: {names: [Nvidia, NVIDIA, nVidia]}
+  GOOGL: {names: [Alphabet, Google]}
+  AMZN: {names: [Amazon, Amazon.com]}
+  META: {names: [Meta, Meta Platforms, Facebook], tickers: [FB]}
+  AVGO: {names: [Broadcom]}
+  TSLA: {names: [Tesla, Tesla Motors]}
+  BRK-B: {names: [Berkshire Hathaway, Berkshire], tickers: [BRK-A, BRK]}
+  LLY: {names: [Eli Lilly, Lilly, Eli Lilly and Company]}
+  MU: {names: [Micron, Micron Technology]}
+  V: {names: [Visa]}
+  WMT: {names: [Walmart, Wal-Mart]}
+  JPM: {names: [JPMorgan Chase, JPMorganChase, JPMorgan, JP Morgan, J.P. Morgan, J.P.Morgan, Chase]}
+  UNH: {names: [UnitedHealth, UnitedHealth Group, UnitedHealthcare]}
+  AMD: {names: [AMD, Advanced Micro Devices, Advanced Micro]}
+  ORCL: {names: [Oracle]}
+  XOM: {names: [ExxonMobil, Exxon Mobil, Exxon]}
+  MA: {names: [Mastercard, MasterCard]}
+  JNJ: {names: [Johnson & Johnson, Johnson and Johnson, J&J]}
+  INTC: {names: [Intel]}
+  NFLX: {names: [Netflix]}
+  COST: {names: [Costco, Costco Wholesale]}
+  PG: {names: [Procter & Gamble, Procter and Gamble, The Procter & Gamble Company, P&G]}
+  PLTR: {names: [Palantir, Palantir Technologies]}
+  HD: {names: [Home Depot, The Home Depot]}
+  BAC: {names: [Bank of America, BofA, BofA Securities, Bank of America Merrill Lynch]}
+  AMAT: {names: [Applied Materials]}
+  ABBV: {names: [AbbVie]}
+  CSCO: {names: [Cisco, Cisco Systems]}
+  LRCX: {names: [Lam Research]}
+  MRK: {names: [Merck, Merck & Co]}
+  CVX: {names: [Chevron]}
+  CAT: {names: [Caterpillar]}
+  KO: {names: [Coca-Cola, Coca Cola, CocaCola, The Coca-Cola Company, Coke]}
+  CRM: {names: [Salesforce, Salesforce.com]}
+  TMUS: {names: [T-Mobile, T-Mobile US]}
+  GE: {names: [GE Aerospace, General Electric, GE]}
+  PM: {names: [Philip Morris International, Philip Morris, PMI]}
+  KLAC: {names: [KLA, KLA Corp, KLA-Tencor]}
+  PEP: {names: [PepsiCo, Pepsi]}
+  WFC: {names: [Wells Fargo]}
+  IBM: {names: [IBM, International Business Machines]}
+  TMO: {names: [Thermo Fisher, Thermo Fisher Scientific, Thermo, Fisher Scientific]}
+  QCOM: {names: [Qualcomm, QUALCOMM]}
+  ACN: {names: [Accenture]}
+  BX: {names: [Blackstone]}
+  ABT: {names: [Abbott, Abbott Laboratories]}
+  MCD: {names: [McDonald's, McDonald’s, McDonalds, McDonald]}
+  LIN: {names: [Linde]}
+  NOW: {names: [ServiceNow]}
+  GS: {names: [Goldman Sachs, Goldman]}
+  MS: {names: [Morgan Stanley]}
+  AXP: {names: [American Express, Amex]}
+  DIS: {names: [Disney, Walt Disney, The Walt Disney Company, Walt Disney Co]}
+  RTX: {names: [RTX, Raytheon, Raytheon Technologies, United Technologies], tickers: [RTN, UTX]}
+  GEV: {names: [GE Vernova, Vernova]}
+  APP: {names: [AppLovin]}
+  DHR: {names: [Danaher]}
+  INTU: {names: [Intuit]}
+  CMCSA: {names: [Comcast]}
+  T: {names: [AT&T, AT & T]}
+  TXN: {names: [Texas Instruments]}
+  VZ: {names: [Verizon, Verizon Communications]}
+  PANW: {names: [Palo Alto Networks]}
+  ISRG: {names: [Intuitive Surgical]}
+  NKE: {names: [Nike, NIKE]}
+  MRVL: {names: [Marvell, Marvell Technology]}
+  PFE: {names: [Pfizer]}
+  AMGN: {names: [Amgen]}
+  C: {names: [Citigroup, Citi]}
+  UBER: {names: [Uber, Uber Technologies]}
+  ANET: {names: [Arista, Arista Networks]}
+  NEE: {names: [NextEra, NextEra Energy, Nextera]}
+  BKNG: {names: [Booking Holdings, Booking.com, Priceline]}
+  BA: {names: [Boeing, The Boeing Company]}
+  GLW: {names: [Corning]}
+  COP: {names: [ConocoPhillips]}
+  WDC: {names: [Western Digital]}
+  ADI: {names: [Analog Devices]}
+  PGR: {names: [Progressive, The Progressive Corporation]}
+  APH: {names: [Amphenol]}
+  UNP: {names: [Union Pacific]}
+  SCHW: {names: [Charles Schwab, Schwab, The Charles Schwab Corporation]}
+  STX: {names: [Seagate, Seagate Technology]}
+  TJX: {names: [TJX, TJX Companies, The TJX Companies]}
+  SPGI: {names: [S&P Global]}
+  CRWD: {names: [CrowdStrike]}
+  BLK: {names: [BlackRock]}
+  GILD: {names: [Gilead, Gilead Sciences]}
+  HON: {names: [Honeywell, Honeywell International]}
+  LOW: {names: [Lowe's, Lowe’s, Lowes, Lowe's Companies]}
+  BSX: {names: [Boston Scientific]}
+  ETN: {names: [Eaton]}
+  UPS: {names: [UPS, United Parcel Service]}
+  SYK: {names: [Stryker]}
+  DE: {names: [Deere, John Deere, Deere & Company, Deere & Co]}
+  LMT: {names: [Lockheed Martin, Lockheed]}
+  KKR: {names: [KKR, KKR & Co]}
+  PLD: {names: [Prologis, ProLogis]}
+  VRTX: {names: [Vertex Pharmaceuticals, Vertex]}
+  ELV: {names: [Elevance, Elevance Health, Anthem]}
+  WELL: {names: [Welltower]}
+  MDT: {names: [Medtronic]}
+  REGN: {names: [Regeneron, Regeneron Pharmaceuticals]}
+  FISV: {names: [Fiserv], tickers: [FI]}
+  ADP: {names: [ADP, Automatic Data Processing]}
+  COF: {names: [Capital One, Capital One Financial]}
+  SBUX: {names: [Starbucks]}
+  IBKR: {names: [Interactive Brokers]}
+  NEM: {names: [Newmont]}
+  BMY: {names: [Bristol Myers Squibb, Bristol-Myers Squibb, Bristol Myers, Bristol-Myers, BMS, Squibb]}
+  CB: {names: [Chubb]}
+  MRSH: {names: [Marsh McLennan, Marsh & McLennan, Marsh & McLennan Companies, McLennan], tickers: [MMC]}
+  CI: {names: [Cigna, The Cigna Group, Cigna Group]}
+  HOOD: {names: [Robinhood, Robinhood Markets]}
+  CVS: {names: [CVS, CVS Health]}
+  VRT: {names: [Vertiv]}
+  MDLZ: {names: [Mondelez, Mondelēz, Mondelez International]}
+  AMT: {names: [American Tower]}
+  PH: {names: [Parker Hannifin, Parker-Hannifin]}
+  ABNB: {names: [Airbnb]}
+  CEG: {names: [Constellation Energy]}
+  MO: {names: [Altria]}
+  HCA: {names: [HCA, HCA Healthcare]}
+  CME: {names: [CME Group, CME]}
+  SO: {names: [Southern Company, Southern Co, The Southern Company]}
+  APO: {names: [Apollo Global Management, Apollo Global, Apollo]}
+  MCK: {names: [McKesson]}
+  ICE: {names: [Intercontinental Exchange, ICE]}
+  SHW: {names: [Sherwin-Williams, Sherwin Williams]}
+  DASH: {names: [DoorDash, Doordash]}
+  TT: {names: [Trane Technologies, Trane]}
+  ZTS: {names: [Zoetis]}
+  DELL: {names: [Dell, Dell Technologies]}
+  SNPS: {names: [Synopsys]}
+  EQIX: {names: [Equinix]}
+  CMG: {names: [Chipotle, Chipotle Mexican Grill]}
+  FTNT: {names: [Fortinet]}
+  DUK: {names: [Duke Energy]}
+  WM: {names: [Waste Management, WM]}
+  CDNS: {names: [Cadence Design Systems, Cadence Design, Cadence]}
+  PYPL: {names: [PayPal, PayPal Holdings]}
+  PWR: {names: [Quanta Services, Quanta]}
+  HWM: {names: [Howmet, Howmet Aerospace]}
+  MCO: {names: [Moody's, Moody’s, Moodys, Moody's Corporation]}
+  RCL: {names: [Royal Caribbean, Royal Caribbean Cruises, Royal Caribbean Group]}
+  ITW: {names: [Illinois Tool Works]}
+  GD: {names: [General Dynamics]}
+  NOC: {names: [Northrop Grumman, Northrop, Grumman]}
+  CTAS: {names: [Cintas]}
+  TGT: {names: [Target]}
+  COIN: {names: [Coinbase, Coinbase Global]}
+  PNC: {names: [PNC, PNC Financial Services, PNC Bank]}
+  CL: {names: [Colgate-Palmolive, Colgate Palmolive, Colgate]}
+  CMI: {names: [Cummins]}
+  EOG: {names: [EOG Resources, EOG]}
+  SLB: {names: [SLB, Schlumberger]}
+  AON: {names: [Aon]}
+  TDG: {names: [TransDigm, Transdigm]}
+  MAR: {names: [Marriott, Marriott International]}
+  CSX: {names: [CSX]}
+  FCX: {names: [Freeport-McMoRan, Freeport McMoRan, Freeport]}
+  AJG: {names: [Arthur J. Gallagher, Arthur J Gallagher, Gallagher]}
+  FDX: {names: [FedEx]}
+  MNST: {names: [Monster Beverage]}
+  MMM: {names: [3M]}
+  USB: {names: [U.S. Bancorp, US Bancorp, U.S. Bank]}
+  ORLY: {names: [O'Reilly Automotive, O’Reilly Automotive, O'Reilly, O’Reilly]}
+  DDOG: {names: [Datadog]}
+  WMB: {names: [Williams Companies, The Williams Companies]}
+  MPC: {names: [Marathon Petroleum]}
+  BDX: {names: [Becton Dickinson, Becton, Dickinson and Company, BD]}
+  MSI: {names: [Motorola Solutions]}
+  CRH: {names: [CRH]}
+  JCI: {names: [Johnson Controls]}
+  RSG: {names: [Republic Services]}
+  CVNA: {names: [Carvana]}
+  NXPI: {names: [NXP, NXP Semiconductors]}
+  BNY: {names: [BNY, BNY Mellon, Bank of New York Mellon, Bank of New York], tickers: [BK]}
+  LULU: {names: [Lululemon, lululemon, Lululemon Athletica]}
+  EMR: {names: [Emerson Electric, Emerson]}
+  ECL: {names: [Ecolab]}
+  PSX: {names: [Phillips 66]}
+  APD: {names: [Air Products, Air Products and Chemicals]}
+  CARR: {names: [Carrier Global]}
+  PXD: {names: [Pioneer Natural Resources]}
+  CIEN: {names: [Ciena]}
+  TEL: {names: [TE Connectivity]}
+  GM: {names: [General Motors, GM]}
+  PCAR: {names: [Paccar, PACCAR]}
+  ROP: {names: [Roper Technologies, Roper]}
+  CHTR: {names: [Charter Communications]}
+  VLO: {names: [Valero, Valero Energy]}
+  WDAY: {names: [Workday]}
+  # --- renamed companies and other well-known short names outside the top 150
+  XYZ: {names: [Block, Square], tickers: [SQ]}
+  CPAY: {names: [Corpay, FleetCor, FleetCor Technologies], tickers: [FLT]}
+  DAY: {names: [Dayforce, Ceridian], tickers: [CDAY]}
+  PSKY: {names: [Paramount, Paramount Global, Paramount Skydance], tickers: [PARA, PARAA]}
+  EG: {names: [Everest Group, Everest Re, Everest], tickers: [RE]}
+  EXE: {names: [Expand Energy, Chesapeake Energy, Chesapeake], tickers: [CHK]}
+  DOC: {names: [Healthpeak, Healthpeak Properties], tickers: [PEAK]}
+  F: {names: [Ford, Ford Motor]}
+  EA: {names: [Electronic Arts]}
+  ED: {names: [Con Edison, Consolidated Edison, ConEd]}
+  BF-B: {names: [Brown-Forman, Brown–Forman], tickers: [BF-A]}
+  LEN: {names: [Lennar], tickers: [LEN-B]}
+  EL: {names: [Estée Lauder, Estee Lauder]}
+  LH: {names: [Labcorp, LabCorp]}
+  K: {names: [Kellanova, Kellogg]}
+  O: {names: [Realty Income]}
+  IT: {names: [Gartner]}
+  J: {names: [Jacobs, Jacobs Solutions]}
+  L: {names: [Loews]}
+  D: {names: [Dominion Energy, Dominion]}
+  A: {names: [Agilent, Agilent Technologies]}
+  WBD: {names: [Warner Bros. Discovery, Warner Bros Discovery]}
+  KHC: {names: [Kraft Heinz]}
+  HPE: {names: [Hewlett Packard Enterprise, HPE]}
+  HPQ: {names: [HP Inc, HP]}
+  GOOG: {names: [Alphabet, Google]}
+  FOXA: {names: [Fox Corporation, Fox Corp]}
+  NWSA: {names: [News Corp, News Corporation]}
+  ON: {names: [ON Semiconductor, onsemi]}
+  SW: {names: [Smurfit WestRock, Smurfit Westrock, WestRock]}
+  Q: {names: [Qnity, Qnity Electronics]}
+  SOLS: {names: [Solstice Advanced Materials]}

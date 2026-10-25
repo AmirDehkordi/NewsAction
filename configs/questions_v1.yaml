@@ -1,0 +1,199 @@
+# Question battery v1 (PREREG §7, Amendment A2.1–A2.3; PRD NA-04 S4). Exact text sent to every decision model.
+# Frozen: configs/frozen.yaml questions_v1_sha256 is the sha256 of this file's bytes; the NA-11 freeze hashes it
+# again. tests/test_states_questions_prereg.py compares every id, type, key and every string that PREREG gives
+# verbatim with docs/PREREG.md.
+#
+# Request shape (OpenRouter Decisions / Laya typed-decisions): questions = {id: {type, instructions, criteria}}.
+#   choice: criteria maps option key -> one-line description;
+#   score:  criteria is an ordered list, lowest level first.
+# No `noul` question anywhere: Laya's noul can follow its own false/true labels (model card, issue #156), so
+# every yes/no item is a two-option choice with neutral keys (PREREG §7).
+#
+# Where PREREG gives a full question sentence it is used verbatim as `instructions`. Where PREREG gives only
+# options (Q2, Q5, Q6, Q9–Q13, Q15) or only end points (Q3, Q4, Q14 levels), NA-04 wrote the remaining text; it
+# references state fields in backticks and states no empirical finding (artifacts/NA-04/REPORT.md §questions).
+
+version: 1
+
+groups:                     # PREREG A2.1: core everywhere; extended / explain only for the primary API instrument
+  core:
+    A: [justified_move, materiality, surprise, tone]
+    B: [justified_move, reaction_adequacy, continuation]
+  extended:                 # A2.2, Call A (news only)
+    A: [impact_horizon, event_type, quantified, scheduled, novelty, credibility, scope, uncertainty, mixed_signals]
+    B: []
+  explain:                  # A2.3, Call B (news + reaction)
+    A: []
+    B: [explains_move, move_reason]
+
+questions:
+  # ---------------------------------------------------------------- core (PREREG §7)
+  justified_move:           # Q1, Calls A and B
+    qid: Q1
+    type: score
+    instructions: "Once investors fully absorb the news in `news`, how will the company's stock perform relative to the overall market and its sector over the next five trading days?"
+    criteria:
+      - "very large fall (> 3 typical daily moves)"
+      - "large fall (2–3)"
+      - "moderate fall (1–2)"
+      - "small fall (0.5–1)"
+      - "no meaningful move (< 0.5)"
+      - "small rise (0.5–1)"
+      - "moderate rise (1–2)"
+      - "large rise (2–3)"
+      - "very large rise (> 3 typical daily moves)"
+  materiality:              # Q2, Call A
+    qid: Q2
+    type: choice
+    instructions: "Does the news in `news` contain new, price-relevant information about the company?"
+    criteria:
+      new_information: "the news contains new, price-relevant information about the company"
+      no_new_information: "the news is commentary, repetition or promotion without new price-relevant information"
+  surprise:                 # Q3, Call A
+    qid: Q3
+    type: score
+    instructions: "How surprising is this news relative to what investors likely expected?"
+    criteria:
+      - "fully expected"
+      - "mostly expected"
+      - "somewhat surprising"
+      - "surprising"
+      - "very surprising"
+  tone:                     # Q4, Call A
+    qid: Q4
+    type: score
+    instructions: "How promotional or sensational is the tone of this coverage?"
+    criteria:
+      - "neutral and factual"
+      - "mostly factual"
+      - "somewhat promotional or sensational"
+      - "promotional or sensational"
+      - "highly promotional or sensational"
+  reaction_adequacy:        # Q5, Call B
+    qid: Q5
+    type: choice
+    instructions: "Compared with what the news in `news` justifies, how adequate is the stock's move in `reaction_so_far`?"
+    criteria:
+      wrong_direction: "the stock moved in the opposite direction to what the news justifies"
+      much_too_small: "the move is much smaller than what the news justifies"
+      too_small: "the move is smaller than what the news justifies"
+      about_right: "the move is about what the news justifies"
+      too_large: "the move is larger than what the news justifies"
+      much_too_large: "the move is much larger than what the news justifies"
+  continuation:             # Q6, Call B
+    qid: Q6
+    type: choice
+    instructions: "What will the stock's move in `reaction_so_far` do over the next five trading days, relative to the market and its sector?"
+    criteria:
+      reverse: "the move reverses, partly or fully"
+      stall: "the stock stays near its current level"
+      continue: "the move continues in the same direction"
+
+  # ---------------------------------------------------------------- extended (PREREG A2.2, Call A)
+  impact_horizon:           # Q7
+    qid: Q7
+    type: choice
+    instructions: "When will most of this news' effect on the stock price happen?"
+    criteria:
+      today: "within the current trading session"
+      within_days: "within the next 2–5 sessions"
+      within_weeks: "within the next few weeks"
+      months_or_longer: "over the coming months or longer"
+      no_material_effect: "the news has no material effect on the stock price"
+  event_type:               # Q8
+    qid: Q8
+    type: choice
+    instructions: "Which best describes the main news?"
+    criteria:
+      earnings_results: "reported quarterly or annual financial results"
+      guidance_outlook: "the company's guidance or outlook for future results"
+      analyst_action: "an analyst rating, price target or estimate change"
+      deal_ma_partnership: "a merger, acquisition, divestiture, partnership or major contract"
+      legal_regulatory: "a lawsuit, investigation, regulatory decision or approval"
+      product_operations: "a product, service, operations or supply development"
+      management_governance: "a management change, board or governance matter"
+      capital_returns_financing: "dividends, share buybacks, debt or equity financing"
+      sector_or_macro: "news about the company's industry or the economy rather than the company itself"
+      other: "none of the above"
+  quantified:               # Q9
+    qid: Q9
+    type: choice
+    instructions: "How is the main news in `news` presented?"
+    criteria:
+      numbers: "states concrete figures about results, guidance or deal terms"
+      narrative: "describes developments without concrete figures"
+  scheduled:                # Q10
+    qid: Q10
+    type: choice
+    instructions: "Was the main news in `news` about an event announced in advance?"
+    criteria:
+      scheduled: "a pre-announced event, e.g. an earnings release or investor day"
+      unscheduled: "an unannounced development"
+  novelty:                  # Q11
+    qid: Q11
+    type: choice
+    instructions: "How new to investors is the main information in `news`?"
+    criteria:
+      new: "first report of new information"
+      partly_known: "adds detail to something already reported"
+      known: "repeats information investors already had"
+  credibility:              # Q12
+    qid: Q12
+    type: choice
+    instructions: "How well established is the main information in `news`?"
+    criteria:
+      confirmed: "official company or regulator statement, or filed data"
+      credible_report: "credible media or analyst report"
+      rumor: "unconfirmed rumor or speculation"
+  scope:                    # Q13
+    qid: Q13
+    type: choice
+    instructions: "Whom does the main news in `news` mainly concern?"
+    criteria:
+      company_specific: "mainly this company"
+      industry_wide: "the company's industry or sector as a whole"
+      market_wide: "the economy or the stock market as a whole"
+  uncertainty:              # Q14
+    qid: Q14
+    type: score
+    instructions: "How much does this news change the uncertainty about the company's future value?"
+    criteria:
+      - "no change"
+      - "small increase"
+      - "moderate increase"
+      - "large increase"
+      - "very large increase"
+  mixed_signals:            # Q15
+    qid: Q15
+    type: choice
+    instructions: "Do the signals in `news` point in one direction?"
+    criteria:
+      one_directional: "the news points clearly one way"
+      mixed: "it contains both positive and negative elements"
+
+  # ---------------------------------------------------------------- explain (PREREG A2.3, Call B)
+  explains_move:            # Q16
+    qid: Q16
+    type: choice
+    instructions: "Does the news in `news` explain the stock's move in `reaction_so_far`?"
+    criteria:
+      fully_explains: "the news fully explains the move"
+      partly_explains: "the news explains part of the move"
+      unrelated: "the move is not explained by this news"
+      contradicts: "the move goes against what the news implies"
+  move_reason:              # Q17: Q8's nine company categories (all but `other`) + two reasons
+    qid: Q17
+    type: choice
+    instructions: "What is the most likely main reason for the stock's move so far?"
+    criteria:
+      earnings_results: "reported quarterly or annual financial results"
+      guidance_outlook: "the company's guidance or outlook for future results"
+      analyst_action: "an analyst rating, price target or estimate change"
+      deal_ma_partnership: "a merger, acquisition, divestiture, partnership or major contract"
+      legal_regulatory: "a lawsuit, investigation, regulatory decision or approval"
+      product_operations: "a product, service, operations or supply development"
+      management_governance: "a management change, board or governance matter"
+      capital_returns_financing: "dividends, share buybacks, debt or equity financing"
+      sector_or_macro: "news about the company's industry or the economy rather than the company itself"
+      market_or_sector_move: "the stock moved with the overall market or its sector"
+      no_identifiable_news: "no news in `news` accounts for the move"

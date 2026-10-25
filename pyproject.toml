@@ -26,7 +26,7 @@ dependencies = [
 
 [project.optional-dependencies]
 # Declared now, installed only by the chunks that need them (`uv sync --extra embed`, ...).
-embed = ["torch", "sentence-transformers", "transformers", "spacy"]
+embed = ["torch", "sentence-transformers", "transformers", "spacy", "en-core-web-sm"]
 laya = ["laya"]
 kaggle = ["kaggle"]
 
@@ -50,6 +50,10 @@ packages = ["src/newsaction"]
 
 [tool.uv]
 default-groups = ["dev"]
+
+[tool.uv.sources]
+# spaCy English pipeline for NA-04 person-name masking (PREREG §6.3); release wheel pinned by URL + lock hash.
+en-core-web-sm = { url = "https://github.com/explosion/spacy-models/releases/download/en_core_web_sm-3.8.0/en_core_web_sm-3.8.0-py3-none-any.whl" }
 
 [tool.ruff]
 line-length = 110
