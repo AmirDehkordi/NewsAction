@@ -1,0 +1,198 @@
+{
+ "label_base_rates_label_ok": {
+  "train": {
+   "material": 0.26,
+   "delayed": 0.0731
+  },
+  "val_a": {
+   "material": 0.2059,
+   "delayed": 0.0703
+  }
+ },
+ "comparison_n_eval": 26738,
+ "rule_trace": {
+  "chosen": "F5",
+  "unconstrained": "F5",
+  "constraint_binding": false,
+  "f1_recall_delayed": 0.2860878661087866,
+  "excluded_by_constraint": [
+   "F2",
+   "F3"
+  ]
+ },
+ "frozen_filter": {
+  "id": "F5",
+  "threshold": 0.4495407760497237,
+  "tie_u_max": 1.0,
+  "tie_seed": 2026,
+  "budget_share": 0.3,
+  "selected_share_val_a": 0.29998504001795195,
+  "rule_version": "prereg-6.8-v1",
+  "constraint_binding": false,
+  "comparison_file": "artifacts/NA-03/filter_comparison.csv",
+  "comparison_sha": "6ca1b1923783eb9ef0443ffd1da625d07feb5ece93c07a400ae6837062dd1326"
+ },
+ "sensitivity_rule_trace": {
+  "chosen": "F5",
+  "unconstrained": "F5",
+  "constraint_binding": false,
+  "f1_recall_delayed": 0.29497907949790797,
+  "excluded_by_constraint": [
+   "F2",
+   "F3"
+  ]
+ },
+ "f5_meta": {
+  "fit_range": {
+   "end": "2025-03-31",
+   "material_ticker_days": 23707,
+   "max_horizon_end": "2025-03-31",
+   "max_session": "2025-03-24",
+   "min_session": "2024-07-01",
+   "start": "2024-07-01",
+   "ticker_days": 89253
+  },
+  "tune_range": {
+   "end": "2025-06-30",
+   "material_ticker_days": 6914,
+   "max_horizon_end": "2025-06-30",
+   "max_session": "2025-06-23",
+   "min_session": "2025-04-01",
+   "start": "2025-04-01",
+   "ticker_days": 28272
+  },
+  "params": {
+   "C": 0.1,
+   "max_iter": 2000,
+   "penalty": "l2",
+   "solver": "lbfgs"
+  },
+  "grid": [
+   {
+    "params": {
+     "C": 0.001
+    },
+    "tune_material_recall_at_budget": 0.3932600520682673
+   },
+   {
+    "params": {
+     "C": 0.01
+    },
+    "tune_material_recall_at_budget": 0.39441712467457335
+   },
+   {
+    "params": {
+     "C": 0.1
+    },
+    "tune_material_recall_at_budget": 0.3945617587503616
+   },
+   {
+    "params": {
+     "C": 1.0
+    },
+    "tune_material_recall_at_budget": 0.39427249059878505
+   }
+  ]
+ },
+ "f6_meta": {
+  "fit_range": {
+   "end": "2025-03-31",
+   "material_ticker_days": 23707,
+   "max_horizon_end": "2025-03-31",
+   "max_session": "2025-03-24",
+   "min_session": "2024-07-01",
+   "start": "2024-07-01",
+   "ticker_days": 89253
+  },
+  "tune_range": {
+   "end": "2025-06-30",
+   "material_ticker_days": 6914,
+   "max_horizon_end": "2025-06-30",
+   "max_session": "2025-06-23",
+   "min_session": "2025-04-01",
+   "start": "2025-04-01",
+   "ticker_days": 28272
+  },
+  "params": {
+   "colsample_bytree": 0.8,
+   "deterministic": true,
+   "force_row_wise": true,
+   "learning_rate": 0.05,
+   "min_child_samples": 400,
+   "n_estimators": 200,
+   "num_leaves": 15,
+   "num_threads": 8,
+   "objective": "binary",
+   "seed": 2026,
+   "subsample": 0.8,
+   "subsample_freq": 1,
+   "verbosity": -1
+  },
+  "grid": [
+   {
+    "params": {
+     "min_child_samples": 100,
+     "n_estimators": 200,
+     "num_leaves": 15
+    },
+    "tune_material_recall_at_budget": 0.41900491755857683
+   },
+   {
+    "params": {
+     "min_child_samples": 100,
+     "n_estimators": 600,
+     "num_leaves": 15
+    },
+    "tune_material_recall_at_budget": 0.41987272201330633
+   },
+   {
+    "params": {
+     "min_child_samples": 400,
+     "n_estimators": 200,
+     "num_leaves": 15
+    },
+    "tune_material_recall_at_budget": 0.4211744286954006
+   },
+   {
+    "params": {
+     "min_child_samples": 400,
+     "n_estimators": 600,
+     "num_leaves": 15
+    },
+    "tune_material_recall_at_budget": 0.41914955163436507
+   },
+   {
+    "params": {
+     "min_child_samples": 100,
+     "n_estimators": 200,
+     "num_leaves": 63
+    },
+    "tune_material_recall_at_budget": 0.4172693086491177
+   },
+   {
+    "params": {
+     "min_child_samples": 100,
+     "n_estimators": 600,
+     "num_leaves": 63
+    },
+    "tune_material_recall_at_budget": 0.41813711310384727
+   },
+   {
+    "params": {
+     "min_child_samples": 400,
+     "n_estimators": 200,
+     "num_leaves": 63
+    },
+    "tune_material_recall_at_budget": 0.42045125831645935
+   },
+   {
+    "params": {
+     "min_child_samples": 400,
+     "n_estimators": 600,
+     "num_leaves": 63
+    },
+    "tune_material_recall_at_budget": 0.41423199305756436
+   }
+  ]
+ }
+}
