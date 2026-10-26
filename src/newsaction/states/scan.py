@@ -158,7 +158,7 @@ _DATE: Final = re.compile(
     r"[\s-]+the year\b"
     r"|(?<=\bin )(?:january|february|april|june|july|august|september|october|november|december)\b"
     r"|(?<![A-Za-z])(?:january|february|april|june|july|august|september|october|november|december)(?=[a-z]{4,})"
-    r"|\b(?i:recently)\s+(?:[12]\d|3[01]|0?[1-9])(?=[.,;)]|\s*$)"
+    r"|\b(?i:recently)\s+(?:[12]\d|3[01]|0?[1-9])(?=[.,;)]|\s*$)|\b(?i:recently)\s+(?:[12]\d|3[01]|0?[1-9])(?:st|nd|rd|th)\b"
 )
 _PRICE_MOVE: Final = re.compile(
     r"(?i)\b(?:shares?|stock|premarket|pre-market|after-hours|extended trading)\b[^.!?]{0,50}?"
@@ -283,9 +283,9 @@ _FUND_AFTER: Final = re.compile(
     r"adjusted\s+|comparable\s+|same-store\s+)*(?:revenues?|sales|earnings|eps|income|profits?|margins?|orders|"
     r"bookings|volume|traffic|costs?|deliveries|guidance)\b"
 )
-# "earnings per share (EPS) surged 78%", "market share rose 2 points to 31%" and "Outstanding shares fell 2%"
-# are no price moves
-_PER_LEFT: Final = re.compile(r"(?i)\b(?:per|market|outstanding)[\s-]$")
+# "earnings per share (EPS) surged 78%", "$3.42/share, up 5%", "market share rose 2 points to 31%" and
+# "Outstanding shares fell 2%" are no price moves
+_PER_LEFT: Final = re.compile(r"(?i)(?:\b(?:per|market|outstanding)[\s-]|/\s?)$")
 _FUNDAMENTAL: Final = re.compile(
     r"(?i)\b(?:revenues?|sales|earnings|eps|income|profits?|margins?|outstanding|dividends?|guidance|orders|"
     r"volume|traffic|bookings|costs?)\b"

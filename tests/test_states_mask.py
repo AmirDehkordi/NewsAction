@@ -798,8 +798,8 @@ def test_val_a_price_talk_below_target() -> None:
 # the fifth verification (revision 5): date forms the masker and the scanner both missed, and (operator
 # decision 2026-10-26) every price move of any security and every index or commodity level
 REVISION5_DATES = (
-    ("24-Jun-2025. Apple. Investor Day.", "Jun"),
-    ("by Theneighborhoodplugman | Jul, 2025", "Jul"),
+    ("24-Jun-2025. Apple. Investor Day.", "24-"),
+    ("by Theneighborhoodplugman | Jul, 2025", ", the year"),
     ("Sep nat-gas prices extended the drop.", "Sep"),
     ("StockSavvyThursday, Jul 3, 2025 4:24 am ET. 1min read.", "Thursday"),
     ("OnJuly 27, local time, the President stated", "July"),
@@ -811,7 +811,7 @@ REVISION5_DATES = (
     ("Apple FY-25 profit 47% as Costs Surge", "FY-25"),
     ("weight-loss data expected in 4th qtr", "qtr"),
     ("EPS Towards Upper Half Of Range - Update. 6/8 15:18. (RTTNews)", "6/8"),
-    ("Coffee News Recap, 29 Aug: Keurig Dr Pepper seals deal", "Aug"),
+    ("Coffee News Recap, 29 Aug: Keurig Dr Pepper seals deal", "29 "),
     ("14:00/US: Jul Employment Trends Index. 14:00/US: Jan CPI", "Jan"),
     ("highest in more than two years in Aug, according to FAO", "Aug"),
     # the revision-5 build, read by hand
@@ -820,6 +820,12 @@ REVISION5_DATES = (
     ("tariffs-on-home-goods-effective-october-2025", "october"),
     ("julyinvestordeck", "july"),
     ("Boeing. Jul. 25. Boeing Reports Q2 Results.", "25"),
+    ("published on 14 july in the newsletter", "july"),
+    ("The board met on Sept. 24th to approve the plan.", "24th"),
+    ("The rate cut is expected in september, analysts said.", "september"),
+    ("Inflation data for Jan, released today, surprised.", "Jan"),
+    ("Boeing. Recently 25. Boeing Reports the quarter Results.", "25"),
+    ("The board met Recently 24th to approve the plan.", "24th"),
 )
 # remnants that only a masked text holds ("Jul. 25." → "Recently 25.")
 REVISION5_MASKED_DATES = ("Boeing. Recently 25. Boeing Reports the quarter Results.",)
@@ -1017,6 +1023,11 @@ REVISION5_FUNDAMENTALS = (
     "While the 2.5% COLA increase may offer some relief, many the company employees must act.",
     "The fund's managers returned 5% of capital to investors.",
     "S&P 500 member the company has about 5,000 shareholders of record.",
+    "Discounts of 20%-30% apply this weekend.",
+    "Food and Drug Administration (FDA) approvals rose 15% this year.",
+    "The agency (CMS) said approvals rose 15% this year.",
+    "Adjusted earnings came to $3.42/share, up 5% from a year ago.",
+    "The company, a REIT, reported 22% higher the year earnings ($3.42/share) and 94.1%...",
 )
 
 
@@ -1035,6 +1046,17 @@ def test_revision5_date_lookalikes_are_kept(text: str) -> None:
 def test_revision5_every_price_move_goes(text: str) -> None:
     assert Masker.has_market_move(text), text
     assert not re.search(r"\d+(?:\.\d+)?\s?%|\d{1,3},\d{3}|\$\d", m(text, AAPL)), m(text, AAPL)
+
+
+def test_revision5_final_pass_drops_market_moves() -> None:
+    """The final pass of mask_prices drops what the pre-NER pass would (text that changed after NER)."""
+    for text in (
+        "The S&P 500 Index is up +0.20% today as tech leads.",
+        "Gold Surges to $3,816 as the dollar slides.",
+        "The Dow fell 300 points on the day.",
+    ):
+        assert masker().mask_prices(text)[0] == "", text
+    assert masker().mask_prices("Revenue rose 5% year over year.")[0] == "Revenue rose 5% year over year."
 
 
 @pytest.mark.parametrize("text", REVISION5_FUNDAMENTALS)
