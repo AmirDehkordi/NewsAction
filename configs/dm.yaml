@@ -1,0 +1,82 @@
+# Decision-model client (PRD NA-05; CLAUDE.md C12–C14, D15). Read by newsaction.dm (DmConfig).
+# Hashed into the NA-11 freeze with every configs/*.yaml (PREREG §4.4). Selections (eligible models, :free
+# approvals, the val-B gate) live in configs/frozen.yaml, not here.
+
+version: 1
+
+api:
+  decisions_url: "https://openrouter.ai/api/alpha/decisions"   # POST, Bearer key (OpenRouter Decisions API, alpha)
+  models_url: "https://openrouter.ai/api/v1/models"             # GET catalog (no spend)
+  key_url: "https://openrouter.ai/api/v1/key"                   # GET the key's usage in USD (no spend)
+  catalog_params: {output_modalities: decisions}
+  key_env: OPENROUTER_API_KEY     # read from the environment or .env; never printed, logged or stored
+  timeout_s: 120.0
+  concurrency: 4                  # default asyncio semaphore; a run may override it
+  retry:                          # 429, 5xx and transport errors: exponential backoff with full jitter
+    max_attempts: 5
+    initial_s: 1.0
+    max_s: 30.0
+  record_headers:                 # response headers kept in the cache's attempts table (rate limits)
+    - x-ratelimit-limit
+    - x-ratelimit-remaining
+    - x-ratelimit-reset
+    - retry-after
+
+cache: cache/decisions.sqlite     # gitignored
+
+# Models that refuse a state object (HTTP 400 "state must be a string or an object with only ...") and take the
+# state as a string: the client sends them the state's canonical JSON text, the same bytes (and state_sha256)
+# that an object state is serialized to. Filled from the NA-05 smoke test.
+state_as_text:                    # NA-05 smoke test (artifacts/NA-05/pilot.json "smoke")
+  - scaledown/classify-1          # "ScaleDown state must be a string or an object with only text, document, …"
+
+# Refusal (d): an unmasked state is sent only under one of these probe tags.
+registered_probes:
+  unmasked_twin: "PREREG §8.3 masked vs unmasked IC on the same events (NA-06 stage 2)"
+  unmasked_robustness: "PREREG §11.6 robustness: unmasked states (NA-11)"
+
+# Dry-run projections (costmodel.py). usd = (prompt price × tokens + request price) × (1 − discount) × safety.
+# tokens = overhead + billed bytes / bytes_per_token, where the billed bytes are the canonical JSON of the
+# state once plus every question ("once"), or the state again with every question ("per_question").
+costmodel:
+  default:                        # used for a model without a pilot calibration; conservative on purpose
+    billing_basis: per_question
+    bytes_per_token: 3.0
+    overhead_tokens: 64
+    safety: 1.5
+  models:                        # pilot calibration (python -m newsaction.dm.pilot --stage report)
+    "cloudflare/clef": {billing_basis: "once", bytes_per_token: 4.434486, question_bytes_per_token: 2.313632, overhead_tokens: 143.34484, safety: 1.1, cost_ratio: 1.0, n_calls: 5}
+    "cloudflare/clef-flash": {billing_basis: "once", bytes_per_token: 4.434486, question_bytes_per_token: 2.313632, overhead_tokens: 143.34484, safety: 1.1, cost_ratio: 1.0, n_calls: 5}
+    "cloudflare/clef-omni": {billing_basis: "once", bytes_per_token: 4.424206, question_bytes_per_token: 2.327407, overhead_tokens: 140.515219, safety: 1.1, cost_ratio: 1.0, n_calls: 5}
+    "inception/mercury-decide": {billing_basis: "once", bytes_per_token: 4.391948, question_bytes_per_token: 2.705064, overhead_tokens: 177.057849, safety: 1.1, cost_ratio: 1.0, n_calls: 333}
+    "jaredpalmer/kev-4b": {billing_basis: "once", bytes_per_token: 4.195525, question_bytes_per_token: 6.146934, overhead_tokens: 81.714733, safety: 1.1, cost_ratio: 1.0, n_calls: 5}
+    "liquid/d1": {billing_basis: "once", bytes_per_token: 3.636202, question_bytes_per_token: 5.038434, overhead_tokens: 135.56005, safety: 1.1, cost_ratio: 1.0, n_calls: 335}
+    "liquid/d1-ultra": {billing_basis: "once", bytes_per_token: 3.382955, question_bytes_per_token: 4.876464, overhead_tokens: 90.462438, safety: 1.1, cost_ratio: 1.0, n_calls: 6}
+    "microsoft/microsoft-decision-1": {billing_basis: "once", bytes_per_token: 4.35864, question_bytes_per_token: 5.300529, overhead_tokens: 57.935544, safety: 1.1, cost_ratio: 1.0, n_calls: 6}
+    "nace-ai/drex-max": {billing_basis: "once", bytes_per_token: 4.157383, question_bytes_per_token: 2.590154, overhead_tokens: 82.874231, safety: 1.1, cost_ratio: 1.0, n_calls: 6}
+    "nace-ai/drex-v1.5": {billing_basis: "once", bytes_per_token: 4.195525, question_bytes_per_token: 6.146934, overhead_tokens: 81.714733, safety: 1.1, cost_ratio: 1.0, n_calls: 5}
+    "nace-ai/drex-v2.0": {billing_basis: "once", bytes_per_token: 4.195525, question_bytes_per_token: 6.146934, overhead_tokens: 81.714733, safety: 1.1, cost_ratio: 1.0, n_calls: 5}
+    "openai/gpt-6-luna-decisions": {billing_basis: "once", bytes_per_token: 4.769364, question_bytes_per_token: 2.203538, overhead_tokens: 85.176204, safety: 1.1, cost_ratio: 1.0, n_calls: 310}
+    "perplexity/pplx-decider-flash-v1.2": {billing_basis: "per_question", bytes_per_token: 4.15232, question_bytes_per_token: 1.703506, overhead_tokens: 0.0, safety: 1.1, cost_ratio: 1.0, n_calls: 4}
+    "perplexity/pplx-decider-v1.2": {billing_basis: "once", bytes_per_token: 4.243988, question_bytes_per_token: 4.593163, overhead_tokens: 155.815902, safety: 1.1, cost_ratio: 1.0, n_calls: 337}
+    "respan/span-02": {billing_basis: "per_question", bytes_per_token: 4.059566, question_bytes_per_token: 1.298794, overhead_tokens: 0.0, safety: 1.1, cost_ratio: 1.0, n_calls: 5}
+    "scaledown/classify-1": {billing_basis: "per_question", bytes_per_token: 4.469396, question_bytes_per_token: 0.862845, overhead_tokens: 0.0, safety: 1.1, cost_ratio: 1.0, n_calls: 5}
+    "togethercomputer/tev1-4b-experimental": {billing_basis: "per_question", bytes_per_token: 4.469396, question_bytes_per_token: 1.68409, overhead_tokens: 12.039483, safety: 1.1, cost_ratio: 1.0, n_calls: 5}
+    "typesafe/jev-1.13": {billing_basis: "once", bytes_per_token: 3.163009, question_bytes_per_token: 3.666921, overhead_tokens: 333.801239, safety: 1.1, cost_ratio: 1.0, n_calls: 5}
+    "typesafe/jev-1.14": {billing_basis: "once", bytes_per_token: 3.543488, question_bytes_per_token: 3.29087, overhead_tokens: 349.493405, safety: 1.1, cost_ratio: 1.0, n_calls: 336}
+    "upstage/solar-decide": {billing_basis: "per_question", bytes_per_token: 4.403995, question_bytes_per_token: 0.697885, overhead_tokens: 0.0, safety: 1.1, cost_ratio: 1.0, n_calls: 5}
+    "upstage/solar-decide-flash": {billing_basis: "per_question", bytes_per_token: 4.403995, question_bytes_per_token: 0.697885, overhead_tokens: 0.0, safety: 1.1, cost_ratio: 1.0, n_calls: 5}
+
+laya:
+  repo: convaiinnovations/laya
+  revision: 55cf4c4ebb4ebe31b2550e8bdf3bd21b99753851   # laya 0.4.14 PINNED_REVISIONS (reviewed); same weights as main @ 7b928d82
+  weights_sha256:                 # LFS sha256 of model.safetensors at that revision (checked before loading)
+    "": 891102d372688fc2a094dac56a384bc537b87c63f21f9f3dac0be2b7cbc8d86c
+    typed-decisions: 4fa56de72383a9d3efa9cfa78955733c81b9fc8067a587ca4beb82c78107a24e
+  variants:                       # model id -> checkpoint subfolder ("" = the repository root)
+    local/laya-typed-decisions: typed-decisions
+    local/laya-base: ""
+  max_len: 1024                   # PREREG §9.1
+  head_max_len: null              # null: the checkpoint's own (typed-decisions 256, root 192)
+  device: mps                     # falls back to cpu when MPS is unavailable
+  fp32: true                      # no fp16 autocast on MPS (Laya switches it on at >= 5 question rows)
