@@ -575,7 +575,7 @@ offline client. The committed files below live under `artifacts/NA-05/` and are 
 - **Key:** `responses.key` = sha256 of the canonical JSON of {model, state, questions (ordered: [[id, [type, instructions, criteria]], …]), provider, params, repeat_idx}; local models add their checkpoint settings (revision, subfolder, max_len, head_max_len, device, fp32) to `params`; the session id is not part of the key
 - **Rows / coverage (end of NA-05):** 2,227 responses with `chunk = NA-05` (1,949 API, all HTTP 200, 278 local Laya), 2,014 API attempts (1,949 × 200, 61 × 400, 3 × 429, 1 × 502). Sessions of the sent states: 1,976 train-split states (2024-07-01 … 2025-06-30) and 251 synthetic ones
 - **Availability:** n/a (decision-model outputs). GAC4: Σ `responses.cost` where `chunk = X` equals chunk X's recorded spend in `ledgers/spend.jsonl` (NA-05: $0.103922341, difference 9.7e-17)
-- **Note:** gitignored like `work/`; the verifier and later chunks need this file next to the branch (copy it with `work/` when merging)
+- **Note:** gitignored like `work/`; the verifier and later chunks need this file next to the branch (copy it with `work/` when merging). `valid` / `problems_json` are the parser's verdict when the row was written; the client re-parses every hit with the current parser, so since the renormalization rule (2026-10-26) a stored row can say invalid for an answer that now parses as valid and `renormalized`. A row is written once and never edited
 
 ### `artifacts/NA-05/catalog.json`
 - **Producer:** `newsaction.dm.pilot --stage catalog` (`dm.catalog.snapshot`; GET /api/v1/models?output_modalities=decisions, no spend), fetched 2026-10-26T17:47:58Z
@@ -597,19 +597,19 @@ offline client. The committed files below live under `artifacts/NA-05/` and are 
 ### `artifacts/NA-05/canary_baseline.parquet`
 - **Producer:** `newsaction.dm.pilot --stage report` (`dm.canary.probability_rows`; registered with `io.register_artifact`)
 - **Inputs:** `cache/decisions.sqlite` (the canary calls, repeat 0), `artifacts/NA-05/canary_v1.jsonl`
-- **Schema:** `model`, `model_build`, `canary_id`, `question`, `option` string, `p` double, `key` string (the cache key of the call), `repeat_idx` int64 (0)
+- **Schema:** `model`, `model_build`, `canary_id`, `question`, `option` string, `p` double (renormalized for an answer whose rounded probabilities summed to 1 within one rounding step), `renormalized` bool (that answer was rescaled; `schemas.RENORM_TOL`), `key` string (the cache key of the call), `repeat_idx` int64 (0)
 - **Key:** (`model`, `canary_id`, `question`, `option`)
-- **Rows / coverage:** 6,827 rows: the 5 pilot API models and the 2 local Laya checkpoints × 50 canary states, valid answers only (Jev 1.14 has 3 answers invalid by its rounded probabilities)
+- **Rows / coverage:** 6,846 rows: the 5 pilot API models and the 2 local Laya checkpoints × 50 canary states × every option (978 per model); 19 rows (Jev 1.14: C19 tone, C31 tone, C49 justified_move) are `renormalized`
 - **Availability:** n/a (decision-model outputs; NA-11 S5 compares a fresh canary run with it via `dm.canary.compare`)
-- **sha256:** `756616fe51bc2ff531121ed8933266b054efc74aedeea8133d570d7354f46c34`
+- **sha256:** `301443ee829cf1e8ab18398a68a491e5b2972d0e1c642cee504fdda3bca9176b`
 
 ### `artifacts/NA-05/pilot.json`
-- **Producer:** `newsaction.dm.pilot --stage report`
+- **Producer:** `newsaction.dm.pilot --stage report` (last run `--offline`, 2026-10-26: recomputed from the cache after the renormalization rule, no network call)
 - **Inputs:** `cache/decisions.sqlite`, `artifacts/NA-05/{catalog.json,canary_v1.jsonl,key_usage.json}`, `artifacts/NA-03/call_projection.csv`, `work/states/{callA_d0_E3,callA_d2_E3,callB_d2_E3,market_E3}.parquet` (state sizes only), `configs/dm.yaml`
 - **Schema:** {`version`, `chunk`, `generated_at`, `git_sha`, `catalog`, `pilot_models`, `local_models`, `stop_per_question_billing`, `items` (the ten PRD S8 answers, `1_billing_basis` … `10_builds`), `per_model` (each pilot model's measurements), `smoke` (every other catalog model), `laya`, `eligibility`, `costmodel`, `na11_projection`, `na06_stage1_projection`, `spend`, `canary`, `peak_rss_mb`}
 - **Key:** n/a (one record)
 - **Availability:** n/a (no return of any period is read)
-- **sha256:** `09f237b8452315d354eb5e399791146751ebaa4aeb73c6754af9b4bf2894790b`
+- **sha256:** `535cc14619e6bfa0565c74f024035b30dcf9a7540dcb1428407df300649827d4`
 
 ### `artifacts/NA-05/key_usage.json`
 - **Producer:** `newsaction.dm.pilot` (`record_key_usage`; GET /api/v1/key, no spend)

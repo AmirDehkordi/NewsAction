@@ -31,6 +31,13 @@ exactly 4.00 state copies with 4 questions:
 The consequences and the reduced plan are in §8. Nothing in NA-05 depends on them, and no further spending was
 done.
 
+**Operator decisions (2026-10-26), applied** (§9):
+- (a) the per-question models stay in NA-06 with the core battery;
+- rounded probabilities within one step (|Σp − 1| ≤ 0.0105) are renormalized and flagged (a change to PRD S1),
+  and the pilot numbers were recomputed from the cache with no API call;
+- the NA-11 canary rule is recorded in `configs/dm.yaml` `canary`;
+- classify-1's `state_as_text` is confirmed.
+
 Pilot answers (`pilot.json` `items`):
 
 | # | Question | Answer |
@@ -41,7 +48,7 @@ Pilot answers (`pilot.json` `items`):
 | 4 | Repeat variance (20 states × 5 repeats) | **luna and pplx deterministic** (100% identical). Jev mean / max \|Δp\| 0.011 / 0.10 (\|ΔN̂\| 0.048 / 0.21). mercury 0.013 / 0.21. d1 0.026 / 0.37 (\|ΔN̂\| 0.13 / 0.62). `seed` is accepted by all and **changes nothing** (seed 1 vs 2 ≈ two calls with one seed). Laya identical |
 | 5 | Question interaction (mean \|ΔN̂\|: Q1 alone vs in core; core + extended vs core) | Jev 0.048 / 0.065 against repeat noise 0.048. luna 0 / 0. mercury 0.062 / 0.048 (noise 0.048). d1 0.126 / 0.120 (noise 0.130). **pplx-decider 0.212 / 0.169 against noise 0**: its answers depend on the other questions of the call. Laya 0 / 0 |
 | 6 | Latency p50 / p95 (ms) at concurrency 1 / 4 / 8 / 16; errors; rate limits | p50 Jev 218–242, luna 311–427, mercury 509–630, d1 312–346, pplx 298–345; p95 0.3–1.8 s. **No error** in 800 latency calls (one 429 retried, pplx at c = 1); no rate-limit header is returned |
-| 7 | Response format | Legends present and matching 100%. Choice = argmax 100%. luna, mercury, d1, pplx: Σp = 1 to 1e-15 and score = Σ i·p_i exactly. **Jev 1.14: probabilities on a 0.01 grid**, so 19 of 1,509 answers sum to 0.99 / 1.01, which is invalid under the strict 1e-6 rule; its score differs from Σ i·p_i by 0.013 on average (max 0.08) |
+| 7 | Response format | Legends present and matching 100%. Choice = argmax 100%. luna, mercury, d1, pplx: Σp = 1 to 1e-15 and score = Σ i·p_i exactly. **Jev 1.14: probabilities on a 0.01 grid**, so 19 of 1,509 answers sum to 0.99 / 1.01; since the operator's decision they are renormalized and flagged (all 1,509 valid). Its score differs from Σ i·p_i by 0.013 on average (max 0.08) |
 | 8 | Numeracy (fixed positive news; reaction at 7 magnitudes × 2 directions): is reaction_adequacy monotone? | **No, for every model.** J is not non-increasing in the rise for any model; Spearman ρ(J, rise) runs from −0.68 (luna, the expected sign) to +0.89 (mercury). After clearly positive news, a fall gets "much_too_large" and P(wrong_direction) ≈ 0 (mean 0.000–0.009), while large rises draw P(wrong_direction) 0.20–0.56 |
 | 9 | data_collection = deny accepted? | **Yes, by every model that answered** (21 catalog models). None refused for data policy. Respan span-01 / span-01-lite refuse our requests for format reasons, so it is not determined for them |
 | 10 | Build ids; catalog hash | jev-1.14-20261014, gpt-6-luna-decisions-20261006, mercury-decide-20260930, d1-20260930, pplx-decider-v1.2-20261016: one build per model for all 361 calls. Catalog snapshot sha256 `205464ea…58d4d` (30 models, 2026-10-26 17:47 UTC) |
@@ -50,7 +57,7 @@ Pilot answers (`pilot.json` `items`):
 
 | Item | Status | Where |
 |---|---|---|
-| S1 schemas | done | `src/newsaction/dm/schemas.py`: `DecisionRequest`, `QuestionSpec` (choice / score; noul refused), `Provider` (deny only), `ChoiceAnswer`, `ScoreAnswer`, `Usage`, `DecisionResponse`, `parse_response` (problems vs notes, nothing repaired) |
+| S1 schemas | done | `src/newsaction/dm/schemas.py`: `DecisionRequest`, `QuestionSpec` (choice / score; noul refused), `Provider` (deny only), `ChoiceAnswer`, `ScoreAnswer`, `Usage`, `DecisionResponse`, `parse_response` (problems vs notes; the raw answer is never altered; a sum within one rounding step is renormalized and flagged, operator decision) |
 | S2 cache | done | `dm/cache.py`: `cache/decisions.sqlite`, tables `responses` and `attempts`; key over {model, state, ordered questions, provider, params, repeat_idx} |
 | S3 client | done | `dm/client.py`: refusals (a)–(f) + pilot period; `dry_run`; projection check + per-call `reserve` / `record` / `release`; tenacity retries (429 / 5xx / transport, 5 attempts, jitter, Retry-After); asyncio semaphore; `offline=True`; `state_as_text`; `key_usage`, `get_json`; `reconcile` |
 | S3 cost model | done | `dm/costmodel.py`: catalog prices, billed bytes, defaults, per-model calibration (two rates, robust fit; written to `configs/dm.yaml`) |
@@ -71,9 +78,9 @@ Also: `io.register_artifact` (committed outputs in the manifest), `configs/dm.ya
 | AC3 refusals | `tests/test_dm_refusals.py`, each online and offline, 0 transport calls: (a) third party (API only; local allowed), (b) test period by session or split label, API and local, allowed after a freeze record, (c) val-B by session or label (API; local allowed; allowed after `allow_val_b: true`), (d) unmasked without a registered probe (`unmasked_twin` allowed), (e) not in `eligible_models` (pilot lifts it), (f) `:free` without approval (pilot does not lift it), pilot period (val-A / val-B states refused with `pilot=True`), a batch with one bad request sends nothing, `Provider(data_collection="allow")` impossible. **Mutations** "2026 guard removed" (the PRD's) and (a), (c), (d), (e), (f), pilot period, split-label-only test check, refusals moved after the cache, provider not deny-only: **RED** | PASS |
 | AC4 pilot | `pilot.json` `items` has a numeric / boolean answer for each of the 10 items (table above). Spend $0.103922 ≤ $0.20 (ledger). Sessions of every state sent, read from the cache's `meta_json`: 1,976 train-split states, latest **2025-06-30**, and 251 synthetic; no val-A, val-B or test state; refused by the client otherwise (`pilot_period`) | PASS |
 | AC5 local Laya | typed-decisions on the 50 canary states: 50 / 50 valid `DecisionResponse`s, \|Σp − 1\| ≤ 2.2e-16 (float64 recomputation; laya's own 4-decimal values kept and checked). Base checkpoint: 50 / 50. `tests/test_dm_laya_local.py` checks 20 canary states from the cache (AC5) and runs 3 states live (slow). **Mutation** "drift check off": RED | PASS |
-| AC6 canary | `canary_v1.jsonl`: 50 lines C01–C50 with `state_sha256` / `questions_sha256` (`load_canary` refuses a tampered line, tested); `build_canary` reproduces the file byte for byte (sha256 `783aa96c…`). `canary_baseline.parquet`: 6,827 rows for the 5 pilot models and both Laya checkpoints, 978 rows each (Jev 959: 3 answers invalid by rounding) | PASS |
+| AC6 canary | `canary_v1.jsonl`: 50 lines C01–C50 with `state_sha256` / `questions_sha256` (`load_canary` refuses a tampered line, tested); `build_canary` reproduces the file byte for byte (sha256 `783aa96c…`). `canary_baseline.parquet`: 6,846 rows for the 5 pilot models and both Laya checkpoints, 978 rows each; 19 rows (Jev: C19 tone, C31 tone, C49 Q1) are `renormalized` | PASS |
 | AC7 eligibility | `configs/frozen.yaml` `eligible_models`: all 30 catalog ids + 2 local ids, each with `include` and a reason (`tests/test_dm_catalog.py::test_frozen_lists_every_catalog_id_with_a_reason`). 21 included, 11 excluded (§4) | PASS |
-| GAC1 | `make verify` exit 0: ruff "All checks passed!", "132 files already formatted"; mypy --strict "no issues found in 65 source files"; pytest **1,329 passed, 1 xfailed** (138 s); manifest 61 artifacts OK; ledgers OK (spend 4,020, test_access 2, trials 94) | PASS |
+| GAC1 | `make verify` exit 0 (after the operator's decisions): ruff "All checks passed!", "132 files already formatted"; mypy --strict "no issues found in 65 source files"; pytest **1,338 passed, 1 xfailed** (139 s); manifest 61 artifacts OK; ledgers OK (spend 4,020, test_access 2, trials 94) | PASS |
 | GAC2 | `git status --porcelain Data/` empty; `make manifest` OK (inputs size + mtime) | PASS |
 | GAC3 | `tests/test_blinding.py` passes: no 2026 literal in `src/` (the client reads the test start from `configs/splits.yaml`); no sealed-path use; `ledgers/test_access.jsonl` unchanged (2 NA-01 lines) | PASS |
 | GAC4 | NA-05 ledger $0.103922341 vs Σ `responses.cost` (chunk NA-05) $0.103922341: difference 9.7e-17; chunk ≤ $0.20; total $0.103922 ≤ $30 | PASS |
@@ -84,18 +91,18 @@ Also: `io.register_artifact` (committed outputs in the manifest), `configs/dm.ya
 A scratchpad script applied each mutation, ran the named test file and restored the file byte for byte
 (asserted). It cleared `__pycache__` before every run, because two mutations of equal length written within
 the same second can leave a stale `.pyc` that hides the second mutation; the first run of the script showed
-exactly that for (a). **27 / 27 RED**:
+exactly that for (a). **30 / 30 RED** (after the operator's decisions; 27 / 27 before them):
 
 | Area | Mutations |
 |---|---|
 | budget | skip reserve(); projection check off |
 | cache | questions not keyed; repeat_idx not keyed; option order not keyed; cache read off; offline check off |
 | refusals | (a) third party; (b) 2026 guard; (b) split label only; (c) val-B; (d) unmasked; (e) eligibility; (f) `:free`; pilot period; refusals after the cache; provider not deny-only |
-| schema | sum tolerance off; missing type accepted; legend check off |
+| schema | sum bound off (everything renormalized); bound widened to 0.02; `renormalized` flag not set; rounded sums not rescaled; missing type accepted; legend check off |
 | Laya | drift check off |
 | parse | N̂ midpoint changed; J's sign term dropped |
 | canary | hash check off |
-| cost / eligibility | billing basis by max (the mercury anomaly flips it); rounding counted as a failure; alias kept |
+| cost / eligibility | billing basis by max (the mercury anomaly flips it); renormalized answers counted as a failure; alias kept |
 
 `git status` afterwards showed only the author's changes.
 
@@ -154,7 +161,7 @@ tokens(n, short state)) / (tokens(1, long) − tokens(1, short)), using C16 (386
 
 | Model | identical | mean \|Δp\| | max \|Δp\| | mean \|ΔN̂\| | max \|ΔN̂\| | seed 1 vs 2 / same seed twice |
 |---|---|---|---|---|---|---|
-| jev-1.14 | 0% | 0.011 | 0.10 | 0.048 | 0.21 | 0.015 / 0.014 |
+| jev-1.14 | 0% | 0.011 | 0.10 | 0.048 | 0.21 | 0.014 / 0.013 |
 | luna | 100% | 0 | 0 | 0 | 0 | 0 / 0 |
 | mercury | 12.5% | 0.013 | 0.21 | 0.048 | 0.14 | 0.013 / 0.010 |
 | d1 | 0% | 0.026 | 0.37 | 0.130 | 0.62 | 0.029 / 0.034 |
@@ -168,7 +175,7 @@ difference between two calls with the same seed.
 
 | Model | Q1 alone vs in core | core + extended vs core | repeat noise | other core questions, \|Δp\| core + ext vs core |
 |---|---|---|---|---|
-| jev-1.14 | 0.048 | 0.065 | 0.048 | 0.013 |
+| jev-1.14 | 0.048 | 0.065 | 0.048 | 0.014 |
 | luna | 0 | 0 | 0 | 0 |
 | mercury | 0.062 | 0.048 | 0.048 | 0.012 |
 | d1 | 0.126 | 0.120 | 0.130 | 0.030 |
@@ -201,8 +208,10 @@ questions share the call (owner decision 4).
 - Jev 1.14 (and 1.13) also use a 0.01 grid, but Jev's sums are off by one step in 1.3% of answers (19 of 1,509;
   in the canary: C19 tone, C31 tone, C49 Q1). Its score is the unrounded position (mean gap 0.013).
 - Five smoke models (clef, clef-flash, kev-4b, drex-v1.5, drex-v2.0) round to 4 decimals, and 2–4 of their 10
-  answers sum to 0.9998–1.0001; clef-omni also rounds to 4 decimals, without an off sum.
-- Under the PRD's strict 1e-6 rule all of these answers are invalid and unused (owner decision 2).
+  answers sum to 0.9998–1.0001; clef-omni also rounds to 4 decimals, without an off sum. solar-decide rounds to 6
+  (one answer at 0.999999).
+- Under the PRD's original 1e-6 rule all of these answers were invalid. Since the operator's decision (owner
+  decision 2) every one of them is renormalized and flagged: no answer of any model is left invalid by its sum.
 
 **Item 8, numeracy.** The positive news (beat, raised guidance, buyback) is read correctly: N̂ +1.7 to +2.3 in
 Call A, and every model gets all six synthetic Call A directions right (miss, downgrade and investigation
@@ -279,10 +288,12 @@ tokens equal NA-04's count. laya clamps the shipped choice:11+ temperature 0.10 
 
 - **States:** canary_v1 has 50 states (§1). The 30 train states run 2024-08-13 … 2025-06-23 and are
   tier-stratified (10 Top-100, 8 Mid, 12 Rest).
-- **Baseline:** repeat 0 of every pilot model and both Laya checkpoints, 6,827 rows.
+- **Baseline:** repeat 0 of every pilot model and both Laya checkpoints, 6,846 rows (19 `renormalized`).
 - **For NA-11 S5** ("STOP if any probability moved ≥ 0.02 vs the NA-05 baseline"): the repeat noise of Jev (max
-  |Δp| 0.10), mercury (0.21) and d1 (0.37) exceeds 0.02 with nothing changed. That rule would fire on noise for
-  those three models (owner decision 3). luna, pplx and Laya are deterministic, so 0.02 is meaningful for them.
+  |Δp| 0.10), mercury (0.21) and d1 (0.37) exceeds 0.02 with nothing changed, so that rule would fire on noise for
+  those three models. **Operator decision:** deterministic models (luna, pplx-decider, both Laya checkpoints) keep
+  max |Δp| ≥ 0.02; any other model compares the canary's mean |Δp| with its own 5-repeat noise (Jev 0.0112,
+  mercury 0.0125, d1 0.0255). Recorded in `configs/dm.yaml` `canary`; NA-11 implements it.
 
 ## 7. Cost model and projections
 
@@ -357,8 +368,11 @@ winner: if luna, clef-omni or drex-max wins, A2.6's cuts are needed; clef-omni (
       that this can matter);
     - (c) exclude them from the tournament.
 
-  **Not done in NA-05:** no plan was changed and nothing was spent on them beyond the smoke test. Operator
-  decision 1.
+  **Not done in NA-05:** no plan was changed and nothing was spent on them beyond the smoke test.
+
+  **Operator decision (2026-10-26): (a).** They stay in the NA-06 tournament with the full core battery, the same
+  questions every model gets. If one becomes the primary instrument, §13's reduced battery applies (Q1, + Q5 for
+  Call B; no extended battery).
 - **PREREG §13, "winner priced above $0.12/M":** not evaluated before NA-11; clef-omni ($0.15/M) is the only
   eligible model above it.
 - **PREREG §13, "any projection exceeds the remaining budget":** no projection of NA-05 did (largest $0.119 for
@@ -366,34 +380,47 @@ winner: if luna, clef-omni or drex-max wins, A2.6's cuts are needed; clef-omni (
   drex-max (with D1 + A3.5) and the per-question tev1-4b / classify-1.
 - Budget: the chunk cap ($0.20) and the total cap were never approached; the per-call reservations never refused.
 
-## 9. Owner decisions
+## 9. Owner decisions and the operator's answers (2026-10-26)
 
-1. **Per-question billing (STOP, §8).** Choose (a), (b) or (c) for the six models in NA-06, and confirm §13's
-   reduced battery if one wins.
-2. **Rounded probabilities.** The strict parser (PRD S1: sum within 1e-6, "record as invalid, not silently fixed")
-   leaves 1.3% of Jev 1.14's answers and 20–40% of the 4-decimal models' answers unused.
-   - Options: keep the rule (NA-06 loses those answers); or accept |Σp − 1| ≤ one rounding step (0.0105) and
-     renormalize, recorded per answer as `renormalized`.
-   - This is a PRD-level change to S1, not a PREREG one; it should be decided before NA-06 spends.
-3. **Canary threshold (NA-11 S5).** Repeat noise alone exceeds 0.02 for Jev (max 0.10), mercury (0.21) and d1
-   (0.37). Suggested: compare the canary on mean |Δp| against the model's own repeat noise (or with 5 repeats),
-   and keep 0.02 on max |Δp| for deterministic models.
-4. **Question interaction (PREREG A2).** pplx-decider-v1.2 changes N̂ by ~0.2 when other questions share the call,
-   so A2's "answered independently" does not hold for it. If it becomes the primary instrument, asking the
-   extended battery in production would shift the N̂ it was selected on. Options: a separate call for the extended
-   questions (one more state billing per event), or core only.
-5. **Numeracy / Q5.** No model treats a fall after good news as "wrong_direction", and none is monotone in the
-   size of a rise. This is evidence for NA-07 (encoding, anchoring). It may also mean Q5's wording or options
-   (NA-04 text) are read as magnitude-only; changing them is a PREREG §7 / questions_v1 matter, so it is only
-   flagged here.
-6. **`state_as_text` for scaledown/classify-1** (`configs/dm.yaml`). The same bytes go as a string, because the
-   model refuses state objects. Confirm, or exclude the model.
-7. **Merging with parallel worktrees.** `cache/decisions.sqlite` (gitignored, 2,227 responses) and the five
-   `work/MANIFEST.json` entries for `artifacts/NA-05/*` exist only in this worktree. The verifier needs the cache:
-   run the verification here, or copy `cache/` with the branch. Main's manifest will lack the five entries until
-   they are re-registered (`io.register_artifact`); `make manifest` does not fail on that.
-8. **Laya head length.** The wrapper keeps the checkpoints' `head_max_len` (256 / 192) with `max_len` 1024, so the
-   state gets 768 / 832 tokens. NA-04's owner decision 2 applies unchanged to NA-08 / NA-09's Laya runs.
+| # | Question | Operator's decision | Applied |
+|---|---|---|---|
+| 1 | Per-question billing (STOP, §8): (a) keep with the core battery, (b) Q1 only, (c) exclude | **(a)**. Keep them in NA-06 with the full core battery; if one becomes the primary instrument, §13's reduced battery (Q1, + Q5 for Call B; no extended battery) | Nothing to change: `eligible_models` includes them, and the cost model prices them per question (`configs/dm.yaml` calibration). Recorded in `docs/decisions/NA-05.md` |
+| 2 | Rounded probabilities under the strict 1e-6 sum rule | **Accept \|Σp − 1\| ≤ 0.0105 (one rounding step), renormalize, flag `renormalized: true`**; beyond the bound, invalid | Yes; details below |
+| 3 | The canary threshold of NA-11 S5 | **Mean \|Δp\| vs the model's own repeat noise (5 repeats); 0.02 on max \|Δp\| only for deterministic models** | Recorded as `configs/dm.yaml` `canary` (validated by `DmConfig.canary`): noise_repeats 5, deterministic_max_abs_dp 0.02, noisy_rule mean_abs_dp_vs_repeat_noise, and the deterministic models of the pilot (luna, pplx-decider, both Laya checkpoints). NA-11 implements the comparison |
+| 4 | pplx-decider-v1.2's question interaction | No decision now; revisit only if it wins | — |
+| 5 | Numeracy / Q5 | Noted for NA-07; no change | — |
+| 6 | `state_as_text` for scaledown/classify-1 | **Confirmed** | Unchanged |
+| 7 | Merging with parallel worktrees (the cache) | — (information) | `cache/decisions.sqlite` (2,227 responses) and the five `work/MANIFEST.json` entries for `artifacts/NA-05/*` exist only in this worktree; the verifier needs the cache here or copied |
+| 8 | Laya head length | — (information) | Unchanged; NA-04's owner decision 2 applies to NA-08 / NA-09 |
+
+**Decision 2 in detail: a change to PRD NA-05 S1.** S1 said "probabilities that do not sum to 1 ± 1e-6 (record as
+invalid, not silently fixed)".
+- **Rule** (`dm/schemas.py` `_probabilities`):
+  - a sum off 1 by at most 1e-6 is accepted as is;
+  - a sum off by more than 1e-6 and at most `RENORM_TOL` = 0.0105 is renormalized (p_k / Σp), and the parsed
+    answer carries `renormalized = True` and the original `raw_sum`;
+  - a larger deviation, or any probability outside [0, 1], stays invalid.
+- **Where the flag goes.** The provider's answer is never altered (the cache keeps it raw). The flag travels with
+  every materialized answer:
+  - `ParsedAnswer.renormalized`;
+  - the `renormalized` column of `runner.answers_frame` and of `canary_baseline.parquet`;
+  - `runner.derived_frame` `n_renormalized`;
+  - the counts in `pilot.json`.
+- **Tests:** both sides of the bound (0.0104 / 0.0106 and ±), the flag, the raw sum, the unaltered raw answer, a
+  value outside [0, 1], a Jev-style score on a 0.01 grid. Mutations (bound off, bound widened, flag dropped, no
+  rescaling) are RED.
+- **Recomputed from the cache with no API call** (`python -m newsaction.dm.pilot --stage report --offline`, which
+  also skips the key-usage GET; `key_usage.json` is unchanged):
+  - Jev 1.14: 19 of 1,509 answers renormalized (1.26%); valid share 98.7% → 100%. Repeat noise mean |Δp| 0.0112,
+    mean |ΔN̂| 0.0480 (0.0485 before; 1,680 cells instead of 1,627). Seed 1 vs 2 / the same seed twice 0.0142 /
+    0.0128 (0.0148 / 0.0135). Core-question |Δp| with the extended battery 0.0136 (0.0130).
+  - Canary baseline: 6,846 rows (6,827), 19 flagged.
+  - Smoke models: every rounded answer renormalized (clef 2, clef-flash 4, kev-4b 4, drex-v1.5 2, drex-v2.0 2,
+    solar-decide 1 of 10); no invalid answer left in any model.
+  - Unchanged: eligibility (only the reasons' wording: "x% of answers renormalized"), the cost calibration, the
+    projections, the billing finding, the spend.
+- **The cache's `valid` / `problems_json` columns** keep the verdict of the parser that wrote the row (a row is
+  written once); every read re-parses with the current parser.
 
 ## 10. Spend, look-ahead, deviations, files
 
@@ -423,13 +450,13 @@ No return, target, label or reaction of any period was read; no val-B or test st
 file was opened; `ledgers/test_access.jsonl` is unchanged. Val-B and test rows of the state files were counted for
 their byte length only, never sent and never summarized.
 
-**Deviations from PREREG.** None; §15 is unchanged. The STOP and owner decisions 2–5 are reported for the
-operator, not applied.
+**Deviations from PREREG.** None; §15 is unchanged. The operator's decision 2 changes PRD NA-05 S1 (the
+probability-sum rule), not PREREG; it is recorded in `docs/decisions/NA-05.md`.
 
 **Files.**
 - **Added — code:** `src/newsaction/dm/{__init__, schemas, cache, costmodel, client, catalog, laya_local, parse,
   canary, runner, pilot}.py`.
-- **Added — config:** `configs/dm.yaml`.
+- **Added — config:** `configs/dm.yaml` (with the operator's `canary` rule).
 - **Added — docs:** `docs/decisions/NA-05.md`; `artifacts/NA-05/*` (REPORT, catalog.json, canary_v1.jsonl,
   canary_baseline.parquet, pilot.json, key_usage.json).
 - **Changed:**
@@ -439,16 +466,20 @@ operator, not applied.
   - `pyproject.toml`: mypy override for `laya.*`;
   - `README.md`: guard row;
   - `ledgers/spend.jsonl`.
-- **Tests (10 files, 107 tests):** `tests/test_dm_{schemas, cache, budget, refusals, parse, costmodel, catalog,
+- **Tests (10 files, 116 tests):** `tests/test_dm_{schemas, cache, budget, refusals, parse, costmodel, catalog,
   canary, laya_local, runner}.py`, with the shared fakes in `tests/dm_fakes.py`. The slow Laya test loads the
   cached checkpoint; nothing is downloaded in tests.
 - **Peak RSS:** billing 0.50 GB, measure 0.99 GB (249 s), smoke 0.51 GB, laya 3.49 GB (181 s), report 1.45 GB.
 
-**`make verify`** (2026-10-26, final code, run when no other pytest was active; the NA-08 worktree's runs had
-finished): exit 0 in 142 s, peak RSS 11.0 GB (an earlier run, before the 4 runner tests, peaked at 6.8 GB).
+**`make verify`** (2026-10-26, after the operator's decisions; run when no other pytest was active): exit 0 in
+143 s, peak RSS 9.8 GB.
 - ruff check "All checks passed!"; ruff format "132 files already formatted";
 - mypy --strict "Success: no issues found in 65 source files";
-- pytest **1,329 passed, 1 xfailed**: 1,330 collected, of which 107 are the new `test_dm_*` tests and 1,223 main's
+- pytest **1,338 passed, 1 xfailed**: 1,339 collected, of which 116 are the new `test_dm_*` tests and 1,223 main's
   at `214108f`;
 - `make manifest` "61 artifacts, 10 inputs checked … OK"; `make ledgers` OK (fmp 0, spend 4,020, test_access 2,
   trials 94).
+
+The first verify after the decisions failed one test: `tests/test_blinding.py` flags any `2026-` month string in
+`src/`, docstrings included, and three new docstrings cited the decision's date. They now point to
+`docs/decisions/NA-05.md`. The earlier verify (before the decisions) passed with 1,329 tests.
