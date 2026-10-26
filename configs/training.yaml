@@ -44,7 +44,7 @@ export:                           # PRD NA-08 S2
   license: other
 
 model:                            # PREREG §9.1–9.2, PRD NA-08 S3
-  max_len: 1024                   # PREREG §9.1
+  max_len: 1036                   # PREREG §9.1 1024 → 1036 (§15 NA-08 row, operator 2026-10-26): no state is cut
   head_max_len: 143               # operator decision 2026-10-26: the longest trained question in Laya's rendering
   laya:                           # Laya-Fin init (convaiinnovations/laya, subfolder typed-decisions)
     repo: convaiinnovations/laya

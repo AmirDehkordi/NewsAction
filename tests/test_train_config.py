@@ -19,11 +19,14 @@ PRD_NA08 = re.sub(r"\s+", " ", PRD[PRD.index("## NA-08 —") : PRD.index("## NA-
 def test_training_recipe_equals_prereg_9_1() -> None:
     m = load_training_config().model
     assert "learning rate 2e-5 (backbone) / 1e-4 (heads), max length 1024, ≤ 3 epochs" in PREREG
-    assert (m.lr_backbone, m.lr_head, m.max_len, m.max_epochs) == (2e-5, 1e-4, 1024, 3)
+    assert (m.lr_backbone, m.lr_head, m.max_epochs) == (2e-5, 1e-4, 3)
+    # max length 1,036, not 1,024: PREREG §15 NA-08 row (operator decision; no state is cut)
+    assert "| NA-08 | §9.1 (max length 1024) |" in PREREG and "up to **1,036** tokens" in PREREG
+    assert m.max_len == 1036
     assert "seeds {13, 17, 23}; the reported model is the 3-seed ensemble" in PREREG
     assert m.seeds == (13, 17, 23)
     assert "LR_BACKBONE 2e-5, LR_HEAD 1e-4, EPOCHS ≤ 3" in PRD_NA08
-    assert "MAX_LEN = 1024" in PRD_NA08
+    assert "MAX_LEN = 1024" in PRD_NA08  # the PRD's value, before the §15 NA-08 row
 
 
 def test_block_dropout_equals_prereg() -> None:

@@ -95,7 +95,7 @@ def test_fitting_uses_val_a_only_and_never_reads_eval_labels() -> None:
 def test_notebook_parameters_are_the_pilot_and_every_kernel_differs_only_there() -> None:
     cfg = load_training_config()
     assert parameters_of(NB) == run_parameters(cfg.kaggle.runs[0], cfg)
-    assert parameters_of(NB)["MAX_LEN"] == 1024 and parameters_of(NB)["HEAD_MAX_LEN"] == 143
+    assert parameters_of(NB)["MAX_LEN"] == 1036 and parameters_of(NB)["HEAD_MAX_LEN"] == 143
 
 
 def test_kernel_notebooks_carry_their_run(tmp_path: Any) -> None:

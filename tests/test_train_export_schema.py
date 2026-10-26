@@ -355,4 +355,6 @@ def test_built_head_lengths_are_laya_s_rendering(built: dict[str, pd.DataFrame])
     heads = head_lengths(tok, training_questions(CFG), CFG.model.head_max_len)
     assert {q: v["head_tokens"] for q, v in info["questions"].items()} == heads
     assert CFG.model.head_max_len == max(heads.values()) == 143
-    assert info["truncation"]["examples_cut"] == 5 and info["truncation"]["max_len_without_cut"] == 1036
+    assert info["truncation"]["max_len"] == CFG.model.max_len == 1036
+    assert info["truncation"]["examples_cut"] == 0  # no state is cut (PREREG §15 NA-08 row)
+    assert info["truncation"]["max_len_without_cut"] <= CFG.model.max_len

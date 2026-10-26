@@ -6,10 +6,10 @@ Decisions: `docs/decisions/NA-08.md` · Config: `configs/training.yaml`.
 **Status: the local half is complete and verified; the Kaggle half has not started.** Labels, the private
 dataset, the notebook, the nine kernel directories, the import, the controls and the model cards are built
 and tested end to end, the notebook on Laya's real weights and the whole chain on a tiny model. Nothing has
-been uploaded to Kaggle. Per the PRD the operator uploads and runs (§4 runbook). The measured throughput (S4),
-the controls (S5), the imported predictions (S7) and the model cards' numbers (S8) wait for those runs; this
-report is updated when they come back. Three owner decisions are open (§8); the first two are needed before
-the upload.
+been uploaded to Kaggle. The measured throughput (S4), the controls (S5), the imported predictions (S7) and the
+model cards' numbers (S8) wait for those runs; this report is updated when they come back. The operator decided
+on 2026-10-26 (§8): MAX_LEN 1,036 so that no state is cut; I run the runbook's Kaggle steps up to the pilot and
+stop for the quota plan; the block-dropout copies stay as specified.
 
 **Result so far.**
 - **Labels (S1).** 48,649 event keys of train, val-A and val-B. The train labels end on 2025-06-30, purge
@@ -26,13 +26,14 @@ the upload.
   keeps the 12-hour limit. There is **no Hub push** (grep-tested). A smoke run on Laya's real
   typed-decisions weights (MPS, 16 train / 300 val-A rows) went through every cell and wrote every output.
 - **Head length (operator decision on NA-04 owner decision 2).** 143 tokens, the longest trained question in
-  Laya's rendering (react). **Finding:** at MAX_LEN 1,024 this still cuts 5 Call A D0 states (4 train, 1
+  Laya's rendering (react). **Finding:** at MAX_LEN 1,024 this would still cut 5 Call A D0 states (4 train, 1
   val-A; none in val-B or test) by 4–12 tokens, because NA-04 sized the D0 budget on Q1 as canonical JSON (132
-  tokens), not Laya's 146-token head. → owner decision 1.
+  tokens), not Laya's 146-token head. **Operator decision: MAX_LEN 1,036**, so no state is cut (PREREG §15
+  NA-08 row).
 - **Block dropout finding.** A Call B state without its reaction block is byte-identical to the event's Call
   A D2 state (48,197 of 48,197). So the PRD's p = 0.3 reaction-dropout copies only re-weight existing Call A
   D2 examples. Together with identical D0 / D2 twins, 10.5% of train examples are exact duplicates. Kept as
-  specified → owner decision 3.
+  specified (operator decision).
 
 **Blinding.** No return of a session ≥ 2026-01-02 was read, joined or summarized. The labels come from
 `panel_public`, which ends on 2025-12-31 (asserted). Test-period rows are Call A states only, without labels.
@@ -117,9 +118,11 @@ Train react levels 0–8: 1,186 / 1,391 / 3,743 / 3,577 / 8,926 / 3,604 / 4,049 
   examples identical to their D0 twin, and 183 others.
 - **Tokens per train sequence** (state + head + 4 special): mean 711, p50 733, p95 925; 124 M tokens per epoch.
 - **Heads in Laya's rendering** (question tokens, no specials): react 143, mag 77, cont 64. Head length
-  143, max length 1,024. Room for the state: react 877, mag 943, cont 956.
-- **States over the room:** 5 react examples (`W0:1001:2025-04-10`, `W0:1581:2025-04-15`, `W0:243:2025-04-03`,
-  `W0:520:2025-06-13` in train; `W0:59:2025-07-18` in val-A), by up to 12 tokens. No cut at 1,036.
+  143, max length **1,036** (PREREG §15 NA-08 row). Room for the state: react 889, mag 955, cont 968; the
+  longest D0 state has 889 tokens, so **no state is cut**.
+- **At the PRD's 1,024** (room 877 for react), 5 react examples would have been cut by up to 12 tokens:
+  `W0:1001:2025-04-10`, `W0:1581:2025-04-15`, `W0:243:2025-04-03`, `W0:520:2025-06-13` (train) and
+  `W0:59:2025-07-18` (val-A).
 - **Tokenizer:** Laya's typed-decisions tokenizer and NA-04's ModernBERT-large tokenizer give identical ids
   on 4,500 sampled states. The notebook re-checks every count on Kaggle.
 
@@ -215,37 +218,37 @@ outputs of a program whose sha256 is not the committed `train_ddp.py`.
 
 ## 7. Deviations from PREREG
 
-None so far. PRD-level choices are in `docs/decisions/NA-08.md`: H-mag on Call A D2, block dropout as copies
-with the context block = attention + company + market, the embargo applied to fitting, the warm-up, the frozen
-act head, the fp32 checkpoint, val-A-only calibration reporting, the corrected runbook commands. Owner
-decision 1 may require one: MAX_LEN 1,036 would be a §9.1 deviation.
+One row was appended to the §15 Deviations log (2026-10-26, NA-08, before the freeze). As in earlier chunks it
+is **in the working tree, not committed**, for the operator to commit on main:
+
+1. **§9.1 max length 1024 → 1,036** for the trained models: the head is the longest trained question in Laya's
+   rendering (143 + 3 tokens), and at 1,024 five Call A D0 states would be cut. Operator decision 2026-10-26.
+
+PRD-level choices are in `docs/decisions/NA-08.md`: H-mag on Call A D2, block dropout as copies with the
+context block = attention + company + market, the embargo applied to fitting, the warm-up, the frozen act head,
+the fp32 checkpoint, val-A-only calibration reporting, the corrected runbook commands.
 
 ## 8. STOP conditions and owner decisions
 
-**STOP, by design:** the PRD has the operator upload and run on Kaggle. Everything before that is done; the
-chunk resumes at the import when the runs are downloaded. No budget, no 2026 outcome, no new third party.
-Kaggle is already approved (CLAUDE.md D15–D16), and the dataset holds only third-party-OK states.
+**Handoff, by design:** the Kaggle runs. Everything before them is done. Per the operator's decision 2, I run
+the upload and the pilot, then stop for the quota plan (decision 4) before any training run; the chunk resumes
+at the import when the runs are downloaded. No budget, no 2026 outcome, no new third party: Kaggle is
+already approved (CLAUDE.md D15–D16), and the dataset holds only third-party-OK states.
+
+`docs/PREREG.md` (the §15 NA-08 row) is in the working tree, not committed, as in earlier chunks.
+`tests/test_train_config.py` checks the row, so commit it with the merge.
 
 Owner decisions:
 
-1. **The 5 states that MAX_LEN 1,024 cuts** (§3.2). Options:
-   - (a) keep MAX_LEN 1,024 and cut those 5 react examples by ≤ 12 tokens (4 of 174,320 train examples,
-     1 val-A prediction; val-B and test untouched);
-   - (b) MAX_LEN 1,036, which cuts nothing; a PREREG §9.1 deviation ("max length 1024") logged in §15. The
-     model and memory are unaffected (ModernBERT reads 8,192 positions);
-   - (c) shorten NA-04's D0 budget by 12 tokens and rebuild the D0 states, which would change state hashes
-     NA-05 / NA-06 already use (not recommended).
-
-   **Recommended: (b).** It is the only option that keeps both the no-cut rule and the states NA-05 uses.
-   The build currently uses (a), PREREG's 1,024. The choice is one constant in `configs/training.yaml` and
-   needs no new upload.
-2. **Who uploads and runs.** The PRD has the operator do it. The Kaggle CLI on this machine is authenticated
-   (`amirdehkordi98`), so I can also run steps 2–5 of the runbook myself on your go-ahead: the upload, each
-   kernel push and the downloads. Uploading puts the masked states on Kaggle (private).
-3. **Reaction-dropout duplicates** (§3.2): keep the p = 0.3 copies (PREREG §9.1 as written; ~5% more compute),
-   or drop them via `TRAIN_VARIANTS` (they duplicate Call A D2 examples), logged as a §9.1 deviation. Likewise
-   the 9,481 D0 / D2 twin duplicates could be dropped (~5% compute). **Recommended:** keep both unless the
-   pilot shows the plan does not fit; then drop them before cutting seeds.
+1. **Decided (2026-10-26): MAX_LEN 1,036**, so no state is cut (§3.2, PREREG §15 NA-08 row). The options were
+   1,024 with 5 states cut by ≤ 12 tokens, or a 12-token tighter NA-04 D0 budget (a rebuild changing state
+   hashes NA-05 / NA-06 use).
+2. **Decided (2026-10-26): I run the Kaggle steps.** That covers uploading the dataset (private), checking the
+   upload's hashes, pushing the pilot and downloading and verifying its outputs. I then stop and show the quota
+   plan before any training run.
+3. **Decided (2026-10-26): keep the reaction-dropout copies** as PREREG §9.1 specifies (§3.2: they duplicate
+   Call A D2 examples). If the quota plan does not fit, they (and the 9,481 D0 / D2 twin duplicates, ~5% each)
+   can be dropped via `TRAIN_VARIANTS` before cutting seeds; that would be a §9.1 deviation.
 4. **The quota plan** (after the pilot): the plan likely needs 2–3 weeks of quota. Choose between the full plan
    and the PRD's reductions (anchor seeds → 1; epochs 2); MAX_LEN 768 is excluded by the no-cut rule.
    `throughput.json` will list the GPU-hours and weeks of each option. Kaggle is assumed to count a T4 ×2

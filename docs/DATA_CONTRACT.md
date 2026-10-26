@@ -584,7 +584,7 @@ sha256 on a rerun (labels and export were run twice: 8 of 8 files identical).
 - **Example:** one (state variant, question) pair. `state_json` is the NA-04 state byte for byte (`variant` full), or a train copy (PREREG §9.1 block dropout, a sha256 draw per state, seed 2026): `no_reaction` (a Call B state without `reaction_so_far`, p = 0.3, asked react; byte-identical to the event's Call A D2 state) or `no_context` (without attention, company and market, p = 0.1, the source's questions). Questions by source: Call A D0 and D2 react + mag, Call B react + cont. `question_json` is Laya's input format `{type, instructions, criteria}` (react = Q1, cont = Q6 of `configs/questions_v1.yaml`, option order kept; mag = the internal H-mag question of `configs/training.yaml`).
 - **Schema:** `example_id` ("{event_id}|{call}|{variant}|{question_id}"), `event_id`, `split`, `call` (A | B), `window` (W0 | W2), `variant`, `question_id` (react | mag | cont), `state_json`, `question_json` string, `n_tokens_state` int64 (ModernBERT-large tokens; NA-04's count for full states, recounted for copies); train and val-A only: `label_index` int8 (val-A nullable: purged or missing); val-A only: `embargo` bool. **The val-B and test files have exactly the columns before `label_index`** (`kaggle_export.EVAL_COLUMNS`, asserted; tests/test_train_export_schema.py).
 - **Key:** `example_id` unique per file
-- **Availability:** a state is an input at its decision point (NA-04); labels `post`. Val-B and test labels never leave this machine (PREREG §9.3, CLAUDE.md D16). Sequence check (`dataset_info.json` `truncation`): with max length 1,024 and head length 143 (react, Laya's rendering), 5 Call A D0 react examples (4 train, 1 val-A) exceed the room for the state by ≤ 12 tokens; no val-B or test example does.
+- **Availability:** a state is an input at its decision point (NA-04); labels `post`. Val-B and test labels never leave this machine (PREREG §9.3, CLAUDE.md D16). Sequence check (`dataset_info.json` `truncation`): with max length 1,036 (PREREG §15 NA-08 row) and head length 143 (react, Laya's rendering) no state is cut; at 1,024, 5 Call A D0 react examples (4 train, 1 val-A) would exceed the room by ≤ 12 tokens.
 
 ### `work/kaggle/dataset/train.parquet`
 - **Producer / schema:** as "Kaggle dataset files" above (labelled examples only)
@@ -609,13 +609,13 @@ sha256 on a rerun (labels and export were run twice: 8 of 8 files identical).
 
 ### `work/kaggle/dataset/dataset_info.json`
 - **Producer:** `--stage export`; uploaded with the dataset
-- **Schema:** JSON: `questions` (Laya input format, type, k, option keys, head tokens: react 143, mag 77, cont 64), `questions_by_source`, `max_len`, `head_max_len`, `truncation` (room per question, the cut example ids, `max_len_without_cut` 1,036), `files`, `counts` (examples / labelled / embargo by call, window, variant, question), `dates`, label definitions, export constants, `provenance` (sha256 of the three state files, the labels, `configs/training.yaml`, `configs/questions_v1.yaml`)
-- **sha256:** `a7d8305b460dd9b3f78cbcffbd48638c6d3e420a277437f666c75d60603ad674`
+- **Schema:** JSON: `questions` (Laya input format, type, k, option keys, head tokens: react 143, mag 77, cont 64), `questions_by_source`, `max_len` (1,036), `head_max_len` (143), `truncation` (room per question: react 889, mag 955, cont 968; cut example ids: none; `max_len_without_cut` 1,036), `files`, `counts` (examples / labelled / embargo by call, window, variant, question), `dates`, label definitions, export constants, `provenance` (sha256 of the three state files, the labels, `configs/training.yaml`, `configs/questions_v1.yaml`)
+- **sha256:** `4011235ee0b9182cf2ef87c267f67119edf14b79657ed6c7713ea6d220c002ae`
 
 ### `work/kaggle/dataset/sha256_manifest.json`
 - **Producer:** `--stage export`; uploaded with the dataset. The notebook checks every file against it on Kaggle and records the sha256s in each run record; `import_preds` requires them to equal this manifest (AC1).
 - **Schema:** JSON `{version, files: {name: {sha256, bytes[, rows, columns]}}}` for the four parquet files and `dataset_info.json`
-- **sha256:** `9167f5e69733ca7bf931ec8f286d908a20850b0b7bd17c0794df1cf9b046bae5`
+- **sha256:** `2bafd1de3d40a705ab14c150672b83d0c251b88d7ee0db57db286f5b0e796992`
 
 ### `work/kaggle/dataset/dataset-metadata.json`
 - **Producer:** `--stage export`; Kaggle's dataset metadata (not uploaded as data)
