@@ -57,6 +57,7 @@ Optional dependency groups are declared but not installed by default: `uv sync -
 | `pit` | availability registry (`configs/availability.yaml`): `check_inputs(columns, "D0"/"D1"/"D2")`, `assert_visible` |
 | `lock` | blinding of 2026 data: `sealed_path` / `read_sealed` (logged in `ledgers/test_access.jsonl`), `freeze` (NA-11), `require_unblind` (NA-12) |
 | `ledger` | append-only, hash-chained ledgers: spend with hard caps (PREREG §13), trials, test access, FMP requests |
-| `io` | hashed parquet I/O, `work/MANIFEST.json`, fingerprints of every `Data/` input read |
+| `io` | hashed parquet I/O, `work/MANIFEST.json`, fingerprints of every `Data/` input read; `register_artifact` for committed outputs under `artifacts/` |
+| `dm.client` | the only path to a decision model (OpenRouter Decisions API or local Laya): refusals (third-party, test period before the freeze, val-B gate, unmasked states, eligibility, `:free`), the sha256 response cache (`cache/decisions.sqlite`), dry runs and the spend ledger with hard caps, retries, `data_collection: deny`, offline mode for verifiers (CLAUDE.md C12–C14) |
 
 Each guard has tests that fail when the guard is removed (`tests/`).
