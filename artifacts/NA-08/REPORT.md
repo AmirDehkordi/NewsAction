@@ -3,13 +3,23 @@
 Date: 2026-10-26 · Branch `feat/NA-08-trained-dm` (worktree `NewsAction-NA08`, cut from `main` @ `214108f`) ·
 Decisions: `docs/decisions/NA-08.md` · Config: `configs/training.yaml`.
 
-**Status: the local half is complete and verified; the Kaggle half has not started.** Labels, the private
-dataset, the notebook, the nine kernel directories, the import, the controls and the model cards are built
-and tested end to end, the notebook on Laya's real weights and the whole chain on a tiny model. Nothing has
-been uploaded to Kaggle. The measured throughput (S4), the controls (S5), the imported predictions (S7) and the
-model cards' numbers (S8) wait for those runs; this report is updated when they come back. The operator decided
-on 2026-10-26 (§8): MAX_LEN 1,036 so that no state is cut; I run the runbook's Kaggle steps up to the pilot and
-stop for the quota plan; the block-dropout copies stay as specified.
+**Status: the local half and the throughput pilot are complete and verified; the 8 training runs are in
+progress on Kaggle.** Labels, the private dataset, the notebook, the kernels, the import, the controls and the
+model cards are built and tested end to end, the notebook on Laya's real weights and the whole chain on a tiny
+model. The dataset is on Kaggle (private), and its download is byte-identical to the local export (AC1).
+
+The pilot ran on 2×T4 and its outputs passed the import's verification: 8.2 seq/s training, 31.9 seq/s
+inference, 10.5 GB peak (§3.3). One epoch takes 5.9 h, so each run trains 1 epoch (≈ 7.4 h a run).
+
+The operator decided on 2026-10-26 (§8):
+- MAX_LEN 1,036, so that no state is cut;
+- I run the Kaggle steps;
+- the block-dropout copies stay;
+- the full plan, hedged: this week shuffle-s13 and laya-s13/17/23; next week anchor-s13, repro-s13,
+  anchor-s17 and anchor-s23 (58 GPU-hours, about two weekly quotas).
+
+The controls (S5), the imported predictions (S7) and the model cards' numbers (S8) wait for those runs; this
+report is updated when they come back.
 
 **Result so far.**
 - **Labels (S1).** 48,649 event keys of train, val-A and val-B. The train labels end on 2025-06-30, purge
@@ -48,7 +58,7 @@ No `newsaction.train` module imports `panel.targets` or the lock. `ledgers/test_
 | S1 labels | done | `src/newsaction/train/labels.py`; `work/kaggle/labels.parquet` |
 | S2 export | done | `src/newsaction/train/kaggle_export.py`; `work/kaggle/dataset/{train,val_a,val_b,test_callA}.parquet`, `dataset_info.json`, `sha256_manifest.json`, `dataset-metadata.json` |
 | S3 notebook | done | `src/newsaction/train/notebook/newsaction_laya_fin.ipynb` (built by `train/nbbuild.py` from `notebook/train_ddp.py`) |
-| S4 throughput pilot | code done; **not run** | pilot kernel `work/kaggle/kernels/pilot`; `train/plan.py` → `artifacts/NA-08/throughput.json` after the pilot |
+| S4 throughput pilot | done | kernel `amirdehkordi98/newsaction-na08-pilot` (v1, 2×T4, ~21 min); outputs `work/kaggle/predictions/pilot/` verified by `train/plan.py`; `artifacts/NA-08/throughput.json` (measured rates, options, the chosen plan) |
 | S5 controls | code done; **not run** | kernels `shuffle-s13`, `repro-s13`; `train/cards.py` → `artifacts/NA-08/controls.json` |
 | S6 runbook | done | §4 below; `work/kaggle/kernels/<run>/` (9 kernels) |
 | S7 import | code done; **no run to import** | `train/import_preds.py` → `work/kaggle/predictions/` |
@@ -126,17 +136,43 @@ Train react levels 0–8: 1,186 / 1,391 / 3,743 / 3,577 / 8,926 / 3,604 / 4,049 
 - **Tokenizer:** Laya's typed-decisions tokenizer and NA-04's ModernBERT-large tokenizer give identical ids
   on 4,500 sampled states. The notebook re-checks every count on Kaggle.
 
-### 3.3 Compute (before the pilot; a projection, not a measurement)
+### 3.3 Throughput pilot and the plan (S4; `artifacts/NA-08/throughput.json`)
 
-- **Rough estimate:** at ~3 GFLOP per token (forward, backward, recomputation) and ~18 TFLOP/s effective
-  per T4, one epoch takes ~3–4.5 h on 2×T4. A 3-epoch run with val-A evaluation and the final inference may
-  not fit a 12-hour session; the time budget then ends the run at its best epoch.
-- **Plan size:** with ~9–11 h per training run, the plan of 8 training runs plus the pilot is ~70–90
-  GPU-hours, i.e. about 3 weeks of a 30 h weekly quota.
-- **Reductions:** the PRD's order is anchor seeds → 1 (saves 2 runs); MAX_LEN 768, which the no-cut rule
-  excludes; then epochs 2. Even reduced, the plan is ~40–55 GPU-hours.
-- **The pilot measures it:** `plan.py` writes the options with GPU-hours and weeks for the operator to choose
-  from (owner decision 4).
+The pilot was one kernel with three launches on Kaggle's GPU T4 x2: Python 3.13.15, torch 2.11.0+cu128,
+transformers 5.20.2, laya 0.4.14. Each trained on a 5% subsample of train (8,716 examples) for 200 micro-batches
+per GPU, then rehearsed the output path on 2,000 / 500 / 500 val-A / val-B / test rows.
+
+| Launch | Training (seq/s, 2 GPUs) | Micro-batch (s, median) | Inference (seq/s) | Peak GPU | Result |
+|---|---|---|---|---|---|
+| Laya, checkpointing on, micro-batch 8 × accum. 4 | 8.24 | 1.92 | 31.9 | 10.5 GB | ok, rehearsal verified |
+| Laya, checkpointing off, micro-batch 4 × accum. 8 | – | – | – | > 14.5 GB | out of memory once AdamW's states exist (the probe alone passed at 10.1 GB) |
+| Anchor, checkpointing on, micro-batch 8 × accum. 4 | 8.21 | 1.93 | 32.0 | 10.5 GB | ok, rehearsal verified |
+
+- **Verification.** Both rehearsals passed `import_preds.verify_run`: the dataset sha256s equal the local
+  manifest, the program equals the committed `train_ddp.py`, the weights equal the pins, the head lengths
+  are as exported, and no state was cut. The probabilities equal softmax(logits / T).
+- **Rehearsal temperatures** (val-A rows, after only 200 steps): react 1.31 / 1.17 (Laya / anchor), mag
+  1.14 / 1.12. The cont head was still uniform at that point (T on the bound 20, NLL = ln 3).
+- **Projection** at the measured rates:
+  - one epoch over the 174,320 train examples takes 5.87 h;
+  - the val-A evaluation 0.54 h, the val-B + test inference 0.94 h, setup ≈ 0.05 h;
+  - so a 1-epoch run takes 7.44 h (6.49 h for a control, which predicts val-A only), and 2 epochs (13.8 h)
+    do not fit the 11.25 h budget of a 12-hour session. Every run trains 1 epoch, within PREREG §9.1's ≤ 3:
+    early stopping has one epoch to choose, and the val-A loss is still recorded. The cosine schedule is
+    fitted to that one epoch (2,724 updates).
+- **Options** (GPU-hours, weeks of a 30 h quota):
+
+  | Option | GPU-h | Weeks |
+  |---|---|---|
+  | full | 58.3 | 2 |
+  | anchor seeds → 1 | 43.4 | 2 |
+  | MAX_LEN 768 | excluded (no-cut rule) | |
+  | epochs 2 | does not fit a session | |
+
+- **Chosen (operator, 2026-10-26): full, hedged.** Week 1: shuffle-s13, laya-s13, laya-s17, laya-s23 (28.8 h).
+  Week 2: anchor-s13, repro-s13, anchor-s17, anchor-s23 (28.8 h). If the quota runs short, the last anchor
+  seeds wait or drop (the PRD's reduction) without losing the reproducibility control.
+- **Kaggle time used so far:** the pilot, ~21 min (pushed 20:22, complete 20:43 local time).
 
 ## 4. Operator runbook (S6)
 
@@ -175,13 +211,14 @@ uv run --locked python -m newsaction.train.build --stage plan     # verifies the
 #    Then choose the plan (owner decision 4); configs/training.yaml `kaggle.runs` / `model.max_epochs` are
 #    edited to it and `--stage kernels` is rerun before step 4.
 
-# 4. Training runs, one at a time, in this order (each ends within 11.25 h):
-#    shuffle-s13, laya-s13, laya-s17, laya-s23, anchor-s13, anchor-s17, anchor-s23, repro-s13
+# 4. Training runs, one at a time, in this order (1 epoch each, ~7.4 h; each ends within 11.25 h):
+#    week 1: shuffle-s13, laya-s13, laya-s17, laya-s23 | week 2: anchor-s13, repro-s13, anchor-s17, anchor-s23
 RUN=shuffle-s13
 uv run --locked kaggle kernels push -p work/kaggle/kernels/$RUN --accelerator NvidiaTeslaT4
 uv run --locked kaggle kernels status amirdehkordi98/newsaction-na08-$RUN           # until "complete"
 uv run --locked kaggle kernels output amirdehkordi98/newsaction-na08-$RUN \
     -p work/kaggle/predictions/$RUN --file-pattern na08_
+uv run --locked python -m newsaction.train.import_preds verify $RUN      # checks the download, writes nothing
 #    --file-pattern na08_ skips the 1.7 GB fp32 checkpoint (ckpt/), which stays in the kernel's output on
 #    Kaggle for NA-11's test Call B inference (attach the kernel's output as an input).
 
@@ -252,10 +289,10 @@ Owner decisions:
 3. **Decided (2026-10-26): keep the reaction-dropout copies** as PREREG §9.1 specifies (§3.2: they duplicate
    Call A D2 examples). If the quota plan does not fit, they (and the 9,481 D0 / D2 twin duplicates, ~5% each)
    can be dropped via `TRAIN_VARIANTS` before cutting seeds; that would be a §9.1 deviation.
-4. **The quota plan** (after the pilot): the plan likely needs 2–3 weeks of quota. Choose between the full plan
-   and the PRD's reductions (anchor seeds → 1; epochs 2); MAX_LEN 768 is excluded by the no-cut rule.
-   `throughput.json` will list the GPU-hours and weeks of each option. Kaggle is assumed to count a T4 ×2
-   session's wall-clock hours against the quota once (to be confirmed on the account page after the pilot).
+4. **Decided (2026-10-26): the full plan, hedged** (§3.3): 1 epoch per run, 58 GPU-hours over two weekly
+   quotas, with repro-s13 before the last two anchor seeds. Kaggle is assumed to count a T4 ×2 session's
+   wall-clock hours once against the 30-hour quota. The account's quota page should show about 0.35 h used
+   by the pilot.
 5. **Ledger merge.** NA-05 runs in parallel. Both branches may append to `ledgers/trials.jsonl`, whose lines
    are hash-chained, so merging both needs a re-chain of one branch's lines. NA-08 appends trials only at the
    cards stage, after the runs.

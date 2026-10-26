@@ -153,6 +153,8 @@ for init in INITS:
 
 LAUNCH: Final = """\
 PROGRAM_SHA256 = sha256("train_ddp.py")
+LIMITS = {s: 0 for s in ("val_b", "test") if s not in PREDICT_SPLITS}  # a split not predicted is not read
+LIMITS.update((LOCAL or {}).get("limits") or {})
 if MODE == "pilot":
     launches = PILOT["launches"]
 else:
@@ -168,7 +170,7 @@ for launch in launches:
         "REHEARSE": launch["rehearse"], "TIME_BUDGET_HOURS": TIME_BUDGET_HOURS, "PILOT": PILOT,
         "ECE_BINS": ECE_BINS, "MODEL_PATHS": MODEL_PATHS, "DATASET_CHECK": DATASET_CHECK,
         "NOTEBOOK_START": NOTEBOOK_START, "DEVICE": DEVICE, "PROGRAM_SHA256": PROGRAM_SHA256,
-        "LIMITS": (LOCAL or {}).get("limits"),
+        "LIMITS": LIMITS or None,
     }
     cfg_path = OUT_DIR / f"na08_{tag}_run_config.json"
     cfg_path.write_text(json.dumps(run_cfg, indent=1), encoding="utf-8")

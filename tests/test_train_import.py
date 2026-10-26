@@ -319,10 +319,10 @@ def tiny(tmp_path_factory: pytest.TempPathFactory) -> dict[str, Any]:
     )
     info = kaggle_export.run(lay, tok=tok, n_tokens=kaggle_export.hf_lengths(tok), cfg=cfg)
     nb = json.loads(NOTEBOOK.read_text(encoding="utf-8"))
-    for name in ("laya-s13", "anchor-s13"):
+    for name in ("laya-s13", "anchor-s13", "shuffle-s13"):
         params = kaggle_export.run_parameters(cfg.kaggle.run(name), cfg)
         params.update(
-            EPOCHS=2,
+            EPOCHS=1 if name == "shuffle-s13" else 2,
             TIME_BUDGET_HOURS=1.0,
             LOCAL={
                 "out_dir": str(lay.work / "kaggle" / "predictions" / name),
@@ -349,7 +349,7 @@ def tiny(tmp_path_factory: pytest.TempPathFactory) -> dict[str, Any]:
 
 def test_tiny_runs_are_imported_and_ensembled(tiny: dict[str, Any]) -> None:
     lay: Layout = tiny["lay"]
-    assert set(tiny["summary"]["runs"]) == {"laya-s13", "anchor-s13"}
+    assert set(tiny["summary"]["runs"]) == {"laya-s13", "anchor-s13", "shuffle-s13"}
     assert tiny["summary"]["models"] == {
         "laya_fin": {"runs": ["laya-s13"]},
         "anchor": {"runs": ["anchor-s13"]},
@@ -390,7 +390,9 @@ def test_tiny_cards_and_controls(tiny: dict[str, Any]) -> None:
         tables = text.split("## Val-A results")[1].split("## Controls")[0]
         assert "val-B" not in tables and "val_b" not in tables and "test" not in tables.lower()
     ctl = json.loads((art / "controls.json").read_text())
-    assert ctl["shuffled_label"]["status"] == "not run" and "deferral" in ctl["reproducibility"]["status"]
+    sh = ctl["shuffled_label"]
+    assert sh["run"] == "shuffle-s13" and isinstance(sh["pass"], bool) and sh["ic_e5"]["days"] == 3
+    assert "deferral" in ctl["reproducibility"]["status"]
     trials = [json.loads(x) for x in (tiny["lay"].ledgers / "trials.jsonl").read_text().splitlines()]
     assert {t["name"] for t in trials} >= {"laya_fin/ensemble", "laya_fin/laya-s13", "anchor/anchor-s13"}
     assert all(t["split"] == "val_a" and t["chunk"] == "NA-08" for t in trials)
@@ -488,3 +490,12 @@ def test_tiny_pilot_is_verified_and_planned(tiny: dict[str, Any]) -> None:
     full = out["options"][0]
     assert [r["run"] for r in full["runs"]][:2] == ["shuffle-s13", "laya-s13"] and full["gpu_hours"] > 0
     assert (lay.artifacts / "NA-08" / "throughput.json").is_file()
+
+
+def test_tiny_control_predicts_val_a_only(tiny: dict[str, Any]) -> None:
+    run = io.read_parquet("kaggle/predictions/runs/shuffle-s13.parquet", layout=tiny["lay"])
+    assert set(run["split"]) == {"val_a"}
+    run_dir = tiny["lay"].work / "kaggle" / "predictions" / "shuffle-s13"
+    rec = json.loads((run_dir / "na08_shuffle-s13_run_record.json").read_text())
+    assert rec["shuffle_labels"] is True and rec["rows_used"]["val_b"] == rec["rows_used"]["test"] == 0
+    assert "shuffle-s13" not in tiny["summary"]["models"]["laya_fin"]["runs"]  # a control is no ensemble seed

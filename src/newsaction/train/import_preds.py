@@ -200,7 +200,7 @@ def check_preds(
     if bool(((sums - 1.0).abs() > PROB_TOL).any()):
         raise RunImportError(f"{tag}: probabilities do not sum to 1")
     redo = [softmax(z, temps[qq]) for z, qq in zip(df["logits"], df["question_id"], strict=True)]
-    worst = max(float(np.abs(a - b).max()) for a, b in zip(redo, df["probs"], strict=True))
+    worst = max((float(np.abs(a - b).max()) for a, b in zip(redo, df["probs"], strict=True)), default=0.0)
     if worst > TEMP_TOL:
         raise RunImportError(f"{tag}: probabilities differ from softmax(logits / T) by {worst:.2e}")
 
@@ -232,7 +232,9 @@ def verify_run(
     for split in PRED_SPLITS:
         df = read_preds(run_dir / f"{PREFIX}{tag}_pred_{split}.arrow")
         exp = expected_ids(split, rec, layout)
-        if subset:
+        if split not in spec.predict:
+            exp = exp.iloc[:0]  # e.g. a control predicts val-A only
+        elif subset:
             exp = exp[exp["example_id"].isin(set(df["example_id"]))]
         check_preds(df, exp, temps, k_of, f"{tag}/{split}")
         meta = exp.set_index("example_id")[["event_id", "call", "window"]]
@@ -416,3 +418,39 @@ def run(layout: Layout | None = None, cfg: TrainingConfig | None = None) -> dict
             )
         summary["models"][model] = {"runs": have}
     return summary
+
+
+def main(argv: Sequence[str] | None = None) -> int:
+    """``python -m newsaction.train.import_preds verify <run>``: check one download, write nothing."""
+    import argparse
+
+    ap = argparse.ArgumentParser(prog="python -m newsaction.train.import_preds")
+    ap.add_argument("command", choices=["verify"])
+    ap.add_argument("run", help="a planned training run downloaded into work/kaggle/predictions/<run>")
+    args = ap.parse_args(argv)
+    cfg = load_training_config()
+    spec = cfg.kaggle.run(args.run)
+    run_dir = resolve_layout(None).work / PREDICTIONS_DIR / spec.name
+    rec, cal, preds = verify_run(run_dir, spec, spec.name, cfg)
+    print(
+        json.dumps(
+            {
+                "run": spec.name,
+                "best_epoch": rec["best_epoch"],
+                "epochs_run": rec["epochs_run"],
+                "stopped_by_time_budget": rec["stopped_by_time_budget"],
+                "temperatures": {q: h["temperature"] for q, h in cal["heads"].items()},
+                "rows": {s: len(p) for s, p in preds.items()},
+                "hours": round(
+                    (rec["throughput"]["wall_s"] + rec["throughput"]["notebook_to_process_s"]) / 3600, 2
+                ),
+            },
+            indent=1,
+        )
+    )
+    print(f"{spec.name}: verified")
+    return 0
+
+
+if __name__ == "__main__":
+    raise SystemExit(main())

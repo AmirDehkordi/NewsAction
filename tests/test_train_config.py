@@ -97,7 +97,13 @@ def test_run_plan_order_and_pilot() -> None:
     k = load_training_config().kaggle
     assert "throughput pilot → shuffled-label → Laya-Fin seeds → anchor seeds → repro" in PRD_NA08
     kinds = [("pilot" if r.mode == "pilot" else r.name.split("-")[0]) for r in k.runs]
-    assert kinds == ["pilot", "shuffle", "laya", "laya", "laya", "anchor", "anchor", "anchor", "repro"]
+    # the operator's plan after the pilot: the PRD order with repro before the last two anchor seeds
+    assert kinds == ["pilot", "shuffle", "laya", "laya", "laya", "anchor", "repro", "anchor", "anchor"]
+    assert all(r.epochs == 1 for r in k.runs if r.mode == "train")  # one epoch fits a session (pilot)
+    assert {r.name: r.predict for r in k.runs if r.predict != ("val_a", "val_b", "test")} == {
+        "shuffle-s13": ("val_a",),
+        "repro-s13": ("val_a",),
+    }
     assert "5% of train for 200 steps per INIT" in PRD_NA08
     assert (k.pilot.train_fraction, k.pilot.steps) == (0.05, 200)
     assert {x.init for x in k.pilot.launches} == {"laya", "modernbert"}

@@ -508,6 +508,7 @@ def run_parameters(run: RunSpec, cfg: TrainingConfig) -> dict[str, Any]:
         "SEED": run.seed if run.seed is not None else m.seeds[0],
         "EPOCHS": run.epochs if run.epochs is not None else m.max_epochs,
         "SHUFFLE_LABELS": run.shuffle_labels,
+        "PREDICT_SPLITS": list(run.predict),
         "SHUFFLE_SEED": cfg.controls.shuffle_permutation_seed,
         "DATASET_DIR": f"/kaggle/input/{ds_slug}",
         "MAX_LEN": m.max_len,

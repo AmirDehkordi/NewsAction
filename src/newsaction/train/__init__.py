@@ -167,6 +167,7 @@ class RunSpec(_Strict):
     seed: int | None = None
     epochs: int | None = Field(default=None, gt=0)
     shuffle_labels: bool = False
+    predict: tuple[Literal["val_a", "val_b", "test"], ...] = ("val_a", "val_b", "test")
 
     @model_validator(mode="after")
     def _shape(self) -> RunSpec:
@@ -174,6 +175,8 @@ class RunSpec(_Strict):
             raise ValueError(f"{self.name}: a pilot lists its inits and has no single init")
         if self.mode == "train" and (self.init is None or self.seed is None):
             raise ValueError(f"{self.name}: a training run needs an init and a seed")
+        if "val_a" not in self.predict:
+            raise ValueError(f"{self.name}: every run predicts val-A (early stopping, temperatures)")
         return self
 
 

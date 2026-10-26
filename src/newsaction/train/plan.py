@@ -80,12 +80,17 @@ def read_pilot(run_dir: Path, cfg: TrainingConfig, layout: Layout | None = None)
     return out
 
 
-def run_hours(rates: dict[str, Any], rows: dict[str, int], epochs: int) -> float:
-    """Projected session hours of one training run with ``epochs`` epochs."""
+def run_hours(
+    rates: dict[str, Any],
+    rows: dict[str, int],
+    epochs: int,
+    predict: tuple[str, ...] = ("val_a", "val_b", "test"),
+) -> float:
+    """Projected session hours of one training run with ``epochs`` epochs that predicts ``predict``."""
     train_rate, eval_rate = rates["train_seq_per_s"], rates["eval_seq_per_s"]
     setup = rates["notebook_to_process_s"] + rates["process_to_training_s"]
     epoch = rows["train"] / train_rate + rows["val_a"] / eval_rate + CKPT_SAVE_S
-    final = (rows["val_b"] + rows["test"]) / eval_rate + OUTPUT_S
+    final = sum(rows[s] for s in ("val_b", "test") if s in predict) / eval_rate + OUTPUT_S
     return float((setup + epochs * epoch + final) / 3600.0)
 
 
@@ -109,12 +114,14 @@ def options(
     for name, n_anchor, cap in steps:
         e = max_epochs(rates, rows, cfg, cap)
         h_run = run_hours(rates, rows, e)
-        h_shuffle = run_hours(rates, rows, 1)
+        k = cfg.kaggle
+        h_shuffle = run_hours(rates, rows, 1, k.run(cfg.controls.shuffle_run).predict)
+        h_repro = run_hours(rates, rows, e, k.run(cfg.controls.repro_runs[1]).predict)
         runs = (
-            [("shuffle-s13", 1, h_shuffle)]
+            [(cfg.controls.shuffle_run, 1, h_shuffle)]
             + [(f"laya-s{s}", e, h_run) for s in seeds]
             + [(f"anchor-s{s}", e, h_run) for s in seeds[:n_anchor]]
-            + [("repro-s13", e, h_run)]
+            + [(cfg.controls.repro_runs[1], e, h_repro)]
         )
         total = pilot_hours + sum(h for _, _, h in runs)
         out.append(
@@ -139,6 +146,16 @@ def options(
         },
     )
     return out
+
+
+def chosen(cfg: TrainingConfig) -> dict[str, Any]:
+    """The plan in ``configs/training.yaml`` (the operator's choice): its runs, in order, and their epochs."""
+    train = [r for r in cfg.kaggle.runs if r.mode == "train"]
+    anchors = sum(r.init == "modernbert" and not r.shuffle_labels for r in train)
+    return {
+        "option": "full" if anchors == len(cfg.model.seeds) else f"anchor seeds -> {anchors}",
+        "runs": [{"run": r.name, "epochs": r.epochs, "predict": list(r.predict)} for r in train],
+    }
 
 
 def run(layout: Layout | None = None, cfg: TrainingConfig | None = None) -> dict[str, Any]:
@@ -167,6 +184,7 @@ def run(layout: Layout | None = None, cfg: TrainingConfig | None = None) -> dict
             ),
         },
         "options": options(fastest, rows, cfg, pilot_hours),
+        "chosen": chosen(cfg),
         "quota": {
             "session_hours": cfg.kaggle.session_hours,
             "weekly_gpu_hours": cfg.kaggle.weekly_gpu_hours,
