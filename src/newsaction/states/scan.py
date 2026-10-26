@@ -130,6 +130,7 @@ _DATE: Final = re.compile(
     r"|\b\d{6}\s+\$?\d+(?:\.\d+)?\s?[CP]\b|\b[A-Z]{1,6}\d{6}[CP]\d{3,9}\b"
     r"|\b(?i:recently)\s?[–\-]\s?\d{1,2}\b(?!:)"  # not a time: "Recently - 08:30 AM"
     r"|\b\d{1,2}\s?[–\-]\s?(?i:recently)\b"
+    r"|\b(?:Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Sept|Oct|Nov|Dec)[-’'/]\d{2}\b(?![-/.]\d)"  # "Sep-25 puts"
 )
 _PRICE_MOVE: Final = re.compile(
     r"(?i)\b(?:shares?|stock|premarket|pre-market|after-hours|extended trading)\b[^.!?]{0,50}?"
@@ -192,6 +193,39 @@ _TARGET_ANY: Final = re.compile(  # "$" after the base labels is counted by _PRI
     r"(?![\d,.]*\s*(?:[MBK]\b|million|billion|bn|trillion))"
     r"|\$\s?\d[\d,]*(?:\.\d+)?\s+(?:price\s+estimate|fair\s+value)\b"
 )
+# a level after a trading verb counts whatever words sit between ("shares, part of the earnings season rally,
+# closed at $242.66")
+_SHARE_VERB_LEVEL: Final = re.compile(
+    r"(?i)\b(?:shares?|stock(?:\s+price)?)\b[^.!?]{0,50}?\b(?:closed|closing|opened|opening|traded|trading|trades?|"
+    r"stood|stands?|settled|settling|ended|finished|hit|touched|reached)\b[^.!?$]{0,20}?\b(?:at|to|near|around|"
+    r"as\s+(?:high|low)\s+as)\s+(?:C\$|US\$|\$|USD\s?|€\s?|£\s?)\d[\d,]*(?:\.\d+)?(?!\s*(?:per|a|/)\s*share)"
+)
+# since the fourth verification's second pass: any cents-precision amount in a sentence without a per-share
+# fundamental word is a level (MarketBeat's "The company traded as high as $155.51", "Receives $49.11 Average
+# Price Target", "a one-year high of $66.44"); options-flow chatter; moves written "an increase of 2.4%" or
+# "added 16%"
+_CENTS_ANY: Final = re.compile(
+    r"(?i)(?:C\$|US\$|A\$|\$|USD\s?|GBX\s?|€\s?|£\s?)\d[\d,]*\.\d{2}(?!\d)"
+    r"(?!\s*(?:[MBKT]\b|mn\b|mln\b|bn\b|million|billion|trillion))"
+)
+_FUNDAMENTAL_WORDS: Final = re.compile(
+    r"(?i)\b(?:eps|earnings|per[\s-]+(?:\w+\s+)?share|dividends?|distributions?|payouts?|ffo|affo|net\s+income|"
+    r"income|loss(?:es)?|profits?|revenues?|sales|consensus|estimates?|expected|expects?|guidance|book\s+value|"
+    r"nav|coupons?|notes|bonds?)\b|/\s?share|\ba\s+share\b"
+)
+_OPTIONS_CHATTER: Final = re.compile(
+    r"(?i)\b(?:lifted|hit|paid)\s+the\s+\$\d|\bunderlying\s+shares\s+were\b"
+    r"|\b(?:Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)-\d{2}\s+\$?\d[\d.]*\s+(?:puts?|calls?)\b"
+    r"|\bweekly\s+\$?\d[\d.]*\s+(?:puts?|calls?)\b"
+)
+_MOVE_OF: Final = re.compile(
+    r"(?i)\b(?:shares?|stocks?|stock\s+price|the\s+company(?:['’]s)?)\b(?P<stretch>[^.!?%]{0,60}?)\b(?:increase|"
+    r"decrease|decline|rise|drop|gain|downturn|dip|loss|surge|jump|uptick|advance|slide|fall)\s+of\s+"
+    r"(?:about\s+|nearly\s+|almost\s+|over\s+|more\s+than\s+)?\d+(?:[.,]\d+)?\s?%"
+    r"|\b(?:shares?|stocks?)\b(?P<stretch2>[^.!?%]{0,30}?)\b(?:add(?:s|ed|ing)?|shed(?:s|ding)?)\s+\d+(?:[.,]\d+)?\s?%"
+    r"|\b\d+(?:[.,]\d+)?\s?%\s+during\s+(?:after-hours|after\s+hours|premarket|pre-market|extended)"
+)
+_SENTENCES: Final = re.compile(r"(?<=[.!?])\s+(?=[A-Z\"“(])")
 _AMOUNT_THEN_PRICE: Final = re.compile(
     r"(?i)(?:C\$|US\$|\$|USD\s?|€\s?|£\s?)\d[\d,]*(?:\.\d+)?\s+(?:stock|share)\s+price"
 )
@@ -223,10 +257,18 @@ def price_level_count(text: str) -> int:
     deal prices (fourth verification)."""
     n = len(_PRICE_LEVEL.findall(text)) + len(_TARGET_ANY.findall(text)) + len(_DEAL_PER_SHARE.findall(text))
     n += len(_AMOUNT_THEN_PRICE.findall(text))
+    for sentence in _SENTENCES.split(text):
+        if (
+            _CENTS_ANY.search(sentence) and not _FUNDAMENTAL_WORDS.search(sentence)
+        ) or _OPTIONS_CHATTER.search(sentence):
+            n += 1
+    verb = [m.span() for m in _SHARE_VERB_LEVEL.finditer(text) if not _SIZE_AFTER.match(text, m.end())]
+    n += len(verb)
     for m in _SHARE_AMOUNT.finditer(text):
         left = text[max(0, m.start() - 30) : m.start()]
         if (
-            _LEFT_CUES.search(left)
+            any(a < m.end() and m.start() < b for a, b in verb)  # counted as a level after a verb
+            or _LEFT_CUES.search(left)
             or _AMOUNT_CUES.search(m.group("stretch"))
             or _FOR_END.search(m.group("stretch"))
             or _SIZE_AFTER.match(m.group("after"))
@@ -250,6 +292,10 @@ def price_move_count(text: str) -> int:
         for m in _MOVE_AFTER_NUMBER.finditer(text)
         if not _FUNDAMENTAL.search(m.group("stretch")) and not _FUND_AFTER.match(text, m.end())
     )
+    for m in _MOVE_OF.finditer(text):
+        stretch = m.group("stretch") or m.group("stretch2") or ""
+        if not _FUNDAMENTAL.search(stretch) and not _PER_LEFT.search(text[max(0, m.start() - 5) : m.start()]):
+            n += 1
     return n + len(_MOVE_NOUN.findall(text))
 
 

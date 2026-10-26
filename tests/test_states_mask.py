@@ -688,9 +688,20 @@ REVISION4_GONE = (
     ("Recently, Norfolk Southern (NSC) closed at a 1.13% decline with a volume of $0.7 billion.", "1.13%"),
     ("Apple Moves 22.8% Higher: Will This Strength Last?", "22.8%"),
     ("Why Apple Zoomed 4% Higher Today", "4%"),
-    ("Apple's shares, part of the earnings season rally, closed at $242.66.", "$242"),  # the verb rule
+    ("Apple's shares, part of the earnings season rally, traded as high as $242.66.", "$242"),  # verb rule
     ("Apple shares snapped a six-session winning streak, closing 1% lower recently.", "1%"),
     ("Lowe's shares snapped their six-day winning streak, closing 0.47% lower at $240.02 recently.", "$240"),
+    # second pass: any cents-precision amount without a per-share fundamental, moves "of N%", options chatter
+    ("Apple traded as high as $155.51 and last traded at $154.20.", "$155"),
+    ("Apple Receives $49.11 Average Price Target from Analysts", "$49"),
+    ("Apple has a one-year high of $66.44 and a one-year low of $47.90.", "$66"),
+    ("An executive has sold 2,500 shares at a price of $251.12 per...", "$251"),
+    ("Truist Financial Reiterates \u201c$415.00\u201d Price Target for Apple", "$415"),
+    ("With a recent closing price of $34.01, Apple continues to capture investor attention.", "$34"),
+    ("In a notable move, shares of Apple saw an increase of 2.4% during after-hours trading.", "2.4%"),
+    ("Duolingo shares added 16% after the app reported strong results.", "16%"),
+    ("Notable profits for the buyer who lifted the $0.37 offer for 1,967 Apple 9/12 weekly 20 puts.", "puts"),
+    ("Crude for Sep-25 delivery rose on Tuesday.", "Sep-25"),
 )
 REVISION4_KEEP = (
     "Apple reported earnings of $1.71 per share, beating estimates by $0.04.",
@@ -709,6 +720,9 @@ REVISION4_KEEP = (
     "The company reported 26% lower the quarter net income amid tariff losses.",
     "If you invested $1,000 in the company stock 10 years ago, you would have approximately $3,000 today.",
     "Stock Market Today: Dow Hits Record, Gold Surges to $3,816",
+    "Apple is expected to report earnings of $0.72 per share, indicating an increase of 16.1% on a year ago.",
+    "Apple's EPS for the quarter was $1.72, surpassing the previous year's $1.57 and the estimated $1.67.",
+    "Home Furnishings Stores Market Expansion Continues, with Forecast Valuation of $286.39 Billion",
 )
 
 
@@ -728,6 +742,10 @@ def test_price_targets_in_other_notations_become_a_relative_change() -> None:
     assert "USD" not in out and "raised by about 20%" in out, out
     out = m("Barclays had its price objective boosted by analysts from GBX 420 to GBX 500 in a report.", AAPL)
     assert "GBX" not in out and "raised by about 19%" in out, out
+    out = m(
+        "Apple had its price target cut by analysts at JPMorgan Chase & Co. from $215.00 to $175.00", AAPL
+    )
+    assert "$" not in out and "lowered by about 19%" in out, out  # an abbreviation's period ("Co.")
     out = m("Offering Of 7 Million Shares At $142.00 Per Share", AAPL)  # the whole amount, not "$142"
     assert "$142" not in out and "a per-share price" in out, out
     assert Masker.amount("1.209,24 USD") == 1209.24 and Masker.amount("GBX 1,410") == 1410.0
@@ -737,7 +755,7 @@ def test_scanner_sees_the_fourth_verification_forms() -> None:
     sc = scanner()
     for text, _ in REVISION4_GONE:  # as a state shows them, the company's name masked
         c = sc.scan_text(text.replace("Apple", "The company"), AAPL)
-        assert c.price_levels + c.price_moves >= 1, text
+        assert c.price_levels + c.price_moves + c.dates >= 1, text
     for text in REVISION4_KEEP:
         c = sc.scan_text(text, AAPL)
         assert c.price_levels + c.price_moves == 0, text

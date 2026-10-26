@@ -163,6 +163,24 @@ _LEVEL_CUES: Final = re.compile(
     r"capitali[sz]ation|stake|position|invest|fund|program|plan\b|award|grant|compensation|salary|fee|fine|"
     r"settlement|cost|offering|buyback|repurchase|you\s+would\s+have"
 )
+# a share-price level in any phrasing (fourth verification: "The company traded as high as $155.51",
+# "Receives $49.11 Average Price Target", "has a one-year high of $66.44", "sold 2,500 shares at a price of
+# $251.12"): after the price-target rewrites, a sentence that still holds a cents-precision amount and no
+# per-share fundamental goes; a size ("$9.05 Billion") is not a level
+_CENTS: Final = re.compile(
+    rf"(?i){_CUR}\d[\d,]*\.\d{{2}}(?!\d)(?!\s*(?:[MBKT]\b|mn\b|mln\b|bn\b|million|billion|trillion))"
+)
+_PER_SHARE_FUND: Final = re.compile(
+    r"(?i)\b(?:eps|earnings|per[\s-]+(?:\w+\s+)?share|dividends?|distributions?|payout|ffo|affo|income|"
+    r"loss(?:es)?|profits?|revenues?|sales|consensus|estimates?|expected|guidance|book\s+value|nav|coupons?|"
+    r"notes|bonds?)\b|/\s?share|\ba\s+share\b"
+)
+# options-flow chatter: a strike near the share price and an expiry month ("lifted the $0.37 offer for 1,967
+# the company 9/12 weekly 20 puts", "Sep-25 24 puts", "when underlying shares were")
+_OPTIONS_FLOW: Final = re.compile(
+    r"(?i)\b(?:Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)-\d{2}\s+\$?\d[\d.]*\s+(?:puts?|calls?)\b"
+    r"|\bweekly\s+\$?\d[\d.]*\s+(?:puts?|calls?)\b|\bunderlying\s+shares\s+were\b|\b(?:lifted|hit|paid)\s+the\s+\$"
+)
 _PER_SHARE_AFTER: Final = re.compile(r"(?i)\s*(?:per[\s-]+(?:\w+\s+)?share|a\s+share|/\s?share)")
 _SIZE: Final = re.compile(r"(?i)\s?(?:[MBK]\b|mn\b|mln\b|bn\b|million|billion|trillion)")
 # a footnote mark after an amount ("a previous target of $49.00.1;")
@@ -186,8 +204,22 @@ PRICE_MOVE: Final = re.compile(
     r"\d+(?:[.,]\d+)?\s?%"
 )
 PRICE_MOVE_AFTER: Final = re.compile(
-    r"(?i)\b\d+(?:[.,]\d+)?\s?%\s+(?:in\s+)?(?:premarket|pre-market|before\s+the\s+bell|after\s+hours|after-hours)"
+    r"(?i)\b\d+(?:[.,]\d+)?\s?%\s+(?:(?:in|during)\s+)?(?:premarket|pre-market|before\s+the\s+bell|after\s+hours|"
+    r"after-hours|extended\s+trading)"
 )
+# "shares of the company saw an increase of 2.4% during after-hours trading", "Duolingo shares added 16%"
+PRICE_MOVE_OF: Final = re.compile(
+    rf"(?i)\b{_SUBJECT}\b(?P<mid>[^.!?%]{{0,60}}?)\b(?:increase|decrease|decline|rise|drop|gain|downturn|dip|"
+    r"loss|surge|jump|uptick|downtick|advance|slide|fall|move|movement)\s+of\s+(?:about\s+|nearly\s+|almost\s+|"
+    r"over\s+|more\s+than\s+)?\d+(?:[.,]\d+)?\s?%"
+)
+PRICE_MOVE_ADDED: Final = re.compile(
+    r"(?i)\b(?:shares?|stocks?)\b(?P<mid>[^.!?%]{0,30}?)\b(?:add(?:s|ed|ing)?|shed(?:s|ding)?|lost|los(?:e|es|ing))"
+    r"\s+\d+(?:[.,]\d+)?\s?%"
+)
+_PER_LEFT: Final = re.compile(
+    r"(?i)\bper[\s-]$"
+)  # "earnings of $0.72 per share, an increase of 16%" is no move
 _PCT: Final = r"\d+(?:[.,]\d+)?\s?%"
 # the direction after the number (NA-04 fourth verification): "The company Trading 2.4% Higher" (MarketBeat;
 # NA-02 scrubs its "Trading Down 3.1%" form, so only rises were left), "shares were 3% lower"
@@ -224,21 +256,29 @@ _FUNDAMENTAL_SUBJECT: Final = re.compile(
 )
 _PT: Final = (  # "price estimate", "fair value", "targeting a price of" since the fourth verification
     r"(?:price\s+targets?|target\s+prices?|price\s+objectives?|price\s+goals?|price\s+estimates?|"
-    r"fair\s+values?(?:\s+estimates?)?|targeting\s+a\s+price|PTs?|targets?)"
+    r"price\s+forecasts?|price\s+predictions?|fair\s+values?(?:\s+estimates?)?|targeting\s+a\s+price|PTs?|"
+    r"targets?)"
 )
+# one character of the stretch between a label and its amount: an abbreviation's period does not end it
+# ("JPMorgan Chase & Co. from $104.00 to $96.00", "Citigroup Inc. from", "B. Riley", "Monday.com Ltd.")
+_ABBR_DOT: Final = (
+    r"(?<=\b[A-Z])\.|(?<=\bCo)\.|(?<=\bInc)\.|(?<=\bCorp)\.|(?<=\bLtd)\.|(?<=\bSt)\.|\.(?=com\b)"
+)
+_MIDC: Final = rf"(?:[^$.;!?]|{_ABBR_DOT})"
+_MIDC_X: Final = rf"(?:[^$€£.;!?]|{_ABBR_DOT})"
 _AMT: Final = (
     r"\$\s?(\d{1,3}(?:,\d{3})+(?:\.\d+)?|\d+(?:\.\d+)?)"
     r"(?!\d|\.\d|\s*(?:million|billion|trillion|bn|mn|[mbk]\b|%))"
 )
 PT_FROM_TO: Final = re.compile(
-    rf"(?i)\b(?P<label>{_PT})\b(?P<mid>[^$.;!?]{{0,60}}?)\bfrom\s+{_AMT}\s+to\s+{_AMT}"
+    rf"(?i)\b(?P<label>{_PT})\b(?P<mid>{_MIDC}{{0,60}}?)\bfrom\s+{_AMT}\s+to\s+{_AMT}"
 )
 PT_TO_FROM: Final = re.compile(
-    rf"(?i)\b(?P<label>{_PT})\b(?P<mid>[^$.;!?]{{0,60}}?)(?:\b(?:to|at)\s+)?{_AMT}\s*,?\s*"
+    rf"(?i)\b(?P<label>{_PT})\b(?P<mid>{_MIDC}{{0,60}}?)(?:\b(?:to|at)\s+)?{_AMT}\s*,?\s*"
     rf"(?:from|vs\.?|versus|up\s+from|down\s+from)\s+{_AMT}"
 )
 PT_AMOUNT: Final = re.compile(
-    rf"(?i)\b(?P<label>{_PT})\b(?P<mid>[^$.;!?]{{0,80}}?)"
+    rf"(?i)\b(?P<label>{_PT})\b(?P<mid>{_MIDC}{{0,80}}?)"
     rf"(?:\b(?:to|at|of|from|is)\s+)?(?:(?:the|a)\s+previous\s+)?{_AMT}"
 )
 AMOUNT_PT: Final = re.compile(rf"(?i){_AMT}\s+(?P<label>{_PT})\b")
@@ -251,14 +291,14 @@ _AMT_X: Final = (
     r"(?!\d|\s*(?:million|billion|trillion|bn|mn|[mbk]\b|%))"
 )
 PT_FROM_TO_X: Final = re.compile(
-    rf"(?i)\b(?P<label>{_PT})\b(?P<mid>[^$€£.;!?]{{0,60}}?)\bfrom\s+(?P<a>{_AMT_X})\s+to\s+(?P<b>{_AMT_X})"
+    rf"(?i)\b(?P<label>{_PT})\b(?P<mid>{_MIDC_X}{{0,60}}?)\bfrom\s+(?P<a>{_AMT_X})\s+to\s+(?P<b>{_AMT_X})"
 )
 PT_TO_FROM_X: Final = re.compile(
-    rf"(?i)\b(?P<label>{_PT})\b(?P<mid>[^$€£.;!?]{{0,60}}?)(?:\b(?:to|at)\s+)?(?P<b>{_AMT_X})\s*,?\s*"
+    rf"(?i)\b(?P<label>{_PT})\b(?P<mid>{_MIDC_X}{{0,60}}?)(?:\b(?:to|at)\s+)?(?P<b>{_AMT_X})\s*,?\s*"
     rf"(?:from|vs\.?|versus|up\s+from|down\s+from)\s+(?P<a>{_AMT_X})"
 )
 PT_AMOUNT_X: Final = re.compile(
-    rf"(?i)\b(?P<label>{_PT})\b(?P<mid>[^$€£.;!?]{{0,80}}?)(?:\b(?:to|at|of|from|is)\s+)?{_AMT_X}"
+    rf"(?i)\b(?P<label>{_PT})\b(?P<mid>{_MIDC_X}{{0,80}}?)(?:\b(?:to|at|of|from|is)\s+)?{_AMT_X}"
     r"(?:\s*/\s*share)?"
 )
 AMOUNT_PT_X: Final = re.compile(rf"(?i){_AMT_X}\s+(?P<label>{_PT})\b")
@@ -724,6 +764,7 @@ _DATE_RULES: Final[tuple[tuple[re.Pattern[str], str], ...]] = tuple(
     (re.compile(p[len(_I) :], re.IGNORECASE) if p.startswith(_I) else re.compile(p), r)
     for p, r in (
         (r"\b(?:Black|Cyber|Good)\s+(?:Friday|Monday)\b", "a holiday"),
+        (r"\b(?:Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Sept|Oct|Nov|Dec)[-’'/]\d{2}\b(?![-/.]\d)", RECENTLY),
         (rf"{YEAR_RE}\s?[年년]\s?(?:{CJK_DAY}|\d{{1,2}}\s?[月월])", RECENTLY),
         (rf"(?<!\d){CJK_DAY}", RECENTLY),
         (rf"{CJK_YEAR}\s?(?:{CJK_QUARTER}|Q[1-4](?![A-Za-z0-9]))", QUARTER),
@@ -1206,7 +1247,9 @@ class Masker:
         if PRICE_MOVE_AFTER.search(sentence) or PRICE_MOVE_NOUN.search(sentence):
             return True
         for sm in _MOVE_SUBJECT.finditer(sentence):
-            for pattern in (PRICE_MOVE, PRICE_MOVE_POSTFIX):
+            if _PER_LEFT.search(sentence[max(0, sm.start() - 5) : sm.start()]):
+                continue
+            for pattern in (PRICE_MOVE, PRICE_MOVE_POSTFIX, PRICE_MOVE_OF, PRICE_MOVE_ADDED):
                 m = pattern.match(sentence, sm.start())
                 if m and not _FUNDAMENTAL_SUBJECT.search(m.group("mid") or ""):
                     return True
@@ -1278,7 +1321,16 @@ class Masker:
             return "a per-share price" if _DEAL.search(left) and not _FUND_LEFT.search(left) else m.group(0)
 
         text, k = PER_SHARE.subn(deal, text)
-        return text, n
+        dropped = 0
+        for sentence in split_sentences(text):
+            if (_CENTS.search(sentence) and not _PER_SHARE_FUND.search(sentence)) or _OPTIONS_FLOW.search(
+                sentence
+            ):
+                text = text.replace(sentence, "", 1)
+                dropped += 1
+        if dropped:
+            text = _SEP_RUN.sub(lambda m: m.group(1) + " ", text).strip(" ;|")
+        return text, n + dropped
 
     # --- one text ----------------------------------------------------------------------------------
 
