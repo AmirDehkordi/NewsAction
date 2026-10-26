@@ -24,6 +24,7 @@ from newsaction.config import (
     load_project,
     load_splits,
 )
+from newsaction.news import clean
 from newsaction.paths import ROOT
 
 PREREG = (ROOT / "docs" / "PREREG.md").read_text(encoding="utf-8")
@@ -135,6 +136,7 @@ def test_frozen_news_section_from_na02() -> None:
         return
     keys = {"summary_variant_allowed", "excluded_sources", "leakage_audit_sha", "leakage_audit_file"}
     assert set(news) == keys | {"parsing_allowed_none"}
+    assert news["parsing_allowed_none"] in clean.NONE_POLICIES  # PREREG §6.1; the operator's decision, §15
     assert isinstance(news["summary_variant_allowed"], bool)
     assert isinstance(news["excluded_sources"], list)
     assert len(str(news["leakage_audit_sha"])) == 64

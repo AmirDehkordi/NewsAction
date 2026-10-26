@@ -27,7 +27,7 @@ import pandas as pd
 
 from newsaction import io
 from newsaction.config import load_splits
-from newsaction.news import ARTICLES, load_news_config
+from newsaction.news import ARTICLES, clean, load_news_config
 from newsaction.paths import CONFIGS, ROOT, Layout
 
 PUBLIC_END: Final[date] = load_splits().splits["val_b"].end
@@ -211,7 +211,7 @@ def frozen_news_section(leak: pd.DataFrame, leak_csv: Path) -> dict[str, object]
         "excluded_sources": excluded,
         "leakage_audit_sha": hashlib.sha256(leak_csv.read_bytes()).hexdigest(),
         "leakage_audit_file": "artifacts/NA-02/leakage_ic.csv",
-        "parsing_allowed_none": "pending_operator",
+        "parsing_allowed_none": clean.none_policy(),  # the operator's decision survives a re-run
     }
 
 

@@ -7,7 +7,9 @@ Per article:
   ``holdings_13f``: an include pattern matches and no exclude pattern does; Form-4 insider and STOCK-Act
   congressional trades are excluded);
 - ``is_form4``: insider-transaction auto-article (Form 4 / Form 144), kept as metadata, not as text;
-- ``third_party_ok``: ``parsing_allowed is True`` (None and False are both not OK, PREREG §6.1).
+- ``third_party_ok``: ``parsing_allowed`` is True, or None when the operator allowed None articles
+  (``configs/frozen.yaml`` ``news.parsing_allowed_none: allow``; decision A of 2026-10-25, PREREG §15).
+  False is never OK (PREREG §6.1, CLAUDE.md D15).
 
 ``passes_clean`` is §6.2 before deduplication; ``keep`` in the output also requires the article to be its
 near-duplicate group's representative (``dedupe``).
@@ -23,11 +25,13 @@ from pathlib import Path
 
 import pandas as pd
 
-from newsaction.config import load_yaml
+from newsaction.config import load_frozen, load_yaml
 from newsaction.news import load_news_config
 from newsaction.news.detect import PATTERNS_PATH
+from newsaction.paths import CONFIGS
 
 CLEAN_FLAGS = ("non_news", "junk_tag", "is_13f", "is_form4")
+NONE_POLICIES = ("allow", "exclude", "pending_operator")
 
 
 @dataclass(frozen=True)
@@ -80,9 +84,23 @@ def _bool(s: pd.Series) -> pd.Series:
     return s.astype("boolean").fillna(False).astype(bool)
 
 
-def third_party_ok(parsing_allowed: pd.Series) -> pd.Series:
-    """PREREG §6.1 / CLAUDE.md D15: only ``parsing_allowed is True`` may ever leave this machine."""
-    return _bool(parsing_allowed)
+def none_policy(path: Path = CONFIGS / "frozen.yaml") -> str:
+    """The operator's ``parsing_allowed == None`` policy (PREREG §6.1): ``allow``, ``exclude`` or
+    ``pending_operator`` (treated as ``exclude``), from ``configs/frozen.yaml``
+    ``news.parsing_allowed_none``."""
+    news = load_frozen(path).news or {}
+    policy = str(news.get("parsing_allowed_none", "pending_operator"))
+    if policy not in NONE_POLICIES:
+        raise ValueError(f"news.parsing_allowed_none must be one of {NONE_POLICIES}, not {policy!r}")
+    return policy
+
+
+def third_party_ok(parsing_allowed: pd.Series, *, none_ok: bool | None = None) -> pd.Series:
+    """PREREG §6.1 / CLAUDE.md D15: ``parsing_allowed`` False never leaves this machine; None only when
+    ``none_ok`` (default: the operator's ``none_policy() == "allow"``)."""
+    if none_ok is None:
+        none_ok = none_policy() == "allow"
+    return parsing_allowed.astype("boolean").fillna(none_ok).astype(bool)
 
 
 def clean_flags(df: pd.DataFrame) -> pd.DataFrame:
