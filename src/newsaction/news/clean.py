@@ -8,7 +8,7 @@ Per article:
   congressional trades are excluded);
 - ``is_form4``: insider-transaction auto-article (Form 4 / Form 144), kept as metadata, not as text;
 - ``third_party_ok``: ``parsing_allowed`` is True, or None when the operator allowed None articles
-  (``configs/frozen.yaml`` ``news.parsing_allowed_none: allow``; decision A of 2026-10-25, PREREG §15).
+  (``configs/frozen.yaml`` ``news.parsing_allowed_none: allow``; operator decision A, PREREG §15).
   False is never OK (PREREG §6.1, CLAUDE.md D15).
 
 ``passes_clean`` is §6.2 before deduplication; ``keep`` in the output also requires the article to be its
