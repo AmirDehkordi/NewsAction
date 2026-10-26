@@ -244,7 +244,8 @@ _FOR_END: Final = re.compile(r"(?i)\bfor\s*$")
 _SIZE_AFTER: Final = re.compile(r"(?i)\s?(?:[MBKT]\b|mn\b|mln|bn|bln|million|billion|trillion)")
 _PER_SHARE_AFTER: Final = re.compile(r"(?i)\s*(?:per[\s-]+(?:\w+\s+)?share|a\s+share|/\s?share)")
 _DEAL_PER_SHARE: Final = re.compile(  # "$47.50 in cash a share", "$4.04 cash + CVR per share"
-    r"(?i)\b(?:acquir\w*|buyout|offer\w*|deal|merger|takeover|tender|bid|pay(?:s|ing)?|paid)\b[^.!?]{0,60}?"
+    r"(?i)\b(?:acquir\w*|buyout|offer\w*|deal|merger|takeover|tender|bid|pay(?:s|ing)?|paid)\b"
+    r"(?:(?!dividend|distribution|\beps\b|earnings)[^.!?]){0,60}?"
     r"\$\s?\d[\d,]*(?:\.\d+)?(?:\s+(?:in\s+)?cash)?(?:\s*\+\s*(?:a\s+|one\s+)?CVR)?"
     r"\s*(?:/\s?|per\s+(?:common\s+)?|a\s+)share\b(?![^.!?]{0,30}\b(?:dividends?|distributions?|eps|earnings)\b)"
 )
