@@ -1,0 +1,298 @@
+{
+ "ledger": {
+  "na06_usd": 3.526621698999973,
+  "total_usd": 3.630544039999973,
+  "by_chunk": {
+   "NA-05": 0.1039223410000001,
+   "NA-06": 3.526621698999973
+  },
+  "cap_usd": 4.0
+ },
+ "reconcile": -2.708944180085382e-14,
+ "n_rows": 65289,
+ "actual_by_stage": {
+  "stage1": 0.7968128170000001,
+  "stage2": 2.696453322,
+  "validity": 0.033355560000000006
+ },
+ "calls_by_stage": {
+  "stage1": 14699,
+  "stage2": 50090,
+  "validity": 500
+ },
+ "by_model": {
+  "cloudflare/clef": {
+   "usd": 0.581154696,
+   "calls": 9050,
+   "cost_ratio": 1.284460512974927,
+   "cost_ratio_max": 5.714285714285715
+  },
+  "cloudflare/clef-flash": {
+   "usd": 0.018429297,
+   "calls": 700,
+   "cost_ratio": 1.1519764275254483,
+   "cost_ratio_max": 2.0
+  },
+  "cloudflare/clef-omni": {
+   "usd": 0.1257159,
+   "calls": 700,
+   "cost_ratio": 1.0,
+   "cost_ratio_max": 1.0000000000000002
+  },
+  "inception/mercury-decide": {
+   "usd": 0.21048948,
+   "calls": 9050,
+   "cost_ratio": 1.0,
+   "cost_ratio_max": 1.0
+  },
+  "jaredpalmer/kev-4b": {
+   "usd": 0.02407986,
+   "calls": 700,
+   "cost_ratio": 1.0,
+   "cost_ratio_max": 1.0000000000000002
+  },
+  "liquid/d1": {
+   "usd": 0.01405844,
+   "calls": 700,
+   "cost_ratio": 1.0,
+   "cost_ratio_max": 1.0
+  },
+  "liquid/d1-ultra": {
+   "usd": 0.426538476,
+   "calls": 9550,
+   "cost_ratio": 1.0000000000000002,
+   "cost_ratio_max": 1.0000000000000002
+  },
+  "microsoft/microsoft-decision-1": {
+   "usd": 0.023633358,
+   "calls": 700,
+   "cost_ratio": 1.0,
+   "cost_ratio_max": 1.0000000000000002
+  },
+  "nace-ai/drex-max": {
+   "usd": 0.04739352,
+   "calls": 700,
+   "cost_ratio": 1.0000000000000002,
+   "cost_ratio_max": 1.0000000000000002
+  },
+  "nace-ai/drex-v1.5": {
+   "usd": 0.0229332,
+   "calls": 700,
+   "cost_ratio": 1.0,
+   "cost_ratio_max": 1.0
+  },
+  "nace-ai/drex-v2.0": {
+   "usd": 0.46667693999999993,
+   "calls": 9050,
+   "cost_ratio": 1.0,
+   "cost_ratio_max": 1.0000000000000002
+  },
+  "openai/gpt-6-luna-decisions": {
+   "usd": 1.0183916000000002,
+   "calls": 9039,
+   "cost_ratio": 1.0000000000000002,
+   "cost_ratio_max": 1.0000000000000002
+  },
+  "perplexity/pplx-decider-flash-v1.2": {
+   "usd": 0.020234679999999998,
+   "calls": 700,
+   "cost_ratio": 1.0,
+   "cost_ratio_max": 1.0
+  },
+  "perplexity/pplx-decider-v1.2": {
+   "usd": 0.01340384,
+   "calls": 700,
+   "cost_ratio": 0.9999999999999999,
+   "cost_ratio_max": 1.0
+  },
+  "respan/span-02": {
+   "usd": 0.25584328,
+   "calls": 9050,
+   "cost_ratio": 1.0,
+   "cost_ratio_max": 1.0
+  },
+  "scaledown/classify-1": {
+   "usd": 0.09635983999999999,
+   "calls": 700,
+   "cost_ratio": 0.9999999999999999,
+   "cost_ratio_max": 1.0
+  },
+  "togethercomputer/tev1-4b-experimental": {
+   "usd": 0.08100943199999999,
+   "calls": 700,
+   "cost_ratio": 1.0,
+   "cost_ratio_max": 1.0000000000000002
+  },
+  "typesafe/jev-1.13": {
+   "usd": 0.04013793,
+   "calls": 700,
+   "cost_ratio": 1.0,
+   "cost_ratio_max": 1.0000000000000002
+  },
+  "typesafe/jev-1.14": {
+   "usd": 0.04013793,
+   "calls": 700,
+   "cost_ratio": 1.0,
+   "cost_ratio_max": 1.0000000000000002
+  }
+ },
+ "projection_vs_actual": {
+  "stage1": {
+   "projected": 0.8629937888648822,
+   "actual": 0.7968128170000001,
+   "actual_over_projected": 0.9233123427783511,
+   "within_20pct": true,
+   "by_model": {
+    "cloudflare/clef": {
+     "projected": 0.03892927609944498,
+     "actual": 0.047346246,
+     "actual_over_projected": 1.216211826776687
+    },
+    "cloudflare/clef-flash": {
+     "projected": 0.01761086299736796,
+     "actual": 0.018429297,
+     "actual_over_projected": 1.0464732479466996
+    },
+    "cloudflare/clef-omni": {
+     "projected": 0.1384547570738126,
+     "actual": 0.1257159,
+     "actual_over_projected": 0.9079926371397892
+    },
+    "inception/mercury-decide": {
+     "projected": 0.017876077318322036,
+     "actual": 0.01637698,
+     "actual_over_projected": 0.916139469995157
+    },
+    "jaredpalmer/kev-4b": {
+     "projected": 0.026493949086632843,
+     "actual": 0.02407986,
+     "actual_over_projected": 0.9088814929499945
+    },
+    "liquid/d1": {
+     "projected": 0.015408508453328388,
+     "actual": 0.01405844,
+     "actual_over_projected": 0.9123816262023233
+    },
+    "liquid/d1-ultra": {
+     "projected": 0.032645226357581485,
+     "actual": 0.029522724,
+     "actual_over_projected": 0.9043504148698813
+    },
+    "microsoft/microsoft-decision-1": {
+     "projected": 0.026183556574239927,
+     "actual": 0.023633358,
+     "actual_over_projected": 0.9026030490926936
+    },
+    "nace-ai/drex-max": {
+     "projected": 0.05157287317452957,
+     "actual": 0.04739352,
+     "actual_over_projected": 0.918962180749828
+    },
+    "nace-ai/drex-v1.5": {
+     "projected": 0.025232332463459847,
+     "actual": 0.0229332,
+     "actual_over_projected": 0.9088814929499947
+    },
+    "nace-ai/drex-v2.0": {
+     "projected": 0.03784849869518979,
+     "actual": 0.0343998,
+     "actual_over_projected": 0.9088814929499942
+    },
+    "openai/gpt-6-luna-decisions": {
+     "projected": 0.08768816198719588,
+     "actual": 0.0798488,
+     "actual_over_projected": 0.9105995403536845
+    },
+    "perplexity/pplx-decider-flash-v1.2": {
+     "projected": 0.02224476999327027,
+     "actual": 0.020234679999999998,
+     "actual_over_projected": 0.909637636447651
+    },
+    "perplexity/pplx-decider-v1.2": {
+     "projected": 0.014769191163906906,
+     "actual": 0.01340384,
+     "actual_over_projected": 0.9075541003732442
+    },
+    "respan/span-02": {
+     "projected": 0.0244537139906057,
+     "actual": 0.021791039999999998,
+     "actual_over_projected": 0.8911137182830955
+    },
+    "scaledown/classify-1": {
+     "projected": 0.1072909156398611,
+     "actual": 0.09635983999999999,
+     "actual_over_projected": 0.8981174167946055
+    },
+    "togethercomputer/tev1-4b-experimental": {
+     "projected": 0.08922935218938827,
+     "actual": 0.08100943199999999,
+     "actual_over_projected": 0.9078787418299128
+    },
+    "typesafe/jev-1.13": {
+     "projected": 0.044830884786533985,
+     "actual": 0.04013793,
+     "actual_over_projected": 0.8953187114445793
+    },
+    "typesafe/jev-1.14": {
+     "projected": 0.04423088082020554,
+     "actual": 0.04013793,
+     "actual_over_projected": 0.9074639540450707
+    }
+   }
+  },
+  "stage2": {
+   "projected": 2.867115056203654,
+   "actual": 2.696453322,
+   "actual_over_projected": 0.9404761473264254,
+   "within_20pct": true,
+   "by_model": {
+    "cloudflare/clef": {
+     "projected": 0.4673405556917423,
+     "actual": 0.53380845,
+     "actual_over_projected": 1.1422258211891627
+    },
+    "inception/mercury-decide": {
+     "projected": 0.21544418859346764,
+     "actual": 0.19411249999999997,
+     "actual_over_projected": 0.9009874031287077
+    },
+    "liquid/d1-ultra": {
+     "projected": 0.40217974111691224,
+     "actual": 0.363660192,
+     "actual_over_projected": 0.9042230495998187
+    },
+    "nace-ai/drex-v2.0": {
+     "projected": 0.4662803966670255,
+     "actual": 0.43227713999999995,
+     "actual_over_projected": 0.9270755174138116
+    },
+    "openai/gpt-6-luna-decisions": {
+     "projected": 1.049680055283532,
+     "actual": 0.9385428,
+     "actual_over_projected": 0.8941227331851015
+    },
+    "respan/span-02": {
+     "projected": 0.26619011885096,
+     "actual": 0.23405224,
+     "actual_over_projected": 0.8792671982352808
+    }
+   }
+  },
+  "validity": {
+   "projected": 0.0374262647482432,
+   "actual": 0.033355560000000006,
+   "actual_over_projected": 0.891234009708803,
+   "within_20pct": true,
+   "by_model": {
+    "liquid/d1-ultra": {
+     "projected": 0.0374262647482432,
+     "actual": 0.03335556,
+     "actual_over_projected": 0.8912340097088027
+    }
+   }
+  }
+ },
+ "projection_total": 3.7675351098167793,
+ "actual_total": 3.526621699,
+ "actual_over_projected_total": 0.9360554304619353
+}

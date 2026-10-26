@@ -97,7 +97,10 @@ def test_b_allows_the_test_period_after_the_freeze(tmp_layout: Layout, tmp_path:
 def test_c_val_b_before_allow_val_b(tmp_layout: Layout, tmp_path: Path, offline: bool) -> None:
     rec = Recorder()
     client = make_client(tmp_layout, tmp_path, rec, offline=offline, pilot=False)
-    set_frozen(tmp_layout, eligible_models=[{"id": MODEL, "include": True, "reason": "test"}])
+    # the gate as it was before NA-06's hand-off (the repository's own frozen.yaml may have opened it)
+    set_frozen(
+        tmp_layout, eligible_models=[{"id": MODEL, "include": True, "reason": "test"}], allow_val_b=False
+    )
     assert_refused(client, rec, spec(info=VAL_B_STATE), "val_b")
     assert_refused(client, rec, spec(info=info(session=date(2025, 12, 31))), "val_b")
 
@@ -108,6 +111,7 @@ def test_c_val_b_after_allow_val_b_and_for_local_models(tmp_layout: Layout, tmp_
     set_frozen(
         tmp_layout,
         eligible_models=[{"id": m, "include": True, "reason": "test"} for m in (MODEL, LOCAL)],
+        allow_val_b=False,
     )
     assert client.decide([spec(model=LOCAL, info=VAL_B_STATE)])[0].ok  # local: nothing is sent
     set_frozen(tmp_layout, allow_val_b=True)
