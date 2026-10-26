@@ -14,6 +14,10 @@ fixed top-level keys ``company``, ``market``, ``attention``, ``news`` and, for C
 {``headline``, ``snippet``, ``source_type``, ``timing``}; the text is NA-02's scrubbed title and snippet
 (``title_clean`` / ``snippet_clean``, as capped in the NA-03 event list), masked unless the spec says
 otherwise. The summary variant is not built here (vendor summaries are text of the §11.6 ablation only).
+Move explainers ("Why … Stock Is Up Today", StockStory's "What Happened? Shares of …") and TradingView
+reposts (``excluded_ids``) are in no state, in any window: the explainers' text explains the session's move,
+and both are often stamped before their content (PREREG §15 NA-04 row 6). The NA-03 lists are not refilled;
+an event left with no article gets no state.
 
 **Availability.** A ``StateSpec`` lists, per block, every input column it reads (``context.block_columns``).
 ``validate_spec`` calls ``pit.check_inputs`` on each block at the decision point (D0 for W0, D2 for W2)
@@ -371,14 +375,26 @@ def event_articles(lay: Layout) -> pd.DataFrame:
     return out.sort_values("id", kind="mergesort").reset_index(drop=True)
 
 
+def excluded_ids(articles: pd.DataFrame, cfg: StatesConfig) -> frozenset[str]:
+    """Ids of the articles left out of every state (``configs/states.yaml`` ``news_exclusion``; PREREG §15
+    NA-04 row 6): move explainers ("Why … Stock Is Up Today", StockStory's "What Happened? Shares of …") and
+    TradingView reposts. ``articles``: id, ``domain`` and NA-02's raw ``title`` and ``snippet``."""
+    ex = cfg.news_exclusion
+    hit = articles["title"].fillna("").astype(str).str.contains(ex.title, regex=True)
+    hit |= articles["snippet"].fillna("").astype(str).str.contains(ex.snippet, regex=True)
+    hit |= articles["domain"].fillna("").astype(str).str.contains(ex.domain, regex=True)
+    return frozenset(articles.loc[hit, "id"].astype(str))
+
+
 def market_selection(lay: Layout, cfg: StatesConfig) -> pd.DataFrame:
-    """A3.5 market-state articles: per W2 session, third-party-OK market-index articles with text,
-    near-identical titles dropped, ordered by source class then t_avail, at most ``max_articles`` and
-    ``max_news_tokens``."""
+    """A3.5 market-state articles: per W2 session, third-party-OK market-index articles with text, excluded
+    articles left out (``excluded_ids``), near-identical titles dropped, ordered by source class then t_avail,
+    at most ``max_articles`` and ``max_news_tokens``."""
     m = io.read_parquet(MARKET_NEWS, layout=lay)
     sp = load_splits()
     keep = m["third_party_ok"].astype(bool) & m["session_w2"].notna()
     keep &= (m["title_clean"].fillna("").str.len() + m["snippet_clean"].fillna("").str.len()) > 0
+    keep &= ~m["id"].astype(str).isin(excluded_ids(m, cfg))
     m = m.loc[keep].copy()
     m["split"] = m["session_w2"].map(lambda d: sp.split_of(d) or "")
     m = m.loc[m["split"].isin(cfg.market_states.splits)]
@@ -519,18 +535,21 @@ class Inputs:
     reaction: pd.DataFrame  # reaction_d2 (session, symbol_id)
     masked: Mapping[str, tuple[str, str]]  # article id -> (title, snippet)
     third_party: Mapping[str, bool]  # article id -> third_party_ok
+    excluded: frozenset[str] = (
+        frozenset()
+    )  # explainers and TradingView reposts (``excluded_ids``), in no state
     cb: Codebook = field(default_factory=load_codebook)
 
 
 def load_inputs(lay: Layout, masked_frame: pd.DataFrame | None = None) -> Inputs:
-    """Context, reaction and masked texts; ``masked_frame`` replaces work/states/articles_masked.parquet
-    (the determinism check rebuilds it from scratch)."""
+    """Context, reaction, masked texts and the excluded articles; ``masked_frame`` replaces
+    work/states/articles_masked.parquet (the determinism check rebuilds it from scratch)."""
     masked = (
         io.read_parquet(ARTICLES_MASKED, columns=["id", "title_masked", "snippet_masked"], layout=lay)
         if masked_frame is None
         else masked_frame
     )
-    tp = io.read_parquet(ARTICLES, columns=["id", "third_party_ok"], layout=lay)
+    tp = io.read_parquet(ARTICLES, columns=["id", "third_party_ok", "domain", "title", "snippet"], layout=lay)
     tp = tp.loc[tp["id"].isin(set(masked["id"]))]
     mk = masked.set_index("id")
     return Inputs(
@@ -541,6 +560,7 @@ def load_inputs(lay: Layout, masked_frame: pd.DataFrame | None = None) -> Inputs
             i: (t, s) for i, t, s in zip(mk.index, mk["title_masked"], mk["snippet_masked"], strict=True)
         },
         third_party=dict(zip(tp["id"], tp["third_party_ok"].astype(bool), strict=True)),
+        excluded=excluded_ids(tp, load_states_config()),
     )
 
 
@@ -548,13 +568,16 @@ def news_items(
     items: Sequence[Mapping[str, Any]], session: date, masked: bool, inp: Inputs
 ) -> tuple[list[dict[str, str]], list[str]]:
     """The ``news`` block and its article ids, in list order. Raises if an article is not third-party OK
-    (CLAUDE.md D15); an article whose masked title and snippet are both empty is left out."""
+    (CLAUDE.md D15); an excluded article (``Inputs.excluded``) and an article whose title and snippet are both
+    empty are left out."""
     out: list[dict[str, str]] = []
     ids: list[str] = []
     for a in items:
         aid = str(a["id"])
         if inp.third_party.get(aid) is not True:
             raise StatesError(f"article {aid} is not third-party OK (CLAUDE.md D15)")
+        if aid in inp.excluded:
+            continue
         if masked:
             title, snippet = inp.masked[aid]
         else:
@@ -732,7 +755,7 @@ def build_event_states(
                 "n_articles": len(state["news"]),
                 "third_party_ok_all": True,
                 "_cut": cut,
-                "_listed": len(rec[f"news_{sfx}"]),
+                "_listed": sum(str(a["id"]) not in inp.excluded for a in rec[f"news_{sfx}"]),
             }
         )
     return pd.DataFrame(rows), kept
@@ -869,10 +892,18 @@ def write_states(df: pd.DataFrame, rel: str, description: str, lay: Layout) -> N
     io.write_parquet(df, rel, producer=PRODUCER, description=description, layout=lay)
 
 
-def _budget_stats(df: pd.DataFrame, n_events: int) -> dict[str, int]:
+def exclusion_counts(events: pd.DataFrame, col: str, excluded: frozenset[str]) -> tuple[int, int]:
+    """(listed excluded articles, events whose every listed article is excluded) of an event frame."""
+    flags = [[str(a["id"]) in excluded for a in items] for items in events[col]]
+    return sum(sum(f) for f in flags), sum(bool(f) and all(f) for f in flags)
+
+
+def _budget_stats(df: pd.DataFrame, n_events: int, excl: tuple[int, int] = (0, 0)) -> dict[str, int]:
     return {
         "rows": len(df),
-        "events_without_text": n_events - len(df),
+        "articles_excluded": excl[0],
+        "events_all_excluded": excl[1],
+        "events_without_text": n_events - len(df) - excl[1],
         "states_with_dropped_articles": int((df["n_articles"] < df["_listed"]).sum()),
         "articles_dropped": int((df["_listed"] - df["n_articles"]).sum()),
         "texts_cut": int(df["_cut"].sum()),
@@ -890,8 +921,8 @@ def run_states(layout: Layout | None = None) -> dict[str, Any]:
     d2 = io.read_parquet(EVENTS_D2, layout=lay)
     stats: dict[str, Any] = {"caps": {w: b.cap for w, b in bud.items()}, "question_tokens": qtok}
 
-    def emit(df: pd.DataFrame, n_events: int, rel: str, description: str, name: str) -> None:
-        stats[name] = _budget_stats(df, n_events)
+    def emit(df: pd.DataFrame, ev: pd.DataFrame, col: str, rel: str, description: str, name: str) -> None:
+        stats[name] = _budget_stats(df, len(ev), exclusion_counts(ev, col, inp.excluded))
         write_states(add_tokens(df, tok, qtok), rel, description, lay)
         print(f"states {name}: {stats[name]}", flush=True)
 
@@ -899,7 +930,8 @@ def run_states(layout: Layout | None = None) -> dict[str, Any]:
     a0, keep_d0 = build_event_states(d0, spec, inp, cfg, budget=bud["W0"])
     emit(
         a0,
-        len(d0),
+        d0,
+        "news_w0",
         f"{STATES_DIR}/callA_d0_E3.parquet",
         "NA-04 S5: Call A on D0 (W0 news), masked, E3",
         spec.name,
@@ -908,7 +940,8 @@ def run_states(layout: Layout | None = None) -> dict[str, Any]:
     a2, keep_d2 = build_event_states(d2, spec, inp, cfg, budget=bud["W2"])
     emit(
         a2,
-        len(d2),
+        d2,
+        "news_w2",
         f"{STATES_DIR}/callA_d2_E3.parquet",
         "NA-04 S5: Call A on D2 (W2 news, A3.1), masked, E3",
         spec.name,
@@ -918,7 +951,8 @@ def run_states(layout: Layout | None = None) -> dict[str, Any]:
     b2, _ = build_event_states(b_events, spec, inp, cfg, keep=keep_d2)
     emit(
         b2,
-        len(b_events),
+        b_events,
+        "news_w2",
         f"{STATES_DIR}/callB_d2_E3.parquet",
         "NA-04 S5: Call B on D2 (train, val-A, val-B), masked, E3",
         spec.name,
@@ -941,7 +975,8 @@ def run_states(layout: Layout | None = None) -> dict[str, Any]:
         df, _ = build_event_states(enc_events, spec, inp, cfg, keep=keep_d0)
         emit(
             df,
-            len(enc_events),
+            enc_events,
+            "news_w0",
             f"{SAMPLES_DIR}/callA_d0_{e}.parquet",
             f"NA-04 S5: NA-07 encoding sample, 1,500 val-A + 1,500 val-B D0 events, Call A {e}",
             f"sample_{e}",
@@ -950,7 +985,8 @@ def run_states(layout: Layout | None = None) -> dict[str, Any]:
     du, _ = build_event_states(twin, spec, inp, cfg, keep=keep_d0)
     emit(
         du,
-        len(twin),
+        twin,
+        "news_w0",
         f"{SAMPLES_DIR}/unmasked.parquet",
         "NA-04 S5: unmasked twin of 1,000 val-A D0 events (Call A E3; masked twin in callA_d0_E3)",
         "unmasked",

@@ -40,6 +40,18 @@ samples:                          # PRD NA-04 S5 (NA-07 encoding study, NA-06 pr
                                   # u = sha256("{seed}:{event_id}")
   exclude_embargo: true           # PREREG §4.2: the first 5 sessions of a split are not evaluated
 
+news_exclusion:                   # PREREG §15 NA-04 row 6 (revision 3): left out of every state, every window
+  # Move explainers ("Why Quest (DGX) Stock Is Up Today", StockStory's "What Happened? Shares of ...") explain
+  # a session's price move by construction: in W0 they are pre-market talk or stamped before their content
+  # (29 of 204 pre-open-stamped ones about the company, 2024-01..2025-09), in W2 they reveal the realized
+  # move. Searched (re.search) in NA-02's raw title / snippet; Benzinga's "What Happened:" does not match.
+  title: '(?i)^(?:here[''’]?s\s+|here\s+is\s+)?why\b.*\b(?:stock|shares)\b.*\btoday\b'
+  snippet: 'What Happened\?\s*(?:Shares of|A number of)'
+  # TradingView reposts carry batch timestamps that precede their content: 128 of 511 of their earnings
+  # summaries (2024-01..2025-09) are stamped before the release they report (DGX's results of 2025-07-22
+  # stamped 07-21 13:01 UTC); other outlets 0-7%, previews included. Operator decision 2026-10-25.
+  domain: '(?:^|\.)tradingview\.com$'
+
 market_states:                    # PREREG A3.5 (optional): one state per session from market-index articles
   window: W2
   max_articles: 6

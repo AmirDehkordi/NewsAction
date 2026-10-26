@@ -8,6 +8,8 @@ the whole corpus), and the states are rendered again. The stored context rows mu
 
 from __future__ import annotations
 
+import dataclasses
+
 import numpy as np
 import pandas as pd
 import pytest
@@ -82,9 +84,9 @@ def test_rebuild_reproduces_every_sha(sample: dict[str, pd.DataFrame]) -> None:
     # a fresh masker with the corpus surnames of the mask stage (deriving them needs NER on the whole corpus)
     mk = b.masker(lay, vocabulary=True, surnames=b.load_surnames(lay))
     masked = b.mask_frame(art_frame, msel, lay, n_process=1, mk=mk)
-    inp = b.load_inputs(lay, masked_frame=masked)
-    inp = b.Inputs(
-        company=company, market=market, reaction=reaction, masked=inp.masked, third_party=inp.third_party
+    # the recomputed context replaces the stored one; masked texts, third-party flags and explainers stay
+    inp = dataclasses.replace(
+        b.load_inputs(lay, masked_frame=masked), company=company, market=market, reaction=reaction
     )
     tok = tokens.tokenizer(load_events_config().events)
     bud = b.budgets(tok, b.question_tokens(load_battery(), tok), cfg, inp.cb)

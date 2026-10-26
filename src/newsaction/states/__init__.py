@@ -17,10 +17,11 @@ Every input column a state consumes is registered in ``configs/availability.yaml
 from __future__ import annotations
 
 import functools
+import re
 from pathlib import Path
 from typing import Final, Literal
 
-from pydantic import BaseModel, ConfigDict, Field
+from pydantic import BaseModel, ConfigDict, Field, field_validator
 
 from newsaction.config import SplitName, load_yaml
 from newsaction.paths import CONFIGS
@@ -93,12 +94,27 @@ class MarketStatesConfig(_Strict):
     splits: tuple[SplitName, ...]
 
 
+class NewsExclusionConfig(_Strict):
+    """Articles left out of every state: regexes searched in NA-02's raw title / snippet and in the domain."""
+
+    title: str = Field(min_length=1)
+    snippet: str = Field(min_length=1)
+    domain: str = Field(min_length=1)
+
+    @field_validator("title", "snippet", "domain")
+    @classmethod
+    def _compiles(cls, v: str) -> str:
+        re.compile(v)
+        return v
+
+
 class StatesConfig(_Strict):
     context: ContextConfig
     market: MarketConfig
     tokens: TokensConfig
     samples: SamplesConfig
     market_states: MarketStatesConfig
+    news_exclusion: NewsExclusionConfig
 
 
 @functools.cache

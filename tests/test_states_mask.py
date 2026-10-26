@@ -1,10 +1,11 @@
 """PRD NA-04 S3 / AC2: masking and the residual-leak scanner.
 
 Golden cases cover the curated aliases (Google for Alphabet, Facebook for Meta, …), ticker forms, people,
-dates, fiscal periods, price talk and price levels, including every leak the two NA-04 verifications found
+dates, fiscal periods, price talk and price levels, including every leak the three NA-04 verifications found
 (BOATS:NEE/PT, ODFL's, MSFT-1.19%, "Second Quarter", "25 septembre", "4/15", Super Micro Computer; then
 "MET earnings per share", MS.N, "（紐交所：DE）", CY2025, "2025年8月7日（星期四）", "recently-18", option
-codes, "· IP. -0.58%", Chinese company names, …). The mutation "empty the alias list" turns the
+codes, "· IP. -0.58%", Chinese company names, …; then "deuxième trimestre", "2분기", "'25", a lone "Aug.",
+"H1", "21/04", "DGXjumped 6.4%"). The mutation "empty the alias list" turns the
 curated-alias cases red. The scanner is checked to be independent of the masker (its imports, and it counts
 every stoplisted ticker), and the val-A leak rates of the built states are read from
 artifacts/NA-04/leak_scan.csv.
@@ -567,3 +568,91 @@ def test_ordinal_period_after_a_number_and_caps_ticker_labels() -> None:
     assert "Second quarter" not in out and "2025" not in out
     assert "MAR" not in m("MARRIOTT INTERNATIONAL INC /MD/ MAR: MARRIOTT DECLARES DIVIDEND", 917, title=True)
     assert "Edison" not in m("Consolidated. Edison, one of the largest utilities", 472)
+
+
+# --- revision 3: the third verification's date forms and glued move verbs ---------------------------
+
+REVISION3_DATES = (  # (text, a fragment that must be gone)
+    ("bénéfice au deuxième trimestre grâce à la souscription", "deuxième trimestre"),
+    ("für das dritte Quartal meldete", "dritte Quartal"),
+    ("im zweiten Quartal 2025 stieg", "zweiten Quartal"),
+    ("Umsatz des zweiten Quartals", "Quartal"),
+    ("resultados del tercer trimestre fiscal", "tercer trimestre"),
+    ("il secondo trimestre è diminuito", "secondo trimestre"),
+    ("no segundo trimestre de 2025", "segundo trimestre"),
+    ("premier semestre 2025", "semestre"),
+    ("het eerste halfjaar", "halfjaar"),
+    ("het tweede kwartaal", "kwartaal"),
+    ("supera expectativas no 3T25 com lucro", "3T25"),
+    ("lucro do 2T 2025", "2T"),
+    ("focus sur les résultats T2 et les tarifs", "T2"),
+    ("dépassent les attentes au T1 alors", "T1"),
+    ("2025년 2분기 실적", "분기"),
+    ("상반기 실적", "반기"),
+    ("Raises '25 EPS View", "'25"),
+    ("Strong Results For Q4 FY’25, Outperforms", "’25"),
+    ("Q1 ‘25 results", "‘25"),
+    ("September’25 outlook", "’25"),
+    ("reports the quarter results on Aug.", "Aug."),
+    ("CHICAGO, Aug.", "Aug."),
+    ("manufacturing PMI (Sept.)", "Sept."),
+    ("The company's 7% H1 Net Income Growth", "H1"),
+    ("but 2H tariff risks loom", "2H"),
+    ("dltr-20250909", "20250909"),
+    ("pire séance depuis 21/04, après NFP", "21/04"),
+    ("Earnings Summary. 31/7 13:40. (RTTNews)", "31/7"),
+    ("17/09/2025POR REUTERS", "17/09"),
+    ("informó el domingo que", "domingo"),
+)
+REVISION3_KEEP = (
+    "using it for T1/PRI lines",
+    "type T2 diabetes drug",
+    "the '90s boom",
+    "rock 'n' roll",
+    "H2 Production plant",
+    "H2 fuel cell trucks",
+    "green H2 strategy",
+    "H1-B visa",
+    "1H timeframe",
+    "</h1>",
+    "24/7 Wall St.",
+    "24/5 trading",
+    "1/2 cents a bushel",
+    "3/4 of revenue",
+)
+
+
+@pytest.mark.parametrize(("text", "gone"), REVISION3_DATES)
+def test_revision3_date_forms(text: str, gone: str) -> None:
+    out = m(text, AAPL)
+    assert gone not in out, out
+    assert not re.search(r"(?<![\d.,$])(?:19|20)\d{2}(?!\d)", out), out
+
+
+@pytest.mark.parametrize("text", REVISION3_KEEP)
+def test_revision3_lookalikes_are_kept(text: str) -> None:
+    assert m(text, AAPL) == text
+
+
+def test_glued_ticker_price_move() -> None:
+    """A move verb glued to a ticker ("DGXjumped 6.4%"): the sentence goes, fundamentals stay."""
+    out = m(
+        "Shares of healthcare diagnostics company Apple AAPLjumped 6.4% in the morning session after the "
+        "company reported strong results. Revenue rose 5% to $94 billion.",
+        AAPL,
+    )
+    assert "6.4%" not in out and "Revenue rose 5% to $94 billion." in out, out
+    out = m(
+        "What Happened?Shares of software company Autodesk NASDAQ:ADSKfell 7.1% in the morning session.", AAPL
+    )
+    assert "7.1%" not in out, out
+    assert "Slower 6%" in m("Stock Faces Slower 6% Earnings Outlook", AAPL, title=True)  # not "S" + "lower"
+
+
+def test_scanner_sees_the_third_verification_forms() -> None:
+    sc = scanner()
+    for text, _ in REVISION3_DATES:
+        c = sc.scan_text(text, AAPL)
+        assert c.dates + c.years >= 1, text
+    for text in REVISION3_KEEP:
+        assert sc.scan_text(text, AAPL).dates == 0, text

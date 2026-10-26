@@ -133,20 +133,23 @@ _LEVEL: Final = re.compile(
 _PER_BEFORE: Final = re.compile(r"(?i)\bper\s+(?:\w+\s+)?$|dividend|distribution")
 # a footnote mark after an amount ("a previous target of $49.00.1;")
 _FOOTNOTE: Final = re.compile(r"(\$\s?\d[\d,]*\.\d{2})\.\d(?!\d)")
-_MOVE_VERB: Final = (
-    r"(?:rise[sn]?|rose|rising|fall(?:s|en|ing)?|fell|jump(?:s|ed|ing)?|drop(?:s|ped|ping)?|gain(?:s|ed|ing)?|"
+_VERBS: Final = (
+    r"rise[sn]?|rose|rising|fall(?:s|en|ing)?|fell|jump(?:s|ed|ing)?|drop(?:s|ped|ping)?|gain(?:s|ed|ing)?|"
     r"slides?|slid|slip(?:s|ped)?|climb(?:s|ed|ing)?|surg(?:e|es|ed|ing)|plung(?:e|es|ed|ing)|soar(?:s|ed|ing)?|"
     r"tumbl(?:e|es|ed|ing)|sinks?|sinking|sank|rall(?:y|ies|ied)|declin(?:e|es|ed|ing)|advanc(?:e|es|ed|ing)|"
-    r"edg(?:e|es|ed)\s+(?:up|down|higher|lower)|trad(?:e|es|ed|ing)\s+(?:up|down|higher|lower)|"
-    r"(?:are|is|was|were)\s+(?:up|down)|higher|lower|up|down)"
+    r"edg(?:e|es|ed)\s+(?:up|down|higher|lower)|trad(?:e|es|ed|ing)\s+(?:up|down|higher|lower)"
 )
+_MOVE_VERB: Final = rf"(?:{_VERBS}|(?:are|is|was|were)\s+(?:up|down)|higher|lower|up|down)"
+# a verb glued to a ticker ("DGXjumped 6.4%", NA-04 revision 3): an upper-case letter, then a lower-case verb
+_GLUED_VERB: Final = rf"(?-i:(?<=[A-Z])(?=[a-z]))(?:{_VERBS})"
 # a stock / share price move in percent (PREREG §6.4), unless a fundamental noun is its subject
 _SUBJECT: Final = (
     r"(?:shares?|stocks?|the\s+company(?:['’]s)?|premarket|pre-market|after-hours|extended\s+trading)"
 )
 _MOVE_SUBJECT: Final = re.compile(rf"(?i)\b{_SUBJECT}\b")
 PRICE_MOVE: Final = re.compile(
-    rf"(?i)\b{_SUBJECT}\b(?P<mid>[^.!?%]{{0,50}}?)\b{_MOVE_VERB}\b[^.!?]{{0,25}}?\d+(?:[.,]\d+)?\s?%"
+    rf"(?i)\b{_SUBJECT}\b(?P<mid>[^.!?%]{{0,50}}?)(?:\b{_MOVE_VERB}|{_GLUED_VERB})\b[^.!?]{{0,25}}?"
+    r"\d+(?:[.,]\d+)?\s?%"
 )
 PRICE_MOVE_AFTER: Final = re.compile(
     r"(?i)\b\d+(?:[.,]\d+)?\s?%\s+(?:in\s+)?(?:premarket|pre-market|before\s+the\s+bell|after\s+hours|after-hours)"
@@ -209,6 +212,7 @@ MONTH_ANY: Final = (
 )
 WEEKDAY: Final = "(?:" + "|".join([*_WEEKDAYS, *(d.upper() for d in _WEEKDAYS)]) + ")"
 YEAR_RE: Final = r"(?:19\d\d|20\d\d)"
+APOS: Final = "['’‘]"  # the straight, right and left single quotes of "'25", "FY’25", "Q1 ‘25"
 # French, German, Italian, Spanish, Portuguese, Dutch and Polish month and weekday names (NA-04 verification)
 F_MONTH: Final = (
     r"(?:janvier|f[ée]vrier|avril|juin|juillet|ao[uû]t|septembre|octobre|novembre|d[ée]cembre|januar|j[äa]nner|"
@@ -222,13 +226,28 @@ F_MONTH_DAY_ONLY: Final = r"(?:mars|mai|mei|maio)"  # also ordinary words: only 
 F_WEEKDAY: Final = (
     r"(?:montag|dienstag|mittwoch|donnerstag|freitag|samstag|sonntag|lundi|mardi|mercredi|jeudi|vendredi|samedi|"
     r"dimanche|luned[iì]|marted[iì]|mercoled[iì]|gioved[iì]|venerd[iì]|sabato|domenica|lunes|martes|"
-    r"mi[ée]rcoles|jueves|viernes|s[áa]bado|segunda-feira|ter[çc]a-feira|quarta-feira|quinta-feira|sexta-feira|"
+    r"mi[ée]rcoles|jueves|viernes|s[áa]bado|domingo|segunda-feira|ter[çc]a-feira|quarta-feira|quinta-feira|sexta-feira|"
     r"maandag|dinsdag|woensdag|donderdag|vrijdag|zaterdag|zondag)"
 )
 F_PREP: Final = (
     r"(?:(?:am|vom|bis|zum|seit|ab|le|du|au|des|el|del|dal|il|op|de|em|no|na|w|z|ce|cette|diesen|letzten|"
     r"vergangenen|n[äa]chsten|este|ese|questo|scorso)\s+)"
 )
+# ordinal quarters and halves written out (NA-04 revision 3): "deuxième trimestre", "zweiten Quartal"
+ORDINAL_X: Final = (
+    r"(?:premi(?:er|ère)|1(?:er|re)|deuxi[eè]me|2(?:e|ème)|seconde?|troisi[eè]me|3(?:e|ème)|quatri[eè]me|"
+    r"4(?:e|ème)|primer[oa]?|segund[oa]|tercer[oa]?|cuart[oa]|prim[oa]|second[oa]|terz[oa]|quart[oa]|"
+    r"primeir[oa]|terceir[oa]|erste[nrs]?|zweite[nrs]?|dritte[nrs]?|vierte[nrs]?|eerste|tweede|derde|vierde)"
+)
+ORDINAL_X_HALF: Final = (
+    r"(?:premi(?:er|ère)|1(?:er|re)|seconde?|deuxi[eè]me|2(?:e|ème)|primer[oa]?|segund[oa]|prim[oa]|"
+    r"second[oa]|primeir[oa]|erste[nrs]?|zweite[nrs]?|eerste|tweede)"
+)
+# a bare T1–T4 after a French, Spanish or Portuguese word that announces a period (fixed-width lookbehinds)
+_T_WORDS: Final = ("au", "Au", "du", "le", "Le", "el", "El", "del", "no", "do", "em", "ao")
+T_CONTEXT: Final = "|".join(
+    [rf"(?<=\b{w} )" for w in _T_WORDS] + [rf"(?<={w} )" for w in ("sultats", "sultados", "sultado")]
+)  # "(ré)sultats", "resultados": endings, since "é" and "s" have no word boundary between them
 DAY: Final = r"(?:[12]\d|3[01]|0?[1-9])(?:st|nd|rd|th)?"
 DAY_RANGE: Final = rf"{DAY}(?:\s?[–\-]\s?{DAY}(?![\d%]))?"  # "July 17-18", "4–5 August"
 # Chinese, Japanese and Korean dates and periods (NA-04 verification 2): 2025年8月7日（星期四）, 8月7日, 週一,
@@ -640,52 +659,72 @@ _DATE_RULES: Final[tuple[tuple[re.Pattern[str], str], ...]] = tuple(
         (rf"{_I}{F_PREP}?\b{F_WEEKDAY}\b", RECENTLY),
         (r"\bam\s+\d{1,2}\.(?=[\s,;]|$)", RECENTLY),
         (
-            rf"{_I}\b(?:im\s+)?(?:[1-4]\.\s*Quartal|[1-4](?:er|e|º|°)?\s+trimestre|T[1-4]\s*'?(?:{YEAR_RE}|\d{{2}}))\b",
+            rf"{_I}\b(?:im\s+)?(?:[1-4]\.\s*Quartal|[1-4](?:er|e|º|°)?\s+trimestre|T[1-4]\s*{APOS}?(?:{YEAR_RE}|\d{{2}}))\b",
             QUARTER,
         ),
+        # NA-04 revision 3: ordinal quarters and halves written out, Spanish / Portuguese "3T25", bare T1–T4
+        # after a period word, Korean quarters and halves
+        (rf"{_I}(?<![A-Za-z\u00C0-\u024F]){ORDINAL_X}\s+(?:trimestre|quartals?|kwartaal)\b", QUARTER),
+        (
+            rf"{_I}(?<![A-Za-z\u00C0-\u024F]){ORDINAL_X_HALF}\s+(?:semestre|halbjahr(?:e?s)?|halfjaar)\b",
+            HALF_YEAR,
+        ),
+        (rf"(?<![A-Za-z0-9])[1-4]T\s?{APOS}?(?:{YEAR_RE}|\d{{2}})(?![A-Za-z0-9])", QUARTER),
+        (rf"(?:{T_CONTEXT})T[1-4](?![A-Za-z0-9/])", QUARTER),
+        (r"[1-4１-４]\s?분기", QUARTER),
+        (r"[상하]반기", HALF_YEAR),
         (rf"{PREP}?\b\d{{4}}-\d{{2}}-\d{{2}}\b", RECENTLY),
         (  # 2025/08/08, 2025/08
             rf"(?<![0-9.]){YEAR_RE}[/.](?:0?[1-9]|1[0-2])(?:[/.](?:[12]\d|3[01]|0?[1-9]))?(?![\d/])",
             RECENTLY,
         ),
         (rf"{PREP}?\b\d{{1,2}}/\d{{1,2}}/(?:\d{{4}}|\d{{2}})\b", RECENTLY),
+        (rf"{PREP}?\b\d{{1,2}}/\d{{1,2}}/(?:{YEAR_RE}|\d{{2}})(?!\d)", RECENTLY),  # glued: "17/09/2025POR"
         (rf"{PREP}?\b\d{{1,2}}\.\d{{1,2}}\.(?:\d{{4}}|\d{{2}})\b", RECENTLY),
         (r"(?<![\d/.$,])\b(?:1[0-2]|0?[1-9])/(?:1[3-9]|2\d|3[01])\b(?![\d/%])", RECENTLY),
         (r"(?<![\d/.$,])\b(?:0[1-9]/(?:[0-2]\d|3[01])|1[0-2]/0[1-9])\b(?![\d/%])", RECENTLY),  # zero padding
         (rf"{PREP}\b(?:1[0-2]|0?[1-9])/(?:[12]?\d|3[01])\b(?![\d/%])", RECENTLY),
+        # day first, unambiguous when the day is 13 or more ("depuis 21/04", "31/7"); not "24/7"
+        (r"(?<![\d/.$,])\b(?!24/(?:7|5|365)\b)(?:1[3-9]|2\d|3[01])/(?:0?[1-9]|1[0-2])\b(?![\d/%])", RECENTLY),
+        (r"(?<!\d)20[0-4]\d(?:0[1-9]|1[0-2])(?:0[1-9]|[12]\d|3[01])(?!\d)", RECENTLY),  # "dltr-20250909"
         (rf"{PREP}?\b(?:{WEEKDAY},?\s+)?{MONTH_ANY}\s+{DAY_RANGE}(?!\d)(?:,?\s*{YEAR_RE}\b)?", RECENTLY),
         (
             rf"{PREP}?\b(?:{WEEKDAY},?\s+)?(?:the\s+)?{DAY_RANGE}\s+(?:of\s+)?{MONTH_ANY}(?:,?\s*{YEAR_RE}\b)?",
             RECENTLY,
         ),
         # a year and a period glued together: FY2025Q2, 2025Q2, 2025-Q2, 2025H1
-        (rf"{_I}(?<![A-Za-z0-9])FY\s?'?(?:{YEAR_RE}|\d{{2}})[\s\-/]?Q[1-4](?![A-Za-z0-9])", QUARTER),
+        (rf"{_I}(?<![A-Za-z0-9])FY\s?{APOS}?(?:{YEAR_RE}|\d{{2}})[\s\-/]?Q[1-4](?![A-Za-z0-9])", QUARTER),
         (rf"{_I}(?<![A-Za-z0-9]){YEAR_RE}[\s\-/]?Q[1-4](?![A-Za-z0-9])", QUARTER),
         (rf"{_I}(?<![A-Za-z0-9]){YEAR_RE}[\s\-/]?H[12](?![A-Za-z0-9])", HALF_YEAR),
         (
-            rf"{_I}(?<![A-Za-z])(?:the\s+)?(?:first|second|third|fourth|1st|2nd|3rd|4th)[\s-]+(?:fiscal\s+)?quarter\s+(?:of\s+)?(?:fiscal\s+(?:year\s+)?)?(?:FY\s?)?'?(?:{YEAR_RE}|\d{{2}})\b",
+            rf"{_I}(?<![A-Za-z])(?:the\s+)?(?:first|second|third|fourth|1st|2nd|3rd|4th)[\s-]+(?:fiscal\s+)?quarter\s+(?:of\s+)?(?:fiscal\s+(?:year\s+)?)?(?:FY\s?)?{APOS}?(?:{YEAR_RE}|\d{{2}})\b",
             QUARTER,
         ),
         (
-            rf"{_I}(?<![A-Za-z])(?:the\s+)?(?:first|second|1st|2nd)[\s-]+half\s+(?:of\s+)?(?:the\s+)?(?:fiscal\s+)?(?:year\s+)?'?(?:{YEAR_RE}|\d{{2}})\b",
+            rf"{_I}(?<![A-Za-z])(?:the\s+)?(?:first|second|1st|2nd)[\s-]+half\s+(?:of\s+)?(?:the\s+)?(?:fiscal\s+)?(?:year\s+)?{APOS}?(?:{YEAR_RE}|\d{{2}})\b",
             HALF_YEAR,
         ),
-        (rf"{_I}(?<![A-Za-z0-9])[12]H[\s\-/'’]*'?(?:{YEAR_RE}|\d{{2}})(?![A-Za-z0-9])", HALF_YEAR),
+        (rf"{_I}(?<![A-Za-z0-9])[12]H[\s\-/'’‘]*{APOS}?(?:{YEAR_RE}|\d{{2}})(?![A-Za-z0-9])", HALF_YEAR),
         # ASCII boundaries: CJK characters are word characters ("年Q2", "Q2财报")
         (
-            rf"{_I}(?<![A-Za-z0-9])(?:fiscal\s+)?Q[1-4][\s\-/'’]*(?:of\s+)?(?:fiscal\s+(?:year\s+)?)?"
-            rf"(?:FY\s?|CY\s?|F)?'?(?:{YEAR_RE}|\d{{2}})(?![A-Za-z0-9])",
+            rf"{_I}(?<![A-Za-z0-9])(?:fiscal\s+)?Q[1-4][\s\-/'’‘]*(?:of\s+)?(?:fiscal\s+(?:year\s+)?)?"
+            rf"(?:FY\s?|CY\s?|F)?{APOS}?(?:{YEAR_RE}|\d{{2}})(?![A-Za-z0-9])",
             QUARTER,
         ),
         (
-            rf"{_I}(?<![A-Za-z0-9])(?:fiscal\s+)?[1-4]Q[\s\-/'’]*(?:FY|CY)?'?(?:{YEAR_RE}|\d{{2}})(?![A-Za-z0-9])",
+            rf"{_I}(?<![A-Za-z0-9])(?:fiscal\s+)?[1-4]Q[\s\-/'’‘]*(?:FY|CY)?{APOS}?(?:{YEAR_RE}|\d{{2}})(?![A-Za-z0-9])",
             QUARTER,
         ),
         (
-            rf"(?<![A-Za-z0-9])(?:fiscal\s+)?[Hh][12][\s\-/'’]*(?:FY|CY)?'?(?:{YEAR_RE}|\d{{2}})(?![A-Za-z0-9])",
+            rf"(?<![A-Za-z0-9])(?:fiscal\s+)?[Hh][12][\s\-/'’‘]*(?:FY|CY)?{APOS}?(?:{YEAR_RE}|\d{{2}})(?![A-Za-z0-9])",
             HALF_YEAR,
         ),
         (rf"{_I}(?<![A-Za-z0-9])(?:fiscal\s+)?(?:Q[1-4]|[1-4]Q)(?![A-Za-z0-9])", QUARTER),
+        (  # a bare half-year label, case-sensitive; not hydrogen ("H2 production"), "H1-B" or "</h1>"
+            r"(?<![A-Za-z0-9$/<])(?<!green )(?<!Green )(?<!blue )(?:H[12]|[12]H)"
+            r"(?![A-Za-z0-9>]|-[A-Z]|\s+(?:[Pp]roduction|[Ff]uel|[Tt]imeframe))",
+            HALF_YEAR,
+        ),
         (rf"{_I}(?<![A-Za-z])(?:first|second|third|fourth|1st|2nd|3rd|4th)-quarter\b", "quarterly"),
         (
             rf"{_I}(?<![A-Za-z])(?:the\s+)?(?:first|second|third|fourth|1st|2nd|3rd|4th)\s+(?:fiscal\s+)?quarter\b",
@@ -697,9 +736,10 @@ _DATE_RULES: Final[tuple[tuple[re.Pattern[str], str], ...]] = tuple(
             HALF_YEAR,
         ),
         (rf"{_I}(?<![A-Za-z])(?:the\s+)?(?:first|second|1st|2nd)\s+(?:fiscal\s+)?half\b", HALF_YEAR),
-        (rf"\b(?:the\s+)?fiscal\s+(?:year\s+)?'?(?:{YEAR_RE}|\d{{2}})\b", FISCAL_YEAR),
-        (rf"{_I}(?<![A-Za-z0-9])FY\s?'?(?:{YEAR_RE}|\d{{2}})(?![A-Za-z0-9])", FISCAL_YEAR),
-        (rf"{_I}(?<![A-Za-z0-9])CY\s?'?(?:{YEAR_RE}|\d{{2}})(?![A-Za-z0-9])", YEAR),
+        (rf"\b(?:the\s+)?fiscal\s+(?:year\s+)?{APOS}?(?:{YEAR_RE}|\d{{2}})\b", FISCAL_YEAR),
+        (rf"{_I}(?<![A-Za-z0-9])FY\s?{APOS}?(?:{YEAR_RE}|\d{{2}})(?![A-Za-z0-9])", FISCAL_YEAR),
+        (rf"{_I}(?<![A-Za-z0-9])CY\s?{APOS}?(?:{YEAR_RE}|\d{{2}})(?![A-Za-z0-9])", YEAR),
+        (rf"(?<![A-Za-z0-9'’‘]){APOS}[12]\d(?![A-Za-z0-9%'’])", YEAR),  # "Raises '25 View", "Feb 18 '25"
         (rf"\b{YEAR_RE}\s*[-–/]\s*(?:{YEAR_RE}|\d{{2}})\b", "the period"),
         (rf"{PREP}?\b(?:early|mid|late)[\s-]+{MONTH_ANY}(?:\s+(?:of\s+)?{YEAR_RE}\b)?", RECENTLY),
         (rf"{PREP}?\b{MONTH_ANY}\s+(?:of\s+)?{YEAR_RE}", RECENTLY),
@@ -716,6 +756,7 @@ _DATE_RULES: Final[tuple[tuple[re.Pattern[str], str], ...]] = tuple(
             r"FEBRUARY|MARCH|APRIL|JUNE|JULY|AUGUST|SEPTEMBER|OCTOBER|NOVEMBER|DECEMBER)\b",
             "recent",
         ),
+        (rf"(?:{PREP})?(?<![A-Za-z]){MON}(?![A-Za-z0-9])", RECENTLY),  # a lone "Aug.": "on Aug.", "(Sept.)"
         (rf"{_I}(?:{PREP})?\b{WEEKDAY}\s+(?:night|morning|afternoon|evening)\b", RECENTLY),
         (rf"{_I}(?:\bon\s+)?\b{WEEKDAY}(?:'s|’s)", "the recent"),
         (rf"{_I}(?:{PREP}|\b(?:last|this|next|early|late)\s+){WEEKDAY}s?\b", RECENTLY),
@@ -726,9 +767,13 @@ _DATE_RULES: Final[tuple[tuple[re.Pattern[str], str], ...]] = tuple(
         (r"(?<![\d.,])\b(?:[12]\d|3[01]|0?[1-9])(?:st|nd|rd|th)?\s?[–\-]\s?(?=[Rr]ecently\b)", ""),
         (
             r"(?:(?<=the quarter)|(?<=the year)|(?<=fiscal year)|(?<=half-year))"
-            r"\s?[\-–'’/]\s?\d{2}(?![\d%]|[.,]\d)",
+            r"\s?[\-–'’‘/]\s?\d{2}(?![\d%]|[.,]\d)",
             "",
         ),  # "the fiscal year/27" (FY26/27); not "2-year/10-year"
+        (
+            r"(?:(?<=[Rr]ecent)|(?<=[Rr]ecently))['’‘]\d{2}(?![\d%]|[.,]\d)",
+            "",
+        ),  # "September’25" -> "recent’25"
     )
 )
 

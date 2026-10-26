@@ -14,8 +14,11 @@ The scanner is **independent of the masker**: it imports nothing from ``states.m
 - **dates**: English, French, German, Italian, Spanish, Portuguese, Dutch, Polish, Chinese, Japanese and
   Korean month and weekday names and dates, numeric dates, option expiries, period labels in any case and
   glued to text (Q3, 3Q25, H1 25, FY25, fiscal 2025, "second quarter", "first half", "3. Quartal", 第二季度,
-  "yearQ2", "quarter-25") and the remnants of masked day ranges ("recently-18"); **years**: 1900–2099 not
-  inside a larger number ("CY2025", "EHA2025", "2025年" count; "Russell 2000" excepted).
+  "yearQ2", "quarter-25") and the remnants of masked day ranges ("recently-18"); since the third verification
+  also written-out ordinal quarters and halves ("deuxième trimestre", "zweiten Quartal"), "3T25", "du T2",
+  Korean 분기 / 반기, two-digit years after an apostrophe ("'25", "FY’25"), a lone "Aug.", bare H1 / 2H,
+  glued yyyymmdd and day-first dates ("21/04"); **years**: 1900–2099 not inside a larger number ("CY2025",
+  "EHA2025", "2025年" count; "Russell 2000" excepted).
 
 AC2 counts names + tickers and years + dates. The scanner also counts, for the REPORT, price-move sentences,
 ticker quotes ("MPC-1.32%", "· IP. -0.58%", "Chg%"), dollar price levels (price targets, "shares at $X",
@@ -81,7 +84,15 @@ _F_MONTHS: Final = (
 _F_WEEKDAYS: Final = (
     "montag|dienstag|mittwoch|donnerstag|freitag|samstag|sonntag|lundi|mardi|mercredi|jeudi|vendredi|samedi|"
     "dimanche|lunedì|lunedi|martedì|martedi|mercoledì|mercoledi|giovedì|giovedi|venerdì|venerdi|lunes|martes|"
-    "miércoles|miercoles|jueves|viernes|maandag|dinsdag|woensdag|donderdag|vrijdag|zaterdag|zondag"
+    "miércoles|miercoles|jueves|viernes|sábado|sabado|domingo|sabato|domenica|segunda-feira|terça-feira|"
+    "terca-feira|quarta-feira|quinta-feira|sexta-feira|maandag|dinsdag|woensdag|donderdag|vrijdag|zaterdag|zondag"
+)
+# written-out ordinal quarters and halves (third verification): "deuxième trimestre", "zweiten Quartal"
+_ORDINALS: Final = (
+    "premier|première|1er|1re|deuxième|deuxieme|2e|2ème|second|seconde|troisième|troisieme|3e|3ème|quatrième|"
+    "quatrieme|4e|4ème|primer|primero|primera|segundo|segunda|tercer|tercero|tercera|cuarto|cuarta|primo|prima|"
+    "secondo|seconda|terzo|terza|quarto|quarta|primeiro|primeira|terceiro|terceira|erste|ersten|erstes|zweite|"
+    "zweiten|zweites|dritte|dritten|drittes|vierte|vierten|viertes|eerste|tweede|derde|vierde"
 )
 _DATE: Final = re.compile(
     rf"\b(?:{_EN_MONTHS}|{_EN_MONTHS.upper()})\b|\b(?:May|MAY)\s+\d"
@@ -95,6 +106,18 @@ _DATE: Final = re.compile(
     r"(?![A-Za-z0-9])|(?<=[a-z])Q[1-4](?![A-Za-z0-9])"
     r"|\b(?i:(?:first|second|third|fourth|1st|2nd|3rd|4th)[\s-]+quarter|(?:first|second|1st|2nd)[\s-]+half)\b"
     r"|\b[Hh][12]\s?'?\d{2,4}\b|\b[12]H\s?'?\d{2}\b|\b(?i:quarter|half|year)\s?[-–'’/]\s?\d{2}\b"
+    # third verification: ordinals with trimestre / Quartal / semestre, "3T25", "du T2", Korean 분기 / 반기,
+    # "'25" / "FY’25" / "Q1 ‘25", a lone "Aug.", bare H1 / 2H, glued yyyymmdd, day-first "21/04"
+    rf"|\b(?i:(?:{_ORDINALS})\s+(?:trimestre|quartals?|kwartaal|semestre|halbjahr(?:e?s)?|halfjaar))\b"
+    r"|(?<![A-Za-z0-9])[1-4]T\s?['’‘]?\d{2}(?:\d{2})?(?![A-Za-z0-9])"
+    r"|\b(?:au|Au|du|le|Le|el|El|del|no|do|em|ao|résultats|resultados?)\s+T[1-4](?![A-Za-z0-9/])"
+    r"|[1-4１-４]\s?분기|[상하]반기"
+    r"|(?<![A-Za-z0-9'’‘])['’‘][12]\d(?![A-Za-z0-9%'’])|(?i:\b[FC]Y\s?['’‘]\d{2}\b)|\b(?i:Q[1-4])\s?['’‘]\d{2}\b"
+    r"|(?<![A-Za-z])(?:Jan|Feb|Mar|Apr|Jun|Jul|Aug|Sep|Sept|Oct|Nov|Dec)\.(?![A-Za-z0-9])"
+    r"|(?<![A-Za-z0-9$/<])(?<!green )(?<!Green )(?<!blue )(?:H[12]|[12]H)"
+    r"(?![A-Za-z0-9>]|-[A-Z]|\s+(?:[Pp]roduction|[Ff]uel|[Tt]imeframe))"
+    r"|(?<!\d)20[0-4]\d(?:0[1-9]|1[0-2])(?:0[1-9]|[12]\d|3[01])(?!\d)"
+    r"|(?<![\d/.$,])\b(?!24/(?:7|5|365)\b)(?:1[3-9]|2\d|3[01])/(?:0?[1-9]|1[0-2])\b(?![\d/%])"
     # Chinese, Japanese, Korean
     r"|\d{1,2}\s?[月월]|(?<!\d)\d{1,2}\s?[日号일](?![本元])"
     r"|(?:星期|週|周|禮拜|礼拜)[一二三四五六日天]|[月火水木金土日]曜|[월화수목금토일]요일"
