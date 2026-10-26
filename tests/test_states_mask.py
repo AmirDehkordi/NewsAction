@@ -702,6 +702,7 @@ REVISION4_GONE = (
     ("Duolingo shares added 16% after the app reported strong results.", "16%"),
     ("Notable profits for the buyer who lifted the $0.37 offer for 1,967 Apple 9/12 weekly 20 puts.", "puts"),
     ("Crude for Sep-25 delivery rose on Tuesday.", "Sep-25"),
+    ("The most active strikes are the 9/12 weekly 26 puts and Oct-25 24 puts.", "26 puts"),
     ("Trading News Apple rallies to $202.34 as AI-driven AWS and booming ad revenue fuel growth.", "$202"),
     ("Results beat revenue estimates, with intrinsic value ($261.36) above current price ($246.03).", "$246"),
     ("Apple ended the latest trading session unchanged at $27.75, after gains driven by earnings.", "$27"),
@@ -734,6 +735,7 @@ REVISION4_KEEP = (
     "Adjusted earnings per share rose 8.3% year over year in the quarter to $1.44.",
     "Apple's EPS rose to $1.44, beating the consensus of $1.40.",
     "Apple's quarterly revenue fell 1.6% to $6.16 bln, beating estimates.",
+    "Earnings Flash Apple Posts Adjusted EPS $2.47 per Share, vs. FactSet Est of $2.44",
 )
 
 
@@ -778,7 +780,7 @@ def test_scanner_sees_the_fourth_verification_forms() -> None:
         assert c.price_levels + c.price_moves + c.dates + c.years >= 1, text
     for text in REVISION4_KEEP:
         c = sc.scan_text(text, AAPL)
-        assert c.price_levels + c.price_moves == 0, text
+        assert c.price_levels + c.price_moves + c.quotes == 0, text
 
 
 def test_val_a_price_talk_below_target() -> None:
