@@ -351,8 +351,17 @@ RUNNING = (
         "2025-07-28 08:45:00",
         "intraday",
     ),
+    (  # rule 1 behind a scraper's age prefix (a 2024 Yahoo page added by the decision-A rebuild)
+        "2 hours Stock market today: Dow futures slip with stocks in retreat as investors rethink rate-cut "
+        "bets",
+        "2 hours Stock market today: Dow futures slip with stocks in retreat. Stock market today: Dow "
+        "futures slip",
+        "2024-10-07 11:00:00",
+        "live",
+    ),
 )
 RUNNING_KEPT = (  # (raw title, raw snippet, t_avail UTC)
+    ("2 Day Getaway from Brisbane, Australia", "", "2024-10-07 11:00:00"),  # an age-like prefix, no live page
     (
         "US Stocks Likely To Open Lower After A Week Of Records: Tesla In Focus",
         "U.S. stock futures declined on Monday after scaling fresh records in the previous truncated week.",
