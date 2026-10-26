@@ -54,7 +54,7 @@ Three Call A (D0) and two Call B (D2) states, drawn with seed 2026 (`newsaction.
 
 ## Call A, D0: `W0:186:2025-07-21`
 
-4 articles · 673 state tokens · 975 with the core questions
+4 articles · 622 state tokens · 924 with the core questions
 
 ```json
 {
@@ -93,7 +93,7 @@ Three Call A (D0) and two Call B (D2) states, drawn with seed 2026 (`newsaction.
       "timing": "after yesterday's close"
     },
     {
-      "headline": "Institutional investors control 72% of DXP Enterprises, Inc. (NASDAQ:DXPE) and were rewarded last week after stock increased 8.9%",
+      "headline": "",
       "snippet": "Key Insights Given the large stake in the stock by institutions, DXP Enterprises' stock price might be vulnerable to...",
       "source_type": "news aggregator",
       "timing": "overnight"
@@ -105,7 +105,7 @@ Three Call A (D0) and two Call B (D2) states, drawn with seed 2026 (`newsaction.
       "timing": "overnight"
     },
     {
-      "headline": "Ethereum Roars To $3,800: What's Driving The Surge?",
+      "headline": "",
       "snippet": "Ethereum's (CRYPTO: ETH) most recent breakout isn't just a product of ETF hype, it's backed by a surge in DeFi activity and a rising structural shift,...",
       "source_type": "news aggregator",
       "timing": "early this morning (before 08:00)"
@@ -114,28 +114,28 @@ Three Call A (D0) and two Call B (D2) states, drawn with seed 2026 (`newsaction.
 }
 ```
 
-## Call A, D0: `W0:1452:2025-09-11`
+## Call A, D0: `W0:1416:2025-09-11`
 
-6 articles · 672 state tokens · 974 with the core questions
+5 articles · 705 state tokens · 1007 with the core questions
 
 ```json
 {
   "attention": {
-    "articles_vs_usual": "very heavy",
-    "distinct_stories": "more than ten"
+    "articles_vs_usual": "normal",
+    "distinct_stories": "six"
   },
   "company": {
     "analyst_estimates_past_month": "little changed",
     "earnings_report": "no scheduled earnings report falls in this window",
-    "market_sensitivity": "market-like",
+    "market_sensitivity": "aggressive",
     "performance_vs_market_and_sector": {
-      "past_month": "moderate fall (≈1.4× a typical month's move)",
-      "past_three_months": "moderate fall (≈1.9× a typical three-month move)",
-      "past_week": "very large fall (≈3.0× a typical week's move)"
+      "past_month": "large fall (≈2.1× a typical month's move)",
+      "past_three_months": "small fall (≈0.8× a typical three-month move)",
+      "past_week": "small fall (≈0.5× a typical week's move)"
     },
-    "sector": "Information Technology",
-    "size": "an S&P 500 company (size rank 251–500)",
-    "volatility_vs_its_past_year": "not available"
+    "sector": "Consumer Staples",
+    "size": "a large US company (size rank 101–250)",
+    "volatility_vs_its_past_year": "low"
   },
   "market": {
     "dollar_change": "negligible fall (≈0.0× a typical day's move)",
@@ -149,40 +149,34 @@ Three Call A (D0) and two Call B (D2) states, drawn with seed 2026 (`newsaction.
   },
   "news": [
     {
-      "headline": "How major US stock indexes fared recently, recently",
-      "snippet": "",
-      "source_type": "news aggregator",
-      "timing": "after yesterday's close"
-    },
-    {
-      "headline": "S&P 500 ends at record as markets await key US consumer price data",
-      "snippet": "",
-      "source_type": "news aggregator",
-      "timing": "after yesterday's close"
-    },
-    {
-      "headline": "Stock market today: S&P 500, Nasdaq notch fresh records as Oracle soars, with inflation data on deck",
-      "snippet": "",
-      "source_type": "news aggregator",
-      "timing": "after yesterday's close"
-    },
-    {
-      "headline": "Morning Bid: Another day, another AI record",
-      "snippet": "Oracle's skyrocketing share price lifted Asian equities recently, as AI enthusiasm shows no signs of abating. Meanwhile, European markets remain in...",
+      "headline": "Walmart Is Starting to Feel the Effects of Tariffs. Is Its Stock in Trouble?",
+      "snippet": "In its quarter, Walmart missed earnings expectations for the first time in more than three years. Its CEO hinted that there could be more noticeable price...",
       "source_type": "news aggregator",
       "timing": "early this morning (before 08:00)"
     },
     {
-      "headline": "",
-      "snippet": "Oracle's massive backlog for its cloud business stunned Wall Street recently, cementing its spot as a key player in the AI market and lifting hopes that...",
+      "headline": "Supreme Showdown: A person-Era Tariffs Under IEEPA Face Ultimate Legal Test",
+      "snippet": "The battle over the a person administration's controversial tariffs, particularly those levied under the International Emergency Economic Powers Act (IEEPA),...",
       "source_type": "news aggregator",
       "timing": "after yesterday's close"
     },
     {
-      "headline": "Wall Street futures inch higher in lead-up to inflation data",
-      "snippet": "U.S. stock index futures were slightly higher recently as investors refrained from making large bets ahead of crucial inflation numbers that are likely...",
+      "headline": "Tariffs' Toll: American Households Face Billions in Increased Everyday Expenses",
+      "snippet": "The United States is currently navigating a complex and often contentious landscape of new tariff policies, measures that are increasingly translating into...",
       "source_type": "news aggregator",
-      "timing": "early this morning (before 08:00)"
+      "timing": "after yesterday's close"
+    },
+    {
+      "headline": "Cost of Living Crisis a person Health as America's Top Concern in the year",
+      "snippet": "The year has marked a pivotal shift in the American psyche, as the pervasive and relentless rise in the cost of living has officially eclipsed health-related...",
+      "source_type": "news aggregator",
+      "timing": "after yesterday's close"
+    },
+    {
+      "headline": "U.S. Companies Shift Investments from China, Favoring Southeast Asia",
+      "snippet": "Investment Redirection**: Nearly 47% of U.S. businesses have shifted planned investments from China to other regions, primarily Southeast Asia, du...",
+      "source_type": "investor commentary",
+      "timing": "after yesterday's close"
     }
   ]
 }
