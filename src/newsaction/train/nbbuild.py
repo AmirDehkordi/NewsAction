@@ -195,9 +195,11 @@ for p in sorted(OUT_DIR.glob("na08_*_run_record.json")):
     rec = json.loads(p.read_text(encoding="utf-8"))
     if rec["hub_push"] is not False:
         raise RuntimeError("a run record does not say hub_push: false")
+    tp = rec["throughput"]
     print(p.name, "| best epoch", rec["best_epoch"], "| epochs", rec["epochs_run"],
-          "| train seq/s", round(rec["throughput"]["train_seq_per_s"], 2),
-          "| eval seq/s", round(rec["throughput"]["eval_seq_per_s"], 2), "| peak GB", rec["peak_gpu_gb"])
+          "| train seq/s", round(tp["train_seq_per_s"], 2),
+          "| eval seq/s", round(tp.get("eval_seq_per_s", tp["eval_seq_per_s_probe"]), 2),
+          "| peak GB", rec["peak_gpu_gb"])
 print(len(outputs), "output files; nothing was pushed to the Hugging Face Hub")
 """
 

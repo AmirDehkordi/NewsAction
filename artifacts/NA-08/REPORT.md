@@ -61,7 +61,7 @@ Also: `train/metrics.py` (val-A IC, NW t, block bootstrap, ECE, temperature), `t
 
 | AC | Evidence | Result |
 |---|---|---|
-| AC1 no val-B / test labels; private; uploaded = local | `tests/test_train_export_schema.py`. On the code path, `split_files` gives val-B and test files with exactly `EVAL_COLUMNS` and no label-like name; the built files' parquet schemas are the same. `dataset-metadata.json` has `isPrivate: true`, and the runbook creates without `--public`. **Mutations** (verifier step 8): `label_index` in the test export, and separately in the val-B export, both **RED**. **Uploaded hash:** pending the upload. On Kaggle the notebook checks every file against `sha256_manifest.json` and records them in each run record, and `import_preds.verify_record` requires them to equal the local manifest. The runbook also downloads the dataset back (`python -m newsaction.train.kaggle_export verify <dir>`). | PASS locally; upload pending |
+| AC1 no val-B / test labels; private; uploaded = local | `tests/test_train_export_schema.py`. On the code path, `split_files` gives val-B and test files with exactly `EVAL_COLUMNS` and no label-like name; the built files' parquet schemas are the same. `dataset-metadata.json` has `isPrivate: true`, and the dataset was created without `--public`. **Mutations** (verifier step 8): `label_index` in the test export, and separately in the val-B export, both **RED**. **Uploaded = local:** `amirdehkordi98/newsaction-na08-states` (created 2026-10-26; Kaggle metadata `isPrivate: true`) was downloaded back file by file, and `python -m newsaction.train.kaggle_export verify` found all 5 manifest files byte-identical; `sha256_manifest.json` itself is identical too (`2bafd1de…`). On Kaggle the notebook re-checks every file and records the sha256s in each run record, which `import_preds.verify_record` compares with the local manifest. | PASS |
 | AC2 date hygiene | Train sessions 2024-07-01 … 2025-06-30. Last train label horizon 2025-06-30 (react 06-24 + 4, cont 06-23 + 5; `check_purge`; `dataset_info.json` `dates`; tests on the built files). Early stopping and temperatures use val-A only, labelled rows outside the first 5 sessions: the program's `fit_mask` / `calibrate(frames["val_a"])` and the run record (`early_stopping`, `temperature_fit`, `labels_read`), which `import_preds` requires. **Mutations:** purge check off, temperatures on val-B, the program reading val-B labels: all **RED** | PASS (run records pending) |
 | AC3 controls | Kernels `shuffle-s13` (Laya, seed 13, 1 epoch, labels permuted within split and question) and `repro-s13`. `cards.controls` applies \|t\| < 2 (D0 N̂ vs e5) and \|Δ IC\| ≤ 0.003 (D0 N̂ vs z_cc,t and vs e5) | pending runs |
 | AC4 import | `import_preds.run`. Event ids are mapped back and must match the state files. Every expected example is present exactly once, with probabilities summing to 1 (±1e-4) and equal to softmax(logits / T). Tested end to end on a tiny model (`tests/test_train_import.py`: 21 tests, both inits through every notebook cell). | code PASS; real runs pending |
@@ -157,9 +157,12 @@ make manifest
 # 2. Upload the dataset: private (no --public), parquet kept as is. ~140 MB.
 uv run --locked kaggle datasets create -p work/kaggle/dataset --keep-tabular
 uv run --locked kaggle datasets status amirdehkordi98/newsaction-na08-states       # until "ready"
-#    AC1: download it back and compare with the local sha256 manifest.
+#    AC1: download it back and compare with the local sha256 manifest. Right after creation the bundle download
+#    can come back empty; per-file downloads work.
 rm -rf /tmp/na08-dataset-check && mkdir -p /tmp/na08-dataset-check
-uv run --locked kaggle datasets download amirdehkordi98/newsaction-na08-states -p /tmp/na08-dataset-check --unzip
+for f in train.parquet val_a.parquet val_b.parquet test_callA.parquet dataset_info.json sha256_manifest.json; do
+  uv run --locked kaggle datasets download amirdehkordi98/newsaction-na08-states -f $f -p /tmp/na08-dataset-check --force
+done
 uv run --locked python -m newsaction.train.kaggle_export verify /tmp/na08-dataset-check
 #    The dataset page on kaggle.com must show "Private".
 

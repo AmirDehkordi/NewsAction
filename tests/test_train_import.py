@@ -334,7 +334,17 @@ def tiny(tmp_path_factory: pytest.TempPathFactory) -> dict[str, Any]:
         nbbuild.run_locally(nb, params, root / f"run-{name}")
     summary = import_preds.run(lay, cfg)
     card_summary = cards.run(lay, cfg)
-    return {"lay": lay, "cfg": cfg, "info": info, "summary": summary, "cards": card_summary, "states": states}
+    return {
+        "lay": lay,
+        "cfg": cfg,
+        "info": info,
+        "summary": summary,
+        "cards": card_summary,
+        "states": states,
+        "nb": nb,
+        "root": root,
+        "model_dirs": {"laya": str(laya_root), "modernbert": str(anchor)},
+    }
 
 
 def test_tiny_runs_are_imported_and_ensembled(tiny: dict[str, Any]) -> None:
@@ -443,3 +453,38 @@ def test_verify_run_refuses_a_tampered_prediction_file(tiny: dict[str, Any], tmp
     p.write_bytes(p.read_bytes()[:-8] + b"\0" * 8)
     with pytest.raises(RunImportError, match="sha256"):
         verify_run(dst, tiny["cfg"].kaggle.run("laya-s13"), "laya-s13", tiny["cfg"], tiny["lay"])
+
+
+def test_tiny_pilot_is_verified_and_planned(tiny: dict[str, Any]) -> None:
+    """The pilot kernel (three launches) through every notebook cell, then plan.run → throughput.json."""
+    from newsaction.train import kaggle_export, nbbuild, plan
+
+    lay, cfg = tiny["lay"], tiny["cfg"]
+    params = kaggle_export.run_parameters(cfg.kaggle.run("pilot"), cfg)
+    params.update(
+        TIME_BUDGET_HOURS=1.0,
+        LOCAL={
+            "out_dir": str(lay.work / "kaggle" / "predictions" / "pilot"),
+            "dataset_dir": str(lay.work / "kaggle" / "dataset"),
+            "model_dirs": tiny["model_dirs"],
+            "device": "cpu",
+        },
+    )
+    nbbuild.run_locally(tiny["nb"], params, tiny["root"] / "run-pilot")
+    out = plan.run(lay, cfg)
+    assert {k: v["status"] for k, v in out["pilot"].items()} == {
+        "laya": "ok",
+        "laya-nockpt": "ok",
+        "modernbert": "ok",
+    }
+    assert (
+        out["pilot"]["laya"]["rehearsal_rows"]["val_a"] > 0
+        and out["pilot"]["laya-nockpt"]["rehearsal_rows"] == {}
+    )
+    assert out["rows"]["train"] == tiny["info"]["counts"]["train"]["examples"]
+    names = [o["option"] for o in out["options"]]
+    assert names == ["full", "anchor seeds -> 1", "MAX_LEN 768", "anchor seeds -> 1, epochs 2"]
+    assert out["options"][2]["available"] is False
+    full = out["options"][0]
+    assert [r["run"] for r in full["runs"]][:2] == ["shuffle-s13", "laya-s13"] and full["gpu_hours"] > 0
+    assert (lay.artifacts / "NA-08" / "throughput.json").is_file()
