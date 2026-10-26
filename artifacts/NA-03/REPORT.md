@@ -14,6 +14,11 @@ ticker-days and **36.5%** of delayed-reaction days. Among those days, abnormal v
 - **Underreaction constraint.** The delayed-recall constraint excludes F2 and F3 but does not bind on the
   choice.
 - **Events.** 48,103 D0 and 62,285 D2 events cover 2024-01-02 … 2026-07-31.
+  *Update 2026-10-26:* after operator decision A (`parsing_allowed` None articles are third-party OK), the
+  `events` and `project` stages were rebuilt with the frozen F5 unchanged. Now 55,485 D0 and 71,540 D2 events;
+  robustness 2,894 / 3,940 and train 22,936 / 29,485, while val-A, val-B, test and the NA-11 cost projection are
+  unchanged. Only 3 selected train days per window lack a third-party-OK article (PREREG §15, NA-02 row of
+  2026-10-26; `selection_by_split.csv`).
 - **NA-11 cost.** The NA-11 plan fits its $18 cap at $0.042/M ($4.03 minimal, $8.32 full). At $0.10/M the
   minimal plan fits ($9.59), but the full plan does not ($18.43).
 

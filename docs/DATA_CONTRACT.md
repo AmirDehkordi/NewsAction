@@ -271,16 +271,16 @@ Instants are UTC; session dates are XNYS-local.
 - **Key:** `id` unique
 - **Rows / coverage:** 2,906,710 member articles (t_avail 2023-07-01 … 2026-07-31; company is an S&P 500 member at `session_w2`); sorted by (t_avail, id). Intermediate of NA-02 (input of the `embed` and `articles` stages); later chunks read `articles_clean`.
 - **Availability:** as `articles_clean` (no near-duplicate or novelty columns yet).
-- **sha256:** `e16c2592ab383f803c2287a974d22aabad4aaa9d24ca0144fa25314a739a1d18`
+- **sha256:** `4be969b2103d963cb174140681f3926ba9c2f5b4b40748ace4b440a7520f4637`
 
 ### `work/news/articles_clean.parquet`
 - **Producer:** `newsaction.news.build --stage articles` (S12; S7 dedupe, S8 novelty)
 - **Inputs:** `work/news/articles_stage1.parquet`, `work/news/embeddings_ts.parquet`
-- **Schema:** `id`, `company_id`, `symbol_id` (int64; for share-class aliases PARAA / BF-A / LEN-B the member class's id), `ticker_raw` (vendor `EXCH:SYM`), `ts_pub_utc`, `precision` (date_only | hour | minute | exact, PREREG §2.2), `t_avail` (§2.3), `session_w0` (date32, null if t_avail is after 09:15 ET and up to the close), `session_w2`, `domain`, `source_class` (domain class, press_wire_primary when `tag_primary_source`), `source_class_domain` (domain only), `title`, `snippet` (raw), `title_clean`, `snippet_clean` (scrubbed, PREREG §6.3–6.4: no after-the-fact / price-path or pre-market sentences, no share-price levels), `summary_present`, flags `non_news`, `junk_tag`, `is_13f`, `is_form4`, `after_fact`, `premarket_talk`, `has_clean_text`, `non_english_hint` (bool), `third_party_ok` (= `parsing_allowed is True`), `parsing_allowed` (bool, nullable), vendor fields `sentiment_direction`, `sentiment_intensity`, `tag_type`, `tag_type2`, the five `tag_*` flags, `tag_source`, `event_id`, `event_age_days`; `dup_group` (string: id of the group's representative), `dup_count`, `dup_count_w0`, `dup_count_w2` (double, NaN outside the usable set), `is_representative` (bool), `novelty` (double, NaN outside the usable set), `keep` (bool)
+- **Schema:** `id`, `company_id`, `symbol_id` (int64; for share-class aliases PARAA / BF-A / LEN-B the member class's id), `ticker_raw` (vendor `EXCH:SYM`), `ts_pub_utc`, `precision` (date_only | hour | minute | exact, PREREG §2.2), `t_avail` (§2.3), `session_w0` (date32, null if t_avail is after 09:15 ET and up to the close), `session_w2`, `domain`, `source_class` (domain class, press_wire_primary when `tag_primary_source`), `source_class_domain` (domain only), `title`, `snippet` (raw), `title_clean`, `snippet_clean` (scrubbed, PREREG §6.3–6.4: no after-the-fact / price-path or pre-market sentences, no share-price levels), `summary_present`, flags `non_news`, `junk_tag`, `is_13f`, `is_form4`, `after_fact`, `premarket_talk`, `has_clean_text`, `non_english_hint` (bool), `third_party_ok` (`parsing_allowed` True, or None while `configs/frozen.yaml` `news.parsing_allowed_none` is `allow`: operator decision A, PREREG §15; never False), `parsing_allowed` (bool, nullable), vendor fields `sentiment_direction`, `sentiment_intensity`, `tag_type`, `tag_type2`, the five `tag_*` flags, `tag_source`, `event_id`, `event_age_days`; `dup_group` (string: id of the group's representative), `dup_count`, `dup_count_w0`, `dup_count_w2` (double, NaN outside the usable set), `is_representative` (bool), `novelty` (double, NaN outside the usable set), `keep` (bool)
 - **Key:** `id` unique; sorted by (t_avail, id)
 - **Rows / coverage:** 2,906,710 member articles of 536 companies, t_avail 2023-07-01 … 2026-07-31. Usable (passes the §6.2 filters and has clean text): 1,669,437; `keep` (usable and near-duplicate representative): 1,494,138.
 - **Availability:** per column in `configs/availability.yaml`. Article columns are `w0`: a row may enter a D0 state of session s only if `session_w0 == s` and a D2 state only if `session_w2 == s` (`pit.assert_visible(t_avail ≤ decision instant)`). `dup_group`, `is_representative` and `novelty` look only backwards (deleting later articles changes none of them; tests/test_news_novelty.py). `dup_count` includes later duplicates (`post`); `dup_count_w0` / `dup_count_w2` count the representative's own window (`w0` / `w2`). Vendor labels and the flags built from them (`source_class`, `summary_present`, `non_news`, `junk_tag`, `keep`, `third_party_ok`, `parsing_allowed`, sentiment, tags, `event_*`) are `selection_only` (CLAUDE.md A6). Contains 2026 articles (text and timestamps only; never joined to a return before unblinding).
-- **sha256:** `64eb68bd4284bf3eae36733e20dd3fd495ed9a251084551e28d3160ac3723f8e`
+- **sha256:** `22b6c616e3cd69b0f6da7337f6416ae52890abebd6e067ff2d2032a85a8af5ba`
 
 ### `work/news/embeddings_ts.parquet`
 - **Producer:** `newsaction.news.build --stage embed` (S6, `newsaction.news.embed`; written with pyarrow, no pandas metadata, registered with `io.register_file`)
@@ -305,9 +305,9 @@ Instants are UTC; session dates are XNYS-local.
 - **Inputs:** Data/news rows with ticker `^GSPC`, `^VIX` or `DX-Y.NYB`
 - **Schema:** `id`, `ticker_raw`, `ts_pub_utc`, `precision`, `t_avail`, `session_w0`, `session_w2`, `domain`, `source_class_domain`, `title`, `snippet`, `title_clean`, `snippet_clean`, `summary_present`, `non_news`, `junk_tag`, `is_13f`, `after_fact`, `premarket_talk`, `third_party_ok`
 - **Key:** `id` unique; sorted by (t_avail, id)
-- **Rows / coverage:** 31,506 cleaned market-index articles (^GSPC 12,179, ^VIX 11,081, DX-Y.NYB 8,246), t_avail 2023-09-01 … 2026-07-31; no company mapping; non_news / junk-tag / 13F rows dropped; `third_party_ok` 89.8%.
+- **Rows / coverage:** 31,506 cleaned market-index articles (^GSPC 12,179, ^VIX 11,081, DX-Y.NYB 8,246), t_avail 2023-09-01 … 2026-07-31; no company mapping; non_news / junk-tag / 13F rows dropped; `third_party_ok` 100% (89.8% before decision A allowed `parsing_allowed` None).
 - **Availability:** as `articles_clean` (article columns `w0`, vendor flags `selection_only`).
-- **sha256:** `8816280faecf42f0dc5b0571493ceda44e091636b66731f750313938b6416dc9`
+- **sha256:** `6eaf66a87d6f66e10acd93e04d7b5a90f96942476c13d6571caef770ca17b2e9`
 
 ## NA-03 — material labels, importance filters, events
 
@@ -405,18 +405,18 @@ frozen models, counts and t−1 tiers only. No module in `newsaction.events` imp
 - **Inputs:** `work/events/{ticker_days,article_scores,window_counts}.parquet`, `work/news/articles_clean.parquet` (text and descriptive fields of kept articles), `work/panel/tiers_monthly.parquet` (t−1 tier, representative class), `configs/frozen.yaml` `filter:`
 - **Schema:** `event_id` ("W0:{company_id}:{session}"), `window`, `decision_point` string, `company_id` int64, `session` date32, `n_list_w0` (1–6), `n_ok_w0`, `n_not_third_party_w0`, `n_dropped_cap_w0`, `news_tokens_w0` (≤ 600, ModernBERT-large @ 45bb4654), `n_non_english_w0` int64, `filter_score_w0` double, `n_articles_w0`, `n_stories_w0`, `n_dup_w0` int64, `attention_mean_w0`, `attention_ratio_w0` double, `month`, `tier` string, `symbol_id` int64, `split` string, `embargo` bool, `clean_1`, `clean_2`, `clean_5`, `clean_10`, `clean_20` boolean (NA when the window runs past 2026-07-31), `news_w0` list<struct{id, rank int32, score double, t_avail timestamp[us, UTC], precision, source_class, source_class_domain string, non_english_hint bool, novelty, dup_count double, title, snippet string, title_truncated, snippet_truncated bool}> (no pandas metadata: `pd.read_parquet` gives arrays of dicts)
 - **Key:** `event_id` unique (= `(company_id, session)`)
-- **Rows / coverage:** 48,103 events 2024-01-02 … 2026-07-31, 523 companies: robustness 689, train 17,759, val-A 9,079, val-B 6,149, test 14,427. 7,385 selected ticker-days have no third-party-OK article and no event (robustness 2,205, train 5,180).
+- **Rows / coverage:** 55,485 events 2024-01-02 … 2026-07-31, 530 companies: robustness 2,894, train 22,936, val-A 9,079, val-B 6,149, test 14,427. 3 selected ticker-days (train) have no third-party-OK article and no event (7,385 before decision A: robustness 2,205, train 5,180).
 - **Availability:** `w0` for the news and count columns (registry suffix `_w0`); `filter_score_w0`, `n_ok_w0`, `n_not_third_party_w0` `selection_only`; `clean_*` `post` (look forward; sample flags). No price, return or target is read; test-period rows come from articles only.
-- **sha256:** `6279bd6227a7f097931efa2b498912e6064e15b36a513eb8450b412bb80f17af`
+- **sha256:** `ee7d43876d89253bb545a143b74363250f3451ad909cc789986f9664de3de6e5`
 
 ### `work/events/events_d2.parquet`
 - **Producer:** as `events_d0` (window W2)
 - **Inputs:** as `events_d0`
 - **Schema:** as `events_d0` with the `_w2` suffix (`event_id` "W2:{company_id}:{session}")
 - **Key:** `event_id` unique
-- **Rows / coverage:** 62,285 events 2024-01-02 … 2026-07-31, 524 companies: robustness 971, train 23,199, val-A 11,252, val-B 7,912, test 18,951; 9,258 selected ticker-days without a third-party-OK article.
+- **Rows / coverage:** 71,540 events 2024-01-02 … 2026-07-31, 531 companies: robustness 3,940, train 29,485, val-A 11,252, val-B 7,912, test 18,951; 3 selected ticker-days (train) without a third-party-OK article (9,258 before decision A).
 - **Availability:** `w2` (D2 decision point); otherwise as `events_d0`.
-- **sha256:** `2acf769d5803f2d90dfcc9445bf0156c17c044b29ebd780ee3f9474e07010002`
+- **sha256:** `7098949a700855d724bf1d1e732310bc705e67b9dfdc048c7fb1edd23b76035b`
 
 ## NA-04 — states: context, masked text, decision-model states
 
@@ -432,9 +432,9 @@ its sha256 on a rerun.
 - **Inputs:** `work/events/events_{d0,d2}.parquet` (keys), `work/panel/panel_public.parquet` and `panel_test_inputs.parquet` (t−1 columns; public `adj_close` shifted one session), `work/snapshot/estimates_fy1.parquet`, `work/market/earnings_dates.parquet`, `work/panel/companies.parquet`, `work/snapshot/symbol_tickers.parquet`
 - **Schema:** `session` date32, `symbol_id`, `company_id` int64, `ctx_sigma_cc_pct`, `ctx_z_m{5,20,60}_pct`, `ctx_ret_m{5,20,60}` double, `sector` string, `beta_m`, `sigma_cc`, `z_m{5,20,60}`, `logv_mad60`, `ctx_eps_fy1_now`, `ctx_eps_fy1_before`, `ctx_eps_revision` double, `ctx_earnings_w0`, `ctx_earnings_w2` bool
 - **Key:** `(session, symbol_id)` unique (the representative symbol of each D0 / D2 event)
-- **Rows / coverage:** 62,285 rows = every D0 ∪ D2 event key, 2024-01-02 … 2026-07-31. `ctx_ret_m*` are NaN for test sessions (E0 states are built for val samples only).
+- **Rows / coverage:** 71,540 rows = every D0 ∪ D2 event key, 2024-01-02 … 2026-07-31. `ctx_ret_m*` are NaN for test sessions (E0 states are built for val samples only).
 - **Availability:** `t_minus_1` (earnings flags `w0` / `w2`): data through close(prev s) only; percentiles compare with the symbol's previous 252 values (tests/test_states_pit.py planted shocks). Contains test-period t−1 values: never summarized before the freeze.
-- **sha256:** `f2935d93c9079e096f742ffc8adbed0d3ec6dd9716b8e63a2f1a2c1edd963f47`
+- **sha256:** `7d30be5ca46d2ed47ab545ef0823e72f6ed6a0b7f068ea883c11827f70e201b4`
 
 ### `work/states/context_market.parquet`
 - **Producer:** `newsaction.states.build --stage context` (S2; `states.context.market_context`, `states.macro`)
@@ -450,36 +450,36 @@ its sha256 on a rerun.
 - **Inputs:** `work/panel/panel_public.parquet`, `work/market/market_prices.parquet` (SPY history)
 - **Schema:** `session` date32, `symbol_id` int64, `g_d2`, `g_d2_lvl`, `react_r_cc`, `react_r_spy_cc`, `react_z_vol`, `react_g_pct`, `react_spy_z`, `react_spy_pct`, `react_volume_multiple` double
 - **Key:** `(session, symbol_id)` unique
-- **Rows / coverage:** 42,363 rows = the D2 event keys of train, val-A and val-B (sessions ≤ 2025-12-31; no test row)
+- **Rows / coverage:** 48,649 rows = the D2 event keys of train, val-A and val-B (sessions ≤ 2025-12-31; no test row)
 - **Availability:** `d2_reaction` (the reaction of s; E4 and σ histories through t−1). Never a Call A input.
-- **sha256:** `8c2e053ba58f5fa20bdc43a4aa2b1b4aa00d02642e3ecdd1e8c68153dcd92916`
+- **sha256:** `32e339109435119426657ac7ebbcc7c2aab832971fc6925d7a0fddb0d31c7346`
 
 ### `work/states/articles_masked.parquet`
 - **Producer:** `newsaction.states.build --stage mask` (S3; `states.mask.Masker`, spaCy `en_core_web_sm` 3.8.0)
 - **Inputs:** the news lists of `work/events/events_{d0,d2}.parquet` (title_clean / snippet_clean as capped by NA-03), `work/news/market_articles.parquet` (A3.5 selection), `work/panel/companies.parquet`, `work/snapshot/symbol_tickers.parquet`, `configs/{aliases,news,patterns}.yaml`
 - **Schema:** `id` string, `kind` (company | market), `company_id` int64 (−1 for market articles), `title_masked`, `snippet_masked` string, `n_names`, `n_tickers`, `n_dates`, `n_persons` int64 (replacements made; price-talk sentences, quotes and price-level rewrites are not counted)
 - **Key:** `id` unique
-- **Rows / coverage:** 299,137 rows: 296,082 event articles, 3,055 market articles (the A3.5 selection leaves out excluded articles: explainers, TradingView reposts, revision 3; non-English articles, revision 4). Excluded event articles are still masked here; `news_items` leaves them out of the states. Since revision 4 the price step also drops share-price levels, the direction after the number, moves as nouns and price targets in any notation (the second pass drops any sentence that still holds a cents-precision share price); since revision 5 it drops every sentence with a price move of any security or an index or commodity level, before NER and in the final pass (`Masker.has_market_move`), and masks the fifth verification's date forms. 4,324 event articles and 80 market articles have no text left
+- **Rows / coverage:** 358,358 rows: 355,191 event articles, 3,167 market articles (the A3.5 selection leaves out excluded articles: explainers, TradingView reposts, revision 3; non-English articles, revision 4). Excluded event articles are still masked here; `news_items` leaves them out of the states. Since revision 4 the price step also drops share-price levels, the direction after the number, moves as nouns and price targets in any notation (the second pass drops any sentence that still holds a cents-precision share price); since revision 5 it drops every sentence with a price move of any security or an index or commodity level, before NER and in the final pass (`Masker.has_market_move`), and masks the fifth verification's date forms. 4,964 event articles and 80 market articles have an empty masked title and snippet
 - **Availability:** `w0` per article (a function of the article's own text; `title_masked` / `snippet_masked` registered `w0`). Third-party OK articles only (NA-03 lists); contains 2026 article text, no return.
-- **sha256:** `e6c525dc765145c944a3ea58d77b595e979fec8ee0cc69d2f6aff09edfdc7f03`
+- **sha256:** `b7919e511d05bf2e77bedd43b5142dab0a9c1da35d03cc50d71c64cb9a510002`
 
 ### `work/states/person_surnames.parquet`
 - **Producer:** `newsaction.states.build --stage mask` (S3; `states.mask.Masker.corpus_surnames`)
 - **Inputs:** the spaCy PERSON entities of every event and market article text
 - **Schema:** `surname` string
 - **Key:** `surname` unique (sorted)
-- **Rows / coverage:** 1,772 surnames: last words of multi-word PERSON names in English texts seen ≥ 3 times, capitalized ASCII, 3+ letters, not an ordinary lower-case word of the event texts, not a word of any company alias, and not tagged inside an organization, product or place name at least half as often
+- **Rows / coverage:** 2,046 surnames: last words of multi-word PERSON names in English texts seen ≥ 3 times, capitalized ASCII, 3+ letters, not an ordinary lower-case word of the event texts, not a word of any company alias, and not tagged inside an organization, product or place name at least half as often
 - **Availability:** a lexicon of the article texts (`w0`); the masker masks each surname wherever it appears capitalized (PREREG §6.3 person names, also used alone). The determinism test reuses it instead of re-running NER on the corpus.
-- **sha256:** `816a0ff5faf42767d316e9ed2f86597e8083044949488b831336b918afdcd1ea`
+- **sha256:** `4db73db8f1eeb4809a7271b4d92138aa427504bf689a79179b663d6cc0a50d4b`
 
 ### `work/states/company_cjk_names.parquet`
 - **Producer:** `newsaction.states.build --stage mask` (S3; `states.mask.cjk_company_names`)
 - **Inputs:** the event articles of `work/events/events_{d0,d2}.parquet` (title_clean / snippet_clean as capped by NA-03), the company tickers (`work/panel/companies.parquet`, `work/snapshot/symbol_tickers.parquet`, `configs/{aliases,news}.yaml`)
 - **Schema:** `company_id` int64, `name` string
 - **Key:** `(company_id, name)` unique
-- **Rows / coverage:** 572 Chinese, Japanese and Korean names of 254 companies: the CJK words right before the company's own ticker in parentheses ("迪爾股份（紐交所：DE）"), leading verbs / function words and corporate suffixes removed (a Korean name seen twice)
+- **Rows / coverage:** 735 Chinese, Japanese and Korean names of 306 companies: the CJK words right before the company's own ticker in parentheses ("迪爾股份（紐交所：DE）"), leading verbs / function words and corporate suffixes removed (a Korean name seen twice)
 - **Availability:** a lexicon of the article texts (`w0`); the masker replaces each name in the company's own texts (PREREG §6.3). The masker and the determinism test derive the same list from the event articles; this file records it.
-- **sha256:** `9a966b772831ee6b5ad0e124853f1e03e39369c2f71ab054b274a12c4a1d2993`
+- **sha256:** `650e9d00d805ec6be59de91d3b6cd4ff3d3723d1161292a9f2c261c69fef54e9`
 
 ### State files (schema shared by the ten files below)
 - **Producer:** `newsaction.states.build --stage states` (S5; `states.build.build_event_states`, `build_market_states`)
@@ -487,71 +487,71 @@ its sha256 on a rerun.
 - **Excluded articles (revisions 3 and 4):** move explainers (a raw title "Why … today" with a move word or a percent between, e.g. "Why … Stock Is Up Today", "Why Micron Technology Rallied Today"; or StockStory's raw snippet "What Happened? Shares of / A number of …"), TradingView reposts (domain) and non-English articles (`states.build.non_english` on the raw title + snippet) are in no state, in any window or call (`configs/states.yaml` `news_exclusion`, `states.build.excluded_ids`; PREREG §15 NA-04 rows 6 and 8). **Running market stories (revision 6):** live blogs and running market reports (live formats, live entries after the open, a market close on the weekday of the session, running intraday wording, market wraps stamped the morning of the session; `configs/states.yaml` `news_exclusion.running_story`, `states.build.running_story_ids`; PREREG §15 NA-04 row 10) are in no W0 state (`callA_d0_E3` and the D0 samples), because their vendor stamp precedes their text; W2 states keep them (W2 ends at the close). The NA-03 lists are not refilled; an event whose every listed article is one gets no state (`events_all_excluded` in artifacts/NA-04/build_states.json; the running stories are `articles_excluded_running`).
 - **Schema (all ten files):** `event_id` string, `company_id` int64 (−1 for market states), `session` date32, `split`, `window` (W0 | W2), `call` (A | B | M), `encoding` (E0–E4) string, `masked` bool, `state_json` string (canonical JSON: sorted keys, compact separators, UTF-8), `state_sha256` string (sha256 of the UTF-8 `state_json`), `n_tokens_state`, `n_tokens_with_questions` int64 (ModernBERT-large @ 45bb4654, no special tokens; + the call's core questions as canonical JSON), `n_articles` int64, `third_party_ok_all` bool
 - **Key:** `event_id` unique per file (`M:{session}` for market states)
-- **Rows / coverage:** `callA_d0_E3.parquet` 46,909; `callA_d2_E3.parquet` 61,354; `callB_d2_E3.parquet` 41,814; `market_E3.parquet` 594; `samples/callA_d0_E0.parquet` 3,000; `samples/callA_d0_E1.parquet` 3,000; `samples/callA_d0_E2.parquet` 3,000; `samples/callA_d0_E3.parquet` 3,000; `samples/callA_d0_E4.parquet` 3,000; `samples/unmasked.parquet` 1,000
+- **Rows / coverage:** `callA_d0_E3.parquet` 54,332; `callA_d2_E3.parquet` 70,709; `callB_d2_E3.parquet` 48,197; `market_E3.parquet` 621; `samples/callA_d0_E0.parquet` 3,000; `samples/callA_d0_E1.parquet` 3,000; `samples/callA_d0_E2.parquet` 3,000; `samples/callA_d0_E3.parquet` 3,000; `samples/callA_d0_E4.parquet` 3,000; `samples/unmasked.parquet` 1,000
 - **Availability:** a state is an input at its decision point: Call A D0 (`window` W0) at 09:15 ET of `session`; Call A D2 and Call B (W2) after close(s); `pit.check_inputs` validated every block (`states.build.validate_spec`). Call B rows exist for train, val-A and val-B only. Test-period rows (Call A only) contain t−1 context words: never summarized before the freeze.
 
 ### `work/states/callA_d0_E3.parquet`
 - **Producer:** `newsaction.states.build --stage states` (S5)
-- **Contents:** Call A on D0 (W0 news), E3, masked: every D0 event with text after masking and at least one article that is not excluded (robustness, train, val-A, val-B, test; 1,061 events have every listed article excluded, 190 more than before revision 6's running-story rule, and 133 have no text after masking, artifacts/NA-04/build_states.json)
+- **Contents:** Call A on D0 (W0 news), E3, masked: every D0 event with text after masking and at least one article that is not excluded (robustness, train, val-A, val-B, test; 1,020 events have every listed article excluded and 133 have no text after masking (before decision A: 1,061, of which 190 from revision 6's running-story rule, and 133), artifacts/NA-04/build_states.json)
 - **Schema / key / availability:** as "State files" above
-- **Rows:** 46,909
-- **sha256:** `717708ddd94c1398af16da9e54635e20d96568eae5ffb5bfc8fc56eec6fbd2aa`
+- **Rows:** 54,332
+- **sha256:** `1b16491f2eb3aaeb34e6b472fb49158a4b486c1b6c434cf9d84cd80e4a9e9608`
 
 ### `work/states/callA_d2_E3.parquet`
 - **Producer:** `newsaction.states.build --stage states` (S5)
-- **Contents:** Call A on D2 (W2 news, PREREG A3.1), E3, masked: every D2 event with text after masking and an article that is not excluded (all splits; 814 have every listed article excluded, 117 have no text)
+- **Contents:** Call A on D2 (W2 news, PREREG A3.1), E3, masked: every D2 event with text after masking and an article that is not excluded (all splits; 714 have every listed article excluded, 117 have no text)
 - **Schema / key / availability:** as "State files" above
-- **Rows:** 61,354
-- **sha256:** `0f50cdf928b800600005a1d06d44f8b7888eb1c6bff598be3875b282f8781b0e`
+- **Rows:** 70,709
+- **sha256:** `0b6db63ecb195ed834ddb061d525b124dd935197e4e54f08d3940387f127412b`
 
 ### `work/states/callB_d2_E3.parquet`
 - **Producer:** `newsaction.states.build --stage states` (S5)
-- **Contents:** Call B on D2 (W2 news + reaction_so_far), E3, masked: the D2 events of train, val-A and val-B with text (480 have every listed article excluded, 69 have no text); same articles as callA_d2_E3
+- **Contents:** Call B on D2 (W2 news + reaction_so_far), E3, masked: the D2 events of train, val-A and val-B with text (383 have every listed article excluded, 69 have no text); same articles as callA_d2_E3
 - **Schema / key / availability:** as "State files" above
-- **Rows:** 41,814
-- **sha256:** `233ab5762e7374126c3d89a2ee8bc1cfa676c8029fd6a2ca4088db2bc8b48d05`
+- **Rows:** 48,197
+- **sha256:** `6625fd984ee8f464cc609d8eb290c604a21ec458446e8c73542339542bffcb26`
 
 ### `work/states/market_E3.parquet`
 - **Producer:** `newsaction.states.build --stage states` (S5)
 - **Contents:** A3.5 (optional) market states: one per session with third-party-OK market-index articles, E3, masked; since revision 5 the index moves and levels are masked out (the states' own target), and a session whose every article lost its text has no state (1 session, `build_states.json` `market_E3.sessions_without_text`)
 - **Schema / key / availability:** as "State files" above
-- **Rows:** 594
-- **sha256:** `bcd3ad15f84083091c9567676c3bffe60276afe48614521d2573fc81ed95dbd8`
+- **Rows:** 621
+- **sha256:** `3c80930c22dbeef70e1961805b894f248f3f01889f34697cf0447da5c7a05a10`
 
 ### `work/states/samples/callA_d0_E0.parquet`
 - **Producer:** `newsaction.states.build --stage states` (S5)
 - **Contents:** NA-07 encoding sample: 1,500 val-A + 1,500 val-B D0 events (tier × month, seed 2026), Call A, E0, masked
 - **Schema / key / availability:** as "State files" above
 - **Rows:** 3,000
-- **sha256:** `20c8ae9619586487026892e7c17543c1882db9b61db9d7d2718a0d68e7c74054`
+- **sha256:** `006611486d2840a8cc1a8d8d1903b6c1164c1118531b734e0157acfeae1dfbbf`
 
 ### `work/states/samples/callA_d0_E1.parquet`
 - **Producer:** `newsaction.states.build --stage states` (S5)
 - **Contents:** NA-07 encoding sample: 1,500 val-A + 1,500 val-B D0 events (tier × month, seed 2026), Call A, E1, masked
 - **Schema / key / availability:** as "State files" above
 - **Rows:** 3,000
-- **sha256:** `4c6070fc177277481f49f5d6096f0337ac8062ca0c58b5a7e445e6082534f93e`
+- **sha256:** `c9be74d4ceab9f5f671d66409e06dda38a2b81e4fb1ccab3d6fa14b1c9583c25`
 
 ### `work/states/samples/callA_d0_E2.parquet`
 - **Producer:** `newsaction.states.build --stage states` (S5)
 - **Contents:** NA-07 encoding sample: 1,500 val-A + 1,500 val-B D0 events (tier × month, seed 2026), Call A, E2, masked
 - **Schema / key / availability:** as "State files" above
 - **Rows:** 3,000
-- **sha256:** `afb08ca75d5e96c8f5e2338eb210169b8ab543a5c64b746bb9aec079999f2b25`
+- **sha256:** `3e58abe34dabbbcddfd093210bb91e7d3b76eb832b346d30c4f9d42691b6e63e`
 
 ### `work/states/samples/callA_d0_E3.parquet`
 - **Producer:** `newsaction.states.build --stage states` (S5)
 - **Contents:** NA-07 encoding sample: 1,500 val-A + 1,500 val-B D0 events (tier × month, seed 2026), Call A, E3, masked
 - **Schema / key / availability:** as "State files" above
 - **Rows:** 3,000
-- **sha256:** `04a973387a0e3a991f416a5fdce24e9bd855a67a702cbc3b7aa7d40ea25707b9`
+- **sha256:** `0d1279ecd2817384ebb8713b6092a7c802812042b8ead0d4e46182ebac1622a0`
 
 ### `work/states/samples/callA_d0_E4.parquet`
 - **Producer:** `newsaction.states.build --stage states` (S5)
 - **Contents:** NA-07 encoding sample: 1,500 val-A + 1,500 val-B D0 events (tier × month, seed 2026), Call A, E4, masked
 - **Schema / key / availability:** as "State files" above
 - **Rows:** 3,000
-- **sha256:** `7058906c20b35f7edc8d7bdaca68ffcbfabf82016e6c59a8229cfa1fc461951b`
+- **sha256:** `0d5c8d1de7e8fd0f9ce8e29285dcd0a4ceee9a73e657e344beceba510daf8554`
 
 ### `work/states/samples/unmasked.parquet`
 - **Producer:** `newsaction.states.build --stage states` (S5)

@@ -4,6 +4,28 @@ Date: 2026-10-25, revisions 4–6 on 2026-10-26 · Branch `feat/NA-04-states` (c
 Decisions: `docs/decisions/NA-04.md` · Artifacts: `artifacts/NA-04/{token_stats.csv, leak_scan.csv, examples.md,
 summary.json, build_states.json}`.
 
+**Update 2026-10-26: decision A rebuild.** After the seventh verification's PASS, the operator's decision A
+(`parsing_allowed` None articles are third-party OK) was applied, and the NA-02 → NA-03 → NA-04 path was rebuilt
+(PREREG §15, the NA-02 row of 2026-10-26).
+- None articles exist only in 2024, so the train and robustness splits grew. Val-A, val-B and test events are
+  unchanged.
+- **States:** Call A D0 54,332, Call A D2 70,709, Call B 48,197, A3.5 621. The NA-07 samples and the twin keep
+  their sizes.
+- **Event counts:** D0 events with every listed article excluded are 1,020 (133 more have no text); D2 714 / 117;
+  Call B 383 / 69.
+- **Name lists:** the masker's corpus name lists grew (surnames 2,046, CJK names 735), so some val-A and val-B
+  states changed. Val-A leak rates are as below, plus one D0 name hit ("MSD Animal Health").
+- **New states:** the 32,289 train and robustness states holding a None article were scanned. Name / ticker hits
+  are in 0.37% of train D0 states (0.24% without a None article) and 0.46% of robustness D0 states; years and dates
+  ≤ 0.10%; price talk ≤ 0.42%. These are the residue kinds of rows 7 and 11.
+- **Live-format rule:** the rebuild found one 2024 live page behind a scraper's age prefix ("2 hours Stock
+  market today: …"). Row 10's live-format patterns now skip such a prefix: one more D0 article is left out
+  (running stories 4,791).
+- **Laya (owner decision 2):** with head_max_len 256, 28% of Call B and 4% of Call A D0 states would be cut
+  (`token_stats.csv` `share_state_le_768`).
+
+The counts in the sections below are those of the verified revision-6 build.
+
 **Result.** Every decision-model input of the paper now exists as canonical JSON:
 - Call A on D0: 46,909 states, all splits including test (inputs only).
 - Call A on D2: 61,354 states (PREREG A3.1).
@@ -884,9 +906,8 @@ Owner decisions:
    $20.5–21.5 against the $18 cap. NA-05's pilot should re-project with the real states.
 4. **Non-English articles** (NA-02 decision 4): decided (operator decision B, 2026-10-25) and applied here in
    revision 4, at the states step and not at NA-02's `keep` (which feeds the frozen F5 filter).
-5. **`parsing_allowed == None`** (NA-02 decision 1): the operator allowed these articles (decision A, 2026-10-25).
-   Applying it needs the NA-02 → NA-03 → NA-04 rebuild path, which NA-04 has not run. States use only the current
-   third-party-OK articles; the rebuild should re-run the leak checks on the added 2024 states.
+5. **`parsing_allowed == None`** (NA-02 decision 1): allowed (decision A, 2026-10-25) and applied by the
+   2026-10-26 rebuild (see the update at the top; PREREG §15).
 6. **Identifiability.** Product names, distinctive facts and the accepted name residue remain (row 7). NA-06's
    company-identification probe will measure it on the masked / unmasked twins.
 7. **NA-02 timestamps (revision 3).** Revision 3 found vendor timestamps that precede their content. They occur for
