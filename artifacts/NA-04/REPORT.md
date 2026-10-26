@@ -4,21 +4,31 @@ Date: 2026-10-25 · Branch `feat/NA-04-states` (cut from `main` @ `45b3da0`) · 
 Artifacts: `artifacts/NA-04/{token_stats.csv, leak_scan.csv, examples.md, summary.json, build_states.json}`.
 
 **Result.** Every decision-model input of the paper now exists as canonical JSON:
-- Call A on D0: 48,085 states, all splits including test (inputs only).
-- Call A on D2: 62,274 states (PREREG A3.1).
-- Call B on D2: 42,359 states, train / val-A / val-B only.
+- Call A on D0: 47,489 states, all splits including test (inputs only).
+- Call A on D2: 61,772 states (PREREG A3.1).
+- Call B on D2: 42,135 states, train / val-A / val-B only.
 - 595 optional A3.5 market states.
 - The NA-07 encoding samples (3,000 events × E0–E4) and a 1,000-event unmasked twin for NA-06.
 
 Main results:
-- **Masking.** On val-A, the independent scanner finds company-name or ticker hits in 9 of 9,073 D0 states (0.10%)
-  and 8 of 11,249 D2 states (0.07%), and no year or date (target < 0.5% each). Five / four of those hits are "IT
-  spending" in Gartner's texts, kept on purpose (§3.3); the rest are other entities. On the unmasked twin the same
-  scanner has hits in 90.5% / 94.1% of states. The verifier's own scripts of the second verification find the
-  company's own ticker only as that "IT", and no year.
+- **Masking.** On val-A the independent scanner finds:
+  - company-name or ticker hits in 9 of 8,965 D0 states (0.10%) and 9 of 11,182 D2 states (0.08%);
+  - no year or date (target < 0.5% each);
+  - on the unmasked twin, hits in 89.5% / 93.7% of states.
+
+  The third verification labelled residues by hand. Its date residue fell from 3.86% to 0.13% of D0 states
+  (revision 3). Its company name / ticker residue is 1.29% of D0 and 1.00% of D2 states of the revision-2 build
+  (1.26% / 0.97% on the revision-3 build, plus about 30 D0 states with the name in Korean or Japanese). This residue is accepted (PREREG §15 NA-04 row 7); NA-06's
+  identification probe measures what remains identifiable.
+- **Look-ahead (revision 3).** Two kinds of article are in no state:
+  - move explainers ("Why … Stock Is Up Today", StockStory's "What Happened? Shares of …");
+  - TradingView reposts, whose vendor timestamps often precede their content.
+
+  The third verification found DGX's 2025-07-22 earnings jump and its earnings summary in the 07-21 pre-open
+  state. 596 D0 events (1.2%) are left without any article (PREREG §15 NA-04 row 6).
 - **Availability.** Every block is checked with `pit.check_inputs` at its decision point. A call rule adds that only
   Call B's `reaction_so_far` may read the D2 reaction, and only `d2_reaction` columns.
-- **Tokens.** p95(state, Call A, E3) = 814 ≤ 900. With the documented tightening (§3.4), every Call A and Call B state
+- **Tokens.** p95(state, Call A, E3) = 809 ≤ 900. With the documented tightening (§3.4), every Call A and Call B state
   plus its longest core question fits Laya's 1,024 tokens.
 - **Questions.** `configs/questions_v1.yaml` is frozen (sha256 in `configs/frozen.yaml`). It uses every PREREG §7 /
   A2.2–A2.3 string verbatim and has no `noul`.
@@ -31,6 +41,76 @@ Main results:
 - No module in `newsaction.states` reads the sealed directory or calls the lock.
 - `ledgers/test_access.jsonl` is unchanged (2 NA-01 `write` entries).
 - No val-B statistic of any return was computed.
+
+## Revision 3 — after the third verification FAIL on AC2, and its look-ahead finding (2026-10-25)
+
+The third verification passed AC1 and AC3–AC7, and failed AC2. It read every val-A state with its own regexes and
+labelled the hits by hand:
+
+| Residue (val-A, revision-2 build) | D0 | D2 / Call B | Scanner reported |
+|---|---|---|---|
+| the company's own name or ticker | 1.29% | 1.00% | 0.10% / 0.07% |
+| a date or period label | 3.86% | 3.64% | 0.00% |
+| of which written-out ordinal quarters in other languages ("deuxième trimestre", "zweiten Quartal") | 2.14% | 2.04% | 0 |
+
+**Look-ahead.** It also found future price information in pre-open inputs:
+- DGX's D0 state for 2025-07-21 read "Quest Diagnostics DGXjumped 6.4% in the morning session after the company
+  reported strong second-quarter" results, a move of 07-22 (z +4.84).
+- The vendor timestamps of these move explainers ("Why Quest (DGX) Stock Is Up Today") can precede their content.
+  Of 204 pre-open-stamped explainers about the company itself (2024-01 … 2025-09), 29 describe a move after their
+  stamp.
+- The price-move filter missed the sentence because the ticker is glued to the verb.
+
+During the fix, the same DGX state turned out to hold Reuters' earnings summary of 07-22, reposted on TradingView
+under the same stamp. 128 of 511 TradingView earnings summaries are stamped before the release they report, against
+0–7% for other outlets (previews included).
+
+**Operator decisions (2026-10-25).**
+1. Fix the look-ahead and the cheap date forms now, before any API spend: states are cached by their sha256.
+2. Exclude TradingView reposts as well.
+3. Accept the name residue as a logged deviation (PREREG §15 NA-04 row 7).
+4. This revision was implemented by the session that ran the third verification (the operator waived the
+   independence of this round). Its re-check is mechanical: the verification's own scripts plus the tests below.
+
+**What changed** (commit `314efd2`):
+- **Exclusion** (`configs/states.yaml` `news_exclusion`, `states.build.excluded_ids`; PREREG §15 NA-04 row 6):
+  - move explainers (raw title "Why … stock/shares … today", or StockStory's raw snippet "What Happened? Shares of / A
+    number of …") and every TradingView domain are in no state, in any window or call (both twins and the samples
+    included);
+  - the NA-03 lists are not refilled;
+  - `build_states.json` counts the excluded articles and the events left without any (`events_all_excluded`)
+    apart from `events_without_text`.
+- **Price-move filter:** a move verb glued to an upper-case ticker ("DGXjumped 6.4%") is a move. "Slower 6%" and
+  "GROUP" are not.
+- **Dates (masker, and the scanner with its own patterns):**
+  - written-out ordinal quarters and halves (FR, ES, IT, PT, DE, NL); "3T25"; a bare T1–T4 after a period word;
+  - Korean 분기 / 반기;
+  - two-digit years after any apostrophe ("'25", "FY’25", "Q1 ‘25");
+  - a lone "Aug."; bare H1 / 2H (not hydrogen);
+  - glued yyyymmdd; day-first dd/mm; "domingo".
+- **Tests:**
+  - `tests/test_states_exclusion.py` (rule golden cases, `news_items`, built files);
+  - revision-3 masker and scanner cases in `tests/test_states_mask.py`;
+  - the determinism test keeps `Inputs.excluded`;
+  - `test_splits_and_counts` accounts for the emptied events.
+
+**After the rebuild** (val-A unless stated):
+
+| Check | Before | After |
+|---|---|---|
+| verification's date residue, D0 / D2 | 3.86% / 3.64% | **0.13% / 0.11%** |
+| verification's own name / ticker residue, D0 / D2 (accepted) | 1.29% / 1.00% | 1.26% / 0.97%, plus about 30 D0 states in Korean / Japanese |
+| scanner name / ticker, D0 / D2 | 0.10% / 0.07% | 0.10% / 0.08% |
+| scanner year / date | 0.00% | 0.00% (now also counting the new forms) |
+| glued move sentences, every file and split | 16 val-A D0 states | **0** |
+| "N% in the morning / afternoon session" in a D0 state, every split | 39 val-A states | **0** |
+| DGX `W0:420:2025-07-21` | the 07-22 jump and results | no state (every listed article excluded) |
+| events without any article: D0 / D2 / Call B | — | 596 / 503 / 224 |
+| events without text after masking | 18 / 11 / 4 | 18 / 10 / 4 |
+
+What is left of the date residue (12 D0 states): "saison T2", "1º semestre", German compounds ("ersten
+Quartalszahlen"), "Investopedia22/08", option expiries ("9/12 weekly puts") and a software version
+"2025.001.20744".
 
 ## Revision 2 — after the second verification FAIL on AC2 (2026-10-25)
 
@@ -123,11 +203,11 @@ dates, corpus surnames and a public-figure list, the price-move sentence filter 
 
 | AC | Evidence | Result |
 |---|---|---|
-| AC1 determinism | **Test.** `tests/test_states_determinism.py` takes 2,000 rows from seven state files (400 each of the three main files; 200 each of E0, E4, unmasked and market). It rebuilds them from the registered inputs: context recomputed for the sampled keys (and compared with the stored rows: equal), every article re-masked by a fresh in-process masker with the stored corpus surname list (the CJK names are derived again from the event texts), states re-rendered. **2,000 / 2,000 sha256 identical.** **Rerun.** A full rerun of `mask` and `states` on the final code: §9 | PASS |
-| AC2 masking | **Independent scanner** (`leak_scan.csv`, val-A, states with ≥ 1 hit). Name/ticker: callA_d0 **9 / 9,073 (0.10%)**, callA_d2 **8 / 11,249 (0.07%)**, callB_d2 8 / 11,249. Year/date: **0** in all three. Target < 0.5% (`test_val_a_leak_rates_below_target`). **Positive control.** Unmasked twin: 90.5% / 94.1%. **Independence.** No import from the masker (`test_scanner_is_independent_of_the_masker`); every stoplisted ATOM ticker counts in capitals (`test_scanner_counts_every_stoplisted_ticker`); mutations "scanner imports the masker", "scanner skips English-word tickers", "scanner refuses years after letters / CJK": RED. **Cross-check.** The second verification's scripts: own ticker 5 / 4 states (Gartner "IT spending"), years 0 (Revision 2). **Mutation** "empty the alias list": RED | PASS |
+| AC1 determinism | **Test.** `tests/test_states_determinism.py` takes 2,000 rows from seven state files (400 each of the three main files; 200 each of E0, E4, unmasked and market). It rebuilds them from the registered inputs: context recomputed for the sampled keys (and compared with the stored rows: equal), every article re-masked by a fresh in-process masker with the stored corpus surname list (the CJK names are derived again from the event texts), states re-rendered. **2,000 / 2,000 sha256 identical** (the test keeps the excluded articles, revision 3). **Rerun.** Revision 3: after the fix commit `314efd2`, a full rerun of `mask`, `states` and `report` reproduced all 13 `work/states` files of the stages and the 5 report artifacts byte for byte (§9) | PASS |
+| AC2 masking | **Independent scanner** (`leak_scan.csv`, val-A, states with ≥ 1 hit). Name/ticker: callA_d0 **9 / 8,965 (0.10%)**, callA_d2 **9 / 11,182 (0.08%)**, callB_d2 9 / 11,182. Year/date: **0** in all three, with the revision-3 forms counted. Target < 0.5% (`test_val_a_leak_rates_below_target`). **Positive control.** Unmasked twin: 89.5% / 93.7%. **Hand-labelled (third verification, revision-3 build).** Own name / ticker 1.26% D0 / 0.97% D2, plus about 30 D0 states in Korean / Japanese: above the target, **accepted by the operator** (PREREG §15 NA-04 row 7); date residue 0.13% / 0.11%. **Independence.** No import from the masker (`test_scanner_is_independent_of_the_masker`); every stoplisted ATOM ticker counts in capitals (`test_scanner_counts_every_stoplisted_ticker`); mutations "scanner imports the masker", "scanner skips English-word tickers", "scanner refuses years after letters / CJK", "scanner revision-3 date forms removed": RED. **Cross-check.** The second verification's scripts: own ticker 5 / 4 states (Gartner "IT spending"), years 0 (Revision 2). **Mutation** "empty the alias list": RED | PASS on the scanner; names: accepted deviation (row 7) |
 | AC3 availability | **Tests.** `tests/test_states_pit.py`, 84 cases: z_id, z_cc, z_on, y0, e5, r_cc, adj_close (`post`), every `w2` / `d2_reaction` column, vendor `selection_only` columns, `material` and `clean_5`, each added to any block of a D0 Call A spec, raise `PITError`. Call B's `reaction_so_far` accepts `d2_reaction` columns only (z_cc, y2, e5, ar_cc, g_d1, raw_close refused). Reaction columns are refused in every other block, and Call A has no reaction block. **Planted shocks.** A +50% SPY day or stock close at t changes no market or company context dated ≤ t, and does change t+1. **Mutation** z_cc registered `t_minus_1`: **RED** | PASS |
 | AC4 encodings | **Tests.** `tests/test_states_codebook.py`: every bin edge of move, percentile, β, attention and revision (value − ε, the edge, + ε); the PREREG examples of E0–E4 reproduced exactly; E2 words carry no digit, E3 only inside "≈k.k×", for every horizon. **Built files.** `tests/test_states_outputs.py`: no digit in the company / market / attention blocks of any E2 sample state; E3 (sample, Call B incl. `reaction_so_far`, market) has digits only inside "≈k.k×". The three fixed PREREG tier phrases ("one of the 100 largest US companies", "… rank 101–250", "… 251–500") are removed first: they are labels, not values. **Mutation** move edge 2.0 → 2.5: **RED** | PASS (tier phrases: note) |
-| AC5 tokens | `token_stats.csv`. **Call A E3:** p95 state **814** (≤ 900), p95 state + longest core question + 3 special tokens **949**, max 1,024. **Call A D2:** 778 / 913 / 930. **Call B:** 857 / **1,006** / 1,024. **Before the tightening:** Call B was 913 / 1,062 (fail); §3.4. Stored counts re-tokenize exactly on 200 states per file (`tests/test_states_tokens.py`) | PASS (after documented tightening) |
+| AC5 tokens | `token_stats.csv`. **Call A E3:** p95 state **809** (≤ 900), p95 state + longest core question + 3 special tokens **944**, max 1,024. **Call A D2:** 776 / 911 / 930. **Call B:** 855 / **1,004** / 1,023. **Before the tightening:** Call B was 913 / 1,062 (fail); §3.4. Stored counts re-tokenize exactly on 200 states per file (`tests/test_states_tokens.py`) | PASS (after documented tightening) |
 | AC6 no 2026 Call B | No state file has a Call B row with split test or session ≥ 2026-01-02. `reaction_d2.parquet` has no test session. `build_event_states` refuses Call B events outside train / val-A / val-B (test + mutation RED). `ledgers/test_access.jsonl` has 2 lines, both NA-01 (`test_access_ledger_has_no_na04_entry`) | PASS |
 | AC7 questions frozen | `tests/test_states_questions_prereg.py` parses the PREREG §7 / A2.2–A2.3 table rows and compares: ids, types and level counts; option keys; every quoted description; the 8 verbatim instructions; Q1's levels; the Q3 / Q4 / Q14 end points; Q17 = Q8's nine company categories + 2. Groups: core A = Q1–Q4, core B = Q1, Q5, Q6, extended = Q7–Q15, explain = Q16–Q17. `questions_v1_sha256` = `e602c6c0…0c85a` = file sha. No `noul`, and the loader refuses one. **Mutations** (one word of Q3; `noul` check removed): **RED** | PASS |
 | GAC1 | `make verify` exit 0 (§9) | PASS |
@@ -139,7 +219,8 @@ dates, corpus surnames and a public-figure list, the price-move sentence filter 
 ### 2.1 Mutations
 
 A scratchpad script applied each mutation, ran the named test file and restored the file byte-for-byte (asserted).
-`git status` afterwards showed only the author's changes. All 41 turn the tests RED.
+`git status` afterwards showed only the author's changes. All 63 turn the tests RED (41 through revision 2, 22 in
+revision 3).
 
 | Mutation | File |
 |---|---|
@@ -152,6 +233,7 @@ A scratchpad script applied each mutation, ran the named test file and restored 
 | loader accepts `noul`; one word of Q3 edited | states/questions.py, configs/questions_v1.yaml |
 | **revision 1:** bare-year rule removed; person masking disabled; public-figure list emptied; any-exchange-code rule removed (BOATS:NEE); ticker quotes kept; quarter labels case-sensitive; non-English weekday rule removed; zero-padded m/d rule removed; price-move sentence filter disabled; price-target amounts kept; scanner imports the masker | states/mask.py, states/scan.py, configs/aliases.yaml |
 | **revision 2:** upper-case stoplisted ticker rule removed; stoplisted tickers in a text in capitals kept even when not a word; full-width / venue ticker forms removed; option codes kept; years glued to letters / CJK kept; CJK weekday rule removed; CJK company names not masked; CJK person names kept; YAML boolean guard removed; glued names kept; truncated names kept; quote widgets removed only after the company step; share-price level sentences kept; bare tickers only after a non-word character; names need a space between words; scanner skips English-word tickers; scanner refuses years after letters / CJK | states/mask.py, states/scan.py |
+| **revision 3:** exclusion skip removed from `news_items`; TradingView domain pattern never matches; explainer patterns never match; `market_selection` keeps excluded articles (determinism test RED); determinism test rebuilds `Inputs` by hand and drops `excluded` (RED); glued-verb alternative removed; each new date rule removed, one at a time (ordinal quarters, ordinal halves, "3T25", bare T after a period word, Korean quarters, Korean halves, glued d/m/y, day-first dd/mm, glued yyyymmdd, bare half-year, apostrophe year, curly apostrophes, lone month abbreviation, "recent’25" remnant, "domingo"); scanner revision-3 date forms removed | configs/states.yaml, states/build.py, states/mask.py, states/scan.py, tests/test_states_determinism.py |
 
 The revision-1 mutation "ODFL back in the stoplist" no longer applies: a stoplisted ticker that is not an ordinary
 word is masked in capitals anyway, which the revision-2 mutation on the vocabulary check covers.
@@ -162,31 +244,36 @@ word is masked in capitals anyway, which the revision-2 mutation on the vocabula
 
 | File | robustness | train | val-A | val-B | test | total | mean articles |
 |---|---|---|---|---|---|---|---|
-| callA_d0_E3 | 689 | 17,759 | 9,073 | 6,145 | 14,419 | 48,085 | 3.88 |
-| callA_d2_E3 | 971 | 23,199 | 11,249 | 7,911 | 18,944 | 62,274 | 4.17 |
-| callB_d2_E3 | — | 23,199 | 11,249 | 7,911 | — | 42,359 | 4.45 |
-| market_E3 (A3.5) | 119 | 203 | 64 | 64 | 145 | 595 | 5.14 |
+| callA_d0_E3 | 685 | 17,689 | 8,965 | 6,075 | 14,075 | 47,489 | 3.75 |
+| callA_d2_E3 | 966 | 23,095 | 11,182 | 7,858 | 18,671 | 61,772 | 4.03 |
+| callB_d2_E3 | — | 23,095 | 11,182 | 7,858 | — | 42,135 | 4.29 |
+| market_E3 (A3.5) | 119 | 203 | 64 | 64 | 145 | 595 | 5.13 |
 
 - **Samples.**
   - NA-07: 1,500 val-A + 1,500 val-B D0 events in each of E0–E4, the same events in every encoding. The E3 sample
     states are byte-identical to the main E3 states.
   - NA-06: an unmasked twin of 1,000 val-A D0 events (Call A E3). The masked twin is the same `event_id` in
     `callA_d0_E3`.
-- **D0 vs D2 Call A.** 10,684 of the 48,085 D0 events have a byte-identical D2 Call A state (NA-03 counted 18,656
+- **D0 vs D2 Call A.** 10,540 of the 47,489 D0 events have a byte-identical D2 Call A state (NA-03 counted 18,656
   identical W0/W2 lists). The rest differ in the W2 attention words, the W2 earnings flag, or the D2 budget cut.
-- **Events without text** (`build_states.json`). 18 D0, 11 D2 and 4 Call B events have no state, because every
+- **Events with every listed article excluded** (revision 3; `build_states.json` `events_all_excluded`). These are
+  move explainers or TradingView reposts, so the event gets no state:
+  - 596 D0 events (test 343, val-A 108, val-B 71, train 70, robustness 4), 503 D2 and 224 Call B;
+  - 8,537 D0 and 11,889 D2 listed articles are left out (45,184 corpus articles match the rule);
+  - PREREG §15 NA-04 row 6.
+- **Events without text** (`build_states.json`). 18 D0, 10 D2 and 4 Call B events have no state, because every
   listed article lost its text to the price-path scrub or the price-move sentence filter ("Shares of eBay declined
-  on Thursday after…"). D0: test 8, val-A 6, val-B 4. PREREG §15 row 5 (e).
+  on Thursday after…"). D0: test 9, val-A 6, val-B 3. PREREG §15 row 5 (e).
 
 ### 3.2 Masking
 
 - **Replacements** in the 296,082 event articles (title + snippet):
   - 353,348 company names;
   - 168,938 ticker forms;
-  - 263,311 date / year / fiscal-period phrases (incl. datelines, ISINs and option codes);
-  - 94,358 person names.
-- **Shares.** 62.7% of articles had a name masked and 20.0% a person. 797 articles have no text left. The 3,062 market
-  articles had 2,055 dates and 1,150 people masked.
+  - 266,161 date / year / fiscal-period phrases (incl. datelines, ISINs and option codes; 263,311 before revision 3);
+  - 94,232 person names.
+- **Shares.** 63.3% of articles had a name masked and 19.9% a person. 807 articles have no text left. The 3,056 market
+  articles (TradingView reposts and explainers left out, revision 3) had 1,987 dates and 1,173 people masked.
 - **Lexicons.** 1,777 corpus surnames (last words of multi-word PERSON names seen ≥ 3 times in English texts,
   capitalized ASCII, not an ordinary or company-alias word, not tagged inside an organization or place at least half
   as often) plus 49 listed public figures; 572 CJK names of 254 companies.
@@ -200,19 +287,20 @@ word is masked in capitals anyway, which the revision-2 mutation on the vocabula
 
 | File | States | Name/ticker | Year/date | Price moves | Quotes | Price levels | Public figures |
 |---|---|---|---|---|---|---|---|
-| callA_d0_E3 | 9,073 | 0.10% | 0.00% | 0.14% | 0.07% | 0.01% | 0.00% |
-| callA_d2_E3 | 11,249 | 0.07% | 0.00% | 0.17% | 0.07% | 0.01% | 0.00% |
-| callB_d2_E3 | 11,249 | 0.07% | 0.00% | 0.17% | 0.07% | 0.01% | 0.00% |
-| unmasked twin (control) | 1,000 | 90.5% | 94.1% | 2.6% | 3.3% | 17.5% | 16.7% |
+| callA_d0_E3 | 8,965 | 0.10% | 0.00% | 0.09% | 0.06% | 0.01% | 0.00% |
+| callA_d2_E3 | 11,182 | 0.08% | 0.00% | 0.13% | 0.06% | 0.01% | 0.00% |
+| callB_d2_E3 | 11,182 | 0.08% | 0.00% | 0.13% | 0.06% | 0.01% | 0.00% |
+| unmasked twin (control) | 1,000 | 89.5% | 93.7% | 2.2% | 3.2% | 17.9% | 16.3% |
 
-The 9 D0 name/ticker states are read one by one:
-- 5 are Gartner's "IT spending" / "IT services", kept on purpose; the scanner counts them conservatively.
-- 4 are other entities: Citizens Holding Company, Morgan Stanley in Kinder Morgan's texts, Carnegie Mellon
+Revision 2 read its 9 D0 name/ticker states one by one:
+- 5 were Gartner's "IT spending" / "IT services", kept on purpose; the scanner counts them conservatively.
+- 4 were other entities: Citizens Holding Company, Morgan Stanley in Kinder Morgan's texts, Carnegie Mellon
   University, "visits to Vegas".
 
-The 8 D2 states are 4 of the same Gartner texts, Citizens Holding Company, Morgan Stanley in Kinder Morgan's and
-Stanley Black & Decker's texts, and "the Mexican market" (Chipotle). The verifier's manual
-read of 10 states (PRD step 2) remains the check on what a scanner cannot see.
+The revision-3 hits (9 D0, 9 D2) were not re-read one by one. **The scanner undercounts names.** The third
+verification's hand count is 1.26% D0 / 0.97% D2 own names or tickers, plus about 30 D0 states in Korean /
+Japanese. The forms it cannot see are one-word names that are ordinary words, glued or inflected names, slug
+tickers, preferred / venue tickers and CJK transliterations. This residue is accepted (PREREG §15 NA-04 row 7).
 
 ### 3.4 Tokens and the tightening (S6, AC5)
 
@@ -233,28 +321,28 @@ read of 10 states (PRD step 2) remains the check on what a scanner cannot see.
     articles (tested), and the cut never depends on the observed reaction.
   - The samples and the unmasked twin reuse the D0 cut.
   - No text was cut.
-  - Articles dropped: 854 from 818 D0 states (1.7%); 6,653 from 6,035 D2 Call A states (9.7%); 6,347 from 5,737
-    Call B states (13.5%).
+  - Articles dropped by the budget or masking (excluded articles not counted): 762 from 731 D0 states (1.5%);
+    5,689 from 5,139 D2 Call A states (8.3%); 5,451 from 4,907 Call B states (11.6%).
 - **After** (`token_stats.csv`):
 
   | File | p50 state | p95 state | max | p95 + longest question | max + longest | share ≤ 768 |
   |---|---|---|---|---|---|---|
-  | callA_d0_E3 | 613 | 814 | 889 | 949 | 1,024 | 85% |
-  | callA_d2_E3 | 666 | 778 | 795 | 913 | 930 | 91% |
-  | callB_d2_E3 | 779 | 857 | 875 | 1,006 | 1,024 | 47% |
-  | samples E0 / E1 / E2 / E3 / E4 | 584 / 558 / 543 / 661 / 638 | 745 / 718 / 701 / 819 / 799 | ≤ 888 | ≤ 954 | ≤ 1,023 | 82–100% |
-  | unmasked twin | 756 | 880 | 951 | 1,015 | 1,086 | 53% |
+  | callA_d0_E3 | 598 | 809 | 889 | 944 | 1,024 | 87% |
+  | callA_d2_E3 | 643 | 776 | 795 | 911 | 930 | 92% |
+  | callB_d2_E3 | 759 | 855 | 874 | 1,004 | 1,023 | 53% |
+  | samples E0 / E1 / E2 / E3 / E4 | 554 / 526 / 511 / 629 / 608 | 737 / 711 / 694 / 812 / 790 | ≤ 888 | ≤ 947 | ≤ 1,023 | 86–100% |
+  | unmasked twin | 728 | 869 | 930 | 1,004 | 1,065 | 62% |
 
-  The unmasked twin is an API probe (NA-06) with the masked twin's articles; 3.9% of it exceeds 1,024 with a question.
-- **Laya.** The model card's `head_max_len = 256` leaves about 768 tokens for the state. 53% of Call B states and 15% of
+  The unmasked twin is an API probe (NA-06) with the masked twin's articles; 3.3% of it exceeds 1,024 with a question.
+- **Laya.** The model card's `head_max_len = 256` leaves about 768 tokens for the state. 47% of Call B states and 13% of
   Call A D0 states are longer (owner decision 2).
 - **Cost.** Mean request tokens (state + core questions, val + test) exceed NA-03's assumption (news + 250 + 350):
 
   | Call | Actual | NA-03 assumed | Difference |
   |---|---|---|---|
-  | Call A D0 | 895 | 803 | +11% |
-  | Call A D2 | 919 | 826 | +11% |
-  | Call B | 1,086 | 857 | +27% |
+  | Call A D0 | 884 | 803 | +10% |
+  | Call A D2 | 909 | 826 | +10% |
+  | Call B | 1,073 | 857 | +25% |
 
   The NA-11 full plan is about 15–20% dearer than projected: roughly $9.7 at $0.042/M (fits $18) and $21–22 at
   $0.10/M (owner decision 3).
@@ -316,7 +404,7 @@ read of 10 states (PRD step 2) remains the check on what a scanner cannot see.
 
 ## 7. Deviations from PREREG
 
-Five rows were appended to the §15 Deviations log (2026-10-25, NA-04), all before the freeze. As in earlier chunks,
+Seven rows were appended to the §15 Deviations log (2026-10-25, NA-04), all before the freeze. As in earlier chunks,
 they are **in the working tree, not committed**, for the operator to commit on main.
 
 1. **§6.10 industry.** Sector only; ATOM has GICS level 1 only.
@@ -342,6 +430,11 @@ they are **in the working tree, not committed**, for the operator to commit on m
    - (c) the question text written by NA-04;
    - (d) the token budget;
    - (e) no state for events without text.
+6. **§2 / §6.4 / §6.9 / A3.1 / A3.5 excluded articles** (revision 3): move explainers and TradingView reposts are in
+   no state. The NA-03 lists are not refilled. 596 D0 / 503 D2 / 224 Call B events are left without any article.
+   Operator decision 2026-10-25.
+7. **§6.3 residual target / AC2** (revision 3): the hand-labelled name / ticker residue (1.26% D0, 0.97% D2) is
+   above 0.5% and accepted, and the revision-3 date forms are listed. Operator decision 2026-10-25.
 
 PRD-level choices that need no PREREG change are in `docs/decisions/NA-04.md`.
 
@@ -349,24 +442,30 @@ PRD-level choices that need no PREREG change are in `docs/decisions/NA-04.md`.
 
 No STOP condition fired: no API call, no budget, no 2026 outcome, no new third party. The three masking policies the
 first verification raised were decided by the operator on 2026-10-25 (Revision 1); the second verification raised
-no new policy question.
+no new policy question. The third raised three, which the operator decided on 2026-10-25 (Revision 3): exclude the
+explainers, exclude TradingView, accept the name residue.
 
 Owner decisions:
 
-1. **Confirm the five NA-04 rows in PREREG §15.** Especially:
+1. **Confirm the seven NA-04 rows in PREREG §15.** Especially:
    - row 4: masking, including the change to NA-02's price-target rule;
-   - row 5 (d): the token budget drops the last articles of 10% of D2 lists.
+   - row 5 (d): the token budget drops the last articles of 8% of D2 lists;
+   - rows 6–7 (revision 3).
 2. **Laya's state budget.** Every state fits PREREG §9.1's max length 1,024 together with its longest question. If
-   NA-08 keeps the released checkpoint's `head_max_len = 256` (≈ 768 for the state), 53% of Call B and 15% of Call A
+   NA-08 keeps the released checkpoint's `head_max_len = 256` (≈ 768 for the state), 47% of Call B and 13% of Call A
    D0 states would be cut at the end of the news list. NA-08 should either set the head length to the question's
    actual length (≤ 146 tokens) or ask for a tighter state budget, which is one constant in `configs/states.yaml`.
-3. **Cost projection.** Requests are 11–27% larger than NA-03 assumed (§3.4). At $0.10/M the full NA-11 plan is about
+3. **Cost projection.** Requests are 10–25% larger than NA-03 assumed (§3.4). At $0.10/M the full NA-11 plan is about
    $21–22 against the $18 cap. NA-05's pilot should re-project with the real states.
 4. **Non-English articles** (NA-02 decision 4, still open). Their dates are masked and CJK names harvested; a CJK
    name never written before the company's ticker is not known, so excluding CJK articles (1%) stays an option.
 5. **`parsing_allowed == None`** (NA-02 decision 1, still open). States use only third-party-OK articles.
-6. **Identifiability.** Product names and distinctive facts remain. NA-06's company-identification probe will measure
-   it on the masked / unmasked twins.
+6. **Identifiability.** Product names, distinctive facts and the accepted name residue remain (row 7). NA-06's
+   company-identification probe will measure it on the masked / unmasked twins.
+7. **NA-02 timestamps (revision 3).** Revision 3 found vendor timestamps that precede their content. They occur for
+   TradingView reposts and pre-open-stamped move explainers, both now left out of the states. NA-02's `t_avail`
+   and the NA-03 lists still contain them, so a later chunk that reads articles directly (for example the NA-10
+   bars or NA-12 analyses of news timing) should apply the same `news_exclusion` rule.
 
 ## 9. Files
 
@@ -380,13 +479,20 @@ Owner decisions:
   - `docs/DATA_CONTRACT.md`: the NA-04 section, 16 artifacts.
   - `pyproject.toml` / `uv.lock`: `en-core-web-sm` 3.8.0 in the `embed` extra.
 - **Changed, uncommitted.** `docs/PREREG.md` (§15 rows).
-- **Tests.** 7 files: `test_states_codebook`, `test_states_pit`, `test_states_mask`, `test_states_questions_prereg`,
-  `test_states_outputs`, `test_states_tokens`, `test_states_determinism`: 251 tests (17 / 130 / 64 / 13 / 19 / 7 / 1).
+- **Tests.** 8 files: `test_states_codebook`, `test_states_pit`, `test_states_mask`, `test_states_questions_prereg`,
+  `test_states_outputs`, `test_states_tokens`, `test_states_determinism`, `test_states_exclusion` (revision 3): 300
+  tests (17 / 130 / 110 / 13 / 19 / 7 / 1 / 3).
 - **Derived (gitignored).** `work/states/*` (16 files); `work/MANIFEST.json`.
-- **Peak RSS per stage (GB).** context 0.7, mask 1.8–2.3 (spaCy, 4 workers), states 4.0–4.3, report 1.5.
-- **Reproducibility.** The final code was built (`mask`, `states`, `report`), then `mask` and `states` were run
-  again, each in a new process: all 16 `work/states/` sha256s identical (16 of 16). Mask stage 783 / 818 s, states
-  328 / 341 s.
-- **`make verify`** (exit 0, 196 s, peak RSS 10.8 GB): ruff check "All checks passed!"; ruff format "109 files
-  already formatted"; mypy --strict "no issues found in 54 source files"; pytest **798 passed, 1 xfailed** (774 + 1
-  after revision 1); manifest 56 artifacts OK; ledgers OK (fmp 0, spend 0, test_access 2, trials 94).
+- **Peak RSS per stage (GB).** context 0.7, mask 1.8–2.3 (spaCy, 4 workers), states 3.2–4.3, report 1.5.
+- **Reproducibility.**
+  - Revision 2: the final code was built (`mask`, `states`, `report`), then `mask` and `states` were run again,
+    each in a new process. All 16 `work/states/` sha256s were identical (16 of 16). Mask stage 783 / 818 s, states
+    328 / 341 s.
+  - Revision 3: the uncommitted fix was built (mask 660 s, states 328 s, report 54 s), then the three stages were
+    run again from the fix commit `314efd2` (mask 872 s, states 327 s, report 54 s). All 13 rebuilt `work/states`
+    files and the 5 report artifacts came out byte for byte identical (18 of 18). The manifest records `314efd2`.
+- **`make verify`** (revision 3: exit 0, 208 s, peak RSS 10.8 GB):
+  - ruff check "All checks passed!"; ruff format "110 files already formatted"; mypy --strict "no issues found
+    in 54 source files";
+  - pytest **847 passed, 1 xfailed** (798 + 1 after revision 2);
+  - manifest 56 artifacts OK; ledgers OK (fmp 0, spend 0, test_access 2, trials 94).
