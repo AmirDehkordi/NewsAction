@@ -80,11 +80,17 @@ def test_splits_and_counts() -> None:
         n = built[name]
         assert len(ids - got) == n["events_without_text"] + n["events_all_excluded"], name
         # excluded articles (explainers, TradingView, non-English) empty about 1.8% of D0 events (PREREG §15
-        # NA-04 rows 6, 8); events whose every article was price talk lose their text: 0.22% since revision 4
-        assert n["events_without_text"] <= 0.003 * len(ids), name
+        # NA-04 rows 6, 8); events whose every article was price talk lose their text: 0.22% in revision 4,
+        # 0.31% of D0 since revision 5 removes every price move and index level ("Dow Drops More Than 700
+        # Points", "shares rise 1.14% premarket")
+        assert n["events_without_text"] <= 0.004 * len(ids), name
         assert n["events_all_excluded"] <= 0.03 * len(ids), name
     a2 = set(states("states/callA_d2_E3.parquet")["event_id"])
     assert set(states("states/callB_d2_E3.parquet")["event_id"]) == a2 & b_ids
+    # A3.5: a market session whose every article lost its text (index wraps) gets no state
+    m = built["market_E3"]
+    assert m["rows"] == len(states("states/market_E3.parquet"))
+    assert m["sessions_without_text"] <= 0.01 * (m["rows"] + m["sessions_without_text"])
 
 
 def test_call_a_d2_and_call_b_share_the_news() -> None:

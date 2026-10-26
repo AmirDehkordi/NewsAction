@@ -80,7 +80,10 @@ def test_rebuild_reproduces_every_sha(sample: dict[str, pd.DataFrame]) -> None:
     art_frame = pd.DataFrame(arts, columns=["id", "company_id", "title", "snippet"]).drop_duplicates()
     msel = b.market_selection(lay, cfg)
     msessions = set(sample["states/market_E3.parquet"]["session"])
-    msel = msel.loc[msel["session_w2"].isin(msessions)]
+    # and every market session without a state (all its text masked away since revision 5): it must stay so
+    stored_m = set(io.read_parquet("states/market_E3.parquet", columns=["session"])["session"])
+    textless = set(msel["session_w2"]) - stored_m
+    msel = msel.loc[msel["session_w2"].isin(msessions | textless)]
     # a fresh masker with the corpus surnames of the mask stage (deriving them needs NER on the whole corpus)
     mk = b.masker(lay, vocabulary=True, surnames=b.load_surnames(lay))
     masked = b.mask_frame(art_frame, msel, lay, n_process=1, mk=mk)
@@ -96,6 +99,7 @@ def test_rebuild_reproduces_every_sha(sample: dict[str, pd.DataFrame]) -> None:
         spec = b.make_spec(rel, call, window, enc, is_masked, cfg)
         if call == "M":
             rebuilt = b.build_market_states(msel, spec, inp, cfg)
+            assert not set(rebuilt["session"]) & textless, "a market session without text got a state"
         else:
             ev = picked[rel]
             # the news list is fitted on the E3 Call A state of the event's window (states.build.run_states)

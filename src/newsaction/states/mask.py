@@ -221,7 +221,7 @@ _MOVE_ANY: Final = re.compile(
 # per share", "Long Position In H Shares", "price target on the shares"), and so is a gauge named after one
 # ("the PMI index", "the Consumer Price Index")
 _FUND_CLAUSE: Final = re.compile(
-    r"(?i)\b(?:(?:stake|positions?|holdings?|ownership|(?:short|open)\s+interest|(?:price\s+)?(?:targets?|objectives?))"
+    r"(?i)\b(?:(?:stake|positions?|holdings|ownership|(?:short|open)\s+interest|(?:price\s+)?(?:targets?|objectives?))"
     r"\s+(?:in|of|on|for)\s+(?:the\s+company(?:['’]s)?(?:\s+(?:shares?|stocks?))?|"
     r"(?:[\w&.'’\-]+\s+){0,4}?(?:shares?|stocks?)|(?:[\w&.'’\-]+\s+){0,5}?\((?:[A-Za-z]{2,12}:\s?)?[A-Z]{1,5}\))|"
     r"payments?|reimbursements?|medicare|medicaid|ads?|advertising|backtest\w*|(?:price\s+)?(?:targets?|objectives?)|inflows?|outflows?|flows|"
@@ -230,12 +230,12 @@ _FUND_CLAUSE: Final = re.compile(
     r"roa|roic|returns?\s+on|expectations|number\s+of|upside|downside|econom(?:y|ies)|(?:restaurant|menu|grocery|egg|drug|rent|insurance|"
     r"ticket|electricity|gasoline|pump)\s+prices?|revenues?|sales|earnings|eps|income|profits?|margins?|growth|cagr|volumes?|guidance|outlook|"
     r"forecasts?|estimates?|surprises?|inflation|cpi|pce|ppi|pmi|ism|mba|gdp|payrolls?|jobs|employment|"
-    r"unemployment|jobless|claims|applications|activity|manufacturing|rates?|"
+    r"unemployment|jobless|claims|applications|(?<!trading\s)activity|manufacturing|rates?|"
     r"traffic|orders|bookings|deliveries|shipments|users|subscribers|members(?:hip)?|comps|comparable|same-store|"
     r"organic|backlog|deposits|loans|assets|aum|costs?|expenses?|spending|capex|wages?|pay|salar(?:y|ies)|"
     r"compensation|headcount|workforce|staff|layoffs|employees|population|production|output|capacity|utilization|"
     r"occupancy|exports?|imports?|demand|supply|inventor(?:y|ies)|tariffs?|taxe?s?|debt|leverage|ratio|stake|"
-    r"ownership|holdings?|positions?|(?:short|open)\s+interest|outstanding\s+shares|shares\s+outstanding|"
+    r"ownership|holdings|positions?|(?:short|open)\s+interest|outstanding\s+shares|shares\s+outstanding|"
     r"outstanding|(?:share\s+)?count|buybacks?|repurchases?|probability|odds|chance|polls?|approval|survey|"
     r"sentiment|confidence|units|stores|customers|accounts|visits|downloads|listings|dividend\s+yields?|"
     r"dividends?|yields?\s+on|ebitda|ffo|cash\s+flow|"

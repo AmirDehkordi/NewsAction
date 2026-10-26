@@ -911,6 +911,13 @@ REVISION5_MOVES = (
     "The S&P 500 suffered its first “2% down day” in 356 days recently.",
     "ASX cops a beating with every sector hit, as Wall Street's 6% dive drags down miners and banks.",
     "Yields jumped 5% this week.",
+    "The S&P 500 index reached a fresh intraday record high of 6,565 recently.",
+    "Shares were selling off 5% in late trading.",
+    # the second revision-5 build, read by hand (val-A)
+    "With Bitcoin holding near $109K and optimism rising, V, CME, and BLK emerge as top crypto-exposed "
+    "stocks.",
+    "The company reported mixed trading activity recently, with a 0.01% gain and a trading volume of $0.74 "
+    "billion.",
 )
 REVISION5_FUNDAMENTALS = (
     "Revenue rose 5% year over year to $94.9 billion.",
@@ -1000,6 +1007,10 @@ REVISION5_FUNDAMENTALS = (
     "Short Interest in Bank of America Co. (NYSE:BAC) Decreases By 8.1%",
     "The U.S. MBA Mortgage Refinance Index has surged to 1,596.7, reflecting a 1609.8-point increase.",
     "Revenue climbed 6% to $45 billion, fueled by higher premium yields and a 19% rise in policies.",
+    "Berkshire's holdings in Apple rose 5%.",
+    "U.S. EIA reports 213,000 bpd crude run surge, pushing refinery utilization to 95.5%.",
+    "The company reported operating cash flow of $2.19 billion, up 13% year over year.",
+    "While the 2.5% COLA increase may offer some relief, many the company employees must act.",
 )
 
 

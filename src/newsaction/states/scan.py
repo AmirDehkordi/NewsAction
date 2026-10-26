@@ -369,7 +369,7 @@ _SECURITY: Final = re.compile(
 # yield", "stake in Apple shares", "short interest in the company's stock", "price target on the shares") or
 # names a gauge ("PMI index", "Consumer Price Index", "Pending Home Sales Index (PHSI)")
 _NOT_PRICE: Final = re.compile(
-    r"(?i)\b(?:(?:stake|positions?|holdings?|ownership|short\s+interest|(?:price\s+)?(?:targets?|objectives?))\s+"
+    r"(?i)\b(?:(?:stake|positions?|holdings|ownership|short\s+interest|(?:price\s+)?(?:targets?|objectives?))\s+"
     r"(?:in|of|on|for)\s+(?:the\s+company(?:['’]s)?(?:\s+(?:shares?|stocks?))?|(?:\S+\s+){0,4}?(?:shares?|stocks?)|"
     r"(?:\S+\s+){0,5}?\((?:[A-Za-z]{2,12}:\s?)?[A-Z]{1,5}\))|payments?|reimbursements?|medicare|medicaid|ads?|"
     r"advertising|backtest\w*|"
@@ -381,7 +381,8 @@ _NOT_PRICE: Final = re.compile(
     r"applications?|manufacturing|traffic|orders|bookings|expectations|number\s+of|"
     r"deliveries|shipments|users|subscribers|comps|same-store|organic|backlog|deposits|loans|assets|costs?|"
     r"expenses?|spending|wages?|workforce|headcount|production|output|capacity|occupancy|exports?|imports?|demand|"
-    r"supply|inventor(?:y|ies)|tariffs?|debt|ratio|stake|holdings?|positions?|short\s+interest|short\s+percent|"
+    r"supply|inventor(?:y|ies)|tariffs?|debt|ratio|stake|holdings|positions?|short\s+interest|short\s+percent|"
+    r"utilization|refiner(?:y|ies)|cash\s+flows?|rents?|leases?|deferrals?|employees|cola|gmv|"
     r"float|(?:outstanding\s+)?shares\s+outstanding|outstanding\s+shares|share\s+count|buybacks?|repurchases?|"
     r"(?:per\s+|/\s?)share|probability|odds|polls?|survey|sentiment|confidence|dividend\s+yields?|dividends?|ebitda|ffo|"
     r"market\s+share|year[\s-]over[\s-]year|year[\s-]on[\s-]year|yoy|sequential(?:ly)?|r&d|mortgages?|permits?|"
