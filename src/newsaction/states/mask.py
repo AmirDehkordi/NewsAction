@@ -28,7 +28,10 @@ In this order, on each title and snippet (already scrubbed by NA-02):
    ("MPC-1.32%", "· IP. -0.58%", "FSLR0.00%", "|Price:49.32|Chg%:-0.60") are dropped; price-target amounts
    become a relative change ("raises its price target to $622
    from $600" → "raises its price target up by about 4%") or are dropped, and per-share deal prices become
-   "a per-share price". Fundamental figures (EPS, revenue, dividends, guidance) are kept.
+   "a per-share price". Fundamental figures (EPS, revenue, dividends, guidance) are kept. Since the fourth
+   verification also: share-price levels after a verb ("shares closed yesterday at $242.66", "traded as high
+   as $145.16"), the direction after the number ("Trading 2.4% Higher"), moves as nouns ("1.95% Stock Rise"),
+   and price targets in any currency notation ("at USD 220", "from GBX 420 to GBX 500", "€151.88 / share").
 
 A replacement at the start of a sentence is capitalized.
 """
@@ -125,12 +128,43 @@ _WIRE_MID: Final = re.compile(
     r"(?:[A-Z][A-Za-z.'\-]*(?:[ ,]+[A-Z][A-Za-z.'\-]*){0,3}\s*)?-{1,2}\s*\(\s*(?:BUSINESS WIRE|Business Wire|"
     r"PRNewswire|PR Newswire|GLOBE NEWSWIRE|GlobeNewswire|ACCESSWIRE|ACCESS Newswire|Newsfile)\s*\)\s*-{0,2}"
 )
-# a share-price level ("boosts stock to $102.89", "shares at $120"), not a per-share figure or an amount
+# a currency before an amount: "$", "C$", "USD 210", "GBX 420", "€151.88" (NA-04 fourth verification)
+_CUR: Final = r"(?:US\$|C\$|A\$|\$|USD\s?|GBX\s?|GBp\s?|EUR\s?|€\s?|£\s?)"
+_NUMBER: Final = r"\d[\d,]*+(?:\.\d+)?+"  # possessive: "$142.00 per share" is never read as "$142"
+_NOT_AMOUNT: Final = r"(?![\d.,]*\s*(?:[MBK]\b|million|billion|bn|trillion))(?!\s*(?:per|a|/)\s*share)"
+# a share-price level ("boosts stock to $102.89", "shares at $120"; since the fourth verification also "The
+# company's shares closed yesterday at $242.66", "The stock traded as high as $145.16", "The stock price for
+# the company currently stands at $768.57", "TSMC Stock (NYSE:TSM) Holds $273"), not a per-share figure or an
+# amount
 _LEVEL: Final = re.compile(
-    r"(?i)\b(?:stock|shares?)\s+(?:to|at|closed\s+at|trading\s+at|hits?|reached|reaches)\s+\$\s?\d[\d,]*(?:\.\d+)?"
-    r"(?![\d.,]*\s*(?:[MBK]\b|million|billion|bn|trillion))(?!\s*(?:per|a|/)\s*share)"
+    rf"(?i)\b(?:stock|shares?)\s+(?:to|at|closed\s+at|trading\s+at|hits?|reached|reaches)\s+\$\s?{_NUMBER}"
+    rf"{_NOT_AMOUNT}"
+    r"|\b(?:stock(?:\s+price)?|shares?)\b[^.!?$€£]{0,40}?\b(?:closed|closing|opened|opening|opens?|traded|"
+    r"trading|trades?|stands?|stood|priced|ended|ending|finished|finishing|settled|settling|hit|reached|touched|"
+    r"sits?|sat|changed\s+hands)\b[^.!?$€£]{0,25}?"
+    rf"\b(?:at|as\s+high\s+as|as\s+low\s+as|to|around|near)\s+{_CUR}{_NUMBER}{_NOT_AMOUNT}"
+    rf"|\b(?:stock|shares?)\b(?:\s*\([^)]{{0,20}}\))?\s+holds?\s+{_CUR}{_NUMBER}{_NOT_AMOUNT}"
 )
 _PER_BEFORE: Final = re.compile(r"(?i)\bper\s+(?:\w+\s+)?$|dividend|distribution")
+# the broad form (fourth verification: "AMD Stock Sees Clearer Path to $200", "NASDAQ:QCOM at $165.42",
+# "shares hit a record $388.14", "share price was $321.27", "$385 stock price"): a currency amount after a
+# share word in the same sentence, unless the amount is per share, a total or a size, or a fundamental is its
+# subject
+_SHARE_LEVEL: Final = re.compile(
+    rf"(?i)\b(?:stocks?|shares?)\b(?!\s+markets?\b)(?P<stretch>[^.!?]{{0,60}}?){_CUR}{_NUMBER}(?P<after>[^.!?]{{0,30}})"
+    rf"|{_CUR}{_NUMBER}\s+(?:stock|share)\s+price\b"
+)
+_LEVEL_LEFT: Final = re.compile(
+    r"(?i)(?:\bper|\ba|earnings|eps|loss|income|dividends?|preferred|\d)[\s-]+(?:\w+\s+)?$"
+)
+_LEVEL_CUES: Final = re.compile(
+    r"(?i)per[\s-]+(?:\w+\s+)?share|a\s+share|/\s?share|dividend|distribution|\beps\b|earnings|income|\bloss|"
+    r"revenue|profit|worth|valued|value\s+of|total\s+value|proceeds|volume|market\s+(?:cap|value)|"
+    r"capitali[sz]ation|stake|position|invest|fund|program|plan\b|award|grant|compensation|salary|fee|fine|"
+    r"settlement|cost|offering|buyback|repurchase|you\s+would\s+have"
+)
+_PER_SHARE_AFTER: Final = re.compile(r"(?i)\s*(?:per[\s-]+(?:\w+\s+)?share|a\s+share|/\s?share)")
+_SIZE: Final = re.compile(r"(?i)\s?(?:[MBK]\b|mn\b|mln\b|bn\b|million|billion|trillion)")
 # a footnote mark after an amount ("a previous target of $49.00.1;")
 _FOOTNOTE: Final = re.compile(r"(\$\s?\d[\d,]*\.\d{2})\.\d(?!\d)")
 _VERBS: Final = (
@@ -154,6 +188,33 @@ PRICE_MOVE: Final = re.compile(
 PRICE_MOVE_AFTER: Final = re.compile(
     r"(?i)\b\d+(?:[.,]\d+)?\s?%\s+(?:in\s+)?(?:premarket|pre-market|before\s+the\s+bell|after\s+hours|after-hours)"
 )
+_PCT: Final = r"\d+(?:[.,]\d+)?\s?%"
+# the direction after the number (NA-04 fourth verification): "The company Trading 2.4% Higher" (MarketBeat;
+# NA-02 scrubs its "Trading Down 3.1%" form, so only rises were left), "shares were 3% lower"
+PRICE_MOVE_POSTFIX: Final = re.compile(
+    rf"(?i)\b{_SUBJECT}\b(?P<mid>[^.!?%]{{0,50}}?)\b(?:trad(?:e|es|ed|ing)|is|are|was|were|closed|closing|ended|"
+    rf"ending|finished|finishing|opened|opening|settled|settling|moves?|moved|moving|sits?|sat|stood|stands?|"
+    rf"rose|fell|jumped|soared|zoomed|popped|slid|dropped|climbed|surged|plunged|tumbled|sank|gained|rallied|"
+    rf"spiked|skyrocketed|rocketed|dipped|slipped|edged|ticked)\s+"
+    rf"(?:up\s+|down\s+)?{_PCT}\s+(?:higher|lower)\b"
+)
+_MOVE_NOUNS: Final = (
+    r"(?:rise|drop|gain|decline|jump|fall|surge|plunge|slide|rally|climb|dip|pop|loss|advance|retreat)"
+)
+_NOT_FUNDAMENTAL: Final = (
+    r"(?!\s+(?:in|of)\s+(?:the\s+company['’]s\s+)?(?:revenues?|sales|earnings|eps|profits?|income|orders|"
+    r"traffic|bookings|deliveries|margins?|volume))"
+)
+# the move as a noun: "Drives 1.95% Stock Rise", "a 3% rise in shares", "The company's 0.69% Gains Defy",
+# "Norfolk Southern (NSC) closed at a 1.13% decline"; and "Mogo (TSE:MOGO) Trading 99.4% Higher" with no share
+# word before it
+PRICE_MOVE_NOUN: Final = re.compile(
+    rf"(?i)\btrad(?:e|es|ed|ing)\s+(?:up\s+|down\s+)?{_PCT}\s+(?:higher|lower)\b"
+    rf"|\b{_PCT}\s+(?:stock|share)\s+{_MOVE_NOUNS}s?\b"
+    rf"|\b(?:a|an)\s+{_PCT}\s+{_MOVE_NOUNS}\s+(?:in|for)\s+(?:the\s+)?(?:company['’]s\s+)?(?:shares?|stock)\b"
+    rf"|\b(?:the\s+company['’]s|stock['’]s|shares['’]?)\s+{_PCT}\s+{_MOVE_NOUNS}(?:s|es)?\b{_NOT_FUNDAMENTAL}"
+    rf"|\bclosed\s+(?:at\s+|with\s+)?an?\s+{_PCT}\s+(?:decline|gain|rise|drop|loss|increase|decrease|fall)\b"
+)
 _FUNDAMENTAL_SUBJECT: Final = re.compile(
     r"(?i)\b(?:revenues?|sales|earnings|eps|income|profits?|margins?|volumes?|orders|shipments|deliveries|guidance|"
     r"dividends?|bookings|subscribers|users|traffic|backlog|cash\s+flow|demand|output|production|compensation|"
@@ -161,7 +222,10 @@ _FUNDAMENTAL_SUBJECT: Final = re.compile(
     r"expenses?|spending|capex|debt|assets|deposits|loans|premiums|rates?|unemployment|inflation|gdp|index|"
     r"prices?\s+of\s+(?!the\s+company))\b"
 )
-_PT: Final = r"(?:price\s+targets?|target\s+prices?|price\s+objectives?|price\s+goals?|PTs?|targets?)"
+_PT: Final = (  # "price estimate", "fair value", "targeting a price of" since the fourth verification
+    r"(?:price\s+targets?|target\s+prices?|price\s+objectives?|price\s+goals?|price\s+estimates?|"
+    r"fair\s+values?(?:\s+estimates?)?|targeting\s+a\s+price|PTs?|targets?)"
+)
 _AMT: Final = (
     r"\$\s?(\d{1,3}(?:,\d{3})+(?:\.\d+)?|\d+(?:\.\d+)?)"
     r"(?!\d|\.\d|\s*(?:million|billion|trillion|bn|mn|[mbk]\b|%))"
@@ -178,7 +242,27 @@ PT_AMOUNT: Final = re.compile(
     rf"(?:\b(?:to|at|of|from|is)\s+)?(?:(?:the|a)\s+previous\s+)?{_AMT}"
 )
 AMOUNT_PT: Final = re.compile(rf"(?i){_AMT}\s+(?P<label>{_PT})\b")
-PER_SHARE: Final = re.compile(r"(?i)\$\s?\d[\d,]*(?:\.\d+)?\s+(?:a|per)\s+share\b")
+# price targets in other notations (NA-04 fourth verification): "unchanged at USD 220", "from GBX 420 to GBX
+# 500", "revised to €151.88 / share", "Raised to 315.00 USD"
+_NUM: Final = r"\d{1,3}(?:[,.']\d{3})+(?:[.,]\d+)?|\d+(?:[.,]\d+)?"
+_AMT_X: Final = (
+    r"(?:(?:US\$|C\$|A\$|USD|GBX|GBp|EUR|CHF|€|£)\s?(?:" + _NUM + r")|(?:" + _NUM + r")\s?"
+    r"(?:USD|US-Dollar|dollars|EUR|euros?|€|GBX|GBp|pence)(?![A-Za-z]))"
+    r"(?!\d|\s*(?:million|billion|trillion|bn|mn|[mbk]\b|%))"
+)
+PT_FROM_TO_X: Final = re.compile(
+    rf"(?i)\b(?P<label>{_PT})\b(?P<mid>[^$€£.;!?]{{0,60}}?)\bfrom\s+(?P<a>{_AMT_X})\s+to\s+(?P<b>{_AMT_X})"
+)
+PT_TO_FROM_X: Final = re.compile(
+    rf"(?i)\b(?P<label>{_PT})\b(?P<mid>[^$€£.;!?]{{0,60}}?)(?:\b(?:to|at)\s+)?(?P<b>{_AMT_X})\s*,?\s*"
+    rf"(?:from|vs\.?|versus|up\s+from|down\s+from)\s+(?P<a>{_AMT_X})"
+)
+PT_AMOUNT_X: Final = re.compile(
+    rf"(?i)\b(?P<label>{_PT})\b(?P<mid>[^$€£.;!?]{{0,80}}?)(?:\b(?:to|at|of|from|is)\s+)?{_AMT_X}"
+    r"(?:\s*/\s*share)?"
+)
+AMOUNT_PT_X: Final = re.compile(rf"(?i){_AMT_X}\s+(?P<label>{_PT})\b")
+PER_SHARE: Final = re.compile(r"(?i)\$\s?\d[\d,]*(?:\.\d+)?\s*(?:(?:a|per)\s+|/\s?)share\b")
 _DEAL: Final = re.compile(
     r"(?i)\b(?:acquir\w*|acquisition|buy(?:out|s|ing)?|bought|offer\w*|deal|merger|merge|takeover|tender|bid|"
     r"valu\w+|purchas\w*|sale|sell\w*|sold|pric(?:ed|ing)|consideration|premium)\b"
@@ -1094,8 +1178,16 @@ class Masker:
     # --- price talk and price levels ---------------------------------------------------------------
 
     @staticmethod
+    def amount(text: str) -> float:
+        """The number of an amount in any notation: "$1,410", "GBX 1,410", "38,36 €", "1.209,24 USD"."""
+        num = re.sub(r"[^\d.,']", "", text).replace("'", "")
+        if re.fullmatch(r"\d{1,3}(?:\.\d{3})+(?:,\d+)?|\d+,\d{1,2}", num):  # European: "1.209,24", "38,36"
+            num = num.replace(".", "").replace(",", ".")
+        return float(num.replace(",", ""))
+
+    @staticmethod
     def _relative(label: str, mid: str, old: str, new: str) -> str:
-        a, b = float(old.replace(",", "")), float(new.replace(",", ""))
+        a, b = Masker.amount(old), Masker.amount(new)
         if a <= 0 or b == a:
             change = "unchanged" if b == a else ""
         else:
@@ -1111,22 +1203,37 @@ class Masker:
     def is_price_move(sentence: str) -> bool:
         """A stock / share price move in percent: any subject occurrence whose stretch to the move verb holds
         no fundamental noun ("Earnings Disappoint, Shares Fall 8.3%" is a move; "revenue rose 5%" is not)."""
-        if PRICE_MOVE_AFTER.search(sentence):
+        if PRICE_MOVE_AFTER.search(sentence) or PRICE_MOVE_NOUN.search(sentence):
             return True
         for sm in _MOVE_SUBJECT.finditer(sentence):
-            m = PRICE_MOVE.match(sentence, sm.start())
-            if m and not _FUNDAMENTAL_SUBJECT.search(m.group("mid") or ""):
-                return True
+            for pattern in (PRICE_MOVE, PRICE_MOVE_POSTFIX):
+                m = pattern.match(sentence, sm.start())
+                if m and not _FUNDAMENTAL_SUBJECT.search(m.group("mid") or ""):
+                    return True
         return False
 
     @staticmethod
     def is_price_level(sentence: str) -> bool:
         """A share-price level ("boosts stock to $102.89"), not a per-share figure ("per diluted share at
         $0.23") or a dividend."""
-        return any(
+        if any(
             not _PER_BEFORE.search(sentence[max(0, m.start() - 40) : m.start()])
             for m in _LEVEL.finditer(sentence)
-        )
+        ):
+            return True
+        for m in _SHARE_LEVEL.finditer(sentence):
+            after = m.group("after") or ""
+            if m.group("stretch") is None:  # "$385 stock price"
+                return True
+            if (
+                _LEVEL_LEFT.search(sentence[max(0, m.start() - 30) : m.start()])
+                or _LEVEL_CUES.search(m.group("stretch"))
+                or _PER_SHARE_AFTER.match(after)
+                or _SIZE.match(after)
+            ):
+                continue
+            return True
+        return False
 
     def mask_prices(self, text: str) -> tuple[str, int]:
         """Step 5b: drop ticker quotes and price-move sentences; remove price-target and deal-price levels."""
@@ -1153,6 +1260,17 @@ class Masker:
             if not k:
                 break
         text, k = AMOUNT_PT.subn(lambda m: m["label"], text)
+        n += k
+        text, k = PT_FROM_TO_X.subn(lambda m: self._relative(m["label"], m["mid"], m["a"], m["b"]), text)
+        n += k
+        text, k = PT_TO_FROM_X.subn(lambda m: self._relative(m["label"], m["mid"], m["a"], m["b"]), text)
+        n += k
+        for _ in range(3):
+            text, k = PT_AMOUNT_X.subn(lambda m: f"{m['label']}{m['mid'].rstrip()}", text)
+            n += k
+            if not k:
+                break
+        text, k = AMOUNT_PT_X.subn(lambda m: m["label"], text)
         n += k
 
         def deal(m: re.Match[str]) -> str:

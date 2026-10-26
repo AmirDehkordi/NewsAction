@@ -45,12 +45,51 @@ news_exclusion:                   # PREREG §15 NA-04 row 6 (revision 3): left o
   # a session's price move by construction: in W0 they are pre-market talk or stamped before their content
   # (29 of 204 pre-open-stamped ones about the company, 2024-01..2025-09), in W2 they reveal the realized
   # move. Searched (re.search) in NA-02's raw title / snippet; Benzinga's "What Happened:" does not match.
-  title: '(?i)^(?:here[''’]?s\s+|here\s+is\s+)?why\b.*\b(?:stock|shares)\b.*\btoday\b'
+  # Revision 4: also "Why Micron Technology Rallied Today", "Why CoreWeave Rocketed as High as 26% Today" (a move
+  # word between "why" and "today"; 188 event articles had escaped), not "Here's Why We Think F5 ... Might
+  # Deserve Your Attention Today".
+  title: '(?i)^(?:here[''’]?s\s+|here\s+is\s+)?why\b.*(?:\b(?:stocks?|shares|rall\w*|fell|fall\w*|drop\w*|plung\w*|soar\w*|jump\w*|surg\w*|sink\w*|sank|tumbl\w*|crash\w*|rocket\w*|skyrocket\w*|pop\w*|slid\w*|slump\w*|climb\w*|gain\w*|ris(?:e|es|ing)|rose|up|down|higher|lower|moving|flying|explod\w*|zoom\w*|spik\w*|dip\w*|slip\w*|lift\w*|shoot\w*|advanc\w*|retreat\w*|declin\w*|tank\w*|lost|los(?:e|es|ing)|crush\w*|sour\w*|rebound\w*|outperform\w*|underperform\w*)\b|\d%).*\btoday\b'
   snippet: 'What Happened\?\s*(?:Shares of|A number of)'
   # TradingView reposts carry batch timestamps that precede their content: 128 of 511 of their earnings
   # summaries (2024-01..2025-09) are stamped before the release they report (DGX's results of 2025-07-22
   # stamped 07-21 13:01 UTC); other outlets 0-7%, previews included. Operator decision 2026-10-25.
   domain: '(?:^|\.)tradingview\.com$'
+  # Non-English articles (operator decision B of 2026-10-25; PREREG §15 NA-04 row 8). The masker and the
+  # price-talk scrubbers are English-only: the fourth verification found share prices, pre-market moves
+  # ("dispararam mais de 27% ... pré-mercado") and dates surviving in non-English text. Searched in NA-02's
+  # raw title + snippet. A text is non-English when it has min_script_chars characters of a non-Latin script;
+  # or its distinct foreign function words number at least min_foreign and more than its distinct English
+  # ones (two with no English one); or it has min_diacritic_words distinct words with a non-English letter and
+  # at most max_english_with_diacritics distinct English words. Words count in lower case or capitalized, so
+  # a ticker in capitals (DE) is not "de"; place names go first. NA-02's non_english_hint (two words of a
+  # short list) found 64% of the verification's non-English price levels and 53% of its Nordic / Dutch dates;
+  # this rule finds 98–100%, and 205 sampled flags (each step's additions, 40 on English-language domains)
+  # were all non-English.
+  non_english:
+    script: '[぀-ヿ㐀-鿿가-힯Ѐ-ӿ؀-ۿ฀-๿֐-׿Ͱ-Ͽऀ-ॿ]'
+    min_script_chars: 2
+    foreign_words: >-
+      le la les des du une est pour sur dans avec qui sont aux ses leur cette été après selon chez d'une
+      l'action c'est n'est l'objectif d'un qu'il annonce résultats
+      el los del por para una con que su sus como más tras sobre según acciones empresa este esta también
+      os da das dos em não com ações pelo pela após seu sua está na no ao desde maior tem
+      il gli della delle dei degli che è sono nel nella sul dal alla anche più azioni titolo viene ancora dopo questo
+      questa suo tra fra ha hanno stato stata essere
+      der das und mit für auf ist im dem ein eine nicht sich zum zur nach bei aus wird sind aktie aktien über
+      seine ihre nachdem auch noch einen einer vom beim sowie durch gegen wurde werden haben oder nur vor seit bis
+      keine schon heute liegt zuletzt
+      het een voor naar zijn niet aan bij ook deze wordt heeft aandelen dat rond uit tot nog maar geen worden
+      werd hun haar meer tussen de van op om te zegt zei
+      og på til af av som det ikke fra och för är att inte netop sin sine hvordan hele inden efter eller også
+      blev vil skal ved hos mod denne dette disse være bliver mellem
+      ning teatab täna oraz się że jest dla przez je se pro ve za který která které jsou bylo
+      dan yang untuk dengan ini itu pada sebesar menjadi persen ve bir için ile kwa ya wa
+    english_words: the of and to in is for on with that by as at from its has are was will be an this after said it have their which
+    min_foreign: 3
+    diacritics: äöüßéèêëàâçãõñłśźżčřěůőåøæışğÄÖÜÉÈÊÀÂÇÃÕÑŁŚŹŻČŘĚŮŐÅØÆŞĞ
+    min_diacritic_words: 3
+    max_english_with_diacritics: 2
+    place_names: '\b[Ll]as\s+Vegas\b|\b[Ll]os\s+(?:Angeles|Ángeles|Gatos|Alamos|Cabos)\b'
 
 market_states:                    # PREREG A3.5 (optional): one state per session from market-index articles
   window: W2

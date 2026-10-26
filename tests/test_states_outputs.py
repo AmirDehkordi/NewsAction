@@ -64,7 +64,7 @@ def test_schema_json_and_hash(rel: str) -> None:
 
 
 def test_splits_and_counts() -> None:
-    """One state per event, except events whose every article is a move explainer or lost its text in masking
+    """One state per event, except events whose every article is excluded or lost its text in masking
     (build_states.json)."""
     built = json.loads((ROOT / "artifacts" / "NA-04" / "build_states.json").read_text(encoding="utf-8"))
     d0 = io.read_parquet("events/events_d0.parquet", columns=["event_id"])
@@ -79,8 +79,10 @@ def test_splits_and_counts() -> None:
         assert got <= ids
         n = built[name]
         assert len(ids - got) == n["events_without_text"] + n["events_all_excluded"], name
-        # excluded articles (explainers, TradingView) empty about 1.2% of D0 events (PREREG §15 NA-04 row 6)
-        assert n["events_without_text"] <= 20 and n["events_all_excluded"] <= 0.02 * len(ids), name
+        # excluded articles (explainers, TradingView, non-English) empty about 1.8% of D0 events (PREREG §15
+        # NA-04 rows 6, 8); events whose every article was price talk lose their text: 0.14% since revision 4
+        assert n["events_without_text"] <= 0.002 * len(ids), name
+        assert n["events_all_excluded"] <= 0.03 * len(ids), name
     a2 = set(states("states/callA_d2_E3.parquet")["event_id"])
     assert set(states("states/callB_d2_E3.parquet")["event_id"]) == a2 & b_ids
 

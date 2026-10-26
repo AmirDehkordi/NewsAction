@@ -20,10 +20,14 @@ The scanner is **independent of the masker**: it imports nothing from ``states.m
   glued yyyymmdd and day-first dates ("21/04"); **years**: 1900–2099 not inside a larger number ("CY2025",
   "EHA2025", "2025年" count; "Russell 2000" excepted).
 
-AC2 counts names + tickers and years + dates. The scanner also counts, for the REPORT, price-move sentences,
-ticker quotes ("MPC-1.32%", "· IP. -0.58%", "Chg%"), dollar price levels (price targets, "shares at $X",
-"Price:49.32") and public figures (a sentinel list and Chinese transliterated names, "薩姆·阿爾特曼"). It
-reads the ``news`` items of a state (the only free text), one headline or snippet at a time.
+AC2 counts names + tickers and years + dates. The scanner also counts, for the REPORT and the price-talk test,
+price-move sentences, ticker quotes ("MPC-1.32%", "· IP. -0.58%", "Chg%"), price levels (price targets,
+"shares at $X", "Price:49.32") and public figures (a sentinel list and Chinese transliterated names,
+"薩姆·阿爾特曼"). Since the fourth verification, price levels also count any amount within reach of a share
+word unless a per-share, fundamental, trade-size or deal cue is near ("shares closed yesterday at $242.66"),
+price targets in any currency notation ("at USD 220", "€151.88 / share") and per-share deal prices; price
+moves also count the direction after the number ("Trading 2.4% Higher") and moves as nouns ("1.95% Stock
+Rise"). It reads the ``news`` items of a state (the only free text), one headline or snippet at a time.
 """
 
 from __future__ import annotations
@@ -135,8 +139,13 @@ _PRICE_MOVE: Final = re.compile(
     r"higher|lower)\b[^.!?]{0,25}?\d+(?:[.,]\d+)?\s?%"
     r"|\b\d+(?:[.,]\d+)?\s?%\s+(?:premarket|pre-market|in premarket|before the bell|after hours)"
 )
+# fundamental acronyms are not tickers ("EPS -59%", "AUM +14%"): the scanner's own list
+_NOT_QUOTED: Final = (
+    r"(?!(?:EPS|FFO|AFFO|AUM|FRE|ARR|NII|NIM|GDP|CPI|PPI|YOY|QOQ|EBIT|EBITDA|ROE|ROI|ROA|FCF|RPO)\b)"
+)
 _QUOTE: Final = re.compile(
-    r"(?<![A-Za-z0-9])[A-Z]{2,5}\s?[+\-−–]\s?\d+(?:\.\d+)?\s?%|(?<![A-Za-z0-9])[A-Z]{2,5}\d+\.\d+\s?%"
+    rf"(?<![A-Za-z0-9]){_NOT_QUOTED}[A-Z]{{2,5}}\s?[+\-−–]\s?\d+(?:\.\d+)?\s?%"
+    rf"|(?<![A-Za-z0-9]){_NOT_QUOTED}[A-Z]{{2,5}}\d+\.\d+\s?%"
     r"|(?:·\s*\S{1,8}?|[Tt]he company)\.?\s+[+\-−–]\s?\d+(?:\.\d+)?\s?%|Chg%"
 )
 _NOT_AMOUNT: Final = r"(?![\d,.]*\s*(?:[MBK]\b|million|billion|bn|trillion))"  # "$35 Billion" is no price
@@ -147,8 +156,101 @@ _PRICE_LEVEL: Final = re.compile(
     rf"{_NOT_AMOUNT}"
     r"|\bPrice:\s?\$?\d"
 )
+# since the fourth verification (the scanner's own forms): the direction after the number ("Trading
+# 2.4% Higher") and moves as nouns ("1.95% Stock Rise", "a 3% rise in shares", "closed at a 1.18% decline")
+_MOVE_AFTER_NUMBER: Final = re.compile(
+    r"(?i)\b(?:shares?|stocks?|the company)\b(?P<stretch>[^.!?%]{0,50}?)\b\d+(?:[.,]\d+)?\s?%\s+"
+    r"(?:higher|lower)\b"
+)
+_MOVE_NOUN: Final = re.compile(
+    r"(?i)\btrad(?:e|es|ed|ing)\s+\d+(?:[.,]\d+)?\s?%\s+(?:higher|lower)\b"
+    r"|\b\d+(?:[.,]\d+)?\s?%\s+(?:stock|share)\s+(?:rise|drop|gain|decline|jump|fall|surge|plunge|slide|rally)"
+    r"|\ban?\s+\d+(?:[.,]\d+)?\s?%\s+(?:rise|drop|gain|decline|jump|fall|surge|plunge|slide|rally|loss)\s+"
+    r"(?:in|for)\s+(?:the\s+company['’]s\s+|the\s+)?(?:shares?|stock)\b"
+    r"|\b(?:company['’]s|stock['’]s)\s+\d+(?:[.,]\d+)?\s?%\s+(?:gains?|rises?|drops?|declines?|jumps?|falls?|"
+    r"surges?|losses|slides?)\b(?!\s+(?:in|of)\s+(?:revenue|sales|earnings|profit|income))"
+    r"|\bclosed\s+(?:at|with)\s+an?\s+\d+(?:[.,]\d+)?\s?%\s+(?:decline|gain|rise|drop|loss)\b"
+)
+# any amount within reach of a share word, unless a per-share, fundamental, trade-size or deal cue is near
+_SHARE_AMOUNT: Final = re.compile(
+    r"(?i)\b(?:shares?|stock(?:\s+price)?)\b(?!\s+markets?\b)(?P<stretch>[^.!?]{0,70}?)(?:C\$|US\$|\$|USD\s?|GBX\s?|€\s?|£\s?)"
+    r"\d[\d,]*(?:\.\d+)?(?P<after>[^.!?]{0,25})"
+)
+_AMOUNT_CUES: Final = re.compile(
+    r"(?i)per\s+(?:\w+\s+)?share|a\s+share|/\s?share|dividend|distribution|eps|earnings|income|loss|revenue|profit|"
+    r"worth|valued|value|offering|proceeds|purchase|repurchase|buyback|"
+    r"volume|million|billion|trillion|\d\s?[mbk]\b|bn\b|market\s+cap|capitali[sz]ation|stake|holding|position|"
+    r"invest|fund|plan|program|award|grant|option|compensation|salary|fee|fine|settlement|cost|for\s+\$|"
+    r"would\s+(?:have|be\s+worth)|gold|silver|crude|oil|bitcoin"
+)
+# a price target, estimate or fair value in any currency notation; a per-share deal price
+_TARGET_ANY: Final = re.compile(  # "$" after the base labels is counted by _PRICE_LEVEL
+    r"(?i)(?:price\s+targets?|target\s+prices?|price\s+objectives?|price\s+goals?|price\s+estimates?|"
+    r"fair\s+values?|targeting\s+a\s+price)[^.!?]{0,60}?(?:(?:US\$|C\$|USD|GBX|GBp|EUR|€|£)\s?\d|"
+    r"\d[\d.,]*\s?(?:USD|EUR|€|GBX|pence)\b)(?![\d,.]*\s*(?:[MBK]\b|million|billion|bn|trillion))"
+    r"|(?:price\s+goals?|price\s+estimates?|fair\s+values?|targeting\s+a\s+price)[^.!?$]{0,60}?\$\s?\d"
+    r"(?![\d,.]*\s*(?:[MBK]\b|million|billion|bn|trillion))"
+    r"|\$\s?\d[\d,]*(?:\.\d+)?\s+(?:price\s+estimate|fair\s+value)\b"
+)
+_AMOUNT_THEN_PRICE: Final = re.compile(
+    r"(?i)(?:C\$|US\$|\$|USD\s?|€\s?|£\s?)\d[\d,]*(?:\.\d+)?\s+(?:stock|share)\s+price"
+)
+_LEFT_CUES: Final = re.compile(r"(?i)(?:\bper|\ba|earnings|eps|loss|income|dividends?|\d)[\s-]+(?:\w+\s+)?$")
+_FOR_END: Final = re.compile(r"(?i)\bfor\s*$")
+_SIZE_AFTER: Final = re.compile(r"(?i)\s?(?:[MBKT]\b|mn\b|mln|bn|million|billion|trillion)")
+_PER_SHARE_AFTER: Final = re.compile(r"(?i)\s*(?:per[\s-]+(?:\w+\s+)?share|a\s+share|/\s?share)")
+_DEAL_PER_SHARE: Final = re.compile(
+    r"(?i)\b(?:acquir\w*|buyout|offer\w*|deal|merger|takeover|tender|bid)\b[^.!?]{0,60}?\$\s?\d[\d,]*(?:\.\d+)?"
+    r"\s*(?:/\s?|per\s+|a\s+)share\b"
+)
+# "30% higher revenue", "26% lower the quarter net income" (not "2% higher after earnings")
+_FUND_AFTER: Final = re.compile(
+    r"(?i)\s*(?:(?:the\s+)?(?:quarter|half-year|year|fiscal\s+year)\s+|quarterly\s+|annual\s+|net\s+|"
+    r"adjusted\s+|comparable\s+|same-store\s+)*(?:revenues?|sales|earnings|eps|income|profits?|margins?|orders|"
+    r"bookings|volume|traffic|costs?|deliveries|guidance)\b"
+)
+_PER_LEFT: Final = re.compile(r"(?i)\bper[\s-]$")  # "earnings per share (EPS) surged 78%" is no price move
+_FUNDAMENTAL: Final = re.compile(
+    r"(?i)\b(?:revenues?|sales|earnings|eps|income|profits?|margins?|outstanding|dividends?|guidance|orders|"
+    r"volume|traffic|bookings|costs?)\b"
+)
 _CLOCK: Final = re.compile(r"\d\s?$")
 _SEGMENTS: Final = re.compile(r"\n| \|\| ")
+
+
+def price_level_count(text: str) -> int:
+    """Dollar levels of the base pattern, plus share-price levels, price targets in any notation and per-share
+    deal prices (fourth verification)."""
+    n = len(_PRICE_LEVEL.findall(text)) + len(_TARGET_ANY.findall(text)) + len(_DEAL_PER_SHARE.findall(text))
+    n += len(_AMOUNT_THEN_PRICE.findall(text))
+    for m in _SHARE_AMOUNT.finditer(text):
+        left = text[max(0, m.start() - 30) : m.start()]
+        if (
+            _LEFT_CUES.search(left)
+            or _AMOUNT_CUES.search(m.group("stretch"))
+            or _FOR_END.search(m.group("stretch"))
+            or _SIZE_AFTER.match(m.group("after"))
+            or _PER_SHARE_AFTER.match(m.group("after"))
+        ):
+            continue
+        n += 1
+    return n
+
+
+def price_move_count(text: str) -> int:
+    """Percent price moves: verb before the number, direction after it, or a move as a noun."""
+    n = sum(
+        1
+        for m in _PRICE_MOVE.finditer(text)
+        if "volume" not in m.group(0).lower()
+        and not _PER_LEFT.search(text[max(0, m.start() - 12) : m.start()])
+    )
+    n += sum(
+        1
+        for m in _MOVE_AFTER_NUMBER.finditer(text)
+        if not _FUNDAMENTAL.search(m.group("stretch")) and not _FUND_AFTER.match(text, m.end())
+    )
+    return n + len(_MOVE_NOUN.findall(text))
 
 
 @dataclass(frozen=True)
@@ -411,9 +513,9 @@ class LeakScanner:
             tickers=tickers,
             years=len(_YEAR.findall(text)),
             dates=len(_DATE.findall(text)),
-            price_moves=sum(1 for m in _PRICE_MOVE.finditer(text) if "volume" not in m.group(0).lower()),
+            price_moves=price_move_count(text),
             quotes=len(_QUOTE.findall(text)),
-            price_levels=len(_PRICE_LEVEL.findall(text)),
+            price_levels=price_level_count(text),
             people=len(PEOPLE.findall(text)),
         )
 

@@ -656,3 +656,100 @@ def test_scanner_sees_the_third_verification_forms() -> None:
         assert c.dates + c.years >= 1, text
     for text in REVISION3_KEEP:
         assert sc.scan_text(text, AAPL).dates == 0, text
+
+
+# the fourth verification (revision 4): share prices, price targets and moves that the English rules missed
+REVISION4_GONE = (
+    ("Apple's shares opened today at $307.00.", "$307"),
+    ("The company's shares closed yesterday at $242.66.", "$242"),
+    ("The stock traded as high as $145.16 and last traded at $144.50.", "$145"),
+    ("The stock price for the company currently stands at $768.57.", "$768"),
+    ("TSMC Stock (NYSE:TSM) Holds $273 After Earnings Beat", "$273"),
+    ("Shares open at $143.45, 24.2% above IPO price.", "$143"),
+    ("AMD Stock Sees Clearer Path to $200 After Recent Downturn", "$200"),
+    ("Qualcomm Stock Forecast: NASDAQ:QCOM at $165.42 With AI Edge Growth", "$165"),
+    ("Apple shares hit a record $388.14 recently, driven by strong earnings.", "$388"),
+    ("Apple declines with $385 stock price and $57B valuation.", "$385"),
+    ("its stock price decreased by $1.04, settling at approximately $54.94.", "$54"),
+    ("The shares were sold at an average price of $45.20, for a total value of $45,200.", "$45.20"),
+    ("The stock traded as low as C$2.77 and last traded at C$2.96.", "2.77"),
+    ("Apple (NASDAQ:AAPL) Trading 2.4% Higher on Analyst Upgrade", "2.4%"),
+    ("Apple's $4.89B UK REIT Acquisition Drives 1.95% Stock Rise", "1.95%"),
+    ("Apple's 0.69% Gains Defy 50.47% Volume Drop to 329th Trading Rank", "0.69%"),
+    ("Recently, Apple closed at a 1.18% decline with a trading volume of $490 million.", "1.18%"),
+    ("Investors cheered a 3% rise in shares after the call.", "3%"),
+    ("The target price is still set at USD 210.", "210"),
+    ("The average one-year price target for Apple has been revised to €151.88 / share.", "151.88"),
+    ("Apple Price Target Raised to 315.00 USD by JMP Securities", "315"),
+    ("Goldman Sachs initiated Apple with a Sell rating, targeting a price of $80.", "$80"),
+    ("Apple Stock Looks Appropriately Priced With $185 Price Estimate", "$185"),
+    ("Apple to Acquire Chart Industries for $210/Share; Secures $14.9B Bridge", "$210"),
+    ("Mogo (TSE:MOGO) Trading 99.4% Higher - Here's What Happened.", "99.4%"),  # no share word before it
+    ("Recently, Norfolk Southern (NSC) closed at a 1.13% decline with a volume of $0.7 billion.", "1.13%"),
+    ("Apple Moves 22.8% Higher: Will This Strength Last?", "22.8%"),
+    ("Why Apple Zoomed 4% Higher Today", "4%"),
+    ("Apple shares snapped a six-session winning streak, closing 1% lower recently.", "1%"),
+    ("Lowe's shares snapped their six-day winning streak, closing 0.47% lower at $240.02 recently.", "$240"),
+)
+REVISION4_KEEP = (
+    "Apple reported earnings of $1.71 per share, beating estimates by $0.04.",
+    "Apple declared a quarterly dividend of $0.40 per share.",
+    "Revenue was 5% higher than a year ago at $94.9 billion.",
+    "The company's 7% gain in revenue beat estimates.",
+    "Apple's CFO sold 16,820 shares worth $2,975,458 recently.",
+    "Apple sold 13M shares for $3.02B.",
+    "Apple will buy back up to $10 billion of its stock.",
+    "Apple returned $758 million to its shareholders through buybacks.",
+    "On a per-share basis, the company said it had profit of $3.06.",
+    "Apple's adjusted EPS of $2.24 beat the consensus of $2.15.",
+    "The company the quarter 10-Q: Sales −1.6%, EPS +4.9% to $2.13; AUM +14% to $686B",
+    "Adjusted earnings per share (EPS) surged 78%, beating estimates.",
+    "Western Digital and the company report 30% higher revenue, fueling a resurgence.",
+    "The company reported 26% lower the quarter net income amid tariff losses.",
+    "If you invested $1,000 in the company stock 10 years ago, you would have approximately $3,000 today.",
+    "Stock Market Today: Dow Hits Record, Gold Surges to $3,816",
+)
+
+
+@pytest.mark.parametrize(("text", "gone"), REVISION4_GONE)
+def test_revision4_price_talk(text: str, gone: str) -> None:
+    assert gone not in m(text, AAPL), m(text, AAPL)
+
+
+@pytest.mark.parametrize("text", REVISION4_KEEP)
+def test_revision4_fundamentals_are_kept(text: str) -> None:
+    out = m(text, AAPL)
+    assert all(a in out for a in re.findall(r"\$[\d.,]+[MB]?|\d+%", text)), out
+
+
+def test_price_targets_in_other_notations_become_a_relative_change() -> None:
+    out = m("UBS is positive on the stock. The target price is increased from USD 500 to USD 600.", AAPL)
+    assert "USD" not in out and "raised by about 20%" in out, out
+    out = m("Barclays had its price objective boosted by analysts from GBX 420 to GBX 500 in a report.", AAPL)
+    assert "GBX" not in out and "raised by about 19%" in out, out
+    out = m("Offering Of 7 Million Shares At $142.00 Per Share", AAPL)  # the whole amount, not "$142"
+    assert "$142" not in out and "a per-share price" in out, out
+    assert Masker.amount("1.209,24 USD") == 1209.24 and Masker.amount("GBX 1,410") == 1410.0
+
+
+def test_scanner_sees_the_fourth_verification_forms() -> None:
+    sc = scanner()
+    for text, _ in REVISION4_GONE:  # as a state shows them, the company's name masked
+        c = sc.scan_text(text.replace("Apple", "The company"), AAPL)
+        assert c.price_levels + c.price_moves >= 1, text
+    for text in REVISION4_KEEP:
+        c = sc.scan_text(text, AAPL)
+        assert c.price_levels + c.price_moves == 0, text
+
+
+def test_val_a_price_talk_below_target() -> None:
+    """Price levels, ticker quotes and price moves (PREREG §6.3, §6.4) in the built val-A states, with the
+    same 0.5% bar as names and dates (fourth verification; the scanner's broader price rules)."""
+    path = ROOT / "artifacts" / "NA-04" / "leak_scan.csv"
+    if not path.is_file():
+        pytest.skip("artifacts/NA-04/leak_scan.csv is absent (run the report stage)")
+    scan = pd.read_csv(path)
+    for _, g in scan.loc[scan["masked"].astype(bool)].groupby("file"):
+        assert ((g["price_moves"] + g["quotes"] + g["price_levels"]) > 0).mean() < 0.005
+    twin = scan.loc[~scan["masked"].astype(bool)]
+    assert ((twin["price_moves"] + twin["quotes"] + twin["price_levels"]) > 0).mean() > 0.05

@@ -16,8 +16,9 @@ fixed top-level keys ``company``, ``market``, ``attention``, ``news`` and, for C
 otherwise. The summary variant is not built here (vendor summaries are text of the §11.6 ablation only).
 Move explainers ("Why … Stock Is Up Today", StockStory's "What Happened? Shares of …") and TradingView
 reposts (``excluded_ids``) are in no state, in any window: the explainers' text explains the session's move,
-and both are often stamped before their content (PREREG §15 NA-04 row 6). The NA-03 lists are not refilled;
-an event left with no article gets no state.
+and both are often stamped before their content (PREREG §15 NA-04 row 6). Non-English articles are in no
+state either (``non_english``; operator decision B, row 8): the masker and the price-talk scrubbers are
+English-only. The NA-03 lists are not refilled; an event left with no article gets no state.
 
 **Availability.** A ``StateSpec`` lists, per block, every input column it reads (``context.block_columns``).
 ``validate_spec`` calls ``pit.check_inputs`` on each block at the decision point (D0 for W0, D2 for W2)
@@ -34,8 +35,10 @@ NA-11 freeze: ``build_call_b`` refuses test-period events, and the D2 reaction c
 from __future__ import annotations
 
 import argparse
+import functools
 import hashlib
 import json
+import re
 import resource
 import sys
 import time
@@ -62,6 +65,7 @@ from newsaction.states import (
     STATES_DIR,
     Call,
     Encoding,
+    NonEnglishConfig,
     StatesConfig,
     StateWindow,
     load_states_config,
@@ -375,15 +379,78 @@ def event_articles(lay: Layout) -> pd.DataFrame:
     return out.sort_values("id", kind="mergesort").reset_index(drop=True)
 
 
+@dataclass(frozen=True)
+class LanguageRule:
+    """``configs/states.yaml`` ``news_exclusion.non_english``, compiled (``non_english``)."""
+
+    script: re.Pattern[str]
+    min_script_chars: int
+    foreign: re.Pattern[str]
+    english: re.Pattern[str]
+    min_foreign: int
+    diacritic_word: re.Pattern[str]
+    min_diacritic_words: int
+    max_english_with_diacritics: int
+    place_names: re.Pattern[str]
+
+
+def _word_forms(words: str) -> str:
+    """Each word in lower case or capitalized (not in capitals: a ticker such as DE is not "de")."""
+    forms = {f for w in words.split() for f in (w, w[:1].upper() + w[1:])}
+    return "|".join(re.escape(f).replace("'", "['’]") for f in sorted(forms, key=len, reverse=True))
+
+
+@functools.cache
+def language_rule(cfg: NonEnglishConfig) -> LanguageRule:
+    word = r"(?<![\w'’-])(?:{})(?![\w'’-])"
+    return LanguageRule(
+        script=re.compile(cfg.script),
+        min_script_chars=cfg.min_script_chars,
+        foreign=re.compile(word.format(_word_forms(cfg.foreign_words))),
+        english=re.compile(word.format(_word_forms(cfg.english_words))),
+        min_foreign=cfg.min_foreign,
+        diacritic_word=re.compile(rf"(?<!\w)\w*[{re.escape(cfg.diacritics)}]\w*(?!\w)"),
+        min_diacritic_words=cfg.min_diacritic_words,
+        max_english_with_diacritics=cfg.max_english_with_diacritics,
+        place_names=re.compile(cfg.place_names),
+    )
+
+
+def non_english(text: str, cfg: NonEnglishConfig) -> bool:
+    """Operator decision B (PREREG §15 NA-04 row 8): the masker and the price-talk scrubbers are English-only,
+    so a non-English article is in no state. The rule is in ``configs/states.yaml``."""
+    r = language_rule(cfg)
+    if len(r.script.findall(text)) >= r.min_script_chars:
+        return True
+    text = r.place_names.sub(" ", text)
+    foreign = {w.lower().replace("’", "'") for w in r.foreign.findall(text)}
+    english = {w.lower() for w in r.english.findall(text)}
+    if len(foreign) >= r.min_foreign and len(foreign) > len(english):
+        return True
+    if len(foreign) >= r.min_foreign - 1 and not english:
+        return True
+    marked = {w.lower() for w in r.diacritic_word.findall(text)}
+    return len(marked) >= r.min_diacritic_words and len(english) <= r.max_english_with_diacritics
+
+
+def non_english_ids(articles: pd.DataFrame, cfg: StatesConfig) -> frozenset[str]:
+    """Ids of the non-English articles (``non_english`` on NA-02's raw title + snippet)."""
+    rule = cfg.news_exclusion.non_english
+    texts = articles["title"].fillna("").astype(str) + " " + articles["snippet"].fillna("").astype(str)
+    hit = [non_english(t, rule) for t in texts]
+    return frozenset(articles.loc[hit, "id"].astype(str))
+
+
 def excluded_ids(articles: pd.DataFrame, cfg: StatesConfig) -> frozenset[str]:
-    """Ids of the articles left out of every state (``configs/states.yaml`` ``news_exclusion``; PREREG §15
-    NA-04 row 6): move explainers ("Why … Stock Is Up Today", StockStory's "What Happened? Shares of …") and
-    TradingView reposts. ``articles``: id, ``domain`` and NA-02's raw ``title`` and ``snippet``."""
+    """Ids of the articles left out of every state (``configs/states.yaml`` ``news_exclusion``): move
+    explainers ("Why … Stock Is Up Today", StockStory's "What Happened? Shares of …") and TradingView reposts
+    (PREREG §15 NA-04 row 6), and non-English articles (row 8). ``articles``: id, ``domain`` and NA-02's raw
+    ``title`` and ``snippet``."""
     ex = cfg.news_exclusion
     hit = articles["title"].fillna("").astype(str).str.contains(ex.title, regex=True)
     hit |= articles["snippet"].fillna("").astype(str).str.contains(ex.snippet, regex=True)
     hit |= articles["domain"].fillna("").astype(str).str.contains(ex.domain, regex=True)
-    return frozenset(articles.loc[hit, "id"].astype(str))
+    return frozenset(articles.loc[hit, "id"].astype(str)) | non_english_ids(articles, cfg)
 
 
 def market_selection(lay: Layout, cfg: StatesConfig) -> pd.DataFrame:
@@ -537,7 +604,8 @@ class Inputs:
     third_party: Mapping[str, bool]  # article id -> third_party_ok
     excluded: frozenset[str] = (
         frozenset()
-    )  # explainers and TradingView reposts (``excluded_ids``), in no state
+    )  # explainers, TradingView reposts and non-English articles (``excluded_ids``), in no state
+    non_english: frozenset[str] = frozenset()  # the non-English ones among them (counted apart)
     cb: Codebook = field(default_factory=load_codebook)
 
 
@@ -552,6 +620,7 @@ def load_inputs(lay: Layout, masked_frame: pd.DataFrame | None = None) -> Inputs
     tp = io.read_parquet(ARTICLES, columns=["id", "third_party_ok", "domain", "title", "snippet"], layout=lay)
     tp = tp.loc[tp["id"].isin(set(masked["id"]))]
     mk = masked.set_index("id")
+    cfg = load_states_config()
     return Inputs(
         company=io.read_parquet(CONTEXT_COMPANY, layout=lay),
         market=io.read_parquet(CONTEXT_MARKET, layout=lay),
@@ -560,7 +629,8 @@ def load_inputs(lay: Layout, masked_frame: pd.DataFrame | None = None) -> Inputs
             i: (t, s) for i, t, s in zip(mk.index, mk["title_masked"], mk["snippet_masked"], strict=True)
         },
         third_party=dict(zip(tp["id"], tp["third_party_ok"].astype(bool), strict=True)),
-        excluded=excluded_ids(tp, load_states_config()),
+        excluded=excluded_ids(tp, cfg),
+        non_english=non_english_ids(tp, cfg),
     )
 
 
@@ -892,16 +962,22 @@ def write_states(df: pd.DataFrame, rel: str, description: str, lay: Layout) -> N
     io.write_parquet(df, rel, producer=PRODUCER, description=description, layout=lay)
 
 
-def exclusion_counts(events: pd.DataFrame, col: str, excluded: frozenset[str]) -> tuple[int, int]:
-    """(listed excluded articles, events whose every listed article is excluded) of an event frame."""
-    flags = [[str(a["id"]) in excluded for a in items] for items in events[col]]
-    return sum(sum(f) for f in flags), sum(bool(f) and all(f) for f in flags)
+def exclusion_counts(
+    events: pd.DataFrame, col: str, excluded: frozenset[str], non_english: frozenset[str] = frozenset()
+) -> tuple[int, int, int]:
+    """(listed excluded articles, events whose every listed article is excluded, listed non-English
+    articles) of an event frame."""
+    ids = [[str(a["id"]) for a in items] for items in events[col]]
+    flags = [[i in excluded for i in row] for row in ids]
+    n_foreign = sum(i in non_english for row in ids for i in row)
+    return sum(sum(f) for f in flags), sum(bool(f) and all(f) for f in flags), n_foreign
 
 
-def _budget_stats(df: pd.DataFrame, n_events: int, excl: tuple[int, int] = (0, 0)) -> dict[str, int]:
+def _budget_stats(df: pd.DataFrame, n_events: int, excl: tuple[int, int, int] = (0, 0, 0)) -> dict[str, int]:
     return {
         "rows": len(df),
         "articles_excluded": excl[0],
+        "articles_excluded_non_english": excl[2],
         "events_all_excluded": excl[1],
         "events_without_text": n_events - len(df) - excl[1],
         "states_with_dropped_articles": int((df["n_articles"] < df["_listed"]).sum()),
@@ -922,7 +998,7 @@ def run_states(layout: Layout | None = None) -> dict[str, Any]:
     stats: dict[str, Any] = {"caps": {w: b.cap for w, b in bud.items()}, "question_tokens": qtok}
 
     def emit(df: pd.DataFrame, ev: pd.DataFrame, col: str, rel: str, description: str, name: str) -> None:
-        stats[name] = _budget_stats(df, len(ev), exclusion_counts(ev, col, inp.excluded))
+        stats[name] = _budget_stats(df, len(ev), exclusion_counts(ev, col, inp.excluded, inp.non_english))
         write_states(add_tokens(df, tok, qtok), rel, description, lay)
         print(f"states {name}: {stats[name]}", flush=True)
 

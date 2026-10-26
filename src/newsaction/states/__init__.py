@@ -94,12 +94,34 @@ class MarketStatesConfig(_Strict):
     splits: tuple[SplitName, ...]
 
 
+class NonEnglishConfig(_Strict):
+    """The language rule of ``build.non_english`` (operator decision B; PREREG §15 NA-04 row 8)."""
+
+    script: str = Field(min_length=1)  # characters of a non-Latin script
+    min_script_chars: int = Field(gt=0)
+    foreign_words: str = Field(min_length=1)  # function words of other languages, space-separated
+    english_words: str = Field(min_length=1)
+    min_foreign: int = Field(gt=0)  # distinct foreign words that must also outnumber the English ones
+    diacritics: str = Field(min_length=1)  # letters that mark a non-English word
+    min_diacritic_words: int = Field(gt=0)
+    max_english_with_diacritics: int = Field(ge=0)
+    place_names: str = Field(min_length=1)  # removed first: "Las Vegas", "Los Angeles"
+
+    @field_validator("script", "place_names")
+    @classmethod
+    def _compiles(cls, v: str) -> str:
+        re.compile(v)
+        return v
+
+
 class NewsExclusionConfig(_Strict):
-    """Articles left out of every state: regexes searched in NA-02's raw title / snippet and in the domain."""
+    """Articles left out of every state: regexes searched in NA-02's raw title / snippet and in the domain,
+    and non-English articles."""
 
     title: str = Field(min_length=1)
     snippet: str = Field(min_length=1)
     domain: str = Field(min_length=1)
+    non_english: NonEnglishConfig
 
     @field_validator("title", "snippet", "domain")
     @classmethod
