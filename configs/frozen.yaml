@@ -28,6 +28,42 @@ calibration: null   # NA-11: calibration maps and their val-A fit ranges
 questions_v1_sha256: e602c6c0a354c7309756f929c0776ec8da0d4b2d29f8c3fb6c59199317a0c85a   # NA-04: sha256 of configs/questions_v1.yaml
 codebook_v1_sha256: 934e63253ac896c39cf5640940e53456d0114ee6672d5ec1414cd34f3d67e129   # NA-04: sha256 of configs/codebook_v1.yaml
 
+free_model_approvals: {}   # operator approvals of :free endpoints (CLAUDE.md C13): none; format {model_id: "approved by, date"}
+
+eligible_models:   # NA-05: every catalog id (snapshot sha256 205464ea1b0c36a2…) and the local Laya checkpoints, PREREG §8.1
+  - {id: "baseten/elephant-1:free", include: false, reason: ":free endpoint without operator approval (PREREG §8.1; CLAUDE.md C13)"}
+  - {id: "baseten/mammoth-1:free", include: false, reason: ":free endpoint without operator approval (PREREG §8.1; CLAUDE.md C13)"}
+  - {id: "cloudflare/clef", include: true, reason: "passed 5/5 NA-05 calls with data_collection deny; 2K sentinel: read to the end; state billed once; probabilities to 4 decimals (20% of answers renormalized)"}
+  - {id: "cloudflare/clef-flash", include: true, reason: "passed 5/5 NA-05 calls with data_collection deny; 2K sentinel: read to the end; state billed once; probabilities to 4 decimals (40% of answers renormalized)"}
+  - {id: "cloudflare/clef-omni", include: true, reason: "passed 5/5 NA-05 calls with data_collection deny; 2K sentinel: read to the end; state billed once; probabilities to 4 decimals (0% of answers renormalized)"}
+  - {id: "inception/mercury-decide", include: true, reason: "passed 341/341 NA-05 calls with data_collection deny; 2K sentinel: read to the end; state billed once"}
+  - {id: "inception/mercury-decide:free", include: false, reason: ":free duplicate of inception/mercury-decide (PREREG §8.1; CLAUDE.md C13)"}
+  - {id: "jaredpalmer/kev-4b", include: true, reason: "passed 5/5 NA-05 calls with data_collection deny; 2K sentinel: read to the end; state billed once; probabilities to 4 decimals (40% of answers renormalized)"}
+  - {id: "liquid/d1", include: true, reason: "passed 341/341 NA-05 calls with data_collection deny; 2K sentinel: read to the end; state billed once"}
+  - {id: "liquid/d1-ultra", include: true, reason: "passed 5/5 NA-05 calls with data_collection deny; 2K sentinel: read to the end; state billed once"}
+  - {id: "microsoft/microsoft-decision-1", include: true, reason: "passed 5/5 NA-05 calls with data_collection deny; 2K sentinel: read to the end; state billed once"}
+  - {id: "nace-ai/drex-max", include: true, reason: "passed 5/5 NA-05 calls with data_collection deny; 2K sentinel: read to the end; state billed once"}
+  - {id: "nace-ai/drex-v1.5", include: true, reason: "passed 5/5 NA-05 calls with data_collection deny; 2K sentinel: read to the end; state billed once; probabilities to 4 decimals (20% of answers renormalized)"}
+  - {id: "nace-ai/drex-v2.0", include: true, reason: "passed 5/5 NA-05 calls with data_collection deny; 2K sentinel: read to the end; state billed once; probabilities to 4 decimals (20% of answers renormalized)"}
+  - {id: "openai/gpt-6-luna-decisions", include: true, reason: "passed 341/341 NA-05 calls with data_collection deny; 2K sentinel: read to the end; state billed once; probabilities to 2 decimals (0% of answers renormalized)"}
+  - {id: "perplexity/pplx-decider-flash-v1.2", include: true, reason: "passed 5/5 NA-05 calls with data_collection deny; 2K sentinel: read to the end; state billed per question"}
+  - {id: "perplexity/pplx-decider-v1.2", include: true, reason: "passed 341/341 NA-05 calls with data_collection deny; 2K sentinel: read to the end; state billed once"}
+  - {id: "respan/span-01", include: false, reason: "failed the NA-05 calls: refuses every request (PREREG §8.1): Respan state must be a string or an object with only input (a message array) and output (a message), where each message has a string content and a role of syste | Respan only accepts noul questions whose instructions and criteria are plain strings (question \"sentinel\")"}
+  - {id: "respan/span-01-lite", include: false, reason: "failed the NA-05 calls: refuses every request (PREREG §8.1): Respan state must be a string or an object with only input (a message array) and output (a message), where each message has a string content and a role of syste | Respan only accepts noul questions whose instructions and criteria are plain strings (question \"sentinel\")"}
+  - {id: "respan/span-01-lite:free", include: false, reason: ":free duplicate of respan/span-01-lite (PREREG §8.1; CLAUDE.md C13)"}
+  - {id: "respan/span-02", include: true, reason: "passed 5/5 NA-05 calls with data_collection deny; 2K sentinel: read to the end; state billed per question"}
+  - {id: "scaledown/classify-1", include: true, reason: "passed 5/5 NA-05 calls with data_collection deny; 2K sentinel: read to the end; state billed per question; state sent as text"}
+  - {id: "togethercomputer/tev1-4b-experimental", include: true, reason: "passed 5/5 NA-05 calls with data_collection deny; 2K sentinel: read to the end; state billed per question"}
+  - {id: "typesafe/jev-1.13", include: true, reason: "passed 5/5 NA-05 calls with data_collection deny; 2K sentinel: read to the end; state billed once; probabilities to 2 decimals (0% of answers renormalized)"}
+  - {id: "typesafe/jev-1.14", include: true, reason: "passed 341/341 NA-05 calls with data_collection deny; 2K sentinel: read to the end; state billed once; probabilities to 2 decimals (1% of answers renormalized)"}
+  - {id: "upstage/solar-decide", include: false, reason: "failed the NA-05 calls: silently truncates a 2K-token state (PREREG §8.1)"}
+  - {id: "upstage/solar-decide-flash", include: false, reason: "failed the NA-05 calls: silently truncates a 2K-token state (PREREG §8.1)"}
+  - {id: "~perplexity/pplx-decider-flash-latest", include: false, reason: "alias: moves to new builds (PREREG §8.1)"}
+  - {id: "~perplexity/pplx-decider-latest", include: false, reason: "alias: moves to new builds (PREREG §8.1)"}
+  - {id: "~typesafe/jev-latest", include: false, reason: "alias: moves to new builds (PREREG §8.1)"}
+  - {id: "local/laya-typed-decisions", include: true, reason: "local open-weight Laya (PREREG §8.1)"}
+  - {id: "local/laya-base", include: true, reason: "local open-weight Laya (PREREG §8.1)"}
+
 allow_val_b: false       # NA-06 sets true after the tournament (CLAUDE.md C13)
 frozen_requested: false  # NA-11 sets true; lock.freeze() refuses otherwise
 frozen: false            # written by lock.freeze() just before hashing; never edit by hand

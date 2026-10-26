@@ -191,6 +191,21 @@ def register_file(
     return _register(lay, path, producer=producer, description=description, inspect_parquet=inspect_parquet)
 
 
+def register_artifact(
+    relpath: str, *, producer: str, description: str, layout: Layout | None = None
+) -> dict[str, Any]:
+    """Register a committed output under ``artifacts/`` (e.g. a parquet a later chunk reads) in the manifest,
+    so ``make manifest`` re-hashes it and checks its docs/DATA_CONTRACT.md entry like a work/ file."""
+    lay = resolve_layout(layout)
+    rel = PurePosixPath(relpath)
+    if rel.is_absolute() or ".." in rel.parts or len(rel.parts) < 2 or rel.parts[0] != "artifacts":
+        raise ManifestError(f"relpath must be under artifacts/ without '..': {relpath!r}")
+    path = lay.root.joinpath(*rel.parts)
+    if not path.is_file():
+        raise ManifestError(f"cannot register missing file {path}")
+    return _register(lay, path, producer=producer, description=description)
+
+
 def _read_verified(
     path: Path, *, columns: list[str] | None = None, verify: bool = True, layout: Layout | None = None
 ) -> pd.DataFrame:

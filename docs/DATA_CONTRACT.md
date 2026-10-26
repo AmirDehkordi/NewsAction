@@ -559,3 +559,61 @@ its sha256 on a rerun.
 - **Schema / key / availability:** as "State files" above
 - **Rows:** 1,000
 - **sha256:** `48136755fb0db7ac198881ff02e0219953ed53c056e1f2c1f75918c0ffebb51c`
+
+## NA-05 — decision-model client, cache, catalog, canary, pilot
+
+Producer: `newsaction.dm` (NA-05). `newsaction.dm.client.DecisionClient` is the only path to a decision model
+(OpenRouter Decisions API or local Laya; CLAUDE.md C12). The pilot runs one stage per process:
+`uv run python -m newsaction.dm.pilot --stage catalog | billing | calibrate | measure | smoke | laya | report`;
+every request is cached, so a rerun spends nothing, and `report` rebuilds every number from the cache with an
+offline client. The committed files below live under `artifacts/NA-05/` and are registered in
+`work/MANIFEST.json` with `io.register_artifact` (so `make manifest` re-hashes them).
+
+### `cache/decisions.sqlite` (gitignored; no fixed hash)
+- **Producer:** `newsaction.dm.cache.DecisionCache`, written only by the client (every chunk that calls a decision model)
+- **Schema:** table `responses`: `key` TEXT PK, `model`, `state_sha256`, `questions_sha256`, `provider_json`, `params_json`, `repeat_idx` INT, `request_json` (the body as sent, without the key), `response_json` (the raw response text), `model_build`, `provider`, `input_tokens` INT, `output_tokens` INT, `cost` REAL, `cost_source` (`usage` = the response's usage.cost, `computed` = catalog price × tokens, `local`), `latency_ms` REAL, `created_at`, `chunk`, `tag`, `meta_json` (the state's provenance: source, file, event_id, session, split, call, masked, third_party_ok_all, probe), `valid` INT (strict parse), `problems_json`. Table `attempts`: `id`, `key`, `model`, `attempt`, `status` (NULL for a transport error), `error`, `latency_ms`, `headers_json` (rate-limit headers), `concurrency`, `created_at`, `chunk`, `tag`.
+- **Key:** `responses.key` = sha256 of the canonical JSON of {model, state, questions (ordered: [[id, [type, instructions, criteria]], …]), provider, params, repeat_idx}; local models add their checkpoint settings (revision, subfolder, max_len, head_max_len, device, fp32) to `params`; the session id is not part of the key
+- **Rows / coverage (end of NA-05):** 2,227 responses with `chunk = NA-05` (1,949 API, all HTTP 200, 278 local Laya), 2,014 API attempts (1,949 × 200, 61 × 400, 3 × 429, 1 × 502). Sessions of the sent states: 1,976 train-split states (2024-07-01 … 2025-06-30) and 251 synthetic ones
+- **Availability:** n/a (decision-model outputs). GAC4: Σ `responses.cost` where `chunk = X` equals chunk X's recorded spend in `ledgers/spend.jsonl` (NA-05: $0.103922341, difference 9.7e-17)
+- **Note:** gitignored like `work/`; the verifier and later chunks need this file next to the branch (copy it with `work/` when merging). `valid` / `problems_json` are the parser's verdict when the row was written; the client re-parses every hit with the current parser, so since the renormalization rule (2026-10-26) a stored row can say invalid for an answer that now parses as valid and `renormalized`. A row is written once and never edited
+
+### `artifacts/NA-05/catalog.json`
+- **Producer:** `newsaction.dm.pilot --stage catalog` (`dm.catalog.snapshot`; GET /api/v1/models?output_modalities=decisions, no spend), fetched 2026-10-26T17:47:58Z
+- **Schema:** {`fetched_at`, `url`, `params`, `sha256` (sha256 of the canonical JSON of `models`, recomputable from the file), `raw_sha256` (the same over the raw model list as fetched), `n_models`, `total_count`, `models`: [{`id`, `name`, `canonical_slug`, `created`, `created_iso`, `context_length`, `pricing` (USD per token, strings), `architecture`, `top_provider`, `per_request_limits`}]} sorted by id
+- **Key:** `models[].id`
+- **Rows / coverage:** 30 models (3 aliases, 4 `:free`); `sha256` 205464ea1b0c36a22420ace1dd7a4a94d8eac2b42daa2a1321bfe7b064a58d4d
+- **Availability:** n/a (vendor catalog; prices feed `dm.costmodel`)
+- **sha256:** `4a5a565a7fb46e6897ac0d2f72902c5b44257b2cfa5686cf9104f8dbed622630`
+
+### `artifacts/NA-05/canary_v1.jsonl`
+- **Producer:** `newsaction.dm.canary.build_canary` / `write_canary` (S7)
+- **Inputs:** `work/states/callA_d0_E3.parquet`, `work/states/callB_d2_E3.parquet` (train split), `configs/{questions_v1,codebook_v1}.yaml`
+- **Schema:** one canonical-JSON object per line: `canary_id` (C01…C50), `version` (canary_v1), `kind` (train | synthetic), `group` (train_A | train_B | synthetic_A | numeracy), `call` (A | B), `label`, `move_z` (numeracy: the signed reaction in typical daily moves), `n_tokens_state`, `info` (StateInfo provenance), `state`, `questions` (the call's core battery, request shape), `state_sha256`, `questions_sha256`
+- **Key:** `canary_id`
+- **Rows / coverage:** 50: 20 train Call A D0 + 10 train Call B D2 (smallest u = sha256("2026:canary:<event_id>") per size tier, proportional), 6 synthetic Call A, 14 synthetic Call B (one positive news item × reaction z ∈ ±{0.3, 0.7, 1.5, 2.5, 4, 6, 9}); train sessions 2024-08-13 … 2025-06-23
+- **Availability:** train-period states (inputs at their decision points) and synthetic states; masked; third-party OK. `load_canary` refuses a line whose hashes do not match
+- **sha256:** `783aa96cd3d2e9595435d7d5c6df0a66a6fba778da292f461998945b923714ad`
+
+### `artifacts/NA-05/canary_baseline.parquet`
+- **Producer:** `newsaction.dm.pilot --stage report` (`dm.canary.probability_rows`; registered with `io.register_artifact`)
+- **Inputs:** `cache/decisions.sqlite` (the canary calls, repeat 0), `artifacts/NA-05/canary_v1.jsonl`
+- **Schema:** `model`, `model_build`, `canary_id`, `question`, `option` string, `p` double (renormalized for an answer whose rounded probabilities summed to 1 within one rounding step), `renormalized` bool (that answer was rescaled; `schemas.RENORM_TOL`), `key` string (the cache key of the call), `repeat_idx` int64 (0)
+- **Key:** (`model`, `canary_id`, `question`, `option`)
+- **Rows / coverage:** 6,846 rows: the 5 pilot API models and the 2 local Laya checkpoints × 50 canary states × every option (978 per model); 19 rows (Jev 1.14: C19 tone, C31 tone, C49 justified_move) are `renormalized`
+- **Availability:** n/a (decision-model outputs; NA-11 S5 compares a fresh canary run with it via `dm.canary.compare`)
+- **sha256:** `301443ee829cf1e8ab18398a68a491e5b2972d0e1c642cee504fdda3bca9176b`
+
+### `artifacts/NA-05/pilot.json`
+- **Producer:** `newsaction.dm.pilot --stage report` (last run `--offline`, 2026-10-26: recomputed from the cache after the renormalization rule, no network call)
+- **Inputs:** `cache/decisions.sqlite`, `artifacts/NA-05/{catalog.json,canary_v1.jsonl,key_usage.json}`, `artifacts/NA-03/call_projection.csv`, `work/states/{callA_d0_E3,callA_d2_E3,callB_d2_E3,market_E3}.parquet` (state sizes only), `configs/dm.yaml`
+- **Schema:** {`version`, `chunk`, `generated_at`, `git_sha`, `catalog`, `pilot_models`, `local_models`, `stop_per_question_billing`, `items` (the ten PRD S8 answers, `1_billing_basis` … `10_builds`), `per_model` (each pilot model's measurements), `smoke` (every other catalog model), `laya`, `eligibility`, `costmodel`, `na11_projection`, `na06_stage1_projection`, `spend`, `canary`, `peak_rss_mb`}
+- **Key:** n/a (one record)
+- **Availability:** n/a (no return of any period is read)
+- **sha256:** `535cc14619e6bfa0565c74f024035b30dcf9a7540dcb1428407df300649827d4`
+
+### `artifacts/NA-05/key_usage.json`
+- **Producer:** `newsaction.dm.pilot` (`record_key_usage`; GET /api/v1/key, no spend)
+- **Schema:** list of {`label`, `ts`, `usage`, `usage_daily`, `limit`, `limit_remaining`, `is_free_tier` (the key's own accounting, USD), `ledger_chunk_usd` (NA-05 spend in `ledgers/spend.jsonl` at that time)}
+- **Key:** list order
+- **Availability:** n/a. The key's usage lags a call by up to about a minute; at the report its change since the first snapshot equals the ledger's to 1e-16
+- **sha256:** `17a255df0311e8662ddf3339ef04bcf6b546d692efe27f13e78884302ef26a1d`

@@ -1,0 +1,102 @@
+[
+  {
+    "label": "before billing",
+    "ts": "2026-10-26T18:01:02.361541+00:00",
+    "usage": 6.174e-05,
+    "usage_daily": 6.174e-05,
+    "limit": 10,
+    "limit_remaining": 9.99993826,
+    "is_free_tier": false,
+    "ledger_chunk_usd": 6.174e-05
+  },
+  {
+    "label": "after billing",
+    "ts": "2026-10-26T18:01:37.438677+00:00",
+    "usage": 6.174e-05,
+    "usage_daily": 6.174e-05,
+    "limit": 10,
+    "limit_remaining": 9.99993826,
+    "is_free_tier": false,
+    "ledger_chunk_usd": 0.0023312360000000004
+  },
+  {
+    "label": "after smoke",
+    "ts": "2026-10-26T18:08:49.887223+00:00",
+    "usage": 0.094016858,
+    "usage_daily": 0.094016858,
+    "limit": 10,
+    "limit_remaining": 9.905983142,
+    "is_free_tier": false,
+    "ledger_chunk_usd": 0.09979018500000006
+  },
+  {
+    "label": "after smoke",
+    "ts": "2026-10-26T18:10:29.550262+00:00",
+    "usage": 0.099790185,
+    "usage_daily": 0.099790185,
+    "limit": 10,
+    "limit_remaining": 9.900209815,
+    "is_free_tier": false,
+    "ledger_chunk_usd": 0.10031834500000007
+  },
+  {
+    "label": "report",
+    "ts": "2026-10-26T18:15:03.660429+00:00",
+    "usage": 0.100318345,
+    "usage_daily": 0.100318345,
+    "limit": 10,
+    "limit_remaining": 9.899681655,
+    "is_free_tier": false,
+    "ledger_chunk_usd": 0.10031834500000007
+  },
+  {
+    "label": "report",
+    "ts": "2026-10-26T18:18:11.228050+00:00",
+    "usage": 0.100318345,
+    "usage_daily": 0.100318345,
+    "limit": 10,
+    "limit_remaining": 9.899681655,
+    "is_free_tier": false,
+    "ledger_chunk_usd": 0.10031834500000007
+  },
+  {
+    "label": "after smoke",
+    "ts": "2026-10-26T18:22:18.104180+00:00",
+    "usage": 0.103034541,
+    "usage_daily": 0.103034541,
+    "limit": 10,
+    "limit_remaining": 9.896965459,
+    "is_free_tier": false,
+    "ledger_chunk_usd": 0.1039223410000001
+  },
+  {
+    "label": "report",
+    "ts": "2026-10-26T18:22:42.609421+00:00",
+    "usage": 0.103922341,
+    "usage_daily": 0.103922341,
+    "limit": 10,
+    "limit_remaining": 9.896077659,
+    "is_free_tier": false,
+    "ledger_chunk_usd": 0.1039223410000001
+  },
+  {
+    "label": "report",
+    "ts": "2026-10-26T18:23:09.279275+00:00",
+    "usage": 0.103922341,
+    "usage_daily": 0.103922341,
+    "limit": 10,
+    "limit_remaining": 9.896077659,
+    "is_free_tier": false,
+    "ledger_chunk_usd": 0.1039223410000001
+  },
+  {
+    "label": "report",
+    "ts": "2026-10-26T18:25:11.325336+00:00",
+    "usage": 0.103922341,
+    "usage_daily": 0.103922341,
+    "limit": 10,
+    "limit_remaining": 9.896077659,
+    "is_free_tier": false,
+    "ledger_chunk_usd": 0.1039223410000001
+  }
+]
