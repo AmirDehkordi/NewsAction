@@ -2,6 +2,8 @@
 
 from __future__ import annotations
 
+from pathlib import Path
+
 import pandas as pd
 import pytest
 
@@ -72,8 +74,36 @@ def test_clean_flags_and_third_party() -> None:
     assert f["junk_tag"].tolist() == [False, True, False, False]
     assert f["non_news"].tolist() == [False, False, True, False]
     assert f["is_form4"].tolist() == [False, False, False, True]
-    assert f["third_party_ok"].tolist() == [True, False, False, True]  # None is not OK (PREREG §6.1)
+    assert f["third_party_ok"].tolist() == clean.third_party_ok(df["parsing_allowed"]).tolist()
     assert clean.passes_clean(f).tolist() == [False, False, False, False]
+
+
+def test_third_party_ok_none_policy(monkeypatch: pytest.MonkeyPatch) -> None:
+    """PREREG §6.1 / CLAUDE.md D15: False never leaves the machine; None only when the operator allowed it."""
+    pa = pd.Series(pd.array([True, None, False], dtype="boolean"))
+    assert clean.third_party_ok(pa, none_ok=True).tolist() == [True, True, False]
+    assert clean.third_party_ok(pa, none_ok=False).tolist() == [True, False, False]
+    for policy, expected in [("allow", [True, True, False]), ("exclude", [True, False, False])]:
+        monkeypatch.setattr(clean, "none_policy", lambda p=policy: p)
+        assert clean.third_party_ok(pa).tolist() == expected
+    monkeypatch.setattr(clean, "none_policy", lambda: "pending_operator")
+    assert clean.third_party_ok(pa).tolist() == [True, False, False]  # undecided counts as excluded
+
+
+@pytest.mark.parametrize("value", clean.NONE_POLICIES)
+def test_none_policy_reads_frozen(tmp_path: Path, value: str) -> None:
+    p = tmp_path / "frozen.yaml"
+    p.write_text(f"news:\n  parsing_allowed_none: {value}\n", encoding="utf-8")
+    assert clean.none_policy(p) == value
+
+
+def test_none_policy_missing_or_unknown(tmp_path: Path) -> None:
+    p = tmp_path / "frozen.yaml"
+    p.write_text("news: null\n", encoding="utf-8")
+    assert clean.none_policy(p) == "pending_operator"
+    p.write_text("news:\n  parsing_allowed_none: maybe\n", encoding="utf-8")
+    with pytest.raises(ValueError, match="parsing_allowed_none"):
+        clean.none_policy(p)
 
 
 def test_summary_present() -> None:

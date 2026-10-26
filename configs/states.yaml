@@ -101,7 +101,8 @@ news_exclusion:                   # PREREG §15 NA-04 row 6 (revision 3): left o
   # out of W0 states only (``build.running_story_ids``). Searched in NA-02's raw title / snippet; s is the
   # article's W0 session and "same day" a stamp on the calendar date of s (before the D0 cutoff). An article
   # goes when one of these holds:
-  #   1. a live format (live_title, live_snippet), whatever its stamp: "Stock market today:", Reuters' "LIVE
+  #   1. a live format (live_title, live_snippet; also behind a scraper's age prefix such as "2 hours "),
+  #      whatever its stamp: "Stock market today:", Reuters' "LIVE
   #      MARKETS-", Investopedia's "Markets News, <date>:", "Live <fund> (TICKER):" (not "Live Nation"), "Live
   #      Updates Live Coverage";
   #   2. same day: a clock time at or after the open of s marking a live entry ("4:15pm:", "10:54 am by";
@@ -128,8 +129,8 @@ news_exclusion:                   # PREREG §15 NA-04 row 6 (revision 3): left o
   #      About half of these recap the previous session: market news, little lost.
   # Company names that look like market subjects stay (Dow Inc., Nasdaq Inc., S&P Global, Live Nation).
   running_story:
-    live_title: '(?i)^\s*(?:stock market (?:today|news today|live)\b|live\s*(?::|\||–|\s-\s)|live (?:s&p 500|nasdaq|dow|stock market|market|earnings|updates?|coverage|blog)\b|markets news,|live market updates|live markets\b|live\s+(?!nation\b)[^:|]{1,60}\([A-Z]{2,5}\)\s*:|(?:nasdaq|dow jones|dow|s&p 500|s&p|wall street|markets?)\s+today\s*:)|\blive (?:updates?|coverage|blog)\b|\blive\s*:|\(live coverage\)|\bas it happened\b'
-    live_snippet: '(?i)^\s*(?:live (?:updates|coverage)|stock market (?:today|live))\b|\blive coverage (?:updates appear|has ended)\b'
+    live_title: '(?i)^\s*(?:\d{1,3}\s+(?:hours?|minutes?|mins?|days?)(?:\s+ago)?\s+)?(?:stock market (?:today|news today|live)\b|live\s*(?::|\||–|\s-\s)|live (?:s&p 500|nasdaq|dow|stock market|market|earnings|updates?|coverage|blog)\b|markets news,|live market updates|live markets\b|live\s+(?!nation\b)[^:|]{1,60}\([A-Z]{2,5}\)\s*:|(?:nasdaq|dow jones|dow|s&p 500|s&p|wall street|markets?)\s+today\s*:)|\blive (?:updates?|coverage|blog)\b|\blive\s*:|\(live coverage\)|\bas it happened\b'
+    live_snippet: '(?i)^\s*(?:\d{1,3}\s+(?:hours?|minutes?|mins?|days?)(?:\s+ago)?\s+)?(?:live (?:updates|coverage)|stock market (?:today|live))\b|\blive coverage (?:updates appear|has ended)\b'
     clock: '(?i)(?:(?<=20\d\d)|(?<![\d:.$]))(\d{1,2})[:.](\d{2})\s?([ap])\.?m\b\.?'
     clock_before: '(?i)(?:\b(?:updated|as of|wrap-up|update)\b[^.|]{0,45}|^\s*)$'
     clock_after: '^\s*(?::|by\s+[A-Z])'
