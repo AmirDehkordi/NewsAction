@@ -36,7 +36,7 @@ import json
 import re
 from collections import Counter
 from collections.abc import Iterable, Mapping, Sequence
-from dataclasses import asdict, dataclass, fields
+from dataclasses import asdict, dataclass, fields, replace
 from typing import Final
 
 import pandas as pd
@@ -626,6 +626,81 @@ def price_move_count(text: str) -> int:
     return n + len(_MOVE_NOUN.findall(text))
 
 
+# --- post-open text in W0 states (revision 6; PREREG §15 NA-04 row 10): the scanner's own forms on the masked
+# text. Masking turns weekdays into "recently", so a close can no longer be tied to its session ("ended
+# recently" may be yesterday's); these forms stay unambiguous: live pages, live entries timed at or after the
+# open, and AP-style running text in an item stamped that morning.
+_LIVE_PAGE: Final = re.compile(
+    r"(?i)^\s*(?:stock market (?:today|live|news today)\b|markets news, recently|"
+    r"(?:nasdaq|dow jones|s&p 500|dow) today\s*:)|\blive\s*(?::|\|)|\blive (?:updates?|coverage|blog)\b|"
+    r"\bas it happened\b"
+)
+_LIVE_TEXT: Final = re.compile(
+    r"(?i)live coverage (?:updates appear|has ended)|^\s*live updates\b|\bwrap-up\s+\d"
+)
+_TIME_OF_DAY: Final = re.compile(r"(?i)(?:(?<=20\d\d)|(?<![\d:.$]))(\d{1,2})[:.](\d{2})\s?([ap])\.?m\b\.?")
+_ENTRY_BEFORE: Final = re.compile(r"(?i)\b(?:updated|update|as of|wrap-up)\b[^.|]{0,45}$")
+_ENTRY_AFTER: Final = re.compile(r"^\s*(?::|by\s+[A-Z])")
+_LONDON_TEXT: Final = re.compile(
+    r"(?i)\b(?:ftse|footsie|london|lse|uk|britain|british|european|stoxx|dax|cac)\b"
+)
+_RUNNING_TEXT: Final = re.compile(
+    r"(?i)\b(?:wall street|u\.?s\.? stocks?|stock indexes|stocks) (?:is|are|was|were) (?:drifting|ticking|"
+    r"hanging|hovering|swinging|steadying|edging|veering|wobbling|slipping|sinking|rallying|climbing|sliding|"
+    r"falling|rising|holding|stumbling|shaky|muted)\b|\b(?:in|during) (?:early|midday|afternoon|morning) "
+    r"trad(?:e|ing)\b|"
+    r"\bmidday trading\b|\bopened (?:higher|lower|flat|mixed)\b|\boff to a \w+ start\b"
+)
+_RUNNING_SUBJECT: Final = re.compile(
+    r"(?i)\b(?:wall street|stocks|s&p|dow|nasdaq|equities|indexes|indices|the market)\b"
+)
+_RUNNING_VETO: Final = re.compile(
+    r"(?i)futures|pre-?market|premarket|before the (?:opening )?bell|before (?:the )?markets? open|asia\w*|"
+    r"europe\w*|euro\w*|ftse|dax|stoxx|nikkei|hang seng|kospi|sensex|nifty|china|chinese|japan\w*|india\w*|"
+    r"\b(?:may|could|might|likely|set to|poised to|expected to)\b"
+)
+_EVENING: Final = (
+    "after yesterday's close"  # the codebook's timing word of an item stamped the evening before
+)
+
+
+def _entry_after_open(text: str, open_minutes: int) -> bool:
+    """A live entry or an update at or after the open ("4:15pm: …", "10:54 am by …", "Updated … 12:00 PM"); a
+    text about a London market runs on London time and is skipped."""
+    if _LONDON_TEXT.search(text):
+        return False
+    for m in _TIME_OF_DAY.finditer(text):
+        hour, minute = int(m.group(1)), int(m.group(2))
+        if not 1 <= hour <= 12 or minute > 59:
+            continue
+        local = (hour % 12 + (12 if m.group(3).lower() == "p" else 0)) * 60 + minute
+        if local >= open_minutes and (
+            _ENTRY_AFTER.match(text[m.end() :]) or _ENTRY_BEFORE.search(text[: m.start()])
+        ):
+            return True
+    return False
+
+
+def post_open_count(headline: str, snippet: str, timing: str, open_minutes: int | None) -> int:
+    """Post-open forms of one news item: a live page, a live entry at or after the open (``open_minutes``: the
+    session's open in minutes after local midnight; None skips the check), running text about the market in an
+    item not stamped the evening before."""
+    n = int(_LIVE_PAGE.search(headline) is not None or _LIVE_TEXT.search(snippet) is not None)
+    text = f"{headline} || {snippet}"
+    if open_minutes is not None and _entry_after_open(text, open_minutes):
+        n += 1
+    if timing != _EVENING:
+        for sentence in _SENTENCES.split(text):
+            if (
+                _RUNNING_TEXT.search(sentence)
+                and _RUNNING_SUBJECT.search(sentence)
+                and not _RUNNING_VETO.search(sentence)
+            ):
+                n += 1
+                break
+    return n
+
+
 @dataclass(frozen=True)
 class LeakCounts:
     names: int
@@ -636,6 +711,7 @@ class LeakCounts:
     quotes: int = 0
     price_levels: int = 0
     people: int = 0
+    post_open: int = 0  # revision 6: post-open text (meaningful for W0 states; W2 news runs to the close)
 
     @property
     def name_or_ticker(self) -> bool:
@@ -892,8 +968,14 @@ class LeakScanner:
             people=len(PEOPLE.findall(text)),
         )
 
-    def residual_leaks(self, state_json: str, company_id: int | None) -> LeakCounts:
-        """Leaks in the ``news`` items of a state (headline and snippet)."""
+    def residual_leaks(
+        self, state_json: str, company_id: int | None, open_minutes: int | None = None
+    ) -> LeakCounts:
+        """Leaks in the ``news`` items of a state (headline and snippet); ``open_minutes``: the session's open
+        in minutes after local midnight, for the post-open live entries."""
         items = json.loads(state_json).get("news", [])
         text = "\n".join(f"{n['headline']} || {n['snippet']}" for n in items)
-        return self.scan_text(text, company_id)
+        post = sum(
+            post_open_count(n["headline"], n["snippet"], n.get("timing", ""), open_minutes) for n in items
+        )
+        return replace(self.scan_text(text, company_id), post_open=post)

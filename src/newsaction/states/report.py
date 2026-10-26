@@ -6,7 +6,8 @@ Writes, from the registered state files only (no return is read):
   input, AC5), and the state with core + extended / explain questions, per file, call and encoding; the
   share of states within the 900-token target and within Laya's 768-token state budget;
 - ``artifacts/NA-04/leak_scan.csv``: the independent scanner (``scan.LeakScanner``; ``scanner``) on every
-  val-A state of the masked E3 files and the unmasked twin (the positive control);
+  val-A state of the masked E3 files and the unmasked twin (the positive control); ``post_open`` (revision 6)
+  counts post-open text, meaningful for the W0 files (W2 news runs to the close);
 - ``artifacts/NA-04/examples.md``: three masked Call A (D0) and two Call B states of val-A, seed 2026;
 - ``artifacts/NA-04/summary.json``; ``configs/frozen.yaml`` ``questions_v1_sha256`` / ``codebook_v1_sha256``.
 """
@@ -14,12 +15,15 @@ Writes, from the registered state files only (no return is read):
 from __future__ import annotations
 
 import json
+from datetime import date
 from typing import Any, Final
+from zoneinfo import ZoneInfo
 
 import numpy as np
 import pandas as pd
 
-from newsaction import io
+from newsaction import calendar, io
+from newsaction.config import load_project
 from newsaction.events import load_events_config, tokens
 from newsaction.paths import Layout, resolve_layout
 from newsaction.states import SAMPLES_DIR, STATES_DIR, load_states_config
@@ -103,6 +107,12 @@ def scanner(lay: Layout) -> LeakScanner:
     return LeakScanner(comp, extra, harvested, ordinary_words([*arts["title"], *arts["snippet"]]), cjk)
 
 
+def open_minutes(session: date) -> int:
+    """The session's open in minutes after local midnight (the scanner's post-open live entries)."""
+    opens = calendar.open_utc(session).tz_convert(ZoneInfo(load_project().timezone))
+    return opens.hour * 60 + opens.minute
+
+
 def leak_scan(lay: Layout) -> pd.DataFrame:
     sc = scanner(lay)
     parts = []
@@ -114,9 +124,10 @@ def leak_scan(lay: Layout) -> pd.DataFrame:
             rel, columns=["event_id", "company_id", "session", "split", "masked", "state_json"], layout=lay
         )
         df = df.loc[df["split"] == "val_a"]
+        opens = {s: open_minutes(s) for s in set(df["session"])}
         counts = [
-            sc.residual_leaks(js, int(c)).as_dict()
-            for js, c in zip(df["state_json"], df["company_id"], strict=True)
+            sc.residual_leaks(js, int(c), opens[s]).as_dict()
+            for js, c, s in zip(df["state_json"], df["company_id"], df["session"], strict=True)
         ]
         out = pd.concat(
             [df.drop(columns=["state_json"]).reset_index(drop=True), pd.DataFrame(counts)], axis=1
@@ -131,7 +142,8 @@ def leak_rates(scan: pd.DataFrame) -> pd.DataFrame:
         name_or_ticker=(scan["names"] + scan["tickers"]) > 0, year_or_date=(scan["years"] + scan["dates"]) > 0
     ).groupby("file", sort=True)
     flags = {
-        c: (c, lambda x: float((x > 0).mean())) for c in ("price_moves", "quotes", "price_levels", "people")
+        c: (c, lambda x: float((x > 0).mean()))
+        for c in ("price_moves", "quotes", "price_levels", "people", "post_open")
     }
     return g.agg(
         states=("event_id", "size"),

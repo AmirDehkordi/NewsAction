@@ -14,6 +14,7 @@ artifacts/NA-04/leak_scan.csv.
 from __future__ import annotations
 
 import ast
+import json
 import re
 from dataclasses import replace
 from functools import cache
@@ -32,7 +33,7 @@ from newsaction.states.mask import (
     load_alias_config,
     name_variants,
 )
-from newsaction.states.scan import LeakScanner, harvest_cjk_names, harvest_names
+from newsaction.states.scan import LeakScanner, harvest_cjk_names, harvest_names, post_open_count
 
 AAPL, GOOGL, META, LLY, HD, PANW, JPM, BAC = 6, 649, 946, 876, 691, 1111, 808, 145
 NEE, ODFL, MSFT, SPGI, WFC, PGR, SMCI, WAB, DD, PEG, DAL, CPB, DASH, NOW = (
@@ -1084,3 +1085,104 @@ def test_scanner_sees_the_fifth_verification_forms() -> None:
 def m_raw_dates(text: str) -> str:
     """The text as the old masker left it (years masked, the rest as written): what the scanner reads."""
     return re.sub(r"(?<!\d)(?:19|20)\d{2}(?!\d)", "the year", text)
+
+
+# revision 6 (PREREG §15 NA-04 row 10): the scanner's post-open forms, on the masked text of the sixth
+# verification's running market stories (masking turns the weekday into "recently"); a full session opens at
+# minute 570
+OPEN = 570
+POST_OPEN = (  # (masked headline, masked snippet, timing word)
+    (
+        "Stock market today: S&P 500, Nasdaq pull back from record run as Senate passes a person tax bill",
+        "Wall Street is watching for progress on trade talks.",
+        "after yesterday's close",
+    ),
+    (
+        "Markets News, recently: Stocks Close Higher After a person Denies a report",
+        "",
+        "shortly before the open",
+    ),
+    (
+        "Stock Market Live recently: Wholesale Inflation Rises, S&P 500 (VOO) Falls",
+        "Live Updates Live Coverage Has Ended recently Wrap-up 4:20 pm The Vanguard S&P 500 ETF closed.",
+        "shortly before the open",
+    ),
+    (
+        "Nasdaq surges to record while broader market brushes off tariff threats",
+        "4:15pm: Crypto surge lifts tech stocks",
+        "early this morning (before 08:00)",
+    ),
+    (
+        "The company among the three most bullish Wall Street firms",
+        "Published Tue, recently 20258:14 AM EDT Updated Tue, recently 202512:00 PM",
+        "early this morning (before 08:00)",
+    ),
+    ("", "U.S. stocks are drifting as Wall Street's momentum slows after record highs.", "overnight"),
+    ("Wall Street holds steadier", "The S&P 500 was up 0.1% in early trading recently.", "overnight"),
+    (
+        "The company shares slide",
+        "Live Updates Live Coverage Updates appear automatically as they are published.",
+        "overnight",
+    ),
+)
+POST_OPEN_KEPT = (
+    (
+        "U.S. Stock Futures Flat ahead of Key Fed Decision",
+        "U.S. stock futures were flat ahead of the session.",
+        "overnight",
+    ),
+    (
+        "Wall Street hovers near records",
+        "Wall Street is mostly flat in premarket trading, hovering near records.",
+        "overnight",
+    ),
+    (
+        "FTSE 100 slips as UK public deficit surprises",
+        "12.30pm: LSEG buoyed by upgrade.",
+        "shortly before the open",
+    ),
+    (
+        "The company sets its earnings call",
+        "The call is at 10:00 a.m. ET.",
+        "early this morning (before 08:00)",
+    ),
+    (
+        "The company shares rise",
+        "The company climbed 3.7% higher in early trading recently.",
+        "shortly before the open",
+    ),
+    ("", "Wall Street is drifting this afternoon as investors react to earnings.", "after yesterday's close"),
+    ("", "Asian stocks are drifting lower recently.", "overnight"),
+)
+
+
+def test_scanner_counts_post_open_text() -> None:
+    for headline, snippet, timing in POST_OPEN:
+        assert post_open_count(headline, snippet, timing, OPEN) > 0, (headline, snippet)
+    for headline, snippet, timing in POST_OPEN_KEPT:
+        assert post_open_count(headline, snippet, timing, OPEN) == 0, (headline, snippet)
+    item = {
+        "headline": POST_OPEN[3][0],
+        "snippet": POST_OPEN[3][1],
+        "source_type": "x",
+        "timing": POST_OPEN[3][2],
+    }
+    sc = LeakScanner(pd.DataFrame(columns=["company_id", "ticker", "name"]))
+    state = json.dumps(
+        {"news": [item, {**item, "headline": "", "snippet": "U.S. stocks are drifting lower."}]}
+    )
+    assert sc.residual_leaks(state, None, OPEN).post_open == 2  # one per item
+    assert sc.residual_leaks(state, None).post_open == 1  # no open: live entries are not checked
+
+
+def test_val_a_post_open_below_target() -> None:
+    """Revision 6: post-open text in the built val-A W0 states (Call A on D0 and its unmasked twin), by the
+    scanner's own forms; every remaining hit was read (artifacts/NA-04/REPORT.md, revision 6)."""
+    path = ROOT / "artifacts" / "NA-04" / "leak_scan.csv"
+    if not path.is_file():
+        pytest.skip("artifacts/NA-04/leak_scan.csv is absent (run the report stage)")
+    scan = pd.read_csv(path)
+    assert "post_open" in scan.columns
+    for label in ("callA_d0_E3", "samples/unmasked"):
+        g = scan.loc[scan["file"] == label]
+        assert len(g) > 500 and (g["post_open"] > 0).mean() < 0.001, label

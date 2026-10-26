@@ -291,8 +291,8 @@ def test_articles_must_be_third_party_ok() -> None:
     item = {"id": "x", "title": "t", "snippet": "s", "source_class_domain": "other", "t_avail": t}
     empty = pd.DataFrame()
     ok = Inputs(empty, empty, empty, masked={"x": ("t", "s")}, third_party={"x": True})
-    assert news_items([item], date(2025, 7, 15), True, ok)[1] == ["x"]
+    assert news_items([item], date(2025, 7, 15), True, ok, "W0")[1] == ["x"]
     for flag in ({"x": False}, {}):
         bad = Inputs(empty, empty, empty, masked={"x": ("t", "s")}, third_party=flag)
         with pytest.raises(StatesError, match="third-party"):
-            news_items([item], date(2025, 7, 15), True, bad)
+            news_items([item], date(2025, 7, 15), True, bad, "W0")
