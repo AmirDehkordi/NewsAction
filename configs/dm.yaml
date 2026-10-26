@@ -30,6 +30,19 @@ cache: cache/decisions.sqlite     # gitignored
 state_as_text:                    # NA-05 smoke test (artifacts/NA-05/pilot.json "smoke")
   - scaledown/classify-1          # "ScaleDown state must be a string or an object with only text, document, …"
 
+# NA-11 S5 canary drift check (operator decision 2026-10-26, NA-05 REPORT §9 item 3). NA-11 implements the
+# comparison; NA-05 records the rule. "Deterministic" = identical answers on all 5 pilot repeats (pilot.json
+# item 4); a model without pilot repeats gets its 5 repeats measured first (repeats 0–4 of the 20 Call A states).
+canary:
+  noise_repeats: 5                          # the model's own repeat noise: repeats 0–4 of the 20 Call A states
+  deterministic_max_abs_dp: 0.02            # a deterministic model: STOP if any probability moved >= 0.02
+  noisy_rule: mean_abs_dp_vs_repeat_noise   # any other model: the canary's mean |Δp| vs its own repeat noise
+  deterministic:                            # identical on all 5 repeats in the NA-05 pilot
+    - openai/gpt-6-luna-decisions
+    - perplexity/pplx-decider-v1.2
+    - local/laya-typed-decisions
+    - local/laya-base
+
 # Refusal (d): an unmasked state is sent only under one of these probe tags.
 registered_probes:
   unmasked_twin: "PREREG §8.3 masked vs unmasked IC on the same events (NA-06 stage 2)"

@@ -5,18 +5,25 @@ string), the questions and ``provider = {"data_collection": "deny"}``, the only 
 accepts (CLAUDE.md C12). PREREG §7 allows two question types: ``choice`` (criteria: option → description, at
 least two) and ``score`` (criteria: 2–10 levels, lowest first). ``noul`` is refused.
 
-**Responses** are parsed strictly and never repaired (``parse_response``):
+**Responses** are parsed strictly (``parse_response``):
 - the envelope needs ``model``, an ``answers`` object and ``usage`` {input_tokens, output_tokens}; otherwise
   the whole response is invalid;
 - every question asked needs an answer, and every answer needs ``type``, the type of the question asked, and
   its typed field (``choice`` naming one of the options, or a numeric ``score``);
 - ``probabilities`` must be present and keyed exactly by the question's options (a score's by "0" … "k−1"),
-  each finite in [0, 1], summing to 1 ± 1e-6;
+  each finite in [0, 1], summing to 1 within 1e-6;
 - a score's ``legend``, when present, must map "0" … "k−1" to the levels as asked.
 
+**Rounded probabilities** (operator decision, a change to PRD NA-05 S1; docs/decisions/NA-05.md). Some models
+round their probabilities (Jev to 0.01, several others to 4 decimals), so a sum can be off 1 by one rounding
+step. A sum off by more than 1e-6 but at most ``RENORM_TOL`` = 0.0105 is renormalized (p_k / Σp) and
+the answer is flagged ``renormalized``, with the original sum kept in ``raw_sum``; a sum off by more than that
+stays a problem.
+
 An answer that breaks a rule keeps its fields and lists the rule in ``problems``; it is invalid and its
-probabilities are not used. Observations that do not invalidate an answer go to ``notes``: no legend, the
-chosen option is not the most probable one, the score is not the probability-weighted position.
+probabilities are not used. The raw answer is never altered: a renormalized vector exists only in the parsed
+answer. Observations that do not invalidate an answer go to ``notes``: no legend, the chosen option is not the
+most probable one, the score is not the probability-weighted position.
 """
 
 from __future__ import annotations
@@ -33,6 +40,7 @@ from pydantic import BaseModel, ConfigDict, Field, ValidationError, model_valida
 from newsaction.states.questions import canonical_json
 
 PROB_TOL: Final = 1e-6
+RENORM_TOL: Final = 0.0105  # one step of a 0.01 grid (and float noise); flagged beyond PROB_TOL
 SCORE_TOL: Final = 1e-3  # |score − Σ i·p_i| above this is noted (item 7 of the pilot)
 MAX_SCORE_LEVELS: Final = 10
 QuestionType = Literal["choice", "score"]
@@ -183,6 +191,8 @@ class ParsedAnswer:
     confidence: float | None
     problems: tuple[str, ...]
     notes: tuple[str, ...]
+    renormalized: bool = False  # the returned sum was off 1 by more than PROB_TOL and at most RENORM_TOL
+    raw_sum: float | None = None  # Σ of the returned probabilities
 
     @property
     def valid(self) -> bool:
@@ -206,23 +216,34 @@ class ParsedResponse:
         return out
 
 
-def _prob_problems(
-    probs: Mapping[str, Any], options: list[str]
-) -> tuple[list[str], tuple[float, ...] | None]:
+@dataclass(frozen=True)
+class _Probs:
+    problems: list[str]
+    probs: tuple[float, ...] | None  # in option order, renormalized if flagged; None with a problem
+    renormalized: bool = False
+    raw_sum: float | None = None
+
+
+def _probabilities(probs: Mapping[str, Any], options: list[str]) -> _Probs:
     keys = [str(k) for k in probs]
     if set(keys) != set(options) or len(keys) != len(options):
-        return [f"probability keys {sorted(keys)} differ from the options {options}"], None
+        return _Probs([f"probability keys {sorted(keys)} differ from the options {options}"], None)
     vals = [probs[k] for k in options]
     if not all(isinstance(v, int | float) and not isinstance(v, bool) for v in vals):
-        return ["a probability is not a number"], None
+        return _Probs(["a probability is not a number"], None)
     p = tuple(float(v) for v in vals)
     out = []
     if not all(math.isfinite(v) and 0.0 <= v <= 1.0 for v in p):
         out.append("a probability is outside [0, 1]")
-    total = math.fsum(p)
-    if abs(total - 1.0) > PROB_TOL:
+    total = math.fsum(p) if all(math.isfinite(v) for v in p) else math.nan
+    off = abs(total - 1.0)
+    if not off <= RENORM_TOL:
         out.append(f"probabilities sum to {total:.9f}")
-    return out, (None if out else p)
+    if out:
+        return _Probs(out, None, raw_sum=total)
+    if off > PROB_TOL:
+        return _Probs([], tuple(v / total for v in p), renormalized=True, raw_sum=total)
+    return _Probs([], p, raw_sum=total)
 
 
 def _argmax_ok(p: tuple[float, ...], options: list[str], chosen: str) -> bool:
@@ -250,12 +271,13 @@ def parse_answer(qid: str, raw: Any, question: QuestionSpec) -> ParsedAnswer:
         where = ".".join(str(x) for x in err["loc"])
         return ParsedAnswer(qid, str(qtype), None, None, None, (f"{where}: {err['msg']}",), ())
     options = question.options()
-    probs: tuple[float, ...] | None = None
+    pr = _Probs([], None)
     if ans.probabilities is None:
         problems.append("missing probabilities")
     else:
-        prob_problems, probs = _prob_problems(ans.probabilities, options)
-        problems += prob_problems
+        pr = _probabilities(ans.probabilities, options)
+        problems += pr.problems
+    probs = pr.probs
     if isinstance(ans, ChoiceAnswer):
         if ans.choice not in options:
             problems.append(f"choice {ans.choice!r} is not an option")
@@ -278,7 +300,15 @@ def parse_answer(qid: str, raw: Any, question: QuestionSpec) -> ParsedAnswer:
     if conf is not None and not (math.isfinite(conf) and 0.0 <= conf <= 1.0):
         notes.append("confidence outside [0, 1]")
     return ParsedAnswer(
-        qid, str(qtype), ans, probs if not problems else None, conf, tuple(problems), tuple(notes)
+        qid,
+        str(qtype),
+        ans,
+        probs if not problems else None,
+        conf,
+        tuple(problems),
+        tuple(notes),
+        renormalized=pr.renormalized and not problems,
+        raw_sum=pr.raw_sum,
     )
 
 

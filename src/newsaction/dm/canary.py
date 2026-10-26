@@ -12,9 +12,12 @@ Every line holds the state, the core questions of its call (``configs/questions_
 both, the state's provenance and, for synthetic states, a label.
 
 **Baseline** (``artifacts/NA-05/canary_baseline.parquet``): one row per (model, canary id, question, option)
-with the probability of the pilot's repeat 0, the model build and the request key. ``compare`` asks the
-canary again under another ``repeat_idx`` (a new key, so a fresh call) and reports max |Δp| against the
-baseline; NA-11 S5 compares it with 0.02, and the pilot's repeat variance (item 4) is the noise floor.
+with the probability of the pilot's repeat 0 (renormalized and flagged for an answer rounded within one step,
+``schemas.RENORM_TOL``), the model build and the request key. ``compare`` asks the canary again under
+another ``repeat_idx`` (a new key, so a fresh call) and reports max and mean |Δp| against the baseline.
+NA-11 S5 (operator decision, docs/decisions/NA-05.md; ``configs/dm.yaml`` ``canary``): a deterministic model
+fails at max |Δp| ≥ 0.02; any other model's mean |Δp| is compared with its own repeat noise (5 repeats, pilot
+item 4).
 """
 
 from __future__ import annotations
@@ -380,8 +383,21 @@ def load_canary(path: Path) -> list[CanaryItem]:
 # --- baseline and drift ------------------------------------------------------------------------------
 
 
+BASELINE_COLUMNS: Final = [
+    "model",
+    "model_build",
+    "canary_id",
+    "question",
+    "option",
+    "p",
+    "renormalized",
+    "key",
+    "repeat_idx",
+]
+
+
 def probability_rows(items: Sequence[CanaryItem], results: Sequence[CallResult]) -> pd.DataFrame:
-    """Valid answers, long: model, model_build, canary_id, question, option, p, key, repeat_idx."""
+    """Valid answers, long (``BASELINE_COLUMNS``); ``renormalized`` marks a rescaled rounded answer."""
     rows: list[dict[str, Any]] = []
     for it, res in zip(items, results, strict=True):
         if res.parsed is None or res.row is None:
@@ -399,13 +415,12 @@ def probability_rows(items: Sequence[CanaryItem], results: Sequence[CallResult])
                         "question": qid,
                         "option": opt,
                         "p": float(p),
+                        "renormalized": ans.renormalized,
                         "key": res.key,
                         "repeat_idx": res.spec.repeat_idx,
                     }
                 )
-    return pd.DataFrame(
-        rows, columns=["model", "model_build", "canary_id", "question", "option", "p", "key", "repeat_idx"]
-    )
+    return pd.DataFrame(rows, columns=BASELINE_COLUMNS)
 
 
 def max_abs_delta(baseline: pd.DataFrame, current: pd.DataFrame) -> dict[str, Any]:

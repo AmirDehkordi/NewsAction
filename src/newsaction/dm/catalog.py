@@ -12,9 +12,9 @@ include / exclude decision with a reason:
 - a ``:free`` id is excluded: a duplicate of its paid id, or an endpoint without the operator's approval
   (CLAUDE.md C13);
 - a model whose pilot or smoke calls failed is excluded with the failure: ``data_collection: deny`` rejected,
-  errors, missing or malformed probabilities, silent truncation (``Outcome.failure``). Probabilities that are
-  only rounded (they sum to 1 ± ≤ 0.0105) are not a PREREG §8.1 failure: those answers are invalid under the
-  strict schema and the share is reported, but the model stays eligible;
+  errors, missing or malformed probabilities (more than 10% invalid answers), silent truncation
+  (``Outcome.failure``). Rounded probabilities within one rounding step are renormalized by the parser
+  (``schemas.RENORM_TOL``) and are not a failure; their share is in the reason;
 - every other model is included; the local Laya checkpoints are included (PREREG §8.1).
 
 ``write_eligibility`` puts the list into ``configs/frozen.yaml`` as ``eligible_models`` (and adds an empty
@@ -108,7 +108,7 @@ class Outcome:
     silent_truncation: bool | None  # None: not measured or inconclusive
     note: str = ""
     rejection: str | None = None  # the API's own message when it refused every call
-    rounded_share: float = 0.0  # answers invalid only because rounded probabilities sum to 1 ± ≤ 0.0105
+    renormalized_share: float = 0.0  # answers whose rounded probabilities the parser renormalized
 
     def failure(self) -> str | None:
         if self.calls == 0:

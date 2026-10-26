@@ -113,8 +113,11 @@ def test_baseline_has_every_pilot_model(baseline: pd.DataFrame, items: list) -> 
         assert set(g["canary_id"]) <= ids and g["canary_id"].nunique() >= 45
         assert (g["repeat_idx"] == 0).all()
     sums = baseline.groupby(["model", "canary_id", "question"])["p"].sum()
-    assert ((sums - 1).abs() <= 1e-6).all()
+    assert ((sums - 1).abs() <= 1e-6).all()  # renormalized answers included
     assert baseline["p"].between(0, 1).all()
+    assert baseline["renormalized"].dtype == bool
+    flagged = baseline.loc[baseline["renormalized"], "model"].unique().tolist()
+    assert set(flagged) <= {"typesafe/jev-1.14"}  # the only pilot model with rounded sums (a 0.01 grid)
 
 
 def test_baseline_is_registered(baseline: pd.DataFrame) -> None:

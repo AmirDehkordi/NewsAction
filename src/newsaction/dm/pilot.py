@@ -880,7 +880,7 @@ def model_rows(client: DecisionClient, model: str) -> list[Any]:
 def item_format(client: DecisionClient, model: str) -> dict[str, Any]:
     from newsaction.dm.schemas import parse_response
 
-    n_ans = with_p = valid = legend = legend_ok = choice_argmax = n_choice = n_score = 0
+    n_ans = with_p = valid = renorm = legend = legend_ok = choice_argmax = n_choice = n_score = 0
     sums, score_gap, grid = [], [], []
     notes: Counter[str] = Counter()
     problems: Counter[str] = Counter()
@@ -891,6 +891,7 @@ def item_format(client: DecisionClient, model: str) -> dict[str, Any]:
         for qid, a in parsed.answers.items():
             n_ans += 1
             valid += int(a.valid)
+            renorm += int(a.renormalized)
             notes.update(a.notes)
             problems.update(p.split(" ")[0] if "sum to" not in p else "sum" for p in a.problems)
             raw = a.answer
@@ -917,8 +918,10 @@ def item_format(client: DecisionClient, model: str) -> dict[str, Any]:
         "responses": len(model_rows(client, model)),
         "answers": n_ans,
         "valid_share": None if not n_ans else valid / n_ans,
+        "renormalized": renorm,
+        "renormalized_share": None if not n_ans else renorm / n_ans,
         "with_probabilities_share": None if not n_ans else with_p / n_ans,
-        "abs_sum_minus_1": _stats(sums),
+        "abs_sum_minus_1": _stats(sums),  # of the probabilities as returned
         "probabilities_on_0.01_grid_share": None if not grid else sum(grid) / len(grid),
         "score_answers": n_score,
         "legend_present_share": None if not n_score else legend / n_score,
@@ -1028,18 +1031,6 @@ def api_message(error: str) -> str:
         return error
 
 
-ROUNDING_TOL: Final = 0.0105  # one step of a 0.01 grid (and float noise)
-_SUM: Final = re.compile(r"^probabilities sum to ([0-9.]+)$")
-
-
-def only_rounding(a: Any) -> bool:
-    """An answer whose only problem is a probability sum off by at most one 0.01 step (rounded output)."""
-    sums = [_SUM.match(p) for p in a.problems]
-    return bool(a.problems) and all(
-        m is not None and abs(float(m.group(1)) - 1) <= ROUNDING_TOL for m in sums
-    )
-
-
 def probability_decimals(results: Sequence[CallResult]) -> int | None:
     """The most decimals any returned probability needs (2: a 0.01 grid; None: more than 8)."""
     worst = 0
@@ -1056,15 +1047,15 @@ def probability_decimals(results: Sequence[CallResult]) -> int | None:
     return worst
 
 
-def outcome_note(client: DecisionClient, model: str, trunc: str, rounded: float, decimals: int | None) -> str:
+def outcome_note(
+    client: DecisionClient, model: str, trunc: str, renormalized: float, decimals: int | None
+) -> str:
     cal = client.config.costmodel.models.get(model)
     parts = [f"2K sentinel: {trunc}"]
     if cal is not None:
         parts.append(f"state billed {'per question' if cal.billing_basis == 'per_question' else 'once'}")
     if decimals is not None and decimals <= 6:
-        parts.append(
-            f"probabilities to {decimals} decimals ({rounded:.0%} of answers off 1 by a rounding step)"
-        )
+        parts.append(f"probabilities to {decimals} decimals ({renormalized:.0%} of answers renormalized)")
     if model in client.config.state_as_text:
         parts.append("state sent as text")
     return "; ".join(parts)
@@ -1081,8 +1072,7 @@ def outcome_of(pilot: Pilot, client: DecisionClient, model: str, tok: Any) -> tu
     policy = bool(len(errors)) and all(DATA_POLICY.search(str(e) or "") for e in errors["error"])
     answers = [a for r in ok if r.parsed is not None for a in r.parsed.answers.values()]
     invalid = [a for a in answers if not a.valid]
-    rounded = [a for a in invalid if only_rounding(a)]
-    structural = [a for a in invalid if not only_rounding(a)]
+    renormalized = [a for a in answers if a.renormalized]
     trunc = item_truncation(pilot, client, model, [SMOKE_TRUNC_TOKENS], tok)[str(SMOKE_TRUNC_TOKENS)][
         "verdict"
     ]
@@ -1101,12 +1091,12 @@ def outcome_of(pilot: Pilot, client: DecisionClient, model: str, tok: Any) -> tu
         ok=len(ok),
         data_policy_rejected=policy and not ok,
         error_share=(len(unique) - len(ok)) / len(unique) if unique else 0.0,
-        invalid_share=(len(structural) + envelope_bad) / max(1, len(answers)),
-        rounded_share=len(rounded) / max(1, len(answers)),
+        invalid_share=(len(invalid) + envelope_bad) / max(1, len(answers)),
+        renormalized_share=len(renormalized) / max(1, len(answers)),
         missing_probabilities=any("missing probabilities" in a.problems for a in answers),
         silent_truncation=silent,
         note=outcome_note(
-            client, model, trunc, len(rounded) / max(1, len(answers)), probability_decimals(ok)
+            client, model, trunc, len(renormalized) / max(1, len(answers)), probability_decimals(ok)
         ),
         rejection=" | ".join(m[:160] for m, _ in messages.most_common(2)) or None,
     )
@@ -1118,7 +1108,7 @@ def outcome_of(pilot: Pilot, client: DecisionClient, model: str, tok: Any) -> tu
         "object_state_rejected": rejects_object_states(client, model),
         "state_as_text": model in client.config.state_as_text,
         "invalid_answers": len(invalid),
-        "invalid_rounding_only": len(rounded),
+        "renormalized_answers": len(renormalized),
         "answers": len(answers),
         "probability_decimals": probability_decimals(ok),
         "invalid_examples": [f"{a.qid}: {'; '.join(a.problems)}" for a in invalid[:3]],
@@ -1415,6 +1405,7 @@ def _answers(
         "7_response_format": {
             "question": "Probabilities sum, legend present, score position consistent with probabilities",
             "valid_share_by_model": by(lambda v: v["format"]["valid_share"]),
+            "renormalized_share_by_model": by(lambda v: v["format"]["renormalized_share"]),
             "max_abs_sum_minus_1_by_model": by(lambda v: v["format"]["abs_sum_minus_1"]["max"]),
             "legend_present_share_by_model": by(lambda v: v["format"]["legend_present_share"]),
             "mean_abs_score_minus_weighted_position_by_model": by(
@@ -1446,7 +1437,17 @@ def _answers(
     }
 
 
-def stage_report(pilot: Pilot) -> int:
+REGISTERED: Final = {
+    CATALOG_FILE: "decision-model catalog snapshot (GET /api/v1/models?output_modalities=decisions)",
+    CANARY_FILE: "canary_v1: 50 fixed requests (30 train-period masked states, 20 synthetic) with sha256s",
+    PILOT_FILE: "NA-05 pilot measurements (items 1-10), eligibility, cost calibration, projections, spend",
+    KEY_USAGE_FILE: "OpenRouter key usage snapshots (GET /api/v1/key) during the NA-05 pilot",
+}
+
+
+def stage_report(pilot: Pilot, *, offline: bool = False) -> int:
+    """Everything from the cache with an offline client; ``offline`` also skips the key-usage snapshot (GET
+    /api/v1/key), so the stage makes no network call at all."""
     from dataclasses import asdict
 
     tok = pilot.tokenizer()
@@ -1455,8 +1456,9 @@ def stage_report(pilot: Pilot) -> int:
     prices = {str(m["id"]): Price.from_catalog(m["pricing"]) for m in snap["models"]}
     stop = stage_calibrate(pilot, final=True)
     cfg = dm_config(pilot.layout)
-    with pilot.client() as live:
-        record_key_usage(pilot, live, "report")
+    if not offline:
+        with pilot.client() as live:
+            record_key_usage(pilot, live, "report")
     with pilot.client(offline=True) as client:
         models: dict[str, dict[str, Any]] = {}
         for m in PILOT_MODELS:
@@ -1548,6 +1550,8 @@ def stage_report(pilot: Pilot) -> int:
     }
     text = json.dumps(_clean(out), indent=2, ensure_ascii=False, allow_nan=False) + "\n"
     io.atomic_write_bytes(root / PILOT_FILE, text.encode("utf-8"))
+    for rel, description in REGISTERED.items():
+        io.register_artifact(rel, producer=PRODUCER, description=description, layout=pilot.layout)
     log(
         f"wrote {PILOT_FILE} ({len(text)} bytes); spend ${spend['ledger_chunk_usd']:.6f}; "
         f"reconcile {spend['reconcile_usd']:.2e}"
@@ -1565,6 +1569,9 @@ def main(argv: list[str] | None = None) -> int:
     parser.add_argument("--stage", required=True, choices=STAGES)
     parser.add_argument("--force", action="store_true", help="catalog: refetch an existing snapshot")
     parser.add_argument("--models", nargs="*", default=None, help="measure: a subset of the pilot models")
+    parser.add_argument(
+        "--offline", action="store_true", help="report: no network call (no key-usage snapshot)"
+    )
     args = parser.parse_args(argv)
     pilot = Pilot.load()
     t0 = time.perf_counter()
@@ -1581,7 +1588,7 @@ def main(argv: list[str] | None = None) -> int:
     elif args.stage == "laya":
         rc = stage_laya(pilot)
     else:
-        rc = stage_report(pilot)
+        rc = stage_report(pilot, offline=args.offline)
     rss = resource.getrusage(resource.RUSAGE_SELF).ru_maxrss / 2**30  # bytes on macOS
     log(f"stage {args.stage}: exit {rc}, {time.perf_counter() - t0:.0f} s, peak RSS {rss:.2f} GB")
     return rc

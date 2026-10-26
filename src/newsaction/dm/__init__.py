@@ -116,11 +116,22 @@ class LayaConfig(_Strict):
     fp32: bool
 
 
+class CanaryConfig(_Strict):
+    """NA-11 S5's drift rule (operator decision, docs/decisions/NA-05.md): max |Δp| for deterministic models,
+    mean |Δp| against the model's own repeat noise for the others."""
+
+    noise_repeats: int = Field(ge=2)
+    deterministic_max_abs_dp: float = Field(gt=0)
+    noisy_rule: Literal["mean_abs_dp_vs_repeat_noise"]
+    deterministic: tuple[str, ...]
+
+
 class DmConfig(_Strict):
     version: int
     api: ApiConfig
     cache: str
     state_as_text: tuple[str, ...]  # models that take the state only as a string (its canonical JSON text)
+    canary: CanaryConfig
     registered_probes: dict[str, str]
     costmodel: CostConfig
     laya: LayaConfig

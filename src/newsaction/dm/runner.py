@@ -4,7 +4,8 @@
   by split or event id;
 - ``state_specs``: one ``CallSpec`` per row, with the call's questions from the frozen battery (any group
   combination) and the row's provenance for the refusal rules;
-- ``answers_frame``: one row per (request, question, option) with its probability;
+- ``answers_frame``: one row per (request, question, option) with its probability and the answer's
+  ``renormalized`` flag (``schemas.RENORM_TOL``);
 - ``derived_frame``: one row per request with the PREREG §7 / A2.4 quantities (``parse.derive``) and the model
   build, tokens, cost and validity.
 """
@@ -25,7 +26,17 @@ from newsaction.dm.schemas import DecisionRequest, questions_from
 from newsaction.paths import Layout
 from newsaction.states.questions import Battery, load_battery
 
-ANSWER_COLUMNS: Final = ["key", "model", "event_id", "tag", "repeat_idx", "question", "option", "p"]
+ANSWER_COLUMNS: Final = [
+    "key",
+    "model",
+    "event_id",
+    "tag",
+    "repeat_idx",
+    "question",
+    "option",
+    "p",
+    "renormalized",
+]
 
 
 def load_states(
@@ -90,6 +101,7 @@ def answers_frame(results: Sequence[CallResult]) -> pd.DataFrame:
                         "question": qid,
                         "option": opt,
                         "p": float(p),
+                        "renormalized": ans.renormalized,
                     }
                 )
     return pd.DataFrame(rows, columns=ANSWER_COLUMNS)
@@ -119,5 +131,6 @@ def derived_frame(results: Sequence[CallResult]) -> pd.DataFrame:
             }
         if r.parsed is not None:
             base |= derive(r.parsed.answers, r.spec.request.questions)
+            base["n_renormalized"] = sum(a.renormalized for a in r.parsed.answers.values())
         rows.append(base)
     return pd.DataFrame(rows)

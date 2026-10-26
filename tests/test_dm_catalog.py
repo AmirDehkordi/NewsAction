@@ -55,8 +55,8 @@ def test_outcome_failures() -> None:
         == "answers without probabilities (PREREG §8.1)"
     )
     assert "malformed answers" in str(Outcome(10, 10, False, 0.0, 0.5, False, False).failure())
-    rounded = Outcome(10, 10, False, 0.0, 0.0, False, False, rounded_share=0.4)
-    assert rounded.failure() is None  # rounded probabilities are not a PREREG §8.1 failure
+    rounded = Outcome(10, 10, False, 0.0, 0.0, False, False, renormalized_share=0.4)
+    assert rounded.failure() is None  # renormalized (rounded) probabilities are not a PREREG §8.1 failure
     assert Outcome(10, 10, False, 0.0, 0.0, False, None).failure() is None  # inconclusive truncation
 
 

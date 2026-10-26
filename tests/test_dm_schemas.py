@@ -11,6 +11,8 @@ from pydantic import ValidationError
 
 from dm_fakes import MODEL, QUESTIONS, STATE, ok_response
 from newsaction.dm.schemas import (
+    PROB_TOL,
+    RENORM_TOL,
     DecisionRequest,
     QuestionSpec,
     SchemaError,
@@ -82,30 +84,61 @@ def test_missing_type_is_invalid() -> None:
     assert p.answers["justified_move"].valid
 
 
-@pytest.mark.parametrize("delta", [1e-5, -2e-6, 0.01])
-def test_probabilities_not_summing_to_one_are_invalid_not_fixed(delta: float) -> None:
+def _with_sum_off(delta: float) -> dict[str, Any]:
     raw = good()
     raw["answers"]["materiality"]["probabilities"] = {
         "new_information": 0.5 + delta,
         "no_new_information": 0.5,
     }
-    p = parse_response(raw, QUESTIONS)
-    a = p.answers["materiality"]
-    assert not a.valid and a.probs is None
+    return raw
+
+
+@pytest.mark.parametrize("delta", [0.0104, -0.0104, 0.01, -2e-6, 1e-5])
+def test_sums_within_one_rounding_step_are_renormalized_and_flagged(delta: float) -> None:
+    """Operator decision 2026-10-26 (PRD S1 changed): 1e-6 < |Σp − 1| ≤ 0.0105 → p / Σp, renormalized."""
+    raw = _with_sum_off(delta)
+    a = parse_response(raw, QUESTIONS).answers["materiality"]
+    assert a.valid and a.renormalized
+    assert a.raw_sum == pytest.approx(1.0 + delta)
+    assert a.probs is not None and sum(a.probs) == pytest.approx(1.0, abs=1e-12)
+    assert a.probs == pytest.approx(((0.5 + delta) / (1.0 + delta), 0.5 / (1.0 + delta)))
+    assert a.answer is not None and a.answer.probabilities == {  # the returned answer is not altered
+        "new_information": 0.5 + delta,
+        "no_new_information": 0.5,
+    }
+
+
+@pytest.mark.parametrize("delta", [0.0106, -0.0106, 0.02, -0.5])
+def test_sums_beyond_one_rounding_step_stay_invalid(delta: float) -> None:
+    a = parse_response(_with_sum_off(delta), QUESTIONS).answers["materiality"]
+    assert not a.valid and a.probs is None and not a.renormalized
     assert any("sum to" in x for x in a.problems)
-    assert a.answer is not None and a.answer.probabilities == {
-        "new_information": 0.5 + delta,
-        "no_new_information": 0.5,
-    }
+    assert a.raw_sum == pytest.approx(1.0 + delta)
 
 
-def test_sum_within_tolerance_is_valid() -> None:
+def test_the_bound_is_the_constant() -> None:
+    assert RENORM_TOL == 0.0105 and PROB_TOL == 1e-6
+
+
+def test_sum_within_tolerance_is_valid_and_not_flagged() -> None:
+    a = parse_response(_with_sum_off(4e-7), QUESTIONS).answers["materiality"]
+    assert a.valid and not a.renormalized and a.probs == (0.5 + 4e-7, 0.5)
+
+
+def test_a_probability_outside_0_1_is_never_renormalized() -> None:
     raw = good()
-    raw["answers"]["materiality"]["probabilities"] = {
-        "new_information": 0.5 + 4e-7,
-        "no_new_information": 0.5,
-    }
-    assert parse_response(raw, QUESTIONS).answers["materiality"].valid
+    raw["answers"]["materiality"]["probabilities"] = {"new_information": 1.004, "no_new_information": -0.001}
+    a = parse_response(raw, QUESTIONS).answers["materiality"]
+    assert not a.valid and not a.renormalized and "outside [0, 1]" in a.problems[0]
+
+
+def test_jev_style_score_on_a_grid_is_renormalized() -> None:
+    raw = good()
+    probs = {"0": 0.2, "1": 0.2, "2": 0.2, "3": 0.2, "4": 0.19}  # sums to 0.99 (a 0.01 grid)
+    raw["answers"]["justified_move"]["probabilities"] = probs
+    a = parse_response(raw, QUESTIONS).answers["justified_move"]
+    assert a.valid and a.renormalized and a.probs is not None
+    assert a.probs[4] == pytest.approx(0.19 / 0.99)
 
 
 def test_missing_or_mismatched_probabilities_are_invalid() -> None:

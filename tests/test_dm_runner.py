@@ -71,10 +71,11 @@ def test_frames_from_results(tmp_layout: Layout, tmp_path: Path) -> None:
     results = client.decide(specs)
     ans = answers_frame(results)
     assert set(ans["question"]) == {"justified_move", "materiality", "surprise", "tone"}
+    assert not ans["renormalized"].any()
     sums = ans.groupby(["key", "question"])["p"].sum()
     assert ((sums - 1).abs() < 1e-9).all()
     der = derived_frame(results)
-    assert len(der) == 2 and der["valid"].all() and der["ok"].all()
+    assert len(der) == 2 and der["valid"].all() and der["ok"].all() and (der["n_renormalized"] == 0).all()
     assert der["n_hat"].abs().max() < 1e-9  # uniform answers: N̂ = 0
     assert (der["m"] == 0.5).all() and (der["model_build"] == f"{MODEL}-build-7").all()
     assert json.loads(results[0].row.meta_json)["event_id"] == "W0:0:2024-08-01"  # type: ignore[union-attr]
