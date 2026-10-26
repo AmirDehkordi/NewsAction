@@ -728,7 +728,6 @@ REVISION4_KEEP = (
     "Western Digital and the company report 30% higher revenue, fueling a resurgence.",
     "The company reported 26% lower the quarter net income amid tariff losses.",
     "If you invested $1,000 in the company stock 10 years ago, you would have approximately $3,000 today.",
-    "Stock Market Today: Dow Hits Record, Gold Surges to $3,816",
     "Apple is expected to report earnings of $0.72 per share, indicating an increase of 16.1% on a year ago.",
     "Apple's EPS for the quarter was $1.72, surpassing the previous year's $1.57 and the estimated $1.67.",
     "Home Furnishings Stores Market Expansion Continues, with Forecast Valuation of $286.39 Billion",
@@ -794,3 +793,164 @@ def test_val_a_price_talk_below_target() -> None:
         assert ((g["price_moves"] + g["quotes"] + g["price_levels"]) > 0).mean() < 0.005
     twin = scan.loc[~scan["masked"].astype(bool)]
     assert ((twin["price_moves"] + twin["quotes"] + twin["price_levels"]) > 0).mean() > 0.05
+
+
+# the fifth verification (revision 5): date forms the masker and the scanner both missed, and (operator
+# decision 2026-10-26) every price move of any security and every index or commodity level
+REVISION5_DATES = (
+    ("24-Jun-2025. Apple. Investor Day.", "Jun"),
+    ("by Theneighborhoodplugman | Jul, 2025", "Jul"),
+    ("Sep nat-gas prices extended the drop.", "Sep"),
+    ("StockSavvyThursday, Jul 3, 2025 4:24 am ET. 1min read.", "Thursday"),
+    ("OnJuly 27, local time, the President stated", "July"),
+    ("Financial Results for the half-year, 30thSeptember 2025.", "September"),
+    ("It had an update when i turned it on. Recently july 14th.", "july"),
+    ("ESTAug 22nd in the last two hours of trading", "Aug"),
+    ("the top performer on September 23rd and 24th, 2025, injecting gains", "24th"),
+    ("completing 53 aircraft by the 23rd of the month.", "23rd"),
+    ("Apple FY-25 profit 47% as Costs Surge", "FY-25"),
+    ("weight-loss data expected in 4th qtr", "qtr"),
+    ("EPS Towards Upper Half Of Range - Update. 6/8 15:18. (RTTNews)", "6/8"),
+    ("Coffee News Recap, 29 Aug: Keurig Dr Pepper seals deal", "Aug"),
+    ("14:00/US: Jul Employment Trends Index. 14:00/US: Jan CPI", "Jan"),
+    ("highest in more than two years in Aug, according to FAO", "Aug"),
+)
+REVISION5_DATE_LOOKALIKES = (
+    "the Del Mar Fairgrounds hosted the event",
+    "Nový Battlefield bude",
+    "Apple Surges to 77th in Daily Trading Volume",
+    "ranked 24th in the Fortune list",
+)
+REVISION5_MOVES = (
+    "The S&P 500 Index is up +0.20% today as tech leads.",
+    "Nvidia dropped solidly by -3.50% on the session.",
+    "Shares have added about 8.5% in that time frame, outpacing the S&P 500.",
+    "The S&P 500 pulled back 0.17% to close at 5,069.76.",
+    "Strength in the tech sector helped the Nasdaq add 1.7% and the Dow closed the session higher.",
+    "Revenue rose 5%, sending shares up 2%.",
+    "The Dow fell 300 points on Tuesday.",
+    "Stock Market Today: Dow 46,414 Hits Record",
+    "Stock Market Today: Dow Hits Record, Gold Surges to $3,816",
+    "WTI crude settled at $63.56 a barrel.",
+    "Bitcoin rebounded to $97,000.",
+    "The 10-year Treasury yield rose to 4.25%.",
+    "European stocks closed 0.6% lower.",
+    "Microsoft rose 1.2% and Alphabet gained 0.8%.",
+    "802.72 USD -22.59 (-2.74%) Volume: 2.0M.",
+    # a market subject after the clause's fundamental, and commodity levels behind a level word
+    "Strong earnings sent shares up 7%.",
+    "Weak jobs data sent the Dow down 1.2%.",
+    "Manufacturing stocks fell 2% on the report.",
+    "Gold Falls Below $4,000",
+    "Brent oil price drops to $64",
+    # the recall sample of revision 5: a move named after the number, a subject elsewhere in the sentence
+    "The company recently faced a 3% price decline over the last quarter.",
+    "The company Announces Positive Phase 2 Results Amid 6% Quarterly Price Dip",
+    "The company Sees 13% Weekly Drop;",
+    "After a rally of 7.8% in a single week, shares of the company are catching investor attention.",
+    "The S&P 500 has printed 55 record high closes and is riding a year gain of 26.8%.",
+    "Shares of exchange operator the company rise as much as 1.9%, outperforming rivals;",
+    "On the day: S&P 500 +1.2%;",
+    "S&P 500 SP:SPX rises second consecutive week, adds 1.7%, aided by a solid jobs report",
+    "The company Dives 37% on Lower Price Target, Pessimistic Rating",
+    "US natgas prices edge up 1% ahead of storage report",
+    "Berkshire Hathaway (BRK.B) saw a minor decline of 0.42% over the past week.",
+    "Recent price decline (-1.02%) contrasts with strong institutional inflows.",
+    "US Sanctions on Russian Oil Spark 5% Crude Price Surge, Rattle Global Markets",
+    "Cencora (COR) faces mixed signals and a 1.24% recent price drop despite strong fundamentals.",
+)
+REVISION5_FUNDAMENTALS = (
+    "Revenue rose 5% year over year to $94.9 billion.",
+    "Same-store sales increased 3.2%.",
+    "Inflation rose 0.3% in the month.",
+    "Unemployment ticked up to 4.3%.",
+    "The quarter was marked by a 7.2% rise in sales and continued growth.",
+    "Revenue: US$26.6b (up 8.2% from the year before)",
+    "The company reported revenue of $1.94 billion, up 9.5% over the same period last year.",
+    "Federal Realty booked a net profit margin of 27.2%, up from last year's 24%.",
+    "The company Declared A Quarterly Dividend Of $0.84 Per Share, Representing An Increase Of 5.0% Versus "
+    "Prior Year",
+    "The firm also reported a 3 percent increase in preliminary full-year revenues.",
+    "Energy giant raises $3B through three note tranches with yields up to 6.25%.",
+    "Market share rose 2 points to 31%.",
+    "The company cut 5% of its workforce.",
+    "President's Day Sale - 70% Off.",
+    # the precision sample of revision 5 (articles before the test period)
+    "The oil and gas company reported $1.76 earnings per share (EPS) for the quarter.",
+    "Major copper producer keeps dividend steady with $0.075 base plus $0.075 variable payout.",
+    "The company Business Platinum $50 Hilton Credit No Longer Works on Gift Cards",
+    "30%-50% Furniture Tariffs Slam Wayfair, RH Stocks",
+    "The company's Long Position In H Shares Of COSCO Shipping Increases To 5.75%",
+    "The projected upside for the SPDR Portfolio S&P 1500 Composite Stock Market ETF indicates a gain.",
+    "The ISM manufacturing index rose 2 points to 49.",
+    "U.S. MBA index shows 25% higher purchase activity.",
+    "Outstanding shares fell 2% after the buyback.",
+    "Earnings per share rose 10%.",
+    "The Consumer Price Index rose 0.3% in the month.",
+    "Gold production rose 5%.",
+    "Tesla's deliveries jumped 20%.",
+    "The company to add 20% more flights out of SFO.",
+    "The company's tirzepatide showed an average weight loss of 20.2% vs. 13.7%.",
+    "Short percent of float has risen 7.14% since its last report.",
+    "The new processors deliver up to 35% higher performance.",
+    "The drug showed a 68% lower death risk.",
+    "The company decreased by 5.5% to $5.51 billion in the quarter.",
+    "The company's ROE is 8.8%, lower than the industry's 11%.",
+    "Financial giants have made a bullish move on the company, with 43% of traders bullish.",
+    "The company announced a 5% price increase on its products.",
+    "Restaurant Prices Are Up 4% as chains respond.",
+    "EPS rose 12% to $1.20, beating estimates.",
+    "The company issued bonds with a 5.5% coupon, up from 4.5%.",
+    "ETF inflows rose 20% in the quarter.",
+    "Analysts' price target on the shares increased 10%.",
+    "The company: Losses Deepen 47% Annually, Profit Growth Outlook Tests Bullish Views",
+    "The GDP growth rate for the last quarter surged to 3.8%, a turnaround from the previous quarter's "
+    "contraction of -0.6%.",
+    "Banking Stock: Dissecting a -19.71% Quarterly Revenue Decline Amid Growth",
+    "Short Interest in the company Decreases By 6.6%",
+    "The report finds global installs +11% YoY, sessions +16%.",
+    "Analysts See +100% Upside",
+    "US Economy Surges with Revised 3.8% the quarter GDP Growth",
+)
+
+
+@pytest.mark.parametrize(("text", "gone"), REVISION5_DATES)
+def test_revision5_dates(text: str, gone: str) -> None:
+    out = m(text, AAPL)
+    assert gone not in out, out
+
+
+@pytest.mark.parametrize("text", REVISION5_DATE_LOOKALIKES)
+def test_revision5_date_lookalikes_are_kept(text: str) -> None:
+    assert m(text, AAPL) == text.replace("Apple", "The company")
+
+
+@pytest.mark.parametrize("text", REVISION5_MOVES)
+def test_revision5_every_price_move_goes(text: str) -> None:
+    assert Masker.has_market_move(text), text
+    assert not re.search(r"\d+(?:\.\d+)?\s?%|\d{1,3},\d{3}|\$\d", m(text, AAPL)), m(text, AAPL)
+
+
+@pytest.mark.parametrize("text", REVISION5_FUNDAMENTALS)
+def test_revision5_fundamental_percents_stay(text: str) -> None:
+    assert not Masker.has_market_move(text), text
+
+
+def test_scanner_sees_the_fifth_verification_forms() -> None:
+    sc = scanner()
+    for text, _ in REVISION5_DATES:
+        c = sc.scan_text(m_raw_dates(text), AAPL)
+        assert c.dates + c.years >= 1, text
+    for text in REVISION5_DATE_LOOKALIKES:
+        assert sc.scan_text(text, AAPL).dates == 0, text
+    for text in REVISION5_MOVES:
+        c = sc.scan_text(text.replace("Apple", "The company"), AAPL)
+        assert c.price_moves + c.price_levels + c.quotes >= 1, text
+    for text in REVISION5_FUNDAMENTALS:
+        c = sc.scan_text(text, AAPL)
+        assert c.price_moves + c.price_levels == 0, (text, c)
+
+
+def m_raw_dates(text: str) -> str:
+    """The text as the old masker left it (years masked, the rest as written): what the scanner reads."""
+    return re.sub(r"(?<!\d)(?:19|20)\d{2}(?!\d)", "the year", text)

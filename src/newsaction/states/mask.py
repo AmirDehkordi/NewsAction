@@ -194,6 +194,139 @@ _OPTIONS_FLOW: Final = re.compile(
     r"(?i)\b(?:Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)-\d{2}\s+\$?\d[\d.]*\s+(?:puts?|calls?)\b"
     r"|\bweekly\s+\$?\d[\d.]*\s+(?:puts?|calls?)\b|\bunderlying\s+shares\s+were\b|\b(?:lifted|hit|paid)\s+the\s+\$"
 )
+# NA-04 revision 5 (operator decision 2026-10-26: every percent price move goes, of any company, index,
+# future, commodity or currency, and every index or commodity level): a percent beside a move word or signed
+# ("Nvidia dropped solidly by -3.50%", "The S&P 500 ... today is up +0.20%", "Shares have added about 8.5%"),
+# unless a fundamental noun is the subject of its clause ("revenue rose 5%"); a move in points; an index level
+# ("closed at 5,069.76", "Dow 46,414"); a commodity or crypto level ("gold at $3,816", "$63.56 a barrel")
+_PCT_ANY: Final = re.compile(
+    r"(?i)(?<![\w.])(?P<sign>[+\-−–])?\d+(?:[.,]\d+)?\s?(?:%|percent\b|per\s+cent\b|pct\b)"
+)
+_MOVE_ANY: Final = re.compile(
+    r"(?i)\b(?:rose|ris(?:e|es|en|ing)|fell|fall(?:s|en|ing)?|gain(?:s|ed|ing)?|lost|los(?:e|es|ing)|add(?:s|ed|ing)?|"
+    r"shed(?:s|ding)?|drop(?:s|ped|ping)?|jump(?:s|ed|ing)?|climb(?:s|ed|ing)?|slid(?:e|es|ing)?|declin(?:e|es|ed|ing)|"
+    r"advanc(?:e|es|ed|ing)|retreat(?:s|ed|ing)?|rall(?:y|ies|ied|ying)|plung(?:e|es|ed|ing)|surg(?:e|es|ed|ing)|"
+    r"tumbl(?:e|es|ed|ing)|sank|sink(?:s|ing)?|soar(?:s|ed|ing)?|edg(?:es|ed|ing)|tick(?:s|ed|ing)|slipp?(?:s|ed|ing)?|"
+    r"dipp?(?:s|ed|ing)?|spik(?:e|es|ed|ing)|slump(?:s|ed|ing)?|eas(?:es|ed|ing)|firm(?:ed|ing)|"
+    r"rebound(?:s|ed|ing)?|recover(?:s|ed|ing)?|pull(?:s|ed|ing)?\s+back|crash(?:es|ed|ing)?|tank(?:s|ed|ing)?|"
+    r"(?:sky)?rocket(?:s|ed|ing)?|pop(?:ped|ping)|zoom(?:s|ed|ing)?|swung|swing(?:s|ing)?|up(?!\s+to\b)|down(?!\s+to\b)|higher|lower|"
+    r"increase[sd]?|decrease[sd]?|change[sd]?|move[sd]?(?!\s+on\b)|movement|uptick|downtick|loss(?:es)?|pullbacks?|"
+    r"sell-?offs?|routs?|plummet(?:s|ed|ing)?|skid(?:s|ded|ding)?|sag(?:s|ged|ging)?|div(?:e|es|ed|ing)|dove|"
+    r"nosediv(?:e|es|ed|ing)|crater(?:s|ed|ing)?|collaps(?:e|es|ed|ing)|lea(?:p|ps|pt|ped|ping)|correct(?:ed|ing)|"
+    r"correction|(?:out|under)perform(?:s|ed|ing)?)\b"
+)
+# a compound that holds a market word is one fundamental ("outstanding shares", "dividend yield", "earnings
+# per share", "Long Position In H Shares", "price target on the shares"), and so is a gauge named after one
+# ("the PMI index", "the Consumer Price Index")
+_FUND_CLAUSE: Final = re.compile(
+    r"(?i)\b(?:(?:stake|positions?|holdings?|ownership|(?:short|open)\s+interest|(?:price\s+)?(?:targets?|objectives?))"
+    r"\s+(?:in|of|on|for)\s+(?:the\s+company(?:['’]s)?(?:\s+(?:shares?|stocks?))?|"
+    r"(?:[\w&.'’\-]+\s+){0,4}?(?:shares?|stocks?))|(?:price\s+)?(?:targets?|objectives?)|inflows?|outflows?|flows|"
+    r"coupons?|ratings?|scores?|rankings?|weights?|short\s+percent|float|pricing|premiums?|buffers?|vehicles|roe|"
+    r"roa|roic|returns?\s+on|expectations|number\s+of|upside|downside|econom(?:y|ies)|(?:restaurant|menu|grocery|egg|drug|rent|insurance|"
+    r"ticket|electricity|gasoline|pump)\s+prices?|revenues?|sales|earnings|eps|income|profits?|margins?|growth|cagr|volumes?|guidance|outlook|"
+    r"forecasts?|estimates?|surprises?|inflation|cpi|pce|ppi|pmi|ism|mba|gdp|payrolls?|jobs|employment|"
+    r"unemployment|jobless|claims|applications|activity|manufacturing|rates?|"
+    r"traffic|orders|bookings|deliveries|shipments|users|subscribers|members(?:hip)?|comps|comparable|same-store|"
+    r"organic|backlog|deposits|loans|assets|aum|costs?|expenses?|spending|capex|wages?|pay|salar(?:y|ies)|"
+    r"compensation|headcount|workforce|staff|layoffs|employees|population|production|output|capacity|utilization|"
+    r"occupancy|exports?|imports?|demand|supply|inventor(?:y|ies)|tariffs?|taxe?s?|debt|leverage|ratio|stake|"
+    r"ownership|holdings?|positions?|(?:short|open)\s+interest|outstanding\s+shares|shares\s+outstanding|"
+    r"outstanding|(?:share\s+)?count|buybacks?|repurchases?|probability|odds|chance|polls?|approval|survey|"
+    r"sentiment|confidence|units|stores|customers|accounts|visits|downloads|listings|dividend\s+yields?|"
+    r"dividends?|yields?\s+on|ebitda|ffo|cash\s+flow|"
+    r"(?:home|house|housing|consumer|producer|import|export|food|wholesale|retail|average\s+selling)\s+prices?|"
+    r"market\s+share|share\s+of|per[\s-]share|year[\s-]over[\s-]year|y/y|yoy|q/q|sequentially|r&d|research|"
+    r"mortgages?|permits|starts|housing|rev)(?:\s+ind(?:ex(?:es)?|ices))?(?!\w)"
+)
+# the past or present tense of a move verb (a capitalized title word such as "An Increase Of" is not a name
+# moving)
+_VERB_FORM: Final = re.compile(
+    r"(?i)rose|rises|fell|falls|gain(?:s|ed)|lost|loses|add(?:s|ed)|shed|drop(?:s|ped)|jump(?:s|ed)|climb(?:s|ed)|"
+    r"slid(?:es)?|declin(?:es|ed)|advanc(?:es|ed)|retreat(?:s|ed)|rall(?:ies|ied)|plung(?:es|ed)|surg(?:es|ed)|"
+    r"tumbl(?:es|ed)|sank|sinks|soar(?:s|ed)|edg(?:es|ed)|tick(?:s|ed)|slip(?:s|ped)|dip(?:s|ped)|spik(?:es|ed)|"
+    r"slump(?:s|ed)|rebound(?:s|ed)|crash(?:es|ed)|tank(?:s|ed)|(?:sky)?rocket(?:s|ed)|popped|zoom(?:s|ed)|swung|"
+    r"plummet(?:s|ed)|skidded|sagged|div(?:es|ed)|dove|nosedived|cratered|collapsed|lea(?:ps|pt|ped)|"
+    r"(?:out|under)perform(?:s|ed)"
+)
+_OWN_TARGET_CHANGE: Final = re.compile(
+    r"(?:raised|lowered)\s+by\s+about\s*$"
+)  # the price-target rewrite's output
+# the move after the number: "3% lower", "a 3.62% price decline", "6.6% Share Price Rise", "13% Weekly Drop"
+_PERIOD: Final = (
+    r"(?:year-to-date|ytd|weekly|daily|monthly|quarterly|annual|yearly|single-day|one-day|two-day|intraday|"
+    r"same-day|overnight|premarket|pre-market|session|one-year|1-year|five-day|5-day|52-week)\s+"
+)
+_POSTFIX_MOVE: Final = re.compile(
+    rf"(?i)\s*(?:higher|lower|(?:{_PERIOD})?(?:(?:share|stock)\s+(?:price\s+)?|(?:[\w-]+\s+)?price\s+)?(?:{_PERIOD})?"
+    r"(?:declines?|drops?|dips?|rises?|gains?|increases?|decreases?|falls?|rall(?:y|ies)|surges?|jumps?|slumps?|"
+    r"plunges?|loss(?:es)?|pullbacks?|sell-?offs?|rebounds?|advances?|slides?|moves?|swings?))\b"
+)
+# "higher" / "lower" before a noun is an adjective ("up to 35% higher performance", "68% lower death risk"),
+# before a preposition, a time word or the end a move ("closed 2.7% lower.", "3% higher premarket")
+_ADJECTIVE_AFTER: Final = re.compile(
+    r"(?i)\s+(?!(?:on|in|at|of|if|is|it|up|than|to|from|after|before|as|by|for|since|over|this|last|today|recently|"
+    r"and|or|with|while|"
+    r"during|following|amid|despite|premarket|pre-market|ahead|heading|going|versus|vs|the|its|their|so|yet|but|"
+    r"into|through|compared|year|week|month|day|session|overnight|intraday|midday|overall|off|ytd|when|until|now|"
+    r"still|again|apiece|each|respectively)\b)[a-z]{2,}"
+)
+# an amount after the number makes it a fundamental's change ("decreased by 5.5% to $5.51 billion")
+_AMOUNT_AFTER: Final = re.compile(
+    r"(?i)\s*(?:to|from)\s+(?:US)?\$\s?\d[\d,.]*\s*(?:billion|million|trillion|bn|mn|[BMK])\b"
+)
+# subjects besides a market word: the masked company itself ("The company Dives 37%"), a size bucket ("AI mega
+# caps"), a ticker ("A person (BRK.B) saw a minor decline of 0.42%")
+_OWN_SUBJECT: Final = re.compile(
+    r"(?i)\b(?:the\s+company|(?:mega|large|small|mid)[\s-]?caps?)\b"
+    r"|(?-i:\((?:[A-Za-z]{2,12}:\s?)?[A-Z]{1,5}(?:\.[A-Z])?\))"
+)
+_MARKET_SUBJECT: Final = re.compile(
+    r"(?i)\b(?:shares?|stocks?|stock\s+price|share\s+price|equit(?:y|ies)|index(?:es)?|indices|futures|ETFs?|"
+    r"S&P|SPX|NDX|DJIA|DJI|SPY|QQQ|Nasdaq|Dow|Russell|VIX|Stoxx|FTSE|DAX|Nikkei|Hang\s+Seng|KOSPI|Sensex|"
+    r"Treasur(?:y|ies)|bonds?|yields?|"
+    r"dollar|euro|yen|yuan|sterling|pound|currenc(?:y|ies)|bitcoin|ether(?:eum)?|crypto\w*|gold|silver|copper|oil|"
+    r"crude|WTI|Brent|natural\s+gas|nat-?gas|commodit(?:y|ies)|markets|stock\s+market|Wall\s+Street|benchmark|"
+    r"prices?\s+of\s+the\s+company|current\s+price|"
+    r"price\s+(?:declin|drop|dip|rall|surg|slump|plung|pullback|rebound|gain|jump|ris|mov|swing|loss|action|"
+    r"trend)\w*)\b"
+)
+# a name right before the move verb: "Nvidia dropped", "Tesla (TSLA) plunged", "Super Micro Computer jumped"
+_NAME_BEFORE_VERB: Final = re.compile(
+    r"(?:[A-Z][\w&.'’\-]*(?:\s+[A-Z][\w&.'’\-]*){0,3})(?:\s*\([^)]{1,25}\))?(?:\s+(?:also|has|have|had|was|is))?\s*$"
+)
+_CLAUSE_BREAK: Final = re.compile(
+    r"(?i)[,;(]|:(?=\s)|\b(?:and|while|after|but|with|sending|pushing|lifting|despite|"
+    r"(?<!much\s)(?<!high\s)(?<!low\s)(?<!many\s)(?<!far\s)as(?!\s+(?:much|high|low|many|far)\s+as\b))\b"
+)
+_POINTS_MOVE: Final = re.compile(
+    r"(?i)\b\d[\d,]*(?:\.\d+)?[\s-]+(?<!basis )points?\b(?!\s+(?:of|in)\s+(?:market\s+)?share)"
+)
+_INDEX_NAMES: Final = (
+    r"(?:S&P\s*500|S&P|SPX|Dow(?:\s+Jones)?(?:\s+Industrial\s+Average)?|Dow\s+Industrials|DJIA|"
+    r"Nasdaq(?:\s+Composite|\s+100)?|NDX|Russell\s+2000|VIX|Stoxx(?:\s+Europe)?\s*600|FTSE(?:\s*100)?|DAX|"
+    r"CAC(?:\s*40)?|Nikkei(?:\s*225)?|Hang\s+Seng|KOSPI|Sensex|Nifty(?:\s*50)?|Shanghai\s+Composite|TSX|"
+    r"dollar\s+index|DXY)"
+)
+_INDEX_LEVEL: Final = re.compile(
+    rf"(?i)\b{_INDEX_NAMES}\b[^.!?%]{{0,40}}?(?<![\w.,$])(?<!Russell )(?<!S&P )(?<!Wilshire )"
+    r"(?:\d{1,3}(?:,\d{3})++|\d{4,6}+)(?:\.\d+)?+"
+    r"(?![\d,.]*\s*(?:%|percent|companies|stocks|members|jobs|employees|people|points?\s+(?:of|in)))"
+)
+_COMMODITY_LEVEL: Final = re.compile(
+    r"(?i)\b(?:gold|silver|platinum|palladium|copper|oil|crude|WTI|Brent|natural\s+gas|nat-gas|bitcoin|BTC|"
+    r"ether(?:eum)?)\b(?P<gap>[^.!?]{0,40}?)(?:US\$|\$|USD\s?)\d[\d,]*+(?:\.\d+)?+"
+    r"(?!\d|\s*(?:[MBKT]\b|mn\b|bn\b|bln\b|million|billion|trillion))"
+    r"|(?:US\$|\$|USD\s?)\d[\d,]*+(?:\.\d+)?+\s+(?:an?|per)\s+(?:troy\s+)?(?:ounce|barrel|bbl|MMBtu|bushel)\b"
+)
+# what makes the amount after a commodity its level: a price or level word or a move verb between the two
+# ("Gold Surges to $3,816", "Brent oil price drops to $64"), and no fundamental ("The oil and gas company
+# reported $1.76 earnings", "copper producer keeps dividend steady with $0.075", "Business Platinum $50")
+_LEVEL_WORD: Final = re.compile(
+    r"(?i)\b(?:prices?|priced|futures|spot|to|at|above|below|past|near|around|over|under|beyond|hits?|tops?|"
+    r"topped|record|highs?|lows?|trades?|traded|trading|settled?|closed|ended|reached|crossed|breaks?|broke|"
+    r"surpass(?:es|ed)?|mark|level)\b"
+)
 _PER_SHARE_AFTER: Final = re.compile(r"(?i)\s*(?:per[\s-]+(?:\w+\s+)?share|a\s+share|/\s?share)")
 _SIZE: Final = re.compile(r"(?i)\s?(?:[MBK]\b|mn\b|mln\b|bn\b|bln\b|million|billion|trillion)")
 # a footnote mark after an amount ("a previous target of $49.00.1;")
@@ -434,6 +567,18 @@ _SENT_START: Final = re.compile(r"(?:^|[.!?:]\s+|\n\s*|^[\"“‘(\[]\s*)$")
 _DOUBLE_DET: Final = re.compile(r"\b(its|their|our|his|her|the|this|that|a|an|The|Its|Their|Our)\s+the\s+")
 _WS: Final = re.compile(r"[ \t]{2,}")
 # a placeholder glued to the next word ("2025Principal" → "the yearthe company"): a space
+# a weekday or month glued to the word before it (NA-04 revision 5: "StockSavvyThursday", "OnJuly 27",
+# "30thSeptember", "ESTAug 22nd"): ``mask_dates`` puts a space in first, so the rules see the word
+_WEEKDAYS_MONTHS: Final = (
+    "Monday|Tuesday|Wednesday|Thursday|Friday|Saturday|Sunday|January|February|March|April|June|July|August|"
+    "September|October|November|December"
+)
+_GLUED_PERIOD: Final = re.compile(
+    rf"(?<=[a-z])(?=(?:{_WEEKDAYS_MONTHS})\b)"
+    r"|(?<=\d(?:st|nd|rd|th))(?=(?:January|February|March|April|May|June|July|August|September|October|November|"
+    r"December)\b)"
+    r"|(?<=[A-Z]{2})(?=(?:Jan|Feb|Mar|Apr|Jun|Jul|Aug|Sep|Sept|Oct|Nov|Dec)\.?\s+\d)"
+)
 _GLUED_PLACEHOLDER: Final = re.compile(r"\b(the year|recently|the quarter)(?=[A-Za-z])")
 # a name next to its ticker: "Apple Inc. AAPL" → "the company the company" → "the company"
 _SAME_COMPANY: Final = re.compile(r"\b([Tt]he company)(?:[\s.·:\-]+the company\b)+")
@@ -783,6 +928,19 @@ _DATE_RULES: Final[tuple[tuple[re.Pattern[str], str], ...]] = tuple(
     for p, r in (
         (r"\b(?:Black|Cyber|Good)\s+(?:Friday|Monday)\b", "a holiday"),
         (r"\b(?:Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Sept|Oct|Nov|Dec)-\d{1,2}-(?:19|20)\d{2}\b", RECENTLY),
+        # NA-04 revision 5 (fifth verification): "24-Jun-2025", "Jul, 2025" bylines, "29 Aug", "10 Sept",
+        # "6/8 15:18"
+        (
+            r"\b\d{1,2}-(?:Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Sept|Oct|Nov|Dec)-(?:(?:19|20)\d{2}|\d{2})\b",
+            RECENTLY,
+        ),
+        (rf"\b(?:Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Sept|Oct|Nov|Dec)\.?,\s*{YEAR_RE}\b", RECENTLY),
+        (
+            rf"(?<![\d.,])\b(?:[12]\d|3[01]|0?[1-9])(?:st|nd|rd|th)?\s+(?:Jan|Feb|Mar|Apr|Jun|Jul|Aug|Sep|Sept|Oct|Nov|"
+            rf"Dec)\b(?!\.?\d)(?:,?\s*{YEAR_RE}\b)?",
+            RECENTLY,
+        ),
+        (r"(?<![\d/.])\b\d{1,2}/\d{1,2}(?=\s+\d{1,2}:\d{2}\b)", RECENTLY),
         (r"\b(?:Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Sept|Oct|Nov|Dec)[-’'/]\d{2}\b(?![-/.]\d)", RECENTLY),
         (rf"{YEAR_RE}\s?[年년]\s?(?:{CJK_DAY}|\d{{1,2}}\s?[月월])", RECENTLY),
         (rf"(?<!\d){CJK_DAY}", RECENTLY),
@@ -871,7 +1029,7 @@ _DATE_RULES: Final[tuple[tuple[re.Pattern[str], str], ...]] = tuple(
         ),
         (rf"{_I}(?<![A-Za-z])(?:first|second|third|fourth|1st|2nd|3rd|4th)-quarter\b", "quarterly"),
         (
-            rf"{_I}(?<![A-Za-z])(?:the\s+)?(?:first|second|third|fourth|1st|2nd|3rd|4th)\s+(?:fiscal\s+)?quarter\b",
+            rf"{_I}(?<![A-Za-z])(?:the\s+)?(?:first|second|third|fourth|1st|2nd|3rd|4th)\s+(?:fiscal\s+)?(?:quarter|qtr)\b",
             QUARTER,
         ),
         (rf"{_I}(?<![A-Za-z])(?:first|second|1st|2nd)-half\b", "half-year"),
@@ -881,7 +1039,7 @@ _DATE_RULES: Final[tuple[tuple[re.Pattern[str], str], ...]] = tuple(
         ),
         (rf"{_I}(?<![A-Za-z])(?:the\s+)?(?:first|second|1st|2nd)\s+(?:fiscal\s+)?half\b", HALF_YEAR),
         (rf"\b(?:the\s+)?fiscal\s+(?:year\s+)?{APOS}?(?:{YEAR_RE}|\d{{2}})\b", FISCAL_YEAR),
-        (rf"{_I}(?<![A-Za-z0-9])FY\s?{APOS}?(?:{YEAR_RE}|\d{{2}})(?![A-Za-z0-9])", FISCAL_YEAR),
+        (rf"{_I}(?<![A-Za-z0-9])FY[\s\-]?{APOS}?(?:{YEAR_RE}|\d{{2}})(?![A-Za-z0-9])", FISCAL_YEAR),
         (rf"{_I}(?<![A-Za-z0-9])CY\s?{APOS}?(?:{YEAR_RE}|\d{{2}})(?![A-Za-z0-9])", YEAR),
         (rf"(?<![A-Za-z0-9'’‘]){APOS}[12]\d(?![A-Za-z0-9%'’])", YEAR),  # "Raises '25 View", "Feb 18 '25"
         (rf"\b{YEAR_RE}\s*[-–/]\s*(?:{YEAR_RE}|\d{{2}})\b", "the period"),
@@ -901,6 +1059,32 @@ _DATE_RULES: Final[tuple[tuple[re.Pattern[str], str], ...]] = tuple(
             "recent",
         ),
         (rf"(?:{PREP})?(?<![A-Za-z]){MON}(?![A-Za-z0-9])", RECENTLY),  # a lone "Aug.": "on Aug.", "(Sept.)"
+        # NA-04 revision 5: a lone abbreviation in title case ("Jul Employment Trends Index", "in Aug,", "Sep
+        # nat-gas", "(Jul year-end)"); "Jan" and "Mar" only where a date is meant (they are also names: "Jan
+        # Hatzius", "Del Mar"); not inside a longer word ("Nový")
+        (rf"(?:{PREP})?(?<![^\W\d_])(?:Feb|Apr|Jun|Jul|Aug|Sep|Sept|Oct|Nov|Dec)(?![^\W\d_])", RECENTLY),
+        (
+            r"(?:(?<=\bin )|(?<=\bon )|(?<=\bof )|(?<=\bfor )|(?<=\bby )|(?<=\bfrom )|(?<=\bsince )"
+            r"|(?<=\buntil )"
+            r"|(?<=: )|(?<=/))(?:Jan|Mar)(?![^\W\d_])|\b(?:Jan|Mar)(?=\s*[,;:)]|\s+(?:the year|recently)\b)",
+            RECENTLY,
+        ),
+        # lower-case months with a day ("july 14th", "14 july")
+        (
+            r"(?<![A-Za-z])(?:january|february|march|april|may|june|july|august|september|october|november|"
+            r"december)\s+(?:[12]\d|3[01]|0?[1-9])(?:st|nd|rd|th)?\b",
+            RECENTLY,
+        ),
+        (
+            r"\b(?:[12]\d|3[01]|0?[1-9])(?:st|nd|rd|th)?\s+(?:of\s+)?(?:january|february|march|april|june|july|"
+            r"august|september|october|november|december)\b",
+            RECENTLY,
+        ),
+        # a day ordinal left beside a masked year or "of the month" ("24th, the year", "the 23rd of the
+        # month")
+        (r"\b(?:[12]\d|3[01]|0?[1-9])(?:st|nd|rd|th),?\s+the year\b", RECENTLY),
+        (r"\b(?:the\s+)?(?:[12]\d|3[01]|0?[1-9])(?:st|nd|rd|th)\s+of\s+the\s+month\b", RECENTLY),
+        (r"(?<=[Rr]ecently)\s+(?:[12]\d|3[01]|0?[1-9])(?:st|nd|rd|th)\b", ""),
         (rf"{_I}(?:{PREP})?\b{WEEKDAY}\s+(?:night|morning|afternoon|evening)\b", RECENTLY),
         (rf"{_I}(?:\bon\s+)?\b{WEEKDAY}(?:'s|’s)", "the recent"),
         (rf"{_I}(?:{PREP}|\b(?:last|this|next|early|late)\s+){WEEKDAY}s?\b", RECENTLY),
@@ -1111,6 +1295,7 @@ class Masker:
 
     def mask_dates(self, text: str) -> tuple[str, int]:
         """Step 3: dates, weekdays, months, years, fiscal periods."""
+        text = _GLUED_PERIOD.sub(" ", text)
         total = 0
         for pattern, word in _DATE_RULES:
             text, n = self._replace(pattern, text, word)
@@ -1298,6 +1483,94 @@ class Masker:
         return False
 
     @staticmethod
+    def has_market_move(sentence: str) -> bool:
+        """A percent or points price move of any security, or an index or commodity level (revision 5).
+
+        A percent near a move word is a price move when it is signed and no fundamental is near, when a
+        market subject (shares, an index, futures, oil, the dollar, ...) follows the last fundamental of its
+        clause, or when a capitalized name stands right before the move verb ("Nvidia dropped 3.5%") and the
+        clause holds no fundamental ("Revenue rose 5%"). An amount after a commodity is its level when a level
+        word or a move verb stands between them. The masker's own price-target output ("raised by about 7%")
+        stays."""
+        if _INDEX_LEVEL.search(sentence):
+            return True
+        for c in _COMMODITY_LEVEL.finditer(sentence):
+            gap = c.group("gap")
+            if gap is None or (
+                (_LEVEL_WORD.search(gap) or _MOVE_ANY.search(gap)) and not _FUND_CLAUSE.search(gap)
+            ):
+                return True
+        # a sentence without any fundamental may name its subject anywhere: "After a rally of 7.8% in a single
+        # week, shares of the company ...", "The company Sees 13% Weekly Drop"
+        anywhere = _FUND_CLAUSE.search(sentence) is None and (
+            _MARKET_SUBJECT.search(sentence) is not None or _OWN_SUBJECT.search(sentence) is not None
+        )
+        for m in list(_PCT_ANY.finditer(sentence)) + list(_POINTS_MOVE.finditer(sentence)):
+            before = sentence[max(0, m.start() - 90) : m.start()]
+            if _OWN_TARGET_CHANGE.search(before):
+                continue
+            after = sentence[m.end() : m.end() + 70]
+            near = before[-45:]
+            found = list(_MOVE_ANY.finditer(near))
+            mv = found[-1] if found else None
+            # "30%-50% Furniture Tariffs" is a range, not a sign ("S&P 500 +1.2%" is one)
+            signed = m.groupdict().get("sign") is not None and not re.search(r"[\d%]$", before)
+            post = _POSTFIX_MOVE.match(after)
+            tail = after[post.end() :] if post else ""
+            if re.match(r"\s+(?:in|of|for)\b", tail) and _FUND_CLAUSE.search(tail[:45]):
+                post = None  # "a 7.2% rise in sales"
+            if post and re.fullmatch(
+                r"(?i)\s*(?!(?:share|stock)\b)(?:[\w-]+\s+)?price\s+(?:in|de)creases?", post.group(0)
+            ):
+                post = None  # "a 5% price increase on its products"; a share price increase stays a move
+            # a masked period may stand between the adjective and its noun: "26% lower the quarter net income"
+            noun = re.sub(r"^\s+the\s+(?:quarter|half-year|year|month)\b", "", tail)
+            if post and post.group(0).strip().lower() in ("higher", "lower") and _ADJECTIVE_AFTER.match(noun):
+                post = None
+            if _AMOUNT_AFTER.match(after) or re.match(r"\s*more\b", after):
+                continue  # "decreased by 5.5% to $5.51 billion", "to add 20% more flights"
+            if mv is None and not signed and post is None:
+                continue
+            # a signed number is a move unless a fundamental stands before it in the sentence or in the words
+            # right after it ("-19.71% Quarterly Revenue Decline", "installs +11% YoY")
+            right_after = " ".join(re.split(r"[^\w\s-]", after, maxsplit=1)[0].split()[:3])
+            if anywhere or (
+                signed
+                and not _FUND_CLAUSE.search(sentence[: m.start()])
+                and not _FUND_CLAUSE.search(right_after)
+            ):
+                return True
+            # a price move as the noun after the number: "Recent 7% Price Dip", "a 3.62% price decline" (a "5%
+            # price increase" may be a product's)
+            if post is not None and re.search(
+                r"(?i)price\s+(?![\w\s-]*(?:in|de)creases?\b)[\w\s-]+$", post.group(0)
+            ):
+                return True
+            # a number in parentheses belongs to the clause before them: "Recent price decline (-1.02%)"
+            src = re.sub(r"\(\s*$", "", before)
+            breaks = list(_CLAUSE_BREAK.finditer(src))
+            clause = src[breaks[-1].end() :] if breaks else src
+            first = clause.split()[0] if clause.split() else ""
+            if breaks and _VERB_FORM.fullmatch(first):  # "S&P 500 rises second week, adds 1.7%"
+                clause = src[breaks[-2].end() :] if len(breaks) > 1 else src
+            if _FUND_CLAUSE.match(after.lstrip()):
+                continue
+            # the subject is the market word after the clause's last fundamental: "Strong earnings sent shares
+            # up 7%" is a move, "Tesla's deliveries jumped 20%" and "Gold production rose 5%" are not
+            funds = list(_FUND_CLAUSE.finditer(clause))
+            rest = clause[funds[-1].end() :] if funds else clause
+            if _MARKET_SUBJECT.search(rest) or _OWN_SUBJECT.search(rest):
+                return True
+            if funds:
+                continue
+            if mv is not None and _VERB_FORM.fullmatch(mv.group(0)):
+                head = near[: mv.start()]
+                name = _NAME_BEFORE_VERB.search(head)
+                if name and not _FUND_CLAUSE.search(name.group(0)):
+                    return True
+        return False
+
+    @staticmethod
     def has_cents_level(sentence: str) -> bool:
         """A cents amount that is a share price (``_CENTS``, ``_PRICE_LEFT``, ``_PER_SHARE_FUND``)."""
         fundamental = _PER_SHARE_FUND.search(sentence) is not None
@@ -1359,7 +1632,11 @@ class Masker:
         text, k = PER_SHARE.subn(deal, text)
         dropped = 0
         for sentence in split_sentences(text):
-            if self.has_cents_level(sentence) or _OPTIONS_FLOW.search(sentence):
+            if (
+                self.has_cents_level(sentence)
+                or _OPTIONS_FLOW.search(sentence)
+                or self.has_market_move(sentence)
+            ):
                 text = text.replace(sentence, "", 1)
                 dropped += 1
         if dropped:
@@ -1378,7 +1655,17 @@ class Masker:
             c.add(cc)
         text, n = self.mask_dates(text)
         c.dates += n
-        return text, c
+        return self.drop_market_moves(text), c
+
+    def drop_market_moves(self, text: str) -> str:
+        """Revision 5: sentences with a price move of any security or an index / commodity level go before
+        NER, which would otherwise turn a title-case "Gold Surges" into a person and hide the commodity."""
+        dropped = False
+        for sentence in split_sentences(text):
+            if self.has_market_move(sentence):
+                text = text.replace(sentence, "", 1)
+                dropped = True
+        return _SEP_RUN.sub(lambda m: m.group(1) + " ", text).strip(" ;|") if dropped else text
 
     def post_ner(
         self, text: str, candidates: Sequence[Candidate], surnames: frozenset[str] = frozenset()
