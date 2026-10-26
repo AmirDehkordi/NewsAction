@@ -211,6 +211,7 @@ _MOVE_ANY: Final = re.compile(
     r"dipp?(?:s|ed|ing)?|spik(?:e|es|ed|ing)|slump(?:s|ed|ing)?|eas(?:es|ed|ing)|firm(?:ed|ing)|"
     r"rebound(?:s|ed|ing)?|recover(?:s|ed|ing)?|pull(?:s|ed|ing)?\s+back|crash(?:es|ed|ing)?|tank(?:s|ed|ing)?|"
     r"(?:sky)?rocket(?:s|ed|ing)?|pop(?:ped|ping)|zoom(?:s|ed|ing)?|swung|swing(?:s|ing)?|up(?!\s+to\b)|down(?!\s+to\b)|higher|lower|"
+    r"returned|"
     r"increas(?:e|es|ed|ing)|decreas(?:e|es|ed|ing)|change[sd]?|move[sd]?(?!\s+on\b)|movements?|uptick|downtick|"
     r"loss(?:es)?|pullbacks?|sell(?:s|ing)?\s+off|sold\s+off|"
     r"sell-?offs?|routs?|plummet(?:s|ed|ing)?|skid(?:s|ded|ding)?|sag(?:s|ged|ging)?|div(?:e|es|ed|ing)|dove|"
@@ -254,7 +255,7 @@ _VERB_FORM: Final = re.compile(
     r"tumbl(?:es|ed)|sank|sinks|soar(?:s|ed)|edg(?:es|ed)|tick(?:s|ed)|slip(?:s|ped)|dip(?:s|ped)|spik(?:es|ed)|"
     r"slump(?:s|ed)|rebound(?:s|ed)|crash(?:es|ed)|tank(?:s|ed)|(?:sky)?rocket(?:s|ed)|popped|zoom(?:s|ed)|swung|"
     r"plummet(?:s|ed)|skidded|sagged|div(?:es|ed)|dove|nosedived|cratered|collapsed|lea(?:ps|pt|ped)|"
-    r"(?:out|under)perform(?:s|ed)"
+    r"(?:out|under)perform(?:s|ed)|returned"
 )
 _OWN_TARGET_CHANGE: Final = re.compile(
     r"(?:raised|lowered)\s+by\s+about\s*$"
@@ -363,7 +364,7 @@ _INDEX_LEVEL: Final = re.compile(
     r"(?:\d{1,3}(?:,\d{3})++|\d{4,6}+)(?:\.\d+)?+"
     r"(?![\d,.]*\s*(?:%|percent|companies|stocks|members|jobs|employees|people|points?\s+(?:of|in)|apartment|"
     r"homes?|units?|customers?|stores?|locations?|square|sq|acres?|barrels?|tons?|miles?|users?|subscribers?|"
-    r"vehicles?|shares?|workers?))"
+    r"vehicles?|shares?|workers?|shareholders?|stockholders?|holders?|households?|patients?|accounts?)\b)"
 )
 _COMMODITY_LEVEL: Final = re.compile(
     r"(?i)\b(?:gold|silver|platinum|palladium|copper|oil|crude|WTI|Brent|natural\s+gas|nat-gas|bitcoin|BTC|"

@@ -344,7 +344,7 @@ _MOVING: Final = re.compile(
     r"dropped|drops|drop|jumped|jumps|jump|climbed|climbs|slid|slides|declined|declines|decline|advanced|advances|"
     r"retreated|rallied|rallies|rally|plunged|plunges|plunge|surged|surges|surge|tumbled|tumbles|sank|sinks|soared|"
     r"soars|edged|ticked|slipped|slips|dipped|dips|dip|spiked|slumped|slump|rebounded|crashed|crashes|tanked|"
-    r"rocketed|skyrocketed|popped|zoomed|swung|plummeted|plummets|skidded|skids|sagged|sags|dived|dives|dove|"
+    r"rocketed|skyrocketed|popped|zoomed|swung|plummeted|plummets|skidded|skids|sagged|sags|dived|dives|dove|returned|"
     r"nosedived|nosedives|cratered|craters|collapses|leaps|"
     r"collapsed|leapt|leaped|corrected|outperformed|underperformed|pullback|sell-?off|rout|increased?|decreased?|"
     r"increases|increasing|decreases|decreasing|selling\s+off|sold\s+off|moved|moves|move(?!\s+on\b)|movements?|"
@@ -399,7 +399,7 @@ _NAME_THEN_VERB: Final = re.compile(
     r"(?P<name>[A-Z][\w&.'’\-]*(?:\s+[A-Z][\w&.'’\-]*){0,3})(?:\s*\([^)]{1,25}\))?\s+"
     r"(?:rose|fell|gained|lost|added|dropped|jumped|climbed|slid|declined|advanced|rallied|plunged|surged|tumbled|"
     r"sank|soared|edged|slipped|dipped|spiked|slumped|rebounded|crashed|tanked|rocketed|popped|zoomed|plummeted|"
-    r"skidded|sagged|dived|dove|nosedived|cratered|collapsed|leapt|leaped)\b[^%]{0,25}$"
+    r"skidded|sagged|dived|dove|nosedived|cratered|collapsed|leapt|leaped|returned)\b[^%]{0,25}$"
 )
 # the move named after the number, up to three words on: "a 3.62% price decline", "a 9.52% 5-day decline",
 # "Mastercard's 13% 3-Month Rise", "a 40%+ rise"
@@ -450,7 +450,8 @@ _INDEX_AT_LEVEL: Final = re.compile(
     r"Nikkei|Hang\s+Seng|dollar\s+index)\b[^.!?%]{0,60}?(?<![\w.,$])(?<!Russell )(?<!S&P )"
     r"(?:\d{1,3}(?:,\d{3})++|\d{4,6}+)"
     r"(?![\d,.]*\s*(?:%|percent|companies|stocks|jobs|employees|points?\s+(?:of|in)|apartments?|homes?|units?|"
-    r"stores?|customers?|square|acres?|barrels?|tons?|users?|vehicles?|shares?|workers?))"
+    r"stores?|customers?|square|acres?|barrels?|tons?|users?|vehicles?|shares?|workers?|shareholders?|"
+    r"stockholders?|holders?|households?|patients?|accounts?)\b)"
 )
 _COMMODITY_AT_LEVEL: Final = re.compile(
     r"(?i)\b(?:gold|silver|platinum|copper|oil|crude|WTI|Brent|natural\s+gas|bitcoin|BTC|ether(?:eum)?)\b"

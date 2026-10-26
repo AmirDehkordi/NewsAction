@@ -918,6 +918,10 @@ REVISION5_MOVES = (
     "stocks.",
     "The company reported mixed trading activity recently, with a 0.01% gain and a trading volume of $0.74 "
     "billion.",
+    # the A3.5 market states of the third build, read by hand
+    "The S&P 500 finished above the 5,000 milestone for the first time recently.",
+    "Dow tops 40,000 milestone",
+    "The S&P 500 Index (NYSE:SPY) returned a total of 26.3% last year.",
 )
 REVISION5_FUNDAMENTALS = (
     "Revenue rose 5% year over year to $94.9 billion.",
@@ -1011,6 +1015,8 @@ REVISION5_FUNDAMENTALS = (
     "U.S. EIA reports 213,000 bpd crude run surge, pushing refinery utilization to 95.5%.",
     "The company reported operating cash flow of $2.19 billion, up 13% year over year.",
     "While the 2.5% COLA increase may offer some relief, many the company employees must act.",
+    "The fund's managers returned 5% of capital to investors.",
+    "S&P 500 member the company has about 5,000 shareholders of record.",
 )
 
 
