@@ -168,8 +168,15 @@ _LEVEL_CUES: Final = re.compile(
 # $251.12"): after the price-target rewrites, a sentence that still holds a cents-precision amount and no
 # per-share fundamental goes; a size ("$9.05 Billion") is not a level
 _CENTS: Final = re.compile(
-    rf"(?i){_CUR}\d[\d,]*\.\d{{2}}(?!\d)(?!\s*(?:[MBKT]\b|mn\b|mln\b|bn\b|million|billion|trillion))"
+    rf"(?i){_CUR}\d[\d,]*\.\d{{2}}(?!\d)(?!\s*(?:[MBKT]\b|mn\b|mln\b|bn\b|bln\b|million|billion|trillion))"
 )
+# a cents amount with a price-target label in the sentence ("Receives $645.36 Consensus Price Target", "a
+# $422.37 average price target"), or quoted with its percent change ("GE VernovaGEV $554.00 (-3.11%)"), is a
+# level
+_PT_LABEL: Final = re.compile(
+    r"(?i)\b(?:price\s+targets?|target\s+prices?|price\s+objectives?|price\s+goals?|PTs?)\b"
+)
+_QUOTED_PCT: Final = re.compile(r"\s*\(\s*[+\-−–]?\d+(?:[.,]\d+)?\s?%\s*\)")
 _PER_SHARE_FUND: Final = re.compile(
     r"(?i)\b(?:eps|earnings|per[\s-]+(?:\w+\s+)?share|dividends?|distributions?|payout|ffo|affo|consensus|"
     r"estimates?|expected|guidance|book\s+value|nav|coupons?|notes|bonds?)\b|/\s?share|\ba\s+share\b"
@@ -188,7 +195,7 @@ _OPTIONS_FLOW: Final = re.compile(
     r"|\bweekly\s+\$?\d[\d.]*\s+(?:puts?|calls?)\b|\bunderlying\s+shares\s+were\b|\b(?:lifted|hit|paid)\s+the\s+\$"
 )
 _PER_SHARE_AFTER: Final = re.compile(r"(?i)\s*(?:per[\s-]+(?:\w+\s+)?share|a\s+share|/\s?share)")
-_SIZE: Final = re.compile(r"(?i)\s?(?:[MBK]\b|mn\b|mln\b|bn\b|million|billion|trillion)")
+_SIZE: Final = re.compile(r"(?i)\s?(?:[MBK]\b|mn\b|mln\b|bn\b|bln\b|million|billion|trillion)")
 # a footnote mark after an amount ("a previous target of $49.00.1;")
 _FOOTNOTE: Final = re.compile(r"(\$\s?\d[\d,]*\.\d{2})\.\d(?!\d)")
 _VERBS: Final = (
@@ -308,9 +315,14 @@ PT_AMOUNT_X: Final = re.compile(
     r"(?:\s*/\s*share)?"
 )
 AMOUNT_PT_X: Final = re.compile(rf"(?i){_AMT_X}\s+(?P<label>{_PT})\b")
-PER_SHARE: Final = re.compile(r"(?i)\$\s?\d[\d,]*(?:\.\d+)?\s*(?:(?:a|per)\s+|/\s?)share\b")
+PER_SHARE: Final = (
+    re.compile(  # "$45 per share", "$210/Share", "$47.50 in cash a share", "$4.04 cash + CVR per share"
+        r"(?i)\$\s?\d[\d,]*(?:\.\d+)?(?:\s+(?:in\s+)?cash)?(?:\s*\+\s*(?:a\s+|one\s+)?CVR)?"
+        r"\s*(?:(?:a|per)\s+(?:common\s+)?|/\s?)share\b"
+    )
+)
 _DEAL: Final = re.compile(
-    r"(?i)\b(?:acquir\w*|acquisition|buy(?:out|s|ing)?|bought|offer\w*|deal|merger|merge|takeover|tender|bid|"
+    r"(?i)\b(?:acquir\w*|acquisition|buy(?:out|s|ing)?|bought|offer\w*|deal|merger|merge|takeover|tender|bid|pay(?:s|ing)?|paid|"
     r"valu\w+|purchas\w*|sale|sell\w*|sold|pric(?:ed|ing)|consideration|premium)\b"
 )
 _FUND_LEFT: Final = re.compile(
@@ -1289,12 +1301,15 @@ class Masker:
     def has_cents_level(sentence: str) -> bool:
         """A cents amount that is a share price (``_CENTS``, ``_PRICE_LEFT``, ``_PER_SHARE_FUND``)."""
         fundamental = _PER_SHARE_FUND.search(sentence) is not None
+        target = _PT_LABEL.search(sentence) is not None
         for m in _CENTS.finditer(sentence):
+            if _QUOTED_PCT.match(sentence, m.end()):
+                return True
             if _PER_SHARE_AFTER.match(sentence, m.end()):
                 continue
             if _PER_SHARE_FUND.search(sentence[max(0, m.start() - 45) : m.start()]):
                 continue
-            if _PRICE_LEFT.search(sentence[max(0, m.start() - 45) : m.start()]) or not fundamental:
+            if target or _PRICE_LEFT.search(sentence[max(0, m.start() - 45) : m.start()]) or not fundamental:
                 return True
         return False
 
@@ -1337,8 +1352,9 @@ class Masker:
         n += k
 
         def deal(m: re.Match[str]) -> str:
-            left = text[max(0, m.start() - 80) : m.start()]
-            return "a per-share price" if _DEAL.search(left) and not _FUND_LEFT.search(left) else m.group(0)
+            left, right = text[max(0, m.start() - 80) : m.start()], text[m.end() : m.end() + 40]
+            fund = _FUND_LEFT.search(left) or _FUND_LEFT.search(right)  # "pay $1.02 per share in dividends"
+            return "a per-share price" if _DEAL.search(left) and not fund else m.group(0)
 
         text, k = PER_SHARE.subn(deal, text)
         dropped = 0

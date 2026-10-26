@@ -206,8 +206,10 @@ _SHARE_VERB_LEVEL: Final = re.compile(
 # "added 16%"
 _CENTS_ANY: Final = re.compile(
     r"(?i)(?:C\$|US\$|A\$|\$|USD\s?|GBX\s?|€\s?|£\s?)\d[\d,]*\.\d{2}(?!\d)"
-    r"(?!\s*(?:[MBKT]\b|mn\b|mln\b|bn\b|million|billion|trillion))"
+    r"(?!\s*(?:[MBKT]\b|mn\b|mln\b|bn\b|bln\b|million|billion|trillion))"
 )
+_TARGET_WORDS: Final = re.compile(r"(?i)\b(?:price\s+targets?|target\s+prices?|price\s+objectives?|PTs?)\b")
+_PCT_IN_PARENS: Final = re.compile(r"\s*\(\s*[+\-−–]?\d+(?:[.,]\d+)?\s?%\s*\)")
 _FUNDAMENTAL_WORDS: Final = re.compile(
     r"(?i)\b(?:eps|earnings|per[\s-]+(?:\w+\s+)?share|dividends?|distributions?|payouts?|ffo|affo|consensus|"
     r"estimates?|expected|expects?|guidance|book\s+value|nav|coupons?|notes|bonds?)\b|/\s?share|\ba\s+share\b"
@@ -239,11 +241,12 @@ _AMOUNT_THEN_PRICE: Final = re.compile(
 )
 _LEFT_CUES: Final = re.compile(r"(?i)(?:\bper|\ba|earnings|eps|loss|income|dividends?|\d)[\s-]+(?:\w+\s+)?$")
 _FOR_END: Final = re.compile(r"(?i)\bfor\s*$")
-_SIZE_AFTER: Final = re.compile(r"(?i)\s?(?:[MBKT]\b|mn\b|mln|bn|million|billion|trillion)")
+_SIZE_AFTER: Final = re.compile(r"(?i)\s?(?:[MBKT]\b|mn\b|mln|bn|bln|million|billion|trillion)")
 _PER_SHARE_AFTER: Final = re.compile(r"(?i)\s*(?:per[\s-]+(?:\w+\s+)?share|a\s+share|/\s?share)")
-_DEAL_PER_SHARE: Final = re.compile(
-    r"(?i)\b(?:acquir\w*|buyout|offer\w*|deal|merger|takeover|tender|bid)\b[^.!?]{0,60}?\$\s?\d[\d,]*(?:\.\d+)?"
-    r"\s*(?:/\s?|per\s+|a\s+)share\b"
+_DEAL_PER_SHARE: Final = re.compile(  # "$47.50 in cash a share", "$4.04 cash + CVR per share"
+    r"(?i)\b(?:acquir\w*|buyout|offer\w*|deal|merger|takeover|tender|bid|pay(?:s|ing)?|paid)\b[^.!?]{0,60}?"
+    r"\$\s?\d[\d,]*(?:\.\d+)?(?:\s+(?:in\s+)?cash)?(?:\s*\+\s*(?:a\s+|one\s+)?CVR)?"
+    r"\s*(?:/\s?|per\s+(?:common\s+)?|a\s+)share\b(?![^.!?]{0,30}\b(?:dividends?|distributions?|eps|earnings)\b)"
 )
 # "30% higher revenue", "26% lower the quarter net income" (not "2% higher after earnings")
 _FUND_AFTER: Final = re.compile(
@@ -265,10 +268,12 @@ def cents_level(sentence: str) -> bool:
     fundamental; not when "per share" follows or a fundamental word is within 45 characters before it."""
     has_fund = _FUNDAMENTAL_WORDS.search(sentence) is not None
     for m in _CENTS_ANY.finditer(sentence):
+        if _PCT_IN_PARENS.match(sentence, m.end()):
+            return True
         before = sentence[max(0, m.start() - 45) : m.start()]
         if _PER_SHARE_AFTER.match(sentence, m.end()) or _FUNDAMENTAL_WORDS.search(before):
             continue
-        if _PRICE_BEFORE.search(before) or not has_fund:
+        if _TARGET_WORDS.search(sentence) or _PRICE_BEFORE.search(before) or not has_fund:
             return True
     return False
 

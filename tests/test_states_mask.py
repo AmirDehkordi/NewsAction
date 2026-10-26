@@ -706,6 +706,10 @@ REVISION4_GONE = (
     ("Results beat revenue estimates, with intrinsic value ($261.36) above current price ($246.03).", "$246"),
     ("Apple ended the latest trading session unchanged at $27.75, after gains driven by earnings.", "$27"),
     ("Apple Presents at Morgan Stanley Conference, Jun-12-2025 02:30 PM", "Jun-12"),
+    ("Apple Receives $645.36 Consensus Price Target from Analysts", "$645"),
+    ("Apple faces mixed ratings, with 8 Buy vs. 10 Hold and a $422.37 average price target.", "$422"),
+    ("GE VernovaGEV $554.00 (-3.11%) posted its best day after a strong earnings report.", "$554"),
+    ("Apple will pay Metsera $47.50 in cash a share and a further $22.50 in a deal.", "$47.50"),
 )
 REVISION4_KEEP = (
     "Apple reported earnings of $1.71 per share, beating estimates by $0.04.",
@@ -729,6 +733,7 @@ REVISION4_KEEP = (
     "Home Furnishings Stores Market Expansion Continues, with Forecast Valuation of $286.39 Billion",
     "Adjusted earnings per share rose 8.3% year over year in the quarter to $1.44.",
     "Apple's EPS rose to $1.44, beating the consensus of $1.40.",
+    "Apple's quarterly revenue fell 1.6% to $6.16 bln, beating estimates.",
 )
 
 
@@ -741,6 +746,15 @@ def test_revision4_price_talk(text: str, gone: str) -> None:
 def test_revision4_fundamentals_are_kept(text: str) -> None:
     out = m(text, AAPL)
     assert all(a in out for a in re.findall(r"\$[\d.,]+[MB]?|\d+%", text)), out
+
+
+def test_deal_prices_are_not_dividends() -> None:
+    """The price step alone (NA-02's scrubber already drops most "$X per share" phrasings): "pay" is a deal
+    word, unless a fundamental is on either side."""
+    out, _ = masker().mask_prices("The company will pay Metsera $47.50 in cash a share in the deal.")
+    assert "$47.50" not in out and "a per-share price" in out, out
+    out, _ = masker().mask_prices("The company will pay $1.02 per share in dividends next quarter.")
+    assert "$1.02 per share" in out, out
 
 
 def test_price_targets_in_other_notations_become_a_relative_change() -> None:
