@@ -1,0 +1,46 @@
+# Scheduled macro releases for the state's market block (PREREG §6.10 "scheduled macro releases today";
+# PRD NA-04 S2; newsaction.states.macro). Both schedules are published in advance, so a session's flags are
+# `static` inputs: they say only that a release is scheduled, never what it said.
+
+cpi:
+  # Release dates come from the data: the ALFRED vintages of CPIAUCSL in work/market/cpi_vintages.parquet.
+  # A vintage date (realtime_start) is a CPI release when that vintage adds a new reference month. That rule
+  # leaves out the February re-vintages of seasonal factors (e.g. 2024-02-09). BLS publishes CPI at 08:30 ET,
+  # before the D0 cutoff.
+  series_id: CPIAUCSL
+  words: consumer price index release before the open
+
+fomc:
+  # FOMC policy statement dates (the second day of each scheduled meeting; statements at 14:00 ET).
+  # Source: Board of Governors of the Federal Reserve System, "Meeting calendars and information",
+  # https://www.federalreserve.gov/monetarypolicy/fomccalendars.htm (read 2026-10-25). The 2025-08-22
+  # notation vote is not a policy statement and is not listed; the page shows no unscheduled meeting in
+  # 2024-2026.
+  words: Federal Reserve policy statement in the afternoon
+  statement_dates:
+    - 2024-01-31
+    - 2024-03-20
+    - 2024-05-01
+    - 2024-06-12
+    - 2024-07-31
+    - 2024-09-18
+    - 2024-11-07
+    - 2024-12-18
+    - 2025-01-29
+    - 2025-03-19
+    - 2025-05-07
+    - 2025-06-18
+    - 2025-07-30
+    - 2025-09-17
+    - 2025-10-29
+    - 2025-12-10
+    - 2026-01-28
+    - 2026-03-18
+    - 2026-04-29
+    - 2026-06-17
+    - 2026-07-29
+    - 2026-09-16
+    - 2026-10-28
+    - 2026-12-09
+
+none_words: none scheduled

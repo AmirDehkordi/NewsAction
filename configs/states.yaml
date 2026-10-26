@@ -1,0 +1,155 @@
+# NA-04 state build constants (newsaction.states; PRD NA-04 S2, S5–S7). The scales themselves are in
+# configs/codebook_v1.yaml and the question text in configs/questions_v1.yaml. Hashed into the NA-11 freeze.
+
+context:                          # PREREG §6.10 company block
+  history_sessions: 252           # percentile / z history of a value: the 252 sessions before the scored one
+  history_min: 126                # fewer valid observations -> "not available"
+  perf_windows:                   # PREREG §6.10 "past 5 / 20 / 60 sessions" (panel z_m5 / z_m20 / z_m60)
+    week: 5
+    month: 20
+    three_months: 60
+  revision_days: 30               # FY1 EPS consensus revision: as of t-1 vs as of t-1 minus 30 days
+
+market:                           # PREREG §6.10 market block, all from data through t-1
+  # change: return (close / previous close - 1) or diff (level difference). value_scale converts the source
+  # unit to a decimal (FRED rates are in percent). extra_lag: sessions of publication lag on top of t-1.
+  # The ICE BofA high-yield OAS is computed after the US close and reaches FRED with a delay, so the state
+  # uses the observation of t-2 (decisions doc); Treasury publishes the constant-maturity yields
+  # the same evening, and market_prices closes are known at the close.
+  series:
+    stock_market: {source: market_prices, symbol: SPY, change: return, value_scale: 1.0, e0_unit: pct, extra_lag: 0}
+    vix: {source: market_prices, symbol: "^VIX", change: diff, value_scale: 1.0, e0_unit: points, extra_lag: 0}
+    ten_year_yield: {source: fred, symbol: DGS10, change: diff, value_scale: 0.01, e0_unit: bp, extra_lag: 0}
+    high_yield_spread: {source: fred, symbol: BAMLH0A0HYM2, change: diff, value_scale: 0.01, e0_unit: bp, extra_lag: 1}
+    dollar: {source: market_prices, symbol: DX-Y.NYB, change: return, value_scale: 1.0, e0_unit: pct, extra_lag: 0}
+    oil: {source: market_prices, symbol: CL=F, change: return, value_scale: 1.0, e0_unit: pct, extra_lag: 0}
+  level_percentile: [vix]         # level vs own 252-session history (percentile words)
+
+tokens:                           # PRD NA-04 S6, AC5 (ModernBERT-large tokenizer of configs/events.yaml)
+  state_p95_max: 900              # p95(state tokens), Call A E3
+  total_max: 1024                 # p95(state + the longest single question) for Laya typed-decisions
+  laya_state_budget: 768          # Laya model card: 1,024 context with head_max_len 256 (reported, not an AC)
+  special_tokens: 3               # [CLS] state [SEP] question [SEP]
+
+samples:                          # PRD NA-04 S5 (NA-07 encoding study, NA-06 probes)
+  seed: 2026                      # PREREG §8.2
+  encodings_val_a: 1500
+  encodings_val_b: 1500
+  unmasked_val_a: 1000
+  strata: [tier, month]           # proportional allocation, largest remainder; within a stratum by
+                                  # u = sha256("{seed}:{event_id}")
+  exclude_embargo: true           # PREREG §4.2: the first 5 sessions of a split are not evaluated
+
+news_exclusion:                   # PREREG §15 NA-04 row 6 (revision 3): left out of every state, every window
+  # Move explainers ("Why Quest (DGX) Stock Is Up Today", StockStory's "What Happened? Shares of ...") explain
+  # a session's price move by construction: in W0 they are pre-market talk or stamped before their content
+  # (29 of 204 pre-open-stamped ones about the company, 2024-01..2025-09), in W2 they reveal the realized
+  # move. Searched (re.search) in NA-02's raw title / snippet; Benzinga's "What Happened:" does not match.
+  # Revision 4: also "Why Micron Technology Rallied Today", "Why CoreWeave Rocketed as High as 26% Today" (a move
+  # word between "why" and "today"; 188 event articles had escaped), not "Here's Why We Think F5 ... Might
+  # Deserve Your Attention Today".
+  title: '(?i)^(?:here[''’]?s\s+|here\s+is\s+)?why\b.*(?:\b(?:stocks?|shares|rall\w*|fell|fall\w*|drop\w*|plung\w*|soar\w*|jump\w*|surg\w*|sink\w*|sank|tumbl\w*|crash\w*|rocket\w*|skyrocket\w*|pop\w*|slid\w*|slump\w*|climb\w*|gain\w*|ris(?:e|es|ing)|rose|up|down|higher|lower|moving|flying|explod\w*|zoom\w*|spik\w*|dip\w*|slip\w*|lift\w*|shoot\w*|advanc\w*|retreat\w*|declin\w*|tank\w*|lost|los(?:e|es|ing)|crush\w*|sour\w*|rebound\w*|outperform\w*|underperform\w*)\b|\d%).*\btoday\b'
+  snippet: 'What Happened\?\s*(?:Shares of|A number of)'
+  # TradingView reposts carry batch timestamps that precede their content: 128 of 511 of their earnings
+  # summaries (2024-01..2025-09) are stamped before the release they report (DGX's results of 2025-07-22
+  # stamped 07-21 13:01 UTC); other outlets 0-7%, previews included. Operator decision 2026-10-25.
+  domain: '(?:^|\.)tradingview\.com$'
+  # Non-English articles (operator decision B of 2026-10-25; PREREG §15 NA-04 row 8). The masker and the
+  # price-talk scrubbers are English-only: the fourth verification found share prices, pre-market moves
+  # ("dispararam mais de 27% ... pré-mercado") and dates surviving in non-English text. Searched in NA-02's
+  # raw title + snippet. A text is non-English when it has min_script_chars characters of a non-Latin script;
+  # or its distinct foreign function words number at least min_foreign and more than its distinct English
+  # ones (two with no English one); or it has min_diacritic_words distinct words with a non-English letter and
+  # at most max_english_with_diacritics distinct English words. Words count in lower case or capitalized, so
+  # a ticker in capitals (DE) is not "de"; place names go first. NA-02's non_english_hint (two words of a
+  # short list) found 64% of the verification's non-English price levels and 53% of its Nordic / Dutch dates;
+  # this rule finds 98–100%, and 205 sampled flags (each step's additions, 40 on English-language domains)
+  # were all non-English.
+  non_english:
+    script: '[぀-ヿ㐀-鿿가-힯Ѐ-ӿ؀-ۿ฀-๿֐-׿Ͱ-Ͽऀ-ॿ]'
+    min_script_chars: 2
+    foreign_words: >-
+      le la les des du une est pour sur dans avec qui sont aux ses leur cette été après selon chez d'une
+      l'action c'est n'est l'objectif d'un qu'il annonce résultats
+      el los del por para una con que su sus como más tras sobre según acciones empresa este esta también
+      os da das dos em não com ações pelo pela após seu sua está na no ao desde maior tem
+      il gli della delle dei degli che è sono nel nella sul dal alla anche più azioni titolo viene ancora dopo questo
+      questa suo tra fra ha hanno stato stata essere
+      der das und mit für auf ist im dem ein eine nicht sich zum zur nach bei aus wird sind aktie aktien über
+      seine ihre nachdem auch noch einen einer vom beim sowie durch gegen wurde werden haben oder nur vor seit bis
+      keine schon heute liegt zuletzt
+      het een voor naar zijn niet aan bij ook deze wordt heeft aandelen dat rond uit tot nog maar geen worden
+      werd hun haar meer tussen de van op om te zegt zei
+      og på til af av som det ikke fra och för är att inte netop sin sine hvordan hele inden efter eller også
+      blev vil skal ved hos mod denne dette disse være bliver mellem
+      ning teatab täna oraz się że jest dla przez je se pro ve za který která které jsou bylo
+      dan yang untuk dengan ini itu pada sebesar menjadi persen ve bir için ile kwa ya wa
+    english_words: the of and to in is for on with that by as at from its has are was will be an this after said it have their which
+    min_foreign: 3
+    diacritics: äöüßéèêëàâçãõñłśźżčřěůőåøæışğÄÖÜÉÈÊÀÂÇÃÕÑŁŚŹŻČŘĚŮŐÅØÆŞĞ
+    min_diacritic_words: 3
+    max_english_with_diacritics: 2
+    place_names: '\b[Ll]as\s+Vegas\b|\b[Ll]os\s+(?:Angeles|Ángeles|Gatos|Alamos|Cabos)\b'
+  # Running market stories (PREREG §15 NA-04 row 10, revision 6; the sixth verification). Live blogs and running
+  # market reports keep their first vendor stamp while their title and snippet are the latest version: AP's
+  # "U.S. stocks are drifting ..." stamped 04:41 ET, Reuters' "The S&P 500 ended Tuesday's choppy session ..."
+  # at 05:57, Investopedia's "Markets News, July 16, 2025: Stocks Close Higher ..." at 08:17, Proactive's
+  # "4:15pm: ... record close" at 04:28, Investing.com's "Stock market today: S&P 500 ends higher ..." stamped
+  # the evening before. In W0 they put the decision session's own cash-market outcome into a D0 state
+  # (morning-stamped market titles agree with SPY's open-to-close direction 55.9% of the time, evening-stamped
+  # ones 47.7%). W2 ends at the close, so there the same text is inside the window: the rule leaves an article
+  # out of W0 states only (``build.running_story_ids``). Searched in NA-02's raw title / snippet; s is the
+  # article's W0 session and "same day" a stamp on the calendar date of s (before the D0 cutoff). An article
+  # goes when one of these holds:
+  #   1. a live format (live_title, live_snippet), whatever its stamp: "Stock market today:", Reuters' "LIVE
+  #      MARKETS-", Investopedia's "Markets News, <date>:", "Live <fund> (TICKER):" (not "Live Nation"), "Live
+  #      Updates Live Coverage";
+  #   2. same day: a clock time at or after the open of s marking a live entry ("4:15pm:", "10:54 am by";
+  #      clock_after) or an update ("Updated at 10:28 AM EST"; clock_before), not in a foreign zone and not a
+  #      schedule; a text about a European market keeps London wall time (european, european_zone: "12.30pm"
+  #      on a FTSE page is 07:30 ET); a "Published on 08/07/2025 at 04:10 pm" byline is the stamp itself;
+  #   3. a market subject and a close verb whose nearest weekday is the weekday of s, in one sentence ("ended
+  #      Tuesday's choppy session", "closed modestly higher on Wednesday"), or "<weekday of s> close"; without
+  #      pre-market, schedule or Asian words (Asian markets close before the US open, European ones after 09:15
+  #      ET);
+  #   4. running intraday wording about the market ("U.S. stocks are drifting", "Wall Street ... in early
+  #      trading", "opened lower"; a market subject in the sentence, or a Reuters text, whose style keeps
+  #      "premarket" for before the open) stamped the same day or naming the weekday of s; without pre-market
+  #      words or another weekday in the sentence, and without a forecast or an overseas market before the
+  #      phrase ("stocks may show a lack of direction in early trading", "European stock indexes opened lower":
+  #      overseas markets trade before the US open); "in late trading" is after hours; a company's "shares rose
+  #      in early trading" before the open is mostly pre-market and stays;
+  #   5. same day: a title opening (or opening a clause) with a US-market subject and a move or close word within
+  #      40 characters ("Dow Swings To Drop 224 Points; Nasdaq Ekes Out A Gain" at 08:07); no futures,
+  #      pre-market or question words in the title (wrap_veto), no forecast or overseas word up to the move word
+  #      ("RBC sees S&P 500 ...", not "US stocks end mixed on report Trump wants higher EU tariff"), no
+  #      pre-market words in the snippet and no overseas market opening its first sentence ("EU mid-market
+  #      update: Stocks open higher", not an AP photo caption "... screens showing the Korea Composite ...").
+  #      About half of these recap the previous session: market news, little lost.
+  # Company names that look like market subjects stay (Dow Inc., Nasdaq Inc., S&P Global, Live Nation).
+  running_story:
+    live_title: '(?i)^\s*(?:stock market (?:today|news today|live)\b|live\s*(?::|\||–|\s-\s)|live (?:s&p 500|nasdaq|dow|stock market|market|earnings|updates?|coverage|blog)\b|markets news,|live market updates|live markets\b|live\s+(?!nation\b)[^:|]{1,60}\([A-Z]{2,5}\)\s*:|(?:nasdaq|dow jones|dow|s&p 500|s&p|wall street|markets?)\s+today\s*:)|\blive (?:updates?|coverage|blog)\b|\blive\s*:|\(live coverage\)|\bas it happened\b'
+    live_snippet: '(?i)^\s*(?:live (?:updates|coverage)|stock market (?:today|live))\b|\blive coverage (?:updates appear|has ended)\b'
+    clock: '(?i)(?:(?<=20\d\d)|(?<![\d:.$]))(\d{1,2})[:.](\d{2})\s?([ap])\.?m\b\.?'
+    clock_before: '(?i)(?:\b(?:updated|as of|wrap-up|update)\b[^.|]{0,45}|^\s*)$'
+    clock_after: '^\s*(?::|by\s+[A-Z])'
+    foreign_zone: '^\s*(?:IST|CET|CEST|GMT|BST|JST|HKT|SGT|AEST|AEDT|PT|PST|PDT)\b'
+    european: '(?i)\bftse\b|footsie|\blondon\b|\blse\b|\buk\b|britain|british|\beuropean\b|\bstoxx\b|\bdax\b|\bcac\b'
+    european_zone: Europe/London
+    market_subject: '(?i)\b(?:u\.?s\.? stocks|stocks|wall st(?:reet)?(?!\s+(?:journal|analysts?|firms?|banks?))|s&p(?:\s*500)?(?!\s*global)|dow(?:\s+jones)?(?!\s*(?:inc\b|chemical|corning|stock|shares|\())|nasdaq(?:\s+composite)?(?!,?\s*inc\b|\s*\(|\s*:|\s+(?:stock|shares)\b)|russell 2000|stock indexes|major (?:indexes|indices|averages)|benchmarks|equities|european (?:shares|stocks)|stoxx|ftse|dax)\b'
+    close_verb: '(?i)\b(?:ended|closed|finished|ends|closes|finishes|wrapped up|settled)\b'
+    premarket: '(?i)futures|pre-?market|premarket|pre-bell|pre-open|before the (?:opening )?(?:bell|open)|before (?:the )?markets? open\w*|ahead of the (?:open|bell)|extended trading|after-hours|after the (?:bell|close)|to open\b|set to open|likely to open|poised to open'
+    forecast: '(?i)\b(?:may|could|might|would|can|will|should|likely|set to|poised to|pointing to|expected to|sees?|targets?|forecasts?|predicts?|outlook)\b|\bopening\b|\?'
+    wire: '\(Reuters\)'
+    schedule: '(?i)conference call|webcast|earnings call|will (?:host|report|release|announce|be)|scheduled|expected to|anticipated to|projected to|likely be|after the market closes|market closes on|before the market opens'
+    asia: '(?i)\basia\w*|nikkei|hang seng|shanghai|shenzhen|kospi|sensex|nifty|\basx\b|india\w*|japan\w*|china|chinese|korea\w*|australia\w*|taiwan\w*|singapore'
+    overseas: '(?i)\basia\w*|nikkei|hang seng|shanghai|shenzhen|kospi|sensex|nifty|\basx\b|india\w*|japan\w*|china|chinese|korea\w*|australia\w*|taiwan\w*|singapore|europe\w*|euro\w*|\beu\b|ftse|dax|stoxx|\bcac\b|london|frankfurt|paris|german\w*|british|\buk\b'
+    intraday: '(?i)\bmidday trading\b|\bin (?:early|morning|afternoon|midday) trad(?:e|ing)\b|\bearly trading on wall street\b|\bopened (?:higher|lower|flat|mixed)\b|\boff to a (?:\w+ )?start on wall street\b|\bstocks are (?:opening|moving|drifting|ticking|mostly)\b|\b(?:wall street|u\.?s\.? stocks?|stock indexes|stocks) (?:is|are) (?:drifting|hanging|ticking|hovering|swinging|shaky|muted|edging|climbing|sliding|falling|rising|stumbling|holding|steadying|veering|wobbling|slipping|sinking|rallying|slumping|tumbling|jumping|dipping|sagging|wavering|bouncing|recovering|rebounding|retreating|struggling|surging|soaring|gaining|losing|pulling back)\b|\bthe stock market just opened\b'
+    wrap_title: '(?i)(?:^|[:;|—–]\s*)(?:the\s+)?(?:(?:u\.?s\.?|us)\s+stocks|stocks|stock market|wall st(?:reet)?(?!\s+(?:journal|analysts?|firms?|banks?))|s&p(?:\s*500)?(?!\s*global)|dow(?:\s+jones)?(?:\s+industrial average)?(?!\s*(?:inc\b|chemical|corning|stock|shares|\())|nasdaq(?:\s+composite)?(?!,?\s*inc\b|\s*\(|\s*:|\s+(?:stock|shares)\b)|major (?:indexes|indices|averages)|equities)\b[^.;:]{0,40}?\b(?:jump\w*|rall\w*|soar\w*|surg\w*|pops?|leap\w*|climb\w*|ris(?:e|es|ing)|rose|gain\w*|higher|advanc\w*|rebound\w*|record\w*|eke\w*|notch\w*|fall\w*|fell|slid\w*|slip\w*|slump\w*|sink\w*|sank|tumbl\w*|drop\w*|plung\w*|retreat\w*|pull\w* back|lower|declin\w*|edg\w*|inch\w*|mixed|flat|steady|little changed|waver\w*|swing\w*|close[sd]?|closing|end(?:s|ed)?|finish\w*|drift\w*|stall\w*|hover\w*|struggl\w*|extend\w*|trim\w*|pare\w*|recover\w*|bounce\w*|stumbl\w*|rut|tiptoe\w*|stead\w*|veer\w*|wobbl\w*|sag\w*|dip\w*|open(?:s|ed)?)\b'
+    wrap_veto: '(?i)futures|pre-?market|premarket|pre-bell|pre-open|before the (?:opening )?(?:bell|open)|before (?:the )?markets? open\w*|\bto open\b|set to|poised to|\bto buy\b|\bbuy\b|\?|week ahead|this week|morning bid|day ahead'
+
+market_states:                    # PREREG A3.5 (optional): one state per session from market-index articles
+  window: W2
+  max_articles: 6
+  max_news_tokens: 600
+  splits: [robustness, train, val_a, val_b, test]

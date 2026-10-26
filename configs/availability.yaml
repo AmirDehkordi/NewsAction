@@ -228,3 +228,50 @@ columns:
   clean_5: post
   clean_10: post
   clean_20: post
+  # --- NA-04 states (work/states/*.parquet; newsaction.states). Context columns are computed only from data
+  # through close(prev(s)) (or earlier, see configs/states.yaml extra_lag); reaction columns only from the
+  # D2 reaction of s and history through t-1.
+  ctx_sigma_cc_pct: t_minus_1        # sigma_cc vs its previous 252 values (percent below)
+  ctx_z_m5_pct: t_minus_1            # |z_m5| vs its previous 252 values (E4)
+  ctx_z_m20_pct: t_minus_1
+  ctx_z_m60_pct: t_minus_1
+  ctx_ret_m5: t_minus_1              # AdjClose(t-1) / AdjClose(t-1-k) - 1 (E0; public sessions only)
+  ctx_ret_m20: t_minus_1
+  ctx_ret_m60: t_minus_1
+  ctx_eps_fy1_now: t_minus_1         # FY1 EPS consensus, last snapshot dated before the session
+  ctx_eps_fy1_before: t_minus_1      # ... 30 days earlier
+  ctx_eps_revision: t_minus_1
+  ctx_earnings_w0: w0                # a scheduled earnings timestamp in [close(prev s), 09:15 ET of s]
+  ctx_earnings_w2: w2                # ... in [close(prev s), close(s))
+  mkt_stock_market_chg: t_minus_1    # SPY return of prev(s)
+  mkt_stock_market_z: t_minus_1      # ... / (1.4826 MAD of the 252 returns before it)
+  mkt_stock_market_pct: t_minus_1
+  mkt_stock_market_sigma_same: t_minus_1   # SPY robust sigma of the 252 returns through prev(s)
+  mkt_vix_chg: t_minus_1
+  mkt_vix_z: t_minus_1
+  mkt_vix_pct: t_minus_1
+  mkt_vix_level_pct: t_minus_1       # VIX close of prev(s) vs the 252 closes before it
+  mkt_ten_year_yield_chg: t_minus_1
+  mkt_ten_year_yield_z: t_minus_1
+  mkt_ten_year_yield_pct: t_minus_1
+  mkt_high_yield_spread_chg: t_minus_1     # the change of t-2 (publication lag, configs/states.yaml)
+  mkt_high_yield_spread_z: t_minus_1
+  mkt_high_yield_spread_pct: t_minus_1
+  mkt_dollar_chg: t_minus_1
+  mkt_dollar_z: t_minus_1
+  mkt_dollar_pct: t_minus_1
+  mkt_oil_chg: t_minus_1
+  mkt_oil_z: t_minus_1
+  mkt_oil_pct: t_minus_1
+  mkt_spy_ret_m5: t_minus_1          # SPY k-session return through t-1 (E0 benchmark)
+  mkt_spy_ret_m20: t_minus_1
+  mkt_spy_ret_m60: t_minus_1
+  macro_cpi_today: static            # pre-announced release calendars (configs/macro_calendar.yaml)
+  macro_fomc_today: static
+  react_g_pct: d2_reaction           # |G| vs the stock's previous 252 |z_cc| (E4)
+  react_spy_z: d2_reaction           # SPY return of s / its robust sigma through t-1
+  react_spy_pct: d2_reaction
+  react_volume_multiple: d2_reaction # V_s / median V over the 60 sessions through t-1 = exp(z_vol * 1.4826 MAD)
+  title_masked: w0                   # masked title_clean (PREREG §6.3)
+  snippet_masked: w0
+  market_news_w2: w2                 # A3.5 market-index articles of W2(s)
