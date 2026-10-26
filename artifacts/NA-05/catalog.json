@@ -1,0 +1,911 @@
+{
+  "fetched_at": "2026-10-26T17:47:58.270748+00:00",
+  "url": "https://openrouter.ai/api/v1/models",
+  "params": {
+    "output_modalities": "decisions"
+  },
+  "sha256": "205464ea1b0c36a22420ace1dd7a4a94d8eac2b42daa2a1321bfe7b064a58d4d",
+  "raw_sha256": "e18e243476b5e5ed3ed9056135de404efce78ea136ce3858281e35bf2186828c",
+  "n_models": 30,
+  "total_count": 30,
+  "models": [
+    {
+      "id": "baseten/elephant-1:free",
+      "name": "Baseten: Elephant 1 (free)",
+      "canonical_slug": "baseten/elephant-1-20261021",
+      "created": 1792622577,
+      "context_length": 16384,
+      "pricing": {
+        "prompt": "0",
+        "completion": "0"
+      },
+      "architecture": {
+        "modality": "text->decisions",
+        "input_modalities": [
+          "text"
+        ],
+        "output_modalities": [
+          "decisions"
+        ],
+        "tokenizer": "Other",
+        "instruct_type": null
+      },
+      "top_provider": {
+        "context_length": 16384,
+        "max_completion_tokens": 14745,
+        "is_moderated": false
+      },
+      "per_request_limits": null,
+      "created_iso": "2026-10-21"
+    },
+    {
+      "id": "baseten/mammoth-1:free",
+      "name": "Baseten: Mammoth 1 (free)",
+      "canonical_slug": "baseten/mammoth-1-20261021",
+      "created": 1792622578,
+      "context_length": 16384,
+      "pricing": {
+        "prompt": "0",
+        "completion": "0"
+      },
+      "architecture": {
+        "modality": "text->decisions",
+        "input_modalities": [
+          "text"
+        ],
+        "output_modalities": [
+          "decisions"
+        ],
+        "tokenizer": "Other",
+        "instruct_type": null
+      },
+      "top_provider": {
+        "context_length": 16384,
+        "max_completion_tokens": 14745,
+        "is_moderated": false
+      },
+      "per_request_limits": null,
+      "created_iso": "2026-10-21"
+    },
+    {
+      "id": "cloudflare/clef",
+      "name": "Cloudflare: Clef",
+      "canonical_slug": "cloudflare/clef",
+      "created": 1790870972,
+      "context_length": 65537,
+      "pricing": {
+        "prompt": "0.000000042",
+        "completion": "0"
+      },
+      "architecture": {
+        "modality": "text+image->decisions",
+        "input_modalities": [
+          "text",
+          "image"
+        ],
+        "output_modalities": [
+          "decisions"
+        ],
+        "tokenizer": "Qwen",
+        "instruct_type": null
+      },
+      "top_provider": {
+        "context_length": 16384,
+        "max_completion_tokens": 14745,
+        "is_moderated": false
+      },
+      "per_request_limits": null,
+      "created_iso": "2026-10-01"
+    },
+    {
+      "id": "cloudflare/clef-flash",
+      "name": "Cloudflare: Clef Flash",
+      "canonical_slug": "cloudflare/clef-flash",
+      "created": 1790870973,
+      "context_length": 24576,
+      "pricing": {
+        "prompt": "0.000000019",
+        "completion": "0"
+      },
+      "architecture": {
+        "modality": "text+image->decisions",
+        "input_modalities": [
+          "text",
+          "image"
+        ],
+        "output_modalities": [
+          "decisions"
+        ],
+        "tokenizer": "Qwen",
+        "instruct_type": null
+      },
+      "top_provider": {
+        "context_length": 24576,
+        "max_completion_tokens": 22118,
+        "is_moderated": false
+      },
+      "per_request_limits": null,
+      "created_iso": "2026-10-01"
+    },
+    {
+      "id": "cloudflare/clef-omni",
+      "name": "Cloudflare: Clef Omni",
+      "canonical_slug": "cloudflare/clef-omni-20261009",
+      "created": 1791577078,
+      "context_length": 65536,
+      "pricing": {
+        "prompt": "0.00000015",
+        "completion": "0"
+      },
+      "architecture": {
+        "modality": "text+image+audio+video->decisions",
+        "input_modalities": [
+          "text",
+          "image",
+          "audio",
+          "video"
+        ],
+        "output_modalities": [
+          "decisions"
+        ],
+        "tokenizer": "Qwen",
+        "instruct_type": null
+      },
+      "top_provider": {
+        "context_length": 65536,
+        "max_completion_tokens": 58982,
+        "is_moderated": false
+      },
+      "per_request_limits": null,
+      "created_iso": "2026-10-09"
+    },
+    {
+      "id": "inception/mercury-decide",
+      "name": "Inception: Mercury Decide",
+      "canonical_slug": "inception/mercury-decide-20260930",
+      "created": 1790789334,
+      "context_length": 65536,
+      "pricing": {
+        "prompt": "0.00000002",
+        "completion": "0",
+        "input_cache_read": "0"
+      },
+      "architecture": {
+        "modality": "text+image->decisions",
+        "input_modalities": [
+          "text",
+          "image"
+        ],
+        "output_modalities": [
+          "decisions"
+        ],
+        "tokenizer": "Other",
+        "instruct_type": null
+      },
+      "top_provider": {
+        "context_length": 65536,
+        "max_completion_tokens": 58982,
+        "is_moderated": false
+      },
+      "per_request_limits": null,
+      "created_iso": "2026-09-30"
+    },
+    {
+      "id": "inception/mercury-decide:free",
+      "name": "Inception: Mercury Decide (free)",
+      "canonical_slug": "inception/mercury-decide-20260930",
+      "created": 1790789334,
+      "context_length": 65536,
+      "pricing": {
+        "prompt": "0",
+        "completion": "0"
+      },
+      "architecture": {
+        "modality": "text+image->decisions",
+        "input_modalities": [
+          "text",
+          "image"
+        ],
+        "output_modalities": [
+          "decisions"
+        ],
+        "tokenizer": "Other",
+        "instruct_type": null
+      },
+      "top_provider": {
+        "context_length": 65536,
+        "max_completion_tokens": 58982,
+        "is_moderated": false
+      },
+      "per_request_limits": null,
+      "created_iso": "2026-09-30"
+    },
+    {
+      "id": "jaredpalmer/kev-4b",
+      "name": "Jared Palmer: Kev 4B",
+      "canonical_slug": "jaredpalmer/kev-4b-20260924",
+      "created": 1790354233,
+      "context_length": 8192,
+      "pricing": {
+        "prompt": "0.000000042",
+        "completion": "0"
+      },
+      "architecture": {
+        "modality": "text->decisions",
+        "input_modalities": [
+          "text"
+        ],
+        "output_modalities": [
+          "decisions"
+        ],
+        "tokenizer": "Other",
+        "instruct_type": null
+      },
+      "top_provider": {
+        "context_length": 8192,
+        "max_completion_tokens": 7372,
+        "is_moderated": false
+      },
+      "per_request_limits": null,
+      "created_iso": "2026-09-25"
+    },
+    {
+      "id": "liquid/d1",
+      "name": "LiquidAI: d1",
+      "canonical_slug": "liquid/d1-20260930",
+      "created": 1790878711,
+      "context_length": 65536,
+      "pricing": {
+        "prompt": "0.00000002",
+        "completion": "0",
+        "input_cache_read": "0.00000002"
+      },
+      "architecture": {
+        "modality": "text+image->decisions",
+        "input_modalities": [
+          "text",
+          "image"
+        ],
+        "output_modalities": [
+          "decisions"
+        ],
+        "tokenizer": "Other",
+        "instruct_type": null
+      },
+      "top_provider": {
+        "context_length": 65536,
+        "max_completion_tokens": 58982,
+        "is_moderated": false
+      },
+      "per_request_limits": null,
+      "created_iso": "2026-10-01"
+    },
+    {
+      "id": "liquid/d1-ultra",
+      "name": "LiquidAI: d1-ultra",
+      "canonical_slug": "liquid/d1-ultra-20261015",
+      "created": 1792108354,
+      "context_length": 32768,
+      "pricing": {
+        "prompt": "0.000000042",
+        "completion": "0",
+        "input_cache_read": "0.000000042"
+      },
+      "architecture": {
+        "modality": "text+image->decisions",
+        "input_modalities": [
+          "text",
+          "image"
+        ],
+        "output_modalities": [
+          "decisions"
+        ],
+        "tokenizer": "Other",
+        "instruct_type": null
+      },
+      "top_provider": {
+        "context_length": 32768,
+        "max_completion_tokens": 29491,
+        "is_moderated": false
+      },
+      "per_request_limits": null,
+      "created_iso": "2026-10-15"
+    },
+    {
+      "id": "microsoft/microsoft-decision-1",
+      "name": "Microsoft: Microsoft-Decision-1",
+      "canonical_slug": "microsoft/microsoft-decision-1-20261009",
+      "created": 1791584978,
+      "context_length": 32768,
+      "pricing": {
+        "prompt": "0.000000042",
+        "completion": "0"
+      },
+      "architecture": {
+        "modality": "text->decisions",
+        "input_modalities": [
+          "text"
+        ],
+        "output_modalities": [
+          "decisions"
+        ],
+        "tokenizer": "Other",
+        "instruct_type": null
+      },
+      "top_provider": {
+        "context_length": 32768,
+        "max_completion_tokens": 29491,
+        "is_moderated": false
+      },
+      "per_request_limits": null,
+      "created_iso": "2026-10-09"
+    },
+    {
+      "id": "nace-ai/drex-max",
+      "name": "Nace.AI: Drex Max",
+      "canonical_slug": "nace-ai/drex-max-20261016",
+      "created": 1792607412,
+      "context_length": 262144,
+      "pricing": {
+        "prompt": "0.00000006",
+        "completion": "0"
+      },
+      "architecture": {
+        "modality": "text->decisions",
+        "input_modalities": [
+          "text"
+        ],
+        "output_modalities": [
+          "decisions"
+        ],
+        "tokenizer": "Other",
+        "instruct_type": null
+      },
+      "top_provider": {
+        "context_length": 262144,
+        "max_completion_tokens": 235929,
+        "is_moderated": false
+      },
+      "per_request_limits": null,
+      "created_iso": "2026-10-21"
+    },
+    {
+      "id": "nace-ai/drex-v1.5",
+      "name": "Nace.AI: Drex v1.5",
+      "canonical_slug": "nace-ai/drex-v1.5-20261009",
+      "created": 1791583576,
+      "context_length": 131072,
+      "pricing": {
+        "prompt": "0.00000004",
+        "completion": "0"
+      },
+      "architecture": {
+        "modality": "text->decisions",
+        "input_modalities": [
+          "text"
+        ],
+        "output_modalities": [
+          "decisions"
+        ],
+        "tokenizer": "Other",
+        "instruct_type": null
+      },
+      "top_provider": {
+        "context_length": 131072,
+        "max_completion_tokens": 117964,
+        "is_moderated": false
+      },
+      "per_request_limits": null,
+      "created_iso": "2026-10-09"
+    },
+    {
+      "id": "nace-ai/drex-v2.0",
+      "name": "Nace.AI: Drex v2.0",
+      "canonical_slug": "nace-ai/drex-v2.0-20261009",
+      "created": 1791827066,
+      "context_length": 131072,
+      "pricing": {
+        "prompt": "0.00000006",
+        "completion": "0"
+      },
+      "architecture": {
+        "modality": "text->decisions",
+        "input_modalities": [
+          "text"
+        ],
+        "output_modalities": [
+          "decisions"
+        ],
+        "tokenizer": "Other",
+        "instruct_type": null
+      },
+      "top_provider": {
+        "context_length": 131072,
+        "max_completion_tokens": 117964,
+        "is_moderated": false
+      },
+      "per_request_limits": null,
+      "created_iso": "2026-10-12"
+    },
+    {
+      "id": "openai/gpt-6-luna-decisions",
+      "name": "OpenAI: GPT-6 Luna Decisions",
+      "canonical_slug": "openai/gpt-6-luna-decisions-20261006",
+      "created": 1791321558,
+      "context_length": 1050000,
+      "pricing": {
+        "prompt": "0.0000001",
+        "completion": "0",
+        "web_search": "0.01",
+        "input_cache_read": "0",
+        "input_cache_write": "0"
+      },
+      "architecture": {
+        "modality": "text+image->decisions",
+        "input_modalities": [
+          "text",
+          "image"
+        ],
+        "output_modalities": [
+          "decisions"
+        ],
+        "tokenizer": "GPT",
+        "instruct_type": null
+      },
+      "top_provider": {
+        "context_length": 1050000,
+        "max_completion_tokens": 945000,
+        "is_moderated": true
+      },
+      "per_request_limits": null,
+      "created_iso": "2026-10-06"
+    },
+    {
+      "id": "perplexity/pplx-decider-flash-v1.2",
+      "name": "Perplexity: Decider Flash V1.2",
+      "canonical_slug": "perplexity/pplx-decider-flash-v1.2-20261016",
+      "created": 1792183496,
+      "context_length": 262144,
+      "pricing": {
+        "prompt": "0.00000001",
+        "completion": "0"
+      },
+      "architecture": {
+        "modality": "text+image->decisions",
+        "input_modalities": [
+          "text",
+          "image"
+        ],
+        "output_modalities": [
+          "decisions"
+        ],
+        "tokenizer": "Other",
+        "instruct_type": null
+      },
+      "top_provider": {
+        "context_length": 262144,
+        "max_completion_tokens": 235929,
+        "is_moderated": false
+      },
+      "per_request_limits": null,
+      "created_iso": "2026-10-16"
+    },
+    {
+      "id": "perplexity/pplx-decider-v1.2",
+      "name": "Perplexity: Decider V1.2",
+      "canonical_slug": "perplexity/pplx-decider-v1.2-20261016",
+      "created": 1792183495,
+      "context_length": 262144,
+      "pricing": {
+        "prompt": "0.00000002",
+        "completion": "0"
+      },
+      "architecture": {
+        "modality": "text+image->decisions",
+        "input_modalities": [
+          "text",
+          "image"
+        ],
+        "output_modalities": [
+          "decisions"
+        ],
+        "tokenizer": "Other",
+        "instruct_type": null
+      },
+      "top_provider": {
+        "context_length": 262144,
+        "max_completion_tokens": 235929,
+        "is_moderated": false
+      },
+      "per_request_limits": null,
+      "created_iso": "2026-10-16"
+    },
+    {
+      "id": "respan/span-01",
+      "name": "Respan: Span-01",
+      "canonical_slug": "respan/span-01-20260925",
+      "created": 1790387550,
+      "context_length": 0,
+      "pricing": {
+        "prompt": "0.00000002",
+        "completion": "0"
+      },
+      "architecture": {
+        "modality": "text->decisions",
+        "input_modalities": [
+          "text"
+        ],
+        "output_modalities": [
+          "decisions"
+        ],
+        "tokenizer": "Other",
+        "instruct_type": null
+      },
+      "top_provider": {
+        "context_length": 0,
+        "max_completion_tokens": 0,
+        "is_moderated": false
+      },
+      "per_request_limits": null,
+      "created_iso": "2026-09-26"
+    },
+    {
+      "id": "respan/span-01-lite",
+      "name": "Respan: Span-01 Lite",
+      "canonical_slug": "respan/span-01-lite-20260925",
+      "created": 1790387542,
+      "context_length": 0,
+      "pricing": {
+        "prompt": "0",
+        "completion": "0"
+      },
+      "architecture": {
+        "modality": "text->decisions",
+        "input_modalities": [
+          "text"
+        ],
+        "output_modalities": [
+          "decisions"
+        ],
+        "tokenizer": "Other",
+        "instruct_type": null
+      },
+      "top_provider": {
+        "context_length": 0,
+        "max_completion_tokens": 0,
+        "is_moderated": false
+      },
+      "per_request_limits": null,
+      "created_iso": "2026-09-26"
+    },
+    {
+      "id": "respan/span-01-lite:free",
+      "name": "Respan: Span-01 Lite (free)",
+      "canonical_slug": "respan/span-01-lite-20260925",
+      "created": 1790387542,
+      "context_length": 0,
+      "pricing": {
+        "prompt": "0",
+        "completion": "0"
+      },
+      "architecture": {
+        "modality": "text->decisions",
+        "input_modalities": [
+          "text"
+        ],
+        "output_modalities": [
+          "decisions"
+        ],
+        "tokenizer": "Other",
+        "instruct_type": null
+      },
+      "top_provider": {
+        "context_length": 0,
+        "max_completion_tokens": 0,
+        "is_moderated": false
+      },
+      "per_request_limits": null,
+      "created_iso": "2026-09-26"
+    },
+    {
+      "id": "respan/span-02",
+      "name": "Respan: Span-02",
+      "canonical_slug": "respan/span-02-20261015",
+      "created": 1792108973,
+      "context_length": 131072,
+      "pricing": {
+        "prompt": "0.00000001",
+        "completion": "0"
+      },
+      "architecture": {
+        "modality": "text+image->decisions",
+        "input_modalities": [
+          "text",
+          "image"
+        ],
+        "output_modalities": [
+          "decisions"
+        ],
+        "tokenizer": "Other",
+        "instruct_type": null
+      },
+      "top_provider": {
+        "context_length": 131072,
+        "max_completion_tokens": 117964,
+        "is_moderated": false
+      },
+      "per_request_limits": null,
+      "created_iso": "2026-10-16"
+    },
+    {
+      "id": "scaledown/classify-1",
+      "name": "ScaleDown: Classify-1",
+      "canonical_slug": "scaledown/classify-1-20260928",
+      "created": 1791893334,
+      "context_length": 1000000,
+      "pricing": {
+        "prompt": "0.00000004",
+        "completion": "0"
+      },
+      "architecture": {
+        "modality": "text+image+file->decisions",
+        "input_modalities": [
+          "text",
+          "image",
+          "file"
+        ],
+        "output_modalities": [
+          "decisions"
+        ],
+        "tokenizer": "Other",
+        "instruct_type": null
+      },
+      "top_provider": {
+        "context_length": 1000000,
+        "max_completion_tokens": 900000,
+        "is_moderated": false
+      },
+      "per_request_limits": null,
+      "created_iso": "2026-10-13"
+    },
+    {
+      "id": "togethercomputer/tev1-4b-experimental",
+      "name": "Together: Tev1 4B Experimental",
+      "canonical_slug": "togethercomputer/tev1-4b-experimental-20260923",
+      "created": 1790795429,
+      "context_length": 32768,
+      "pricing": {
+        "prompt": "0.000000042",
+        "completion": "0"
+      },
+      "architecture": {
+        "modality": "text->decisions",
+        "input_modalities": [
+          "text"
+        ],
+        "output_modalities": [
+          "decisions"
+        ],
+        "tokenizer": "Qwen3",
+        "instruct_type": null
+      },
+      "top_provider": {
+        "context_length": 32768,
+        "max_completion_tokens": 8,
+        "is_moderated": false
+      },
+      "per_request_limits": null,
+      "created_iso": "2026-09-30"
+    },
+    {
+      "id": "typesafe/jev-1.13",
+      "name": "TypeSafe: Jev 1.13",
+      "canonical_slug": "typesafe/jev-1.13-20260917",
+      "created": 1789689684,
+      "context_length": 262144,
+      "pricing": {
+        "prompt": "0.000000042",
+        "completion": "0"
+      },
+      "architecture": {
+        "modality": "text+image->decisions",
+        "input_modalities": [
+          "text",
+          "image"
+        ],
+        "output_modalities": [
+          "decisions"
+        ],
+        "tokenizer": "Other",
+        "instruct_type": null
+      },
+      "top_provider": {
+        "context_length": 262144,
+        "max_completion_tokens": 235929,
+        "is_moderated": false
+      },
+      "per_request_limits": null,
+      "created_iso": "2026-09-18"
+    },
+    {
+      "id": "typesafe/jev-1.14",
+      "name": "TypeSafe: Jev 1.14",
+      "canonical_slug": "typesafe/jev-1.14-20261014",
+      "created": 1792021417,
+      "context_length": 262144,
+      "pricing": {
+        "prompt": "0.000000042",
+        "completion": "0"
+      },
+      "architecture": {
+        "modality": "text+image->decisions",
+        "input_modalities": [
+          "text",
+          "image"
+        ],
+        "output_modalities": [
+          "decisions"
+        ],
+        "tokenizer": "Other",
+        "instruct_type": null
+      },
+      "top_provider": {
+        "context_length": 262144,
+        "max_completion_tokens": 235929,
+        "is_moderated": false
+      },
+      "per_request_limits": null,
+      "created_iso": "2026-10-14"
+    },
+    {
+      "id": "upstage/solar-decide",
+      "name": "Upstage: Solar Decide",
+      "canonical_slug": "upstage/solar-decide-20260928",
+      "created": 1790592657,
+      "context_length": 524288,
+      "pricing": {
+        "prompt": "0.00000005",
+        "completion": "0",
+        "input_cache_read": "0.00000005"
+      },
+      "architecture": {
+        "modality": "text->decisions",
+        "input_modalities": [
+          "text"
+        ],
+        "output_modalities": [
+          "decisions"
+        ],
+        "tokenizer": "Other",
+        "instruct_type": null
+      },
+      "top_provider": {
+        "context_length": 524288,
+        "max_completion_tokens": 471859,
+        "is_moderated": false
+      },
+      "per_request_limits": null,
+      "created_iso": "2026-09-28"
+    },
+    {
+      "id": "upstage/solar-decide-flash",
+      "name": "Upstage: Solar Decide Flash",
+      "canonical_slug": "upstage/solar-decide-flash-20261008",
+      "created": 1791419983,
+      "context_length": 524288,
+      "pricing": {
+        "prompt": "0.00000005",
+        "completion": "0",
+        "input_cache_read": "0.00000005"
+      },
+      "architecture": {
+        "modality": "text->decisions",
+        "input_modalities": [
+          "text"
+        ],
+        "output_modalities": [
+          "decisions"
+        ],
+        "tokenizer": "Other",
+        "instruct_type": null
+      },
+      "top_provider": {
+        "context_length": 524288,
+        "max_completion_tokens": 471859,
+        "is_moderated": false
+      },
+      "per_request_limits": null,
+      "created_iso": "2026-10-08"
+    },
+    {
+      "id": "~perplexity/pplx-decider-flash-latest",
+      "name": "Perplexity: Decider Flash Latest",
+      "canonical_slug": "~perplexity/pplx-decider-flash-latest",
+      "created": 1792173791,
+      "context_length": 262144,
+      "pricing": {
+        "prompt": "0.00000001",
+        "completion": "0"
+      },
+      "architecture": {
+        "modality": "text+image->decisions",
+        "input_modalities": [
+          "text",
+          "image"
+        ],
+        "output_modalities": [
+          "decisions"
+        ],
+        "tokenizer": "Router",
+        "instruct_type": null
+      },
+      "top_provider": {
+        "context_length": 262144,
+        "max_completion_tokens": 235929,
+        "is_moderated": false
+      },
+      "per_request_limits": null,
+      "created_iso": "2026-10-16"
+    },
+    {
+      "id": "~perplexity/pplx-decider-latest",
+      "name": "Perplexity: Decider Latest",
+      "canonical_slug": "~perplexity/pplx-decider-latest",
+      "created": 1792003377,
+      "context_length": 262144,
+      "pricing": {
+        "prompt": "0.00000002",
+        "completion": "0"
+      },
+      "architecture": {
+        "modality": "text+image->decisions",
+        "input_modalities": [
+          "text",
+          "image"
+        ],
+        "output_modalities": [
+          "decisions"
+        ],
+        "tokenizer": "Router",
+        "instruct_type": null
+      },
+      "top_provider": {
+        "context_length": 262144,
+        "max_completion_tokens": 235929,
+        "is_moderated": false
+      },
+      "per_request_limits": null,
+      "created_iso": "2026-10-14"
+    },
+    {
+      "id": "~typesafe/jev-latest",
+      "name": "TypeSafe: Jev Latest",
+      "canonical_slug": "~typesafe/jev-latest",
+      "created": 1789689685,
+      "context_length": 262144,
+      "pricing": {
+        "prompt": "0.000000042",
+        "completion": "0"
+      },
+      "architecture": {
+        "modality": "text+image->decisions",
+        "input_modalities": [
+          "text",
+          "image"
+        ],
+        "output_modalities": [
+          "decisions"
+        ],
+        "tokenizer": "Router",
+        "instruct_type": null
+      },
+      "top_provider": {
+        "context_length": 262144,
+        "max_completion_tokens": 235929,
+        "is_moderated": false
+      },
+      "per_request_limits": null,
+      "created_iso": "2026-09-18"
+    }
+  ]
+}
