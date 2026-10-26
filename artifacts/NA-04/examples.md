@@ -52,28 +52,28 @@ Three Call A (D0) and two Call B (D2) states, drawn with seed 2026 (`newsaction.
 }
 ```
 
-## Call A, D0: `W0:186:2025-07-21`
+## Call A, D0: `W0:193:2025-07-21`
 
-4 articles · 622 state tokens · 924 with the core questions
+5 articles · 656 state tokens · 958 with the core questions
 
 ```json
 {
   "attention": {
-    "articles_vs_usual": "busy",
+    "articles_vs_usual": "normal",
     "distinct_stories": "more than ten"
   },
   "company": {
-    "analyst_estimates_past_month": "raised",
+    "analyst_estimates_past_month": "cut sharply",
     "earnings_report": "no scheduled earnings report falls in this window",
     "market_sensitivity": "market-like",
     "performance_vs_market_and_sector": {
-      "past_month": "moderate rise (≈1.5× a typical month's move)",
-      "past_three_months": "small rise (≈0.8× a typical three-month move)",
-      "past_week": "negligible fall (≈0.2× a typical week's move)"
+      "past_month": "moderate rise (≈1.2× a typical month's move)",
+      "past_three_months": "negligible rise (≈0.1× a typical three-month move)",
+      "past_week": "large rise (≈2.0× a typical week's move)"
     },
-    "sector": "Financials",
-    "size": "one of the 100 largest US companies",
-    "volatility_vs_its_past_year": "high"
+    "sector": "Health Care",
+    "size": "a large US company (size rank 101–250)",
+    "volatility_vs_its_past_year": "normal"
   },
   "market": {
     "dollar_change": "small fall (≈0.5× a typical day's move)",
@@ -87,36 +87,42 @@ Three Call A (D0) and two Call B (D2) states, drawn with seed 2026 (`newsaction.
   },
   "news": [
     {
-      "headline": "Charles Schwab the quarter ETF Assets Jump 26% as Markets Rise",
-      "snippet": "ETF assets under management increased to $439.7B. - Schwab grabbed 1M new brokerage accounts that brought in $80.3B. - SCHD brought in $1.8B.",
+      "headline": "The company to Announce Results for the quarter, full-year recently",
+      "snippet": "The company to Announce Results for the quarter, full-year recently. The company (NYS:...",
       "source_type": "news aggregator",
       "timing": "after yesterday's close"
     },
     {
-      "headline": "",
-      "snippet": "Key Insights Given the large stake in the stock by institutions, DXP Enterprises' stock price might be vulnerable to...",
-      "source_type": "news aggregator",
-      "timing": "overnight"
+      "headline": "The company Trading Volume Plummets 36 Percent to 231st Rank Despite Promising Drug Developments",
+      "snippet": "Recently,. The company experienced a significant drop in trading volume, with a total of $504 million in shares traded,...",
+      "source_type": "automated article",
+      "timing": "after yesterday's close"
     },
     {
-      "headline": "A person's ETF Assets Rise 26% in the quarter Amid Market Gains",
-      "snippet": "A person's ETF assets rose 26% YoY to $439.7 billion in the quarter, driven by market gains and inflows into funds such as a person US Dividend Equity ETF and...",
+      "headline": "The company Stock Opinions on Phase 3 Trial Results",
+      "snippet": "Recent discussions on X about the company have centered around the company's latest clinical trial results and strategic moves.",
       "source_type": "automated article",
       "timing": "overnight"
     },
     {
-      "headline": "",
-      "snippet": "Ethereum's (CRYPTO: ETH) most recent breakout isn't just a product of ETF hype, it's backed by a surge in DeFi activity and a rising structural shift,...",
-      "source_type": "news aggregator",
-      "timing": "early this morning (before 08:00)"
+      "headline": "The company’s Reblozyl fails Phase 3 in anemia; Sanofi, Blueprint deal closes",
+      "snippet": "Plus, news about DiaMedica Therapeutics, Cantargia and a person: The company suffers late-stage miss in anemia: Patients with...",
+      "source_type": "other source",
+      "timing": "after yesterday's close"
+    },
+    {
+      "headline": "Rep. Sells the company Shares",
+      "snippet": "Representative (R-North Carolina) recently sold shares of the company. In a filing disclosed recently,...",
+      "source_type": "automated article",
+      "timing": "after yesterday's close"
     }
   ]
 }
 ```
 
-## Call A, D0: `W0:1416:2025-09-11`
+## Call A, D0: `W0:1401:2025-09-11`
 
-5 articles · 705 state tokens · 1007 with the core questions
+3 articles · 586 state tokens · 888 with the core questions
 
 ```json
 {
@@ -127,15 +133,15 @@ Three Call A (D0) and two Call B (D2) states, drawn with seed 2026 (`newsaction.
   "company": {
     "analyst_estimates_past_month": "little changed",
     "earnings_report": "no scheduled earnings report falls in this window",
-    "market_sensitivity": "aggressive",
+    "market_sensitivity": "very aggressive",
     "performance_vs_market_and_sector": {
-      "past_month": "large fall (≈2.1× a typical month's move)",
-      "past_three_months": "small fall (≈0.8× a typical three-month move)",
-      "past_week": "small fall (≈0.5× a typical week's move)"
+      "past_month": "small fall (≈0.9× a typical month's move)",
+      "past_three_months": "negligible fall (≈0.0× a typical three-month move)",
+      "past_week": "moderate fall (≈1.1× a typical week's move)"
     },
-    "sector": "Consumer Staples",
-    "size": "a large US company (size rank 101–250)",
-    "volatility_vs_its_past_year": "low"
+    "sector": "Health Care",
+    "size": "an S&P 500 company (size rank 251–500)",
+    "volatility_vs_its_past_year": "very high"
   },
   "market": {
     "dollar_change": "negligible fall (≈0.0× a typical day's move)",
@@ -149,33 +155,21 @@ Three Call A (D0) and two Call B (D2) states, drawn with seed 2026 (`newsaction.
   },
   "news": [
     {
-      "headline": "Walmart Is Starting to Feel the Effects of Tariffs. Is Its Stock in Trouble?",
-      "snippet": "In its quarter, Walmart missed earnings expectations for the first time in more than three years. Its CEO hinted that there could be more noticeable price...",
-      "source_type": "news aggregator",
-      "timing": "early this morning (before 08:00)"
-    },
-    {
-      "headline": "Supreme Showdown: A person-Era Tariffs Under IEEPA Face Ultimate Legal Test",
-      "snippet": "The battle over the a person administration's controversial tariffs, particularly those levied under the International Emergency Economic Powers Act (IEEPA),...",
-      "source_type": "news aggregator",
+      "headline": "A person Takes one Step Back and Another Forward in his Attempt to Reshape the Fed",
+      "snippet": "Cobb ruled that Fed governors can only be fired for malfeasance or other actions while in office and said the White House also failed to provide a person with a...",
+      "source_type": "other source",
       "timing": "after yesterday's close"
     },
     {
-      "headline": "Tariffs' Toll: American Households Face Billions in Increased Everyday Expenses",
-      "snippet": "The United States is currently navigating a complex and often contentious landscape of new tariff policies, measures that are increasingly translating into...",
-      "source_type": "news aggregator",
-      "timing": "after yesterday's close"
+      "headline": "U.S. CPI Rose Faster Than Expected 0.4% recently; Core Rate In Line",
+      "snippet": "U.S. inflation for recent came in hotter than expected, though likely not enough to derail the Federal Reserve from cutting interest rates next week.",
+      "source_type": "other source",
+      "timing": "shortly before the open"
     },
     {
-      "headline": "Cost of Living Crisis a person Health as America's Top Concern in the year",
-      "snippet": "The year has marked a pivotal shift in the American psyche, as the pervasive and relentless rise in the cost of living has officially eclipsed health-related...",
-      "source_type": "news aggregator",
-      "timing": "after yesterday's close"
-    },
-    {
-      "headline": "U.S. Companies Shift Investments from China, Favoring Southeast Asia",
-      "snippet": "Investment Redirection**: Nearly 47% of U.S. businesses have shifted planned investments from China to other regions, primarily Southeast Asia, du...",
-      "source_type": "investor commentary",
+      "headline": "Rising US Stock Records Amid Mixed Market Signals: Decoding the S&P 500's Lead and the Divergent Paths of the Dow and Nasdaq",
+      "snippet": "S&P 500's record highs reflect macroeconomic resilience and sector diversification, outperforming lagging Dow and Nasdaq.",
+      "source_type": "automated article",
       "timing": "after yesterday's close"
     }
   ]
