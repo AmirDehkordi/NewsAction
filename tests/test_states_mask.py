@@ -702,6 +702,10 @@ REVISION4_GONE = (
     ("Duolingo shares added 16% after the app reported strong results.", "16%"),
     ("Notable profits for the buyer who lifted the $0.37 offer for 1,967 Apple 9/12 weekly 20 puts.", "puts"),
     ("Crude for Sep-25 delivery rose on Tuesday.", "Sep-25"),
+    ("Trading News Apple rallies to $202.34 as AI-driven AWS and booming ad revenue fuel growth.", "$202"),
+    ("Results beat revenue estimates, with intrinsic value ($261.36) above current price ($246.03).", "$246"),
+    ("Apple ended the latest trading session unchanged at $27.75, after gains driven by earnings.", "$27"),
+    ("Apple Presents at Morgan Stanley Conference, Jun-12-2025 02:30 PM", "Jun-12"),
 )
 REVISION4_KEEP = (
     "Apple reported earnings of $1.71 per share, beating estimates by $0.04.",
@@ -723,6 +727,8 @@ REVISION4_KEEP = (
     "Apple is expected to report earnings of $0.72 per share, indicating an increase of 16.1% on a year ago.",
     "Apple's EPS for the quarter was $1.72, surpassing the previous year's $1.57 and the estimated $1.67.",
     "Home Furnishings Stores Market Expansion Continues, with Forecast Valuation of $286.39 Billion",
+    "Adjusted earnings per share rose 8.3% year over year in the quarter to $1.44.",
+    "Apple's EPS rose to $1.44, beating the consensus of $1.40.",
 )
 
 
@@ -755,7 +761,7 @@ def test_scanner_sees_the_fourth_verification_forms() -> None:
     sc = scanner()
     for text, _ in REVISION4_GONE:  # as a state shows them, the company's name masked
         c = sc.scan_text(text.replace("Apple", "The company"), AAPL)
-        assert c.price_levels + c.price_moves + c.dates >= 1, text
+        assert c.price_levels + c.price_moves + c.dates + c.years >= 1, text
     for text in REVISION4_KEEP:
         c = sc.scan_text(text, AAPL)
         assert c.price_levels + c.price_moves == 0, text

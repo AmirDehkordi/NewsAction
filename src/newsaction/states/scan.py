@@ -209,9 +209,13 @@ _CENTS_ANY: Final = re.compile(
     r"(?!\s*(?:[MBKT]\b|mn\b|mln\b|bn\b|million|billion|trillion))"
 )
 _FUNDAMENTAL_WORDS: Final = re.compile(
-    r"(?i)\b(?:eps|earnings|per[\s-]+(?:\w+\s+)?share|dividends?|distributions?|payouts?|ffo|affo|net\s+income|"
-    r"income|loss(?:es)?|profits?|revenues?|sales|consensus|estimates?|expected|expects?|guidance|book\s+value|"
-    r"nav|coupons?|notes|bonds?)\b|/\s?share|\ba\s+share\b"
+    r"(?i)\b(?:eps|earnings|per[\s-]+(?:\w+\s+)?share|dividends?|distributions?|payouts?|ffo|affo|consensus|"
+    r"estimates?|expected|expects?|guidance|book\s+value|nav|coupons?|notes|bonds?)\b|/\s?share|\ba\s+share\b"
+)
+_PRICE_BEFORE: Final = re.compile(
+    r"(?i)\b(?:price|prices|trading|traded|trades|closed|closing|opened|ended|rall(?:y|ies|ied)|jump(?:s|ed)?|"
+    r"plung(?:e|es|ed)|surg(?:e|es|ed)|sank|soar(?:s|ed)?|climb(?:s|ed)?|fell|rose|hits?|reach(?:es|ed)?|"
+    r"touch(?:es|ed)?|stands?|stood|settl(?:es|ed|ing))\b[^$€£.;!?]{0,25}$"
 )
 _OPTIONS_CHATTER: Final = re.compile(
     r"(?i)\b(?:lifted|hit|paid)\s+the\s+\$\d|\bunderlying\s+shares\s+were\b"
@@ -225,7 +229,11 @@ _MOVE_OF: Final = re.compile(
     r"|\b(?:shares?|stocks?)\b(?P<stretch2>[^.!?%]{0,30}?)\b(?:add(?:s|ed|ing)?|shed(?:s|ding)?)\s+\d+(?:[.,]\d+)?\s?%"
     r"|\b\d+(?:[.,]\d+)?\s?%\s+during\s+(?:after-hours|after\s+hours|premarket|pre-market|extended)"
 )
-_SENTENCES: Final = re.compile(r"(?<=[.!?])\s+(?=[A-Z\"“(])")
+# a sentence break, not after an abbreviation ("EPS $2.47, vs. FactSet Est. of $2.44", "Chase & Co. from")
+_SENTENCES: Final = re.compile(
+    r"(?<=[.!?])(?<![Vv]s\.)(?<!Est\.)(?<!Inc\.)(?<!Co\.)(?<!Corp\.)(?<!Ltd\.)(?<!Mr\.)(?<!Ms\.)(?<!Dr\.)(?<!St\.)"
+    r"(?<!\b[A-Z]\.)\s+(?=[A-Z\"“(])"
+)
 _AMOUNT_THEN_PRICE: Final = re.compile(
     r"(?i)(?:C\$|US\$|\$|USD\s?|€\s?|£\s?)\d[\d,]*(?:\.\d+)?\s+(?:stock|share)\s+price"
 )
@@ -252,15 +260,26 @@ _CLOCK: Final = re.compile(r"\d\s?$")
 _SEGMENTS: Final = re.compile(r"\n| \|\| ")
 
 
+def cents_level(sentence: str) -> bool:
+    """A cents amount that is a price: after a price word or move verb, or in a sentence with no per-share
+    fundamental; not when "per share" follows or a fundamental word is within 45 characters before it."""
+    has_fund = _FUNDAMENTAL_WORDS.search(sentence) is not None
+    for m in _CENTS_ANY.finditer(sentence):
+        before = sentence[max(0, m.start() - 45) : m.start()]
+        if _PER_SHARE_AFTER.match(sentence, m.end()) or _FUNDAMENTAL_WORDS.search(before):
+            continue
+        if _PRICE_BEFORE.search(before) or not has_fund:
+            return True
+    return False
+
+
 def price_level_count(text: str) -> int:
     """Dollar levels of the base pattern, plus share-price levels, price targets in any notation and per-share
     deal prices (fourth verification)."""
     n = len(_PRICE_LEVEL.findall(text)) + len(_TARGET_ANY.findall(text)) + len(_DEAL_PER_SHARE.findall(text))
     n += len(_AMOUNT_THEN_PRICE.findall(text))
     for sentence in _SENTENCES.split(text):
-        if (
-            _CENTS_ANY.search(sentence) and not _FUNDAMENTAL_WORDS.search(sentence)
-        ) or _OPTIONS_CHATTER.search(sentence):
+        if _OPTIONS_CHATTER.search(sentence) or cents_level(sentence):
             n += 1
     verb = [m.span() for m in _SHARE_VERB_LEVEL.finditer(text) if not _SIZE_AFTER.match(text, m.end())]
     n += len(verb)

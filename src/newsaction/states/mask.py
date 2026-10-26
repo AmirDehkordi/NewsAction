@@ -171,9 +171,15 @@ _CENTS: Final = re.compile(
     rf"(?i){_CUR}\d[\d,]*\.\d{{2}}(?!\d)(?!\s*(?:[MBKT]\b|mn\b|mln\b|bn\b|million|billion|trillion))"
 )
 _PER_SHARE_FUND: Final = re.compile(
-    r"(?i)\b(?:eps|earnings|per[\s-]+(?:\w+\s+)?share|dividends?|distributions?|payout|ffo|affo|income|"
-    r"loss(?:es)?|profits?|revenues?|sales|consensus|estimates?|expected|guidance|book\s+value|nav|coupons?|"
-    r"notes|bonds?)\b|/\s?share|\ba\s+share\b"
+    r"(?i)\b(?:eps|earnings|per[\s-]+(?:\w+\s+)?share|dividends?|distributions?|payout|ffo|affo|consensus|"
+    r"estimates?|expected|guidance|book\s+value|nav|coupons?|notes|bonds?)\b|/\s?share|\ba\s+share\b"
+)
+# a cents amount right after a price word or a move verb is a level whatever else the sentence says ("rallies
+# to $202.34 as ... ad revenue", "current price ($246.03)", "ended the session unchanged at $27.75"), unless a
+# per-share fundamental is just before it ("EPS rose to $1.44")
+_PRICE_LEFT: Final = re.compile(
+    r"(?i)\b(?:prices?|traded|trading|trades|closed|closing|opened|ended|rall\w*|jump\w*|plung\w*|surg\w*|sank|"
+    r"soar\w*|climb\w*|fell|rose|hits?|reach\w*|touch\w*|stands?|stood|settl\w*)\b[^$€£.;!?]{0,25}$"
 )
 # options-flow chatter: a strike near the share price and an expiry month ("lifted the $0.37 offer for 1,967
 # the company 9/12 weekly 20 puts", "Sep-25 24 puts", "when underlying shares were")
@@ -764,6 +770,7 @@ _DATE_RULES: Final[tuple[tuple[re.Pattern[str], str], ...]] = tuple(
     (re.compile(p[len(_I) :], re.IGNORECASE) if p.startswith(_I) else re.compile(p), r)
     for p, r in (
         (r"\b(?:Black|Cyber|Good)\s+(?:Friday|Monday)\b", "a holiday"),
+        (r"\b(?:Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Sept|Oct|Nov|Dec)-\d{1,2}-(?:19|20)\d{2}\b", RECENTLY),
         (r"\b(?:Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Sept|Oct|Nov|Dec)[-’'/]\d{2}\b(?![-/.]\d)", RECENTLY),
         (rf"{YEAR_RE}\s?[年년]\s?(?:{CJK_DAY}|\d{{1,2}}\s?[月월])", RECENTLY),
         (rf"(?<!\d){CJK_DAY}", RECENTLY),
@@ -1278,6 +1285,19 @@ class Masker:
             return True
         return False
 
+    @staticmethod
+    def has_cents_level(sentence: str) -> bool:
+        """A cents amount that is a share price (``_CENTS``, ``_PRICE_LEFT``, ``_PER_SHARE_FUND``)."""
+        fundamental = _PER_SHARE_FUND.search(sentence) is not None
+        for m in _CENTS.finditer(sentence):
+            if _PER_SHARE_AFTER.match(sentence, m.end()):
+                continue
+            if _PER_SHARE_FUND.search(sentence[max(0, m.start() - 45) : m.start()]):
+                continue
+            if _PRICE_LEFT.search(sentence[max(0, m.start() - 45) : m.start()]) or not fundamental:
+                return True
+        return False
+
     def mask_prices(self, text: str) -> tuple[str, int]:
         """Step 5b: drop ticker quotes and price-move sentences; remove price-target and deal-price levels."""
         n = 0
@@ -1323,9 +1343,7 @@ class Masker:
         text, k = PER_SHARE.subn(deal, text)
         dropped = 0
         for sentence in split_sentences(text):
-            if (_CENTS.search(sentence) and not _PER_SHARE_FUND.search(sentence)) or _OPTIONS_FLOW.search(
-                sentence
-            ):
+            if self.has_cents_level(sentence) or _OPTIONS_FLOW.search(sentence):
                 text = text.replace(sentence, "", 1)
                 dropped += 1
         if dropped:
