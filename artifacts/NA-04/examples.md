@@ -2,28 +2,28 @@
 
 Three Call A (D0) and two Call B (D2) states, drawn with seed 2026 (`newsaction.states.report.examples`), for human review of the masking and the codebook. Each block is the exact `state_json` sent to a decision model, pretty-printed (the stored form is compact). Event ids and token counts are shown outside the state; they are not part of it.
 
-## Call A, D0: `W0:1098:2025-07-03`
+## Call A, D0: `W0:1093:2025-07-03`
 
-6 articles · 722 state tokens · 1024 with the core questions
+2 articles · 481 state tokens · 783 with the core questions
 
 ```json
 {
   "attention": {
-    "articles_vs_usual": "normal",
-    "distinct_stories": "more than ten"
+    "articles_vs_usual": "busy",
+    "distinct_stories": "four"
   },
   "company": {
     "analyst_estimates_past_month": "little changed",
     "earnings_report": "no scheduled earnings report falls in this window",
-    "market_sensitivity": "aggressive",
+    "market_sensitivity": "market-like",
     "performance_vs_market_and_sector": {
-      "past_month": "small rise (≈0.6× a typical month's move)",
-      "past_three_months": "negligible rise (≈0.3× a typical three-month move)",
-      "past_week": "negligible rise (≈0.0× a typical week's move)"
+      "past_month": "moderate fall (≈1.1× a typical month's move)",
+      "past_three_months": "moderate fall (≈1.5× a typical three-month move)",
+      "past_week": "negligible fall (≈0.3× a typical week's move)"
     },
-    "sector": "Information Technology",
-    "size": "an S&P 500 company (size rank 251–500)",
-    "volatility_vs_its_past_year": "very high"
+    "sector": "Energy",
+    "size": "a large US company (size rank 101–250)",
+    "volatility_vs_its_past_year": "high"
   },
   "market": {
     "dollar_change": "negligible fall (≈0.0× a typical day's move)",
@@ -37,66 +37,42 @@ Three Call A (D0) and two Call B (D2) states, drawn with seed 2026 (`newsaction.
   },
   "news": [
     {
-      "headline": "",
-      "snippet": "Nasdaq's record rally fuels upside in MSFT, V, and MA as easing tariffs and AI momentum lift tech optimism.",
+      "headline": "Analyst Expectations For the company's Future",
+      "snippet": "Providing a diverse range of perspectives from bullish to bearish, 8 analysts have published ratings on the company. The company. in the last three months.",
       "source_type": "news aggregator",
       "timing": "shortly before the open"
     },
     {
-      "headline": "‘Investors Were Relieved’: CNN Admits Stock Market Having ‘Remarkable’ Turnaround Under a person",
-      "snippet": "CNN reporter a person and “CNN News Central” host a person expressed shock recently at the “remarkable” turnaround on Wall Street as stocks...",
+      "headline": "JPMorgan Adjusts Price Target on the company raised by about 3%, Maintains Overweight Rating",
+      "snippet": "The company is one of the leading American natural gas distributors. Sales break down by activity as follows: - gathering, processing and distribution of...",
       "source_type": "news aggregator",
-      "timing": "after yesterday's close"
-    },
-    {
-      "headline": "Silicon On Insulators Market Thrives On Surging Demand",
-      "snippet": "Stay ahead with our updated market reports featuring the latest on tariffs, trade flows, and supply chain transformations. What Will the Silicon On...",
-      "source_type": "automated article",
       "timing": "early this morning (before 08:00)"
-    },
-    {
-      "headline": "Chip Industry Week in Review",
-      "snippet": "U.S. lifts EDA export restrictions to China; collusion risk in the IC supply chain; Onto buys materials analysis biz; Tenstorrent acquires a person;...",
-      "source_type": "other source",
-      "timing": "overnight"
-    },
-    {
-      "headline": "Ambiq Micro files for U.S. IPO as generative AI fuels chip demand",
-      "snippet": "",
-      "source_type": "news aggregator",
-      "timing": "shortly before the open"
-    },
-    {
-      "headline": "The Role of Semiconductor Filters in Shaping Modern Electronics",
-      "snippet": "Explore how advancements in semiconductor filter technology, including AI integration and ultra-pure gas filtration, shape industries like 5G, IoT,...",
-      "source_type": "other source",
-      "timing": "after yesterday's close"
     }
   ]
 }
 ```
 
-## Call A, D0: `W0:185:2025-07-21`
+## Call A, D0: `W0:186:2025-07-21`
 
-6 articles · 691 state tokens · 993 with the core questions
+4 articles · 673 state tokens · 975 with the core questions
 
 ```json
 {
   "attention": {
-    "articles_vs_usual": "very heavy",
-    "distinct_stories": "six"
+    "articles_vs_usual": "busy",
+    "distinct_stories": "more than ten"
   },
   "company": {
-    "analyst_estimates_past_month": "cut",
+    "analyst_estimates_past_month": "raised",
     "earnings_report": "no scheduled earnings report falls in this window",
-    "market_sensitivity": "aggressive",
+    "market_sensitivity": "market-like",
     "performance_vs_market_and_sector": {
-      "past_month": "small rise (≈0.7× a typical month's move)",
-      "past_three_months": "moderate fall (≈1.0× a typical three-month move)",
-      "past_week": "large fall (≈2.1× a typical week's move)"
+      "past_month": "moderate rise (≈1.5× a typical month's move)",
+      "past_three_months": "small rise (≈0.8× a typical three-month move)",
+      "past_week": "negligible fall (≈0.2× a typical week's move)"
     },
-    "sector": "Industrials",
-    "size": "an S&P 500 company (size rank 251–500)",
+    "sector": "Financials",
+    "size": "one of the 100 largest US companies",
     "volatility_vs_its_past_year": "high"
   },
   "market": {
@@ -111,40 +87,28 @@ Three Call A (D0) and two Call B (D2) states, drawn with seed 2026 (`newsaction.
   },
   "news": [
     {
-      "headline": "The company the quarter Earnings Report",
-      "snippet": "The company announced their quarter earnings recently. View the company's earnings results at MarketBeat.",
-      "source_type": "automated article",
-      "timing": "overnight"
-    },
-    {
-      "headline": "Zelman & Associates Reaffirms Underperform Rating for the company",
-      "snippet": "The company's stock had its \"underperform\" rating reiterated by investment analysts at Zelman & Associates in a...",
-      "source_type": "automated article",
-      "timing": "overnight"
-    },
-    {
-      "headline": "Jefferies Reiterates Buy Rating on the company with Price Target",
-      "snippet": "Jefferies maintains a Buy rating on the company with a price target, citing positive corporate insider sentiment and a one-year high of...",
-      "source_type": "automated article",
+      "headline": "Charles Schwab the quarter ETF Assets Jump 26% as Markets Rise",
+      "snippet": "ETF assets under management increased to $439.7B. - Schwab grabbed 1M new brokerage accounts that brought in $80.3B. - SCHD brought in $1.8B.",
+      "source_type": "news aggregator",
       "timing": "after yesterday's close"
     },
     {
-      "headline": "North American Morning Briefing: Stocks Rise -2",
-      "snippet": "Of about the year bunkers and air-raid shelters operational during the Cold War, only 580 remain, offering space for 480000 people, or half a percent of...",
+      "headline": "Institutional investors control 72% of DXP Enterprises, Inc. (NASDAQ:DXPE) and were rewarded last week after stock increased 8.9%",
+      "snippet": "Key Insights Given the large stake in the stock by institutions, DXP Enterprises' stock price might be vulnerable to...",
+      "source_type": "news aggregator",
+      "timing": "overnight"
+    },
+    {
+      "headline": "A person's ETF Assets Rise 26% in the quarter Amid Market Gains",
+      "snippet": "A person's ETF assets rose 26% YoY to $439.7 billion in the quarter, driven by market gains and inflows into funds such as a person US Dividend Equity ETF and...",
+      "source_type": "automated article",
+      "timing": "overnight"
+    },
+    {
+      "headline": "Ethereum Roars To $3,800: What's Driving The Surge?",
+      "snippet": "Ethereum's (CRYPTO: ETH) most recent breakout isn't just a product of ETF hype, it's backed by a surge in DeFi activity and a rising structural shift,...",
       "source_type": "news aggregator",
       "timing": "early this morning (before 08:00)"
-    },
-    {
-      "headline": "Tremont Co-operative Grain Co.",
-      "snippet": "",
-      "source_type": "other source",
-      "timing": "after yesterday's close"
-    },
-    {
-      "headline": "Insider Buying Surges: Top Executives Invest $170 Million in the company, UNH, and MIDD",
-      "snippet": "Insider buying activity has surged at three major companies, with top executives and influential insiders investing over $170 million.",
-      "source_type": "automated article",
-      "timing": "overnight"
     }
   ]
 }
@@ -224,28 +188,28 @@ Three Call A (D0) and two Call B (D2) states, drawn with seed 2026 (`newsaction.
 }
 ```
 
-## Call B, D2: `W2:983:2025-07-10`
+## Call B, D2: `W2:975:2025-07-10`
 
-6 articles · 850 state tokens · 1205 with the core questions
+4 articles · 691 state tokens · 1046 with the core questions
 
 ```json
 {
   "attention": {
     "articles_vs_usual": "normal",
-    "distinct_stories": "six"
+    "distinct_stories": "four"
   },
   "company": {
-    "analyst_estimates_past_month": "raised",
+    "analyst_estimates_past_month": "little changed",
     "earnings_report": "no scheduled earnings report falls in this window",
     "market_sensitivity": "market-like",
     "performance_vs_market_and_sector": {
-      "past_month": "moderate rise (≈1.2× a typical month's move)",
-      "past_three_months": "large rise (≈2.7× a typical three-month move)",
-      "past_week": "moderate rise (≈1.0× a typical week's move)"
+      "past_month": "moderate fall (≈1.4× a typical month's move)",
+      "past_three_months": "negligible fall (≈0.0× a typical three-month move)",
+      "past_week": "large fall (≈2.5× a typical week's move)"
     },
-    "sector": "Energy",
+    "sector": "Consumer Staples",
     "size": "a large US company (size rank 101–250)",
-    "volatility_vs_its_past_year": "high"
+    "volatility_vs_its_past_year": "normal"
   },
   "market": {
     "dollar_change": "negligible fall (≈0.0× a typical day's move)",
@@ -259,73 +223,61 @@ Three Call A (D0) and two Call B (D2) states, drawn with seed 2026 (`newsaction.
   },
   "news": [
     {
-      "headline": "A person Annonce de Nouveaux Avis de Tarifs Douaniers alors que l'UE Pousse pour un Accord Commercial avec les États-Unis",
-      "snippet": "Le président américain a person a publié recently des avis finaux de tarifs douaniers visant sept partenaires commerciaux secondaires, alors que son...",
+      "headline": "The company the quarter Earnings Report",
+      "snippet": "The company announced their quarter earnings recently. View the company's earnings results at MarketBeat.",
+      "source_type": "automated article",
+      "timing": "during today's trading session"
+    },
+    {
+      "headline": "North American Morning Briefing: Futures Point to -2",
+      "snippet": "12:30/US: Recently Unemployment Insurance Weekly Claims Report - Initial Claims 12:30/US: U.S. Weekly Export Sales 13:00/RUS: Weekly International Reserves...",
+      "source_type": "news aggregator",
+      "timing": "early this morning (before 08:00)"
+    },
+    {
+      "headline": "Global stocks mostly up despite new a person tariffs, Nasdaq at record",
+      "snippet": "The Nasdaq powered to a fresh record and major European markets closed in the green recently, brushing off US President's growing array of...",
       "source_type": "news aggregator",
       "timing": "after yesterday's close"
     },
     {
-      "headline": "Marathon Oil Employees: Is the Russia-Ukraine War a Threat to the Global Economy?",
-      "snippet": "Standard deduction. $15,000 single; $30,000 married filing jointly for the year, $15,750 single; $31,500 married filing jointly for the year.",
+      "headline": "Global Sports Nutrition Supplements Market Size is expected to experience a CAGR of 4.2% through the period, according to industry projections.",
+      "snippet": "Global Sports Nutrition Supplements Market Size is expected to experience a CAGR of 4.2% through the period, according to industry projections.",
       "source_type": "other source",
-      "timing": "early this morning (before 08:00)"
-    },
-    {
-      "headline": "The company Price Target Raised",
-      "snippet": "The company had its price target boosted by investment analysts at Piper Sandler raised by about 11% in a report...",
-      "source_type": "automated article",
-      "timing": "during today's trading session"
-    },
-    {
-      "headline": "The company: UBS herhaalt koopadvies",
-      "snippet": "The company is gespecialiseerd in olieraffinage, transport en distributie. De verkoop kan als volgt per activiteit worden uitgesplitst...",
-      "source_type": "news aggregator",
-      "timing": "during today's trading session"
-    },
-    {
-      "headline": "Wells Fargo & Company Issues Positive Forecast for the company Stock Price",
-      "snippet": "The company had its price objective boosted by Wells Fargo & Company raised by about 13% in a report issued on...",
-      "source_type": "automated article",
-      "timing": "during today's trading session"
-    },
-    {
-      "headline": "The company Price Target Raised by Wells Fargo | the company Stock News",
-      "snippet": "Recently, Wells Fargo analyst announced an update on the company, maintaining an \"Overweight\" rating on the stock...",
-      "source_type": "automated article",
-      "timing": "during today's trading session"
+      "timing": "after yesterday's close"
     }
   ],
   "reaction_so_far": {
     "stock_market_move": "negligible rise (≈0.3× a typical day's move)",
-    "stock_move_vs_market_and_sector": "moderate rise (≈1.0× a typical day's move)",
+    "stock_move_vs_market_and_sector": "moderate fall (≈1.3× a typical day's move)",
     "time": "by the close",
-    "volume_vs_normal": "busy"
+    "volume_vs_normal": "normal"
   }
 }
 ```
 
-## Call B, D2: `W2:400:2025-08-06`
+## Call B, D2: `W2:401:2025-08-06`
 
-6 articles · 846 state tokens · 1201 with the core questions
+3 articles · 615 state tokens · 970 with the core questions
 
 ```json
 {
   "attention": {
-    "articles_vs_usual": "busy",
+    "articles_vs_usual": "normal",
     "distinct_stories": "more than ten"
   },
   "company": {
-    "analyst_estimates_past_month": "not available",
+    "analyst_estimates_past_month": "raised",
     "earnings_report": "no scheduled earnings report falls in this window",
-    "market_sensitivity": "market-like",
+    "market_sensitivity": "very aggressive",
     "performance_vs_market_and_sector": {
-      "past_month": "negligible fall (≈0.1× a typical month's move)",
-      "past_three_months": "small rise (≈0.5× a typical three-month move)",
-      "past_week": "small rise (≈0.5× a typical week's move)"
+      "past_month": "small rise (≈0.5× a typical month's move)",
+      "past_three_months": "negligible fall (≈0.4× a typical three-month move)",
+      "past_week": "negligible fall (≈0.1× a typical week's move)"
     },
-    "sector": "Utilities",
-    "size": "a large US company (size rank 101–250)",
-    "volatility_vs_its_past_year": "very high"
+    "sector": "Industrials",
+    "size": "an S&P 500 company (size rank 251–500)",
+    "volatility_vs_its_past_year": "normal"
   },
   "market": {
     "dollar_change": "no change (≈0.0× a typical day's move)",
@@ -339,45 +291,27 @@ Three Call A (D0) and two Call B (D2) states, drawn with seed 2026 (`newsaction.
   },
   "news": [
     {
-      "headline": "The company the quarter Earnings Call Transcript",
-      "snippet": "The company the quarter Earnings Call Transcript recently. The company beats earnings expectations. Reported EPS is $0.75,...",
-      "source_type": "investor commentary",
+      "headline": "London Heathrow Expansion: These 4 New Long-Haul Airlines Set To Launch Flights",
+      "snippet": "Air Peace, Alaska Airlines, IndiGo, and Riyadh Air are reportedly coming.",
+      "source_type": "major news outlet",
       "timing": "shortly before the open"
     },
     {
-      "headline": "The company Posts Higher Profit",
-      "snippet": "The company has reported $649 million in adjusted net profit for the quarter, up from $567 million for the same three-month period last year...",
+      "headline": "The company COVID-19 flexible booking",
+      "snippet": "+1 844 376 0587Take advantage of the company COVID-19 flexible booking for peace of mind when planning your trip. +1 844 376 0587the company has.",
       "source_type": "other source",
-      "timing": "during today's trading session"
+      "timing": "early this morning (before 08:00)"
     },
     {
-      "headline": "The company's the quarter Earnings Call: Balancing Progress and Challenges",
-      "snippet": "The company reported the quarter operating earnings of $0.75 per share, reaffirming its financial guidance for the year. The Coastal Virginia Offshore Wind project...",
-      "source_type": "automated article",
-      "timing": "overnight"
-    },
-    {
-      "headline": "The company's Solar Stadium Push Drives 46.63% Trading Surge to 182nd in Market Activity",
-      "snippet": "Recently,. The company traded with a volume of $0.61 billion, a 46.63% increase from the previous day, ranking 182nd in market...",
-      "source_type": "automated article",
-      "timing": "after yesterday's close"
-    },
-    {
-      "headline": "IBD Rating Upgrades: The company Flashes Improved Technical Strength",
-      "snippet": "Recently, the company received a positive adjustment to its Relative Strength (RS) Rating, from 69 to 72. When To Sell Stocks To Lock In Profits And...",
-      "source_type": "news aggregator",
-      "timing": "overnight"
-    },
-    {
-      "headline": "U.S. MBA 30-Year Mortgage Rate Hits 6.77%: Sector-Specific Market Responses and Strategic Portfolio Adjustments",
-      "snippet": "U.S. MBA 30-Year Mortgage Rate fell to 6.77% recently, sparking sector-specific market responses amid inflation and labor challenges.",
-      "source_type": "automated article",
+      "headline": "Behind the scenes with a company meteorologist",
+      "snippet": "Every day, a person sits down at his desk in the company's Operations and Customer Center in Atlanta and performs a job that's crucial to the airline's.",
+      "source_type": "other source",
       "timing": "early this morning (before 08:00)"
     }
   ],
   "reaction_so_far": {
     "stock_market_move": "moderate rise (≈1.0× a typical day's move)",
-    "stock_move_vs_market_and_sector": "small rise (≈0.8× a typical day's move)",
+    "stock_move_vs_market_and_sector": "moderate rise (≈1.0× a typical day's move)",
     "time": "by the close",
     "volume_vs_normal": "normal"
   }

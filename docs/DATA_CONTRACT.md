@@ -459,9 +459,9 @@ its sha256 on a rerun.
 - **Inputs:** the news lists of `work/events/events_{d0,d2}.parquet` (title_clean / snippet_clean as capped by NA-03), `work/news/market_articles.parquet` (A3.5 selection), `work/panel/companies.parquet`, `work/snapshot/symbol_tickers.parquet`, `configs/{aliases,news,patterns}.yaml`
 - **Schema:** `id` string, `kind` (company | market), `company_id` int64 (−1 for market articles), `title_masked`, `snippet_masked` string, `n_names`, `n_tickers`, `n_dates`, `n_persons` int64 (replacements made; price-talk sentences, quotes and price-level rewrites are not counted)
 - **Key:** `id` unique
-- **Rows / coverage:** 299,138 rows: 296,082 event articles, 3,056 market articles (the A3.5 selection leaves out excluded articles, revision 3)
+- **Rows / coverage:** 299,137 rows: 296,082 event articles, 3,055 market articles (the A3.5 selection leaves out excluded articles: explainers, TradingView reposts, revision 3; non-English articles, revision 4). Excluded event articles are still masked here; `news_items` leaves them out of the states. Since revision 4 the price step also drops share-price levels, the direction after the number, moves as nouns and price targets in any notation (2,852 event articles have no text left; the second pass drops any sentence that still holds a cents-precision share price)
 - **Availability:** `w0` per article (a function of the article's own text; `title_masked` / `snippet_masked` registered `w0`). Third-party OK articles only (NA-03 lists); contains 2026 article text, no return.
-- **sha256:** `dd1e4b0e9b705f19caa65d7220da7257a415214c50b2b73d6ee64985c736107d`
+- **sha256:** `c67c1b5863b82fd39c86ca7138db05e29a8a88c063f4d4efed903abb322e369d`
 
 ### `work/states/person_surnames.parquet`
 - **Producer:** `newsaction.states.build --stage mask` (S3; `states.mask.Masker.corpus_surnames`)
@@ -483,79 +483,79 @@ its sha256 on a rerun.
 
 ### State files (schema shared by the ten files below)
 - **Producer:** `newsaction.states.build --stage states` (S5; `states.build.build_event_states`, `build_market_states`)
-- **Inputs:** the four files above, `work/events/events_{d0,d2}.parquet`, `work/news/articles_clean.parquet` (`id`, `third_party_ok`, and the raw `title`, `snippet` for the move-explainer rule), `work/news/market_articles.parquet`, `configs/{codebook_v1,questions_v1,macro_calendar,states}.yaml`
-- **Excluded articles (revision 3):** move explainers, i.e. a raw title "Why … stock/shares … today" or StockStory's raw snippet "What Happened? Shares of / A number of …" (`configs/states.yaml` `news_exclusion`, `states.build.explainer_ids`), are in no state, in any window or call (PREREG §15 NA-04 row 6). The NA-03 lists are not refilled; an event whose every listed article is one gets no state (`events_all_excluded` in artifacts/NA-04/build_states.json).
+- **Inputs:** the four files above, `work/events/events_{d0,d2}.parquet`, `work/news/articles_clean.parquet` (`id`, `third_party_ok`, `domain` and the raw `title`, `snippet` for the exclusion rules), `work/news/market_articles.parquet`, `configs/{codebook_v1,questions_v1,macro_calendar,states}.yaml`
+- **Excluded articles (revisions 3 and 4):** move explainers (a raw title "Why … today" with a move word or a percent between, e.g. "Why … Stock Is Up Today", "Why Micron Technology Rallied Today"; or StockStory's raw snippet "What Happened? Shares of / A number of …"), TradingView reposts (domain) and non-English articles (`states.build.non_english` on the raw title + snippet) are in no state, in any window or call (`configs/states.yaml` `news_exclusion`, `states.build.excluded_ids`; PREREG §15 NA-04 rows 6 and 8). The NA-03 lists are not refilled; an event whose every listed article is one gets no state (`events_all_excluded` in artifacts/NA-04/build_states.json).
 - **Schema (all ten files):** `event_id` string, `company_id` int64 (−1 for market states), `session` date32, `split`, `window` (W0 | W2), `call` (A | B | M), `encoding` (E0–E4) string, `masked` bool, `state_json` string (canonical JSON: sorted keys, compact separators, UTF-8), `state_sha256` string (sha256 of the UTF-8 `state_json`), `n_tokens_state`, `n_tokens_with_questions` int64 (ModernBERT-large @ 45bb4654, no special tokens; + the call's core questions as canonical JSON), `n_articles` int64, `third_party_ok_all` bool
 - **Key:** `event_id` unique per file (`M:{session}` for market states)
-- **Rows / coverage:** `callA_d0_E3.parquet` 47,489; `callA_d2_E3.parquet` 61,772; `callB_d2_E3.parquet` 42,135; `market_E3.parquet` 595; `samples/callA_d0_E0.parquet` 3,000; `samples/callA_d0_E1.parquet` 3,000; `samples/callA_d0_E2.parquet` 3,000; `samples/callA_d0_E3.parquet` 3,000; `samples/callA_d0_E4.parquet` 3,000; `samples/unmasked.parquet` 1,000
+- **Rows / coverage:** `callA_d0_E3.parquet` 47,125; `callA_d2_E3.parquet` 61,405; `callB_d2_E3.parquet` 41,852; `market_E3.parquet` 595; `samples/callA_d0_E0.parquet` 3,000; `samples/callA_d0_E1.parquet` 3,000; `samples/callA_d0_E2.parquet` 3,000; `samples/callA_d0_E3.parquet` 3,000; `samples/callA_d0_E4.parquet` 3,000; `samples/unmasked.parquet` 1,000
 - **Availability:** a state is an input at its decision point: Call A D0 (`window` W0) at 09:15 ET of `session`; Call A D2 and Call B (W2) after close(s); `pit.check_inputs` validated every block (`states.build.validate_spec`). Call B rows exist for train, val-A and val-B only. Test-period rows (Call A only) contain t−1 context words: never summarized before the freeze.
 
 ### `work/states/callA_d0_E3.parquet`
 - **Producer:** `newsaction.states.build --stage states` (S5)
-- **Contents:** Call A on D0 (W0 news), E3, masked: every D0 event with text after masking and at least one article that is not excluded (robustness, train, val-A, val-B, test; 596 events have every listed article excluded and 18 have no text after masking, artifacts/NA-04/build_states.json)
+- **Contents:** Call A on D0 (W0 news), E3, masked: every D0 event with text after masking and at least one article that is not excluded (robustness, train, val-A, val-B, test; 871 events have every listed article excluded and 107 have no text after masking, artifacts/NA-04/build_states.json)
 - **Schema / key / availability:** as "State files" above
-- **Rows:** 47,489
-- **sha256:** `f70bb7132eb290e07664475fb9541826a79537ea90a48e5c84d106c021437613`
+- **Rows:** 47,125
+- **sha256:** `a95ed62ccd80f664c1633260a3f58a44dca1e55213913e0c15b302ea4bba673c`
 
 ### `work/states/callA_d2_E3.parquet`
 - **Producer:** `newsaction.states.build --stage states` (S5)
-- **Contents:** Call A on D2 (W2 news, PREREG A3.1), E3, masked: every D2 event with text after masking and an article that is not excluded (all splits; 503 have every listed article excluded, 10 have no text)
+- **Contents:** Call A on D2 (W2 news, PREREG A3.1), E3, masked: every D2 event with text after masking and an article that is not excluded (all splits; 814 have every listed article excluded, 66 have no text)
 - **Schema / key / availability:** as "State files" above
-- **Rows:** 61,772
-- **sha256:** `28326a032340d0d7c952d38b5acf45f5a323c77cdf8c52f8607ca9d62ee96141`
+- **Rows:** 61,405
+- **sha256:** `893c651a124d685272705b403da136499e18dbcf6119627c073d511ca4485b42`
 
 ### `work/states/callB_d2_E3.parquet`
 - **Producer:** `newsaction.states.build --stage states` (S5)
-- **Contents:** Call B on D2 (W2 news + reaction_so_far), E3, masked: the D2 events of train, val-A and val-B with text (224 have every listed article excluded, 4 have no text); same articles as callA_d2_E3
+- **Contents:** Call B on D2 (W2 news + reaction_so_far), E3, masked: the D2 events of train, val-A and val-B with text (480 have every listed article excluded, 31 have no text); same articles as callA_d2_E3
 - **Schema / key / availability:** as "State files" above
-- **Rows:** 42,135
-- **sha256:** `4f4ce7956f732fc7c1fae80651e66ba3d61ef15f97f656bc7bc57081d4ce93bb`
+- **Rows:** 41,852
+- **sha256:** `3993b512becbb80ce0086741901c9f0412ed3d9a52a3bc7002b5371ad81cbfcc`
 
 ### `work/states/market_E3.parquet`
 - **Producer:** `newsaction.states.build --stage states` (S5)
 - **Contents:** A3.5 (optional) market states: one per session with third-party-OK market-index articles, E3, masked
 - **Schema / key / availability:** as "State files" above
 - **Rows:** 595
-- **sha256:** `8c4c4718e5cb0d784ffccc1e3357a0d420446f48845851306d3502fcd736e916`
+- **sha256:** `55980ee629c737bbdc6ff1a6c9d712e97706fc1a9f1441c54872c1126c5d6b60`
 
 ### `work/states/samples/callA_d0_E0.parquet`
 - **Producer:** `newsaction.states.build --stage states` (S5)
 - **Contents:** NA-07 encoding sample: 1,500 val-A + 1,500 val-B D0 events (tier × month, seed 2026), Call A, E0, masked
 - **Schema / key / availability:** as "State files" above
 - **Rows:** 3,000
-- **sha256:** `1626d345cf13292c5c0fba04db0f88094c2f793fed2756e385eb65d84921b075`
+- **sha256:** `7fa91bc87063258f1e9d720ce10d5bbed5a614166ef05547900bb7f7c31f2845`
 
 ### `work/states/samples/callA_d0_E1.parquet`
 - **Producer:** `newsaction.states.build --stage states` (S5)
 - **Contents:** NA-07 encoding sample: 1,500 val-A + 1,500 val-B D0 events (tier × month, seed 2026), Call A, E1, masked
 - **Schema / key / availability:** as "State files" above
 - **Rows:** 3,000
-- **sha256:** `1750443ca807fcf3933e8dc267a992fdcf5ec8e2237e0c6ebcd62ace83ccc4fa`
+- **sha256:** `0ca24578ff0aeb3a93e1ac2ff7333454ef80fdb6abbca8ecd04f290a772d5490`
 
 ### `work/states/samples/callA_d0_E2.parquet`
 - **Producer:** `newsaction.states.build --stage states` (S5)
 - **Contents:** NA-07 encoding sample: 1,500 val-A + 1,500 val-B D0 events (tier × month, seed 2026), Call A, E2, masked
 - **Schema / key / availability:** as "State files" above
 - **Rows:** 3,000
-- **sha256:** `a05868c4164f7a29e4613ac6bfa6b20cb0a1fe3adc4e394f14834f0df6d58611`
+- **sha256:** `40cec28f43d1213fe4d4e972f6c73f08a7055f4e57cbb5818f84320f5eb29a23`
 
 ### `work/states/samples/callA_d0_E3.parquet`
 - **Producer:** `newsaction.states.build --stage states` (S5)
 - **Contents:** NA-07 encoding sample: 1,500 val-A + 1,500 val-B D0 events (tier × month, seed 2026), Call A, E3, masked
 - **Schema / key / availability:** as "State files" above
 - **Rows:** 3,000
-- **sha256:** `0ac2baefbd2bece52824d3a2774822239a00d8a3e06ad6e9adf36520c4bf19ed`
+- **sha256:** `35e6cf83bec88250c1e799faaa2fa73174f4846a6777c1b5531cbfc660cc2394`
 
 ### `work/states/samples/callA_d0_E4.parquet`
 - **Producer:** `newsaction.states.build --stage states` (S5)
 - **Contents:** NA-07 encoding sample: 1,500 val-A + 1,500 val-B D0 events (tier × month, seed 2026), Call A, E4, masked
 - **Schema / key / availability:** as "State files" above
 - **Rows:** 3,000
-- **sha256:** `360552924092a0945b80116e212eb7f47e72e30cdb62846304faefda7a8ab91c`
+- **sha256:** `52767608bbe13904e1be1c5baf5e013ad803a3558e16f56bfbf10a7e54d459ed`
 
 ### `work/states/samples/unmasked.parquet`
 - **Producer:** `newsaction.states.build --stage states` (S5)
 - **Contents:** NA-06 probe: unmasked twin of 1,000 val-A D0 events (tier × month, seed 2026), Call A, E3; the masked twin is the same event_id in callA_d0_E3
 - **Schema / key / availability:** as "State files" above
 - **Rows:** 1,000
-- **sha256:** `6879d6ad3f79e6b46fb5ab39fd8d57cf0686e7655266374e9dc03684c53df3fd`
+- **sha256:** `f43cad769f58a20bafe08027e507d19c0ac4e6207fd523438f163bda7d967bf8`
