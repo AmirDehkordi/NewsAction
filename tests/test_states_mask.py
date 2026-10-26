@@ -688,6 +688,7 @@ REVISION4_GONE = (
     ("Recently, Norfolk Southern (NSC) closed at a 1.13% decline with a volume of $0.7 billion.", "1.13%"),
     ("Apple Moves 22.8% Higher: Will This Strength Last?", "22.8%"),
     ("Why Apple Zoomed 4% Higher Today", "4%"),
+    ("Apple's shares, part of the earnings season rally, closed at $242.66.", "$242"),  # the verb rule
     ("Apple shares snapped a six-session winning streak, closing 1% lower recently.", "1%"),
     ("Lowe's shares snapped their six-day winning streak, closing 0.47% lower at $240.02 recently.", "$240"),
 )
