@@ -814,13 +814,26 @@ REVISION5_DATES = (
     ("Coffee News Recap, 29 Aug: Keurig Dr Pepper seals deal", "Aug"),
     ("14:00/US: Jul Employment Trends Index. 14:00/US: Jan CPI", "Jan"),
     ("highest in more than two years in Aug, according to FAO", "Aug"),
+    # the revision-5 build, read by hand
+    ("AJuly filing shows that a senator reported a sale.", "July"),
+    ("standalone net profit declines in the june 2025 quarter", "june"),
+    ("tariffs-on-home-goods-effective-october-2025", "october"),
+    ("julyinvestordeck", "july"),
+    ("Boeing. Jul. 25. Boeing Reports Q2 Results.", "25"),
 )
+# remnants that only a masked text holds ("Jul. 25." → "Recently 25.")
+REVISION5_MASKED_DATES = ("Boeing. Recently 25. Boeing Reports the quarter Results.",)
 REVISION5_DATE_LOOKALIKES = (
     "the Del Mar Fairgrounds hosted the event",
     "Nový Battlefield bude",
     "Apple Surges to 77th in Daily Trading Volume",
     "ranked 24th in the Fortune list",
+    "Augusta Farmers Coop",
+    "Clare-Mar Farms Limited",
+    "Recently 18:09 ET - News Release.",
 )
+# look-alikes the scanner must not count (spaCy reads this one as a person, so the masker test cannot use it)
+REVISION5_SCANNER_LOOKALIKES = ("Archer Daniels the quarter Earnings: Will Soft Segment Trends Mar Results?",)
 REVISION5_MOVES = (
     "The S&P 500 Index is up +0.20% today as tech leads.",
     "Nvidia dropped solidly by -3.50% on the session.",
@@ -858,6 +871,46 @@ REVISION5_MOVES = (
     "Recent price decline (-1.02%) contrasts with strong institutional inflows.",
     "US Sanctions on Russian Oil Spark 5% Crude Price Surge, Rattle Global Markets",
     "Cencora (COR) faces mixed signals and a 1.24% recent price drop despite strong fundamentals.",
+    # the revision-5 build, read by hand (val-A)
+    "The blue-chip Dow followed its +500-point gain by selling off -316 points.",
+    "Major indexes are in the green: the Dow is +67 points at this hour.",
+    "FDA Approval Boosts nvo stock Despite 3.897% Dip on Earnings Volatility",
+    "The company Options Sentiment Mixed Despite 1.47% Share Price Increase",
+    "That reading put the index ahead on the week by 180 points.",
+    "The company experienced a notable 68% price increase over the past quarter.",
+    "The company saw a 17% upward price movement over the last month.",
+    "The company traded 600M shares, ranking 234th in market activity with a 0.68% closing decline.",
+    "The S&P 500 index reached an intraday record high of 6,565 points recently.",
+    "Amcor's stock shows weak technical indicators and a 4.38% recent decline.",
+    "Corpay (CPAY) faces a 9.52% 5-day decline amid mixed analyst ratings.",
+    "Let's look at how major indexes are doing: S&P 500: +16.43 (+.30%) Nasdaq.",
+    "New World extends gain to 7.7% as family weighs capital boost",
+    "The company Lists Bio Protocol and Euler Spurring 18.99% BIO and 22.22% EUL Gains",
+    "A Promising Partnership with Potential UpsideBX-1.48%.",
+    "The recent 11.9% single-day plunge in.",
+    "While the S&P Telecom Select Industry Index has recorded a 40%+ rise over the last year.",
+    "Fees, Fines & Gains: Mastercard's 13% 3-Month Rise Laughs at Headlines",
+    "When a Healthcare Giant Gets Sick: Elevance Health's 20% YTD Decline",
+    "Micron Technology (MU) has seen a modest rise of 0.93% recently, but the technical outlook remains "
+    "bearish.",
+    "Dutch Bros (NYSE: BROS) is currently trading at 26% below its all-time high.",
+    "Bitcoin Retakes $112K, SOL Hits 7-Month High",
+    "Bitcoin's Sub-$110,000 Plunge Rattles Digital Asset Markets",
+    "Crude Eyes $68: What's Moving Markets",
+    "Rate Cut Euphoria Propels Bitcoin Towards $150,000 Mark",
+    "Gold's Breakout Moment: Positioning for a $3,400 Threshold",
+    "Bitcoin $200K?",
+    "Energy services face mixed prospects amid $74–$90/b Brent crude prices.",
+    "Wall Street Balances Shutdown Fears, Record Gold, and Nvidia’s $185 Rally",
+    "The barley tender failed, triggering 15% CBOT barley futures surges.",
+    "Shares fell 5% in reaction to weak sales.",
+    "Shares jumped 5% after the price target was raised by about 10%.",
+    "The stock has run roughly +69–71% year-to-date.",
+    "Is This AI Stock -- a 251% Gainer Since Its IPO -- Becoming a Meme Stock?",
+    "Wall Street is shifting into a risk-on mode, with the S&P 500 sitting just 2% shy of the record.",
+    "The S&P 500 suffered its first “2% down day” in 356 days recently.",
+    "ASX cops a beating with every sector hit, as Wall Street's 6% dive drags down miners and banks.",
+    "Yields jumped 5% this week.",
 )
 REVISION5_FUNDAMENTALS = (
     "Revenue rose 5% year over year to $94.9 billion.",
@@ -911,6 +964,42 @@ REVISION5_FUNDAMENTALS = (
     "The report finds global installs +11% YoY, sessions +16%.",
     "Analysts See +100% Upside",
     "US Economy Surges with Revised 3.8% the quarter GDP Growth",
+    # the scanner's revision-5 hits, read by hand (val-A), and the verification's price script
+    "The company has seen its institutional ownership surge to a remarkable 90.09%.",
+    "Broadcom (NASDAQ:AVGO) jumps 46% YoY in AI sales to $4.4B.",
+    "Revenue (GAAP) declined 42.4% year over year.",
+    "The Consumer Price Index (CPI), which surprised markets by rising to 2.7% year-over-year, marks a "
+    "juncture.",
+    "The company Reports Quarterly Loss Despite 35% Sales Rise",
+    "StepStone (STEP) AUM Jumps 18%",
+    "SoftBank Sells 13M Shares for $3.02B; Ownership Drops Below 5%",
+    "Cyber incidents in the region rose by 29% year-over-year.",
+    "The short interest in the company's stock has decreased by 10.37% since its last report.",
+    "The recent 66.21% price target increase for the company.",
+    "Recent moves by Washington, such as taking a 10% share of a chipmaker.",
+    "The company reports $2.06 trillion AUM, up 1.9% from previous month-end.",
+    "The fund experienced a 2.9% decrease in units outstanding.",
+    "While the Pending Home Sales Index (PHSI) rose 1.8% compared to the prior month.",
+    "Retailers face 26% shoplifting surge, deploying AI locks.",
+    "The company's Solar Stadium Push Drives 46.63% Trading Surge to 182nd in Market Activity",
+    "Value Fund ETF (WTV) Potential 10% Gain: Analysts' Target Prices",
+    "The company: European Stocks Are Forecast to Rise 5% After a Stellar Start",
+    "The company Business Platinum $50 Hilton Credit No Longer Works",
+    # the precision sample of the second revision-5 pass (articles before the test period)
+    "The company, a REIT, reported 22% higher the year earnings ($3.42/share) and 94.1% occupancy.",
+    "Delta Air Lines (NYSE:DAL) Reports 63% Increase In Net Income To US$2,130 Million",
+    "Wall Street expects a 0.2% monthly overall increase and a 0.3% uptick in the core CPI.",
+    "JP Morgan has raised the price target for Dell Technologies (DELL) raised by about 16%, a 16% increase.",
+    "S&P 500 multifamily REIT the company, managing over 60000 apartment homes, announces earnings.",
+    "Revenue growth of 5-10% is expected.",
+    "The company Added as Top 10 Utility Dividend Stock With 2.71% Yield",
+    "The Centers for Medicare & Medicaid Services (CMS) announced a 5.06% Medicare Advantage payment "
+    "increase.",
+    "The company the quarter Win: 65% Ad Surge Driven By Super Bowl, Tubi Growth",
+    "The company Unveils 23-Point Action Plan Following Independent Business Audit",
+    "Short Interest in Bank of America Co. (NYSE:BAC) Decreases By 8.1%",
+    "The U.S. MBA Mortgage Refinance Index has surged to 1,596.7, reflecting a 1609.8-point increase.",
+    "Revenue climbed 6% to $45 billion, fueled by higher premium yields and a 19% rise in policies.",
 )
 
 
@@ -941,7 +1030,9 @@ def test_scanner_sees_the_fifth_verification_forms() -> None:
     for text, _ in REVISION5_DATES:
         c = sc.scan_text(m_raw_dates(text), AAPL)
         assert c.dates + c.years >= 1, text
-    for text in REVISION5_DATE_LOOKALIKES:
+    for text in REVISION5_MASKED_DATES:
+        assert sc.scan_text(text, AAPL).dates >= 1, text
+    for text in REVISION5_DATE_LOOKALIKES + REVISION5_SCANNER_LOOKALIKES:
         assert sc.scan_text(text, AAPL).dates == 0, text
     for text in REVISION5_MOVES:
         c = sc.scan_text(text.replace("Apple", "The company"), AAPL)

@@ -135,8 +135,13 @@ _DATE: Final = re.compile(
     # case ("Jul, the year", "Sep nat-gas", "in Aug,"; not "Del Mar", "Mar-a-Lago"), a weekday or month glued
     # to a word ("StockSavvyThursday", "OnJuly"), a month in lower case beside a day ("july 14th"), "24-Jun-",
     # "FY-25", "4th qtr", "6/8 15:18" and a day ordinal next to a masked year ("24th, the year")
-    r"|(?<![^\W\d_])(?<!Del )(?:Jan|Feb|Mar|Apr|Jun|Jul|Aug|Sep|Sept|Oct|Nov|Dec)(?![^\W\d_])(?!-a-)"
-    r"(?!\s+[A-Z][a-z]+\s+said)"
+    r"|(?<![^\W\d_])(?<![-–])(?:Feb|Apr|Jun|Jul|Aug|Sep|Sept|Oct|Nov|Dec)(?![^\W\d_])(?!\s+[A-Z][a-z]+\s+said)"
+    # "Jan" and "Mar" are names and a verb too ("Jan Hatzius", "Clare-Mar Farms", "Trends Mar Results"): only
+    # after a preposition or before a day, a comma or a masked year
+    r"|(?:(?<=\bin )|(?<=\bon )|(?<=\bof )|(?<=\bby )|(?<=\bsince ))(?:Jan|Mar)\b"
+    r"|\b(?:Jan|Mar)(?=[,;)]|\s+(?:\d|the year\b|recently\b))"
+    # a one-letter word glued to a month ("AJuly filing")
+    r"|(?<=\b[A-Z])(?:January|February|April|June|July|August|September|October|November|December)\b"
     r"|(?<=[a-z])(?:Monday|Tuesday|Wednesday|Thursday|Friday|Saturday|Sunday|January|February|April|June|July|August"
     r"|September|October|November|December)"
     r"|\b(?:january|february|april|june|july|august|september|october|november|december|march|may)\s+"
@@ -146,6 +151,14 @@ _DATE: Final = re.compile(
     r"|(?<=[A-Z]{2})(?:Jan|Feb|Mar|Apr|Jun|Jul|Aug|Sep|Sept|Oct|Nov|Dec)\.?\s+\d"  # "ESTAug 22nd"
     r"|\bFY-\d{2}\b|\b[1-4](?:st|nd|rd|th)\s+qtr\b|(?<![\d/])\b\d{1,2}/\d{1,2}\s+\d{1,2}:\d{2}\b"
     r"|\b(?:[12]\d|3[01]|[1-9])(?:st|nd|rd|th),?\s+(?:the year|of the month)\b"
+    # lower-case months beside a masked year, after "in", or glued to a slug ("in the june the year
+    # quarter", "effective-october-the year", "in september", "julyinvestordeck"); a day left after "recently"
+    # ("Recently 25.")
+    r"|\b(?:january|february|march|april|may|june|july|august|september|october|november|december)"
+    r"[\s-]+the year\b"
+    r"|(?<=\bin )(?:january|february|april|june|july|august|september|october|november|december)\b"
+    r"|(?<![A-Za-z])(?:january|february|april|june|july|august|september|october|november|december)(?=[a-z]{4,})"
+    r"|\b(?i:recently)\s+(?:[12]\d|3[01]|0?[1-9])(?=[.,;)]|\s*$)"
 )
 _PRICE_MOVE: Final = re.compile(
     r"(?i)\b(?:shares?|stock|premarket|pre-market|after-hours|extended trading)\b[^.!?]{0,50}?"
@@ -323,7 +336,9 @@ def price_level_count(text: str) -> int:
 
 # since revision 5 (operator decision: every price move counts, of any company, index, future or commodity,
 # and every index or commodity level): the scanner's own words for each
-_ANY_PCT: Final = re.compile(r"(?i)(?<![\w.])(?P<sign>[+\-−–])?\d+(?:[.,]\d+)?\s?(?:%|percent\b)")
+_ANY_PCT: Final = re.compile(
+    r"(?i)(?<![\w.])(?P<sign>[+\-−–])?(?:\d+(?:[.,]\d+)?[–\-]\s?)?(?:\d+(?:[.,]\d+)?|[.,]\d+)\s?(?:%|percent\b)"
+)
 _MOVING: Final = re.compile(
     r"(?i)\b(?:rose|rising|rises|rise|fell|falling|falls|gained|gains|gain|lost|losing|losses|loss|added|adds|add|"
     r"dropped|drops|drop|jumped|jumps|jump|climbed|climbs|slid|slides|declined|declines|decline|advanced|advances|"
@@ -332,60 +347,88 @@ _MOVING: Final = re.compile(
     r"rocketed|skyrocketed|popped|zoomed|swung|plummeted|plummets|skidded|skids|sagged|sags|dived|dives|dove|"
     r"nosedived|nosedives|cratered|craters|collapses|leaps|"
     r"collapsed|leapt|leaped|corrected|outperformed|underperformed|pullback|sell-?off|rout|increased?|decreased?|"
-    r"moved|moves|move(?!\s+on\b)|movement|pulled\s+back|up(?!\s+to\b)|down(?!\s+to\b)|higher|lower)\b"
+    r"increases|increasing|decreases|decreasing|selling\s+off|sold\s+off|moved|moves|move(?!\s+on\b)|movements?|"
+    r"pulled\s+back|up(?!\s+to\b)|down(?!\s+to\b)|higher|lower)\b"
 )
 _MARKET_WORDS: Final = re.compile(
     r"(?i)\b(?:shares?|stocks?|stock\s+price|equities|index(?:es)?|indices|futures|ETFs?|S&P|SPX|NDX|DJIA|SPY|QQQ|"
-    r"Nasdaq|Dow|Russell|VIX|FTSE|DAX|Nikkei|Hang\s+Seng|KOSPI|Sensex|Nifty|Treasur(?:y|ies)|yields?|dollar|euro|"
-    r"yen|yuan|currenc(?:y|ies)|bitcoin|crypto\w*|gold|silver|copper|oil|crude|WTI|Brent|natural\s+gas|nat-?gas|"
-    r"commodit(?:y|ies)|markets|Wall\s+Street|price\s+(?:declin|drop|dip|rall|surg|slump|plung|gain|jump|ris|mov|"
-    r"loss|trend|swing|rebound)\w*)\b"
+    r"Nasdaq(?!\s*:)|Dow|Russell|VIX|FTSE|DAX|Nikkei|Hang\s+Seng|KOSPI|Sensex|Nifty|Treasur(?:y|ies)|"
+    r"(?:\d+-year|ten-year|two-year|bond|note|bund|gilt|benchmark)\s+yields?|yields?(?=\s+(?:rose|fell|climbed|"
+    r"jumped|dropped|slipped|eased|surged|spiked|tumbled|declined|soared))|"
+    r"dollar|euro|yen|yuan|currenc(?:y|ies)|bitcoin|crypto\w*|gold|silver|copper|oil|crude|WTI|Brent|natural\s+gas|"
+    r"nat-?gas|commodit(?:y|ies)|markets|Wall\s+Street|price\s+(?:declin|drop|dip|rall|surg|slump|plung|gain|jump|"
+    r"ris|mov|loss|trend|swing|rebound)\w*)\b"
 )
 # the company the state is about, and a ticker in parentheses ("A person (BRK.B) saw a minor decline of
 # 0.42%")
-_SECURITY: Final = re.compile(r"(?i:\bthe\s+company\b)|\((?:[A-Za-z]{2,12}:\s?)?[A-Z]{1,5}(?:\.[A-Z])?\)")
+_SECURITY: Final = re.compile(
+    r"(?i:\bthe\s+company\b)|\((?!(?:CMS|FDA|SEC|EPA|FTC|DOJ|ECB|IMF|OPEC|CPI|PPI|GDP|PCE|EU|UK|US|AI|EV|IPO|ETF|"
+    r"CEO|CFO|ESG|WHO|REIT|LLC|AUM|EPS|GAAP)\))(?:[A-Za-z]{2,12}:\s?)?[A-Z]{1,5}(?:\.[A-Z])?\)"
+)
 # one not-price unit also when it holds a market word ("shares outstanding", "earnings per share", "dividend
-# yield", "stake in Apple shares", "price target on the shares") or names a gauge ("PMI index", "Consumer
-# Price Index")
+# yield", "stake in Apple shares", "short interest in the company's stock", "price target on the shares") or
+# names a gauge ("PMI index", "Consumer Price Index", "Pending Home Sales Index (PHSI)")
 _NOT_PRICE: Final = re.compile(
-    r"(?i)\b(?:(?:stake|positions?|holdings?|short\s+interest|(?:price\s+)?(?:targets?|objectives?))\s+"
-    r"(?:in|of|on|for)\s+(?:the\s+company|(?:\S+\s+){0,4}?(?:shares?|stocks?))|(?:price\s+)?(?:targets?|objectives?)|"
-    r"upside|downside|econom(?:y|ies)|"
+    r"(?i)\b(?:(?:stake|positions?|holdings?|ownership|short\s+interest|(?:price\s+)?(?:targets?|objectives?))\s+"
+    r"(?:in|of|on|for)\s+(?:the\s+company(?:['’]s)?(?:\s+(?:shares?|stocks?))?|(?:\S+\s+){0,4}?(?:shares?|stocks?)|"
+    r"(?:\S+\s+){0,5}?\((?:[A-Za-z]{2,12}:\s?)?[A-Z]{1,5}\))|payments?|reimbursements?|medicare|medicaid|ads?|"
+    r"advertising|backtest\w*|"
+    r"(?:price\s+)?(?:targets?|objectives?)|upside|downside|econom(?:y|ies)|ownership|aum|"
+    r"assets\s+under\s+management|share\s+of|units?\s+outstanding|units?|segments?|divisions?|forecasts?|"
+    r"(?:net\s+)?loss(?:es)?\s+(?:deepen|widen|narrow|shrink|grow)\w*|ebit|impressions|clicks|"
     r"revenues?|rev|sales|earnings|eps|income|profits?|margins?|growth|cagr|volumes?|guidance|outlook|"
     r"estimates?|inflation|cpi|ppi|pce|pmi|ism|mba|gdp|payrolls?|jobs|employment|unemployment|claims|rates?|"
-    r"applications|manufacturing|traffic|orders|bookings|expectations|number\s+of|"
+    r"applications?|manufacturing|traffic|orders|bookings|expectations|number\s+of|"
     r"deliveries|shipments|users|subscribers|comps|same-store|organic|backlog|deposits|loans|assets|costs?|"
     r"expenses?|spending|wages?|workforce|headcount|production|output|capacity|occupancy|exports?|imports?|demand|"
     r"supply|inventor(?:y|ies)|tariffs?|debt|ratio|stake|holdings?|positions?|short\s+interest|short\s+percent|"
     r"float|(?:outstanding\s+)?shares\s+outstanding|outstanding\s+shares|share\s+count|buybacks?|repurchases?|"
-    r"per\s+share|probability|odds|polls?|survey|sentiment|confidence|dividend\s+yields?|dividends?|ebitda|ffo|"
-    r"market\s+share|year\s+over\s+year|yoy|r&d|mortgages?|permits|housing|coupons?|ratings?|scores?|rankings?|"
+    r"(?:per\s+|/\s?)share|probability|odds|polls?|survey|sentiment|confidence|dividend\s+yields?|dividends?|ebitda|ffo|"
+    r"market\s+share|year[\s-]over[\s-]year|year[\s-]on[\s-]year|yoy|sequential(?:ly)?|r&d|mortgages?|permits?|"
+    r"housing|coupons?|ratings?|scores?|rankings?|"
     r"weights?|inflows?|outflows?|flows|pricing|premiums?|buffers?|vehicles|roe|roa|roic|returns?\s+on|"
     r"(?:home|house|consumer|producer|food|retail|restaurant|menu|grocery|egg|drug|rent|insurance|ticket|"
-    r"electricity|gasoline|pump)\s+prices?)(?:\s+index)?\b"
+    r"electricity|gasoline|pump)\s+prices?)(?:\s+(?:[A-Za-z-]+\s+){0,2}?index)?(?!\w)(?:\s*\([A-Z]{2,6}\))?"
 )
 _CLAUSE_START: Final = re.compile(
-    r"(?i)[,;(]|:(?=\s)|\b(?:and|while|after|but|with|sending|pushing|lifting|"
+    r"(?i)[,;(]|:(?=\s)|\b(?:and|while|after|but|with|despite|sending|pushing|lifting|"
     r"(?<!much\s)(?<!high\s)(?<!low\s)(?<!many\s)(?<!far\s)as(?!\s+(?:much|high|low|many|far)\s+as\b))\b"
 )
 _NAME_THEN_VERB: Final = re.compile(
-    r"[A-Z][\w&.'’\-]*(?:\s+[A-Z][\w&.'’\-]*){0,3}(?:\s*\([^)]{1,25}\))?\s+"
+    r"(?P<name>[A-Z][\w&.'’\-]*(?:\s+[A-Z][\w&.'’\-]*){0,3})(?:\s*\([^)]{1,25}\))?\s+"
     r"(?:rose|fell|gained|lost|added|dropped|jumped|climbed|slid|declined|advanced|rallied|plunged|surged|tumbled|"
     r"sank|soared|edged|slipped|dipped|spiked|slumped|rebounded|crashed|tanked|rocketed|popped|zoomed|plummeted|"
     r"skidded|sagged|dived|dove|nosedived|cratered|collapsed|leapt|leaped)\b[^%]{0,25}$"
 )
-# a move verb in the past or present tense opening a clause whose subject came before it
-_TENSED: Final = re.compile(
-    r"(?i)\s*(?:rose|rises|fell|falls|gained|gains|lost|loses|added|adds|dropped|drops|jumped|jumps|climbed|climbs|"
-    r"slid|slides|declined|declines|advanced|advances|rallied|rallies|plunged|plunges|surged|surges|tumbled|tumbles|"
-    r"sank|sinks|soared|soars|edged|edges|slipped|slips|dipped|dips|slumped|rebounded|crashed|tanked)\b"
-)
-# the move named after the number: "a 3.62% price decline", "Amid 6% Quarterly Price Dip", "13% Weekly Drop"
+# the move named after the number, up to three words on: "a 3.62% price decline", "a 9.52% 5-day decline",
+# "Mastercard's 13% 3-Month Rise", "a 40%+ rise"
 _AFTER_NUMBER_MOVE: Final = re.compile(
-    r"(?i)\s*(?:(?:[\w-]+\s+)?(?:share\s+|stock\s+)?price\s+(?:[\w-]+\s+)?|(?:year-to-date|ytd|weekly|daily|"
-    r"monthly|quarterly|annual|one-day|single-day|intraday|same-day|overnight|premarket|pre-market)\s+)?"
+    r"(?i)\s*\+?\s*(?:(?:up|down)\s+(?:day|session|week)|(?:[\w-]+\s+){0,3}?"
     r"(?:declines?|drops?|dips?|gains?|rises?|rall(?:y|ies)|surges?|jumps?|slumps?|plunges?|loss(?:es)?|pullbacks?|"
-    r"sell-?offs?|rebounds?|advances?|slides?|moves?|swings?|increases?|decreases?)\b"
+    r"sell-?offs?|rebounds?|advances?|slides?|moves?|movements?|swings?|increases?|decreases?|dives?|tumbles?|"
+    r"crash(?:es)?|routs?|corrections?|spikes?|gainers?|losers?))\b"
+)
+# words of the trading day that make such a noun a price move by themselves ("a 0.68% closing decline")
+_TRADING_WORD: Final = re.compile(
+    r"(?i)\b(?:closing|opening|intraday|single-day|one-day|two-day|same-day|overnight|premarket|pre-market|"
+    r"after-hours|session)\b"
+)
+_FORECASTING: Final = re.compile(
+    r"(?i)\b(?:potential|projected|projects|project|expected|expects|implied|possible|estimated|targeted|"
+    r"forecasts?|forecasted|predicts?|predicted|could|may|might|would)\s+(?:an?\s+)?$"
+)
+_POSSESSIVE: Final = re.compile(r"[A-Z][\w&.\-]*(?:\s+[A-Z][\w&.\-]*){0,3}['’]s\s+$")
+_EXTENDS_TO: Final = re.compile(
+    r"(?i)\b(?:extend|pare|trim|narrow|widen|erase)\w*\s+(?:its\s+|their\s+|the\s+)?(?:early\s+|earlier\s+)?"
+    r"(?:gains?|loss(?:es)?|declines?|advances?|rall(?:y|ies))\s+(?:to|of)\s+(?:about\s+|nearly\s+|over\s+)?$"
+)
+_FROM_HIGH_LOW: Final = re.compile(
+    r"(?i)\s*(?:below|above|off|under|from|shy\s+of|short\s+of)\s+(?:its|the|their|a)\s+(?:[\w-]+\s+)?"
+    r"(?:high|low|peak|bottom|record)s?\b"
+)
+_QUOTE_GLUED: Final = re.compile(r"(?:(?<=[a-z])|(?<![\w.]))[A-Z]{2,5}[+\-−–]\d+(?:\.\d+)?%(?!\w)")
+_AMOUNT_THEN_MOVE: Final = re.compile(
+    r"(?i)(?:US\$|\$)\d[\d,]*(?:\.\d+)?\s+(?:rally|surge|plunge|drop|decline|breakout|breakdown|sell-?off|rebound)\b"
 )
 # "higher" / "lower" after the number end the move ("closing 2.7% lower.", "3% higher premarket") unless a
 # noun follows ("35% higher performance", "26% lower the quarter net income")
@@ -398,85 +441,144 @@ _DIRECTION_END: Final = re.compile(
 _FUND_AMOUNT_AFTER: Final = re.compile(
     r"(?i)\s*(?:more\b|(?:to|from)\s+(?:US)?\$\s?\d[\d,.]*\s*(?:billion|million|trillion|bn|mn|[BMK])\b)"
 )
+_PHRASE_STOP: Final = re.compile(
+    r"(?i)after|before|on|in|as|amid|despite|following|since|while|when|from|to|at|by|with|for|over|than|and|or|but"
+)
 _INDEX_AT_LEVEL: Final = re.compile(
     r"(?i)\b(?:S&P(?:\s*500)?|Dow(?:\s+Jones)?|DJIA|Nasdaq(?:\s+Composite|\s+100)?|Russell\s+2000|FTSE(?:\s*100)?|DAX|"
-    r"Nikkei|Hang\s+Seng|dollar\s+index)\b[^.!?%]{0,40}?(?<![\w.,$])(?<!Russell )(?<!S&P )"
+    r"Nikkei|Hang\s+Seng|dollar\s+index)\b[^.!?%]{0,60}?(?<![\w.,$])(?<!Russell )(?<!S&P )"
     r"(?:\d{1,3}(?:,\d{3})++|\d{4,6}+)"
-    r"(?![\d,.]*\s*(?:%|percent|companies|stocks|jobs|employees|points?\s+(?:of|in)))"
+    r"(?![\d,.]*\s*(?:%|percent|companies|stocks|jobs|employees|points?\s+(?:of|in)|apartments?|homes?|units?|"
+    r"stores?|customers?|square|acres?|barrels?|tons?|users?|vehicles?|shares?|workers?))"
 )
 _COMMODITY_AT_LEVEL: Final = re.compile(
     r"(?i)\b(?:gold|silver|platinum|copper|oil|crude|WTI|Brent|natural\s+gas|bitcoin|BTC|ether(?:eum)?)\b"
     r"(?P<between>[^.!?]{0,40}?)"
-    r"(?:US\$|\$|USD\s?)\d[\d,]*+(?:\.\d+)?+(?!\s*(?:[MBKT]\b|mn\b|bn\b|bln\b|million|billion|trillion))"
+    r"(?:US\$|\$|USD\s?)(?P<amount>\d[\d,]*+(?:\.\d+)?+)(?P<k>[Kk]\b)?"
+    r"(?!\s*(?:[MBT]\b|mn\b|bn\b|bln\b|million|billion|trillion))"
+    r"|(?:US\$|\$)\d[\d,]*(?:\.\d+)?\s*(?:/\s?(?:b|bbl|oz|t|ton|MMBtu)\b|(?:an?|per)\s+(?:ounce|barrel|bushel)\b)"
 )
-# the words that make an amount after a commodity its price: "Gold Falls Below $4,000", "WTI at $64"
+# the words that make an amount after a commodity its price: "Gold Falls Below $4,000", "WTI at $64",
+# "Bitcoin Retakes $112K", "Crude Eyes $68"
 _AT_PRICE: Final = re.compile(
     r"(?i)\b(?:price[sd]?|futures|spot|to|at|above|below|past|near|over|under|hit|hits|tops?|topped|record|high|"
-    r"low|trad(?:e|es|ed|ing)|settled?|closed|ended|reached|crossed|broke|breaks?|surpass\w*)\b"
+    r"low|trad(?:e|es|ed|ing)|settled?|closed|ended|reached|crossed|broke|breaks?|surpass\w*|sub|eyes|eyeing|"
+    r"towards?|nears?|nearing|retakes?|reclaims?|holds?|steadies)\b"
+)
+_LEVEL_NOUN_AFTER: Final = re.compile(
+    r"(?i)\s*(?:threshold|mark|level|handle|barrier|milestone|resistance|support)\b"
 )
 _POINT_MOVES: Final = re.compile(
-    r"(?i)\b(?:Dow|S&P|Nasdaq|index|FTSE|DAX|Nikkei|Russell)\b[^.!?]{0,40}?\b\d[\d,]*\s*-?\s*points?\b"
-    r"|\b\d[\d,]*\s*-?\s*points?\s+(?:higher|lower|up|down|gain|drop|decline|rise|fall)"
+    r"(?i)(?:(?<![\w.])(?P<sign>[+\-−–]))?\b\d[\d,]*(?:\.\d+)?\s*-?\s*(?<!basis )points?\b"
+    r"(?!\s+(?:of|in)\s+(?:market\s+)?share)"
 )
 
 
-def _priced(stretch: str) -> bool:
-    """A market word or the security after the stretch's last not-price unit: "weak jobs data sent the Dow
-    down 1%" is priced, "the PMI index rose 2 points" is not."""
+def _priced(stretch: str, until: int | None = None, security: bool = True) -> bool:
+    """A market word (or the security) after the stretch's last not-price unit and before ``until``: "weak
+    jobs data sent the Dow down 1%" is priced, "the PMI index rose 2 points" is not."""
     nots = list(_NOT_PRICE.finditer(stretch))
-    tail = stretch[nots[-1].end() :] if nots else stretch
-    return _MARKET_WORDS.search(tail) is not None or _SECURITY.search(tail) is not None
+    start = nots[-1].end() if nots else 0
+    end = len(stretch) if until is None else until
+    words = [_MARKET_WORDS, _SECURITY] if security else [_MARKET_WORDS]
+    return any(w.start() < end for p in words for w in p.finditer(stretch, start))
 
 
 def _commodity_at_level(sentence: str) -> bool:
-    return any(
-        (_AT_PRICE.search(c.group("between")) or _MOVING.search(c.group("between")))
-        and not _NOT_PRICE.search(c.group("between"))
-        for c in _COMMODITY_AT_LEVEL.finditer(sentence)
-    )
+    for c in _COMMODITY_AT_LEVEL.finditer(sentence):
+        between = c.group("between")
+        if between is None:
+            return True  # "$63.56 a barrel", "$90/b"
+        if _NOT_PRICE.search(between):
+            continue
+        big = c.group("k") is not None or len(c.group("amount").replace(",", "").split(".")[0]) >= 4
+        if (
+            _AT_PRICE.search(between)
+            or _MOVING.search(between)
+            or _LEVEL_NOUN_AFTER.match(sentence, c.end())
+            or (big and not between.strip(" '’s"))
+        ):
+            return True
+    return False
+
+
+def _points_move(sentence: str, p: re.Match[str]) -> bool:
+    """A points change of something priced ("the Dow is +67 points", "the index ahead on the week by 180
+    points"); "market share rose 2 points" and "the PMI index rose 2 points" are not."""
+    before = re.sub(r"\(\s*$", "", sentence[max(0, p.start() - 90) : p.start()])
+    return _priced(before, security=False) or (p.group("sign") is not None and not _NOT_PRICE.search(before))
 
 
 def _moves_at(sentence: str, m: re.Match[str], named: bool) -> bool:
-    """Whether the percent ``m`` is a price move: signed with no not-price unit before it, a price move noun
-    after it, the security or a market word anywhere in a sentence without a not-price unit (``named``), or
-    the subject of its clause."""
+    """Whether the percent ``m`` is a price move: signed with no not-price unit before it or right after it; a
+    move noun after it that names the price or a trading word; the security or a market word anywhere in a
+    sentence without a not-price unit (``named``); or a market word or the security after the last not-price
+    unit of the 90 characters before it."""
     before = sentence[max(0, m.start() - 90) : m.start()]
     after = sentence[m.end() : m.end() + 70]
     if re.search(r"(?:raised|lowered)\s+by\s+about\s*$", before) or _FUND_AMOUNT_AFTER.match(after):
         return False  # a rewritten price target; "to add 20% more flights", "by 5.5% to $5.51 billion"
+    # the noun phrase right after the number, to punctuation or a preposition ("-19.71% Quarterly Revenue
+    # Decline", "installs +11% YoY"; "5% after revenue missed" names nothing)
+    phrase = []
+    for w in re.split(r"[^\w\s-]", after, maxsplit=1)[0].split()[:3]:
+        if _PHRASE_STOP.fullmatch(w):
+            break
+        phrase.append(w)
+    not_price_after = _NOT_PRICE.search(" ".join(phrase)) is not None
     # a sign right after a number or a percent is a range ("30%-50% tariffs"), one after a space is not
-    # ("S&P 500 +1.2%"); a not-price unit anywhere before it or in the words right after it makes it no move
-    # ("-19.71% Quarterly Revenue Decline", "installs +11% YoY")
+    # ("S&P 500 +1.2%")
     if (
         m.group("sign") is not None
         and not re.search(r"[\d%]$", before)
         and not _NOT_PRICE.search(sentence[: m.start()])
-        and not _NOT_PRICE.search(" ".join(re.split(r"[^\w\s-]", after, maxsplit=1)[0].split()[:3]))
+        and not not_price_after
     ):
         return True
     noun = _AFTER_NUMBER_MOVE.match(after)
     if noun and (
-        re.fullmatch(r"(?i)\s*(?!(?:share|stock)\b)(?:[\w-]+\s+)?price\s+(?:in|de)creases?", noun.group(0))
+        _FORECASTING.search(before)
+        or _NOT_PRICE.search(noun.group(0))
+        or re.search(r"(?i)\b(?:trading|target|objective)\b", noun.group(0))
         or (
-            re.match(r"\s+(?:in|of|for)\b", after[noun.end() :])
+            re.fullmatch(
+                r"(?i)\s*\+?\s*(?![\w-]*\s*(?:share|stock)\b)(?:[\w-]+\s+)?price\s+(?:in|de)creases?",
+                noun.group(0),
+            )
+            and not re.match(r"\s+over\s+the\s+(?:past|last|previous)\b", after[noun.end() :])
+        )
+        or (
+            re.match(r"(?i)\s+(?:in|of|for)\b", after[noun.end() :])
             and _NOT_PRICE.search(after[noun.end() :][:45])
         )
+        or re.search(r"(?:raised|lowered)\s+by\s+about\s+\d", before)  # a price-target change restated
     ):
-        noun = None  # a product's "5% price increase"; "a 7.2% rise in sales"
-    if not (_MOVING.search(before[-45:]) or noun or _DIRECTION_END.match(after)):
-        return False
-    if named or (noun is not None and "price" in noun.group(0).lower()):
+        noun = (
+            None  # a forecast, a fundamental, volume, a product's "5% price increase", "a 7.2% rise in sales"
+        )
+    verbs = list(_MOVING.finditer(before[-45:]))
+    if not (verbs or noun or _DIRECTION_END.match(after)):
+        # "trading at 26% below its all-time high"
+        return _FROM_HIGH_LOW.match(after) is not None and not _NOT_PRICE.search(before)
+    if named or _EXTENDS_TO.search(before) or (noun is not None and _POSSESSIVE.search(before)):
         return True
+    if noun is not None and (
+        re.search(r"(?i)\bprice\b", noun.group(0)) or _TRADING_WORD.search(noun.group(0))
+    ):
+        return True
+    in_not_price = re.match(r"(?i)\s*(?:[\w-]+\s+)?(?:in|of|for)\s+(?:the\s+)?((?:\S+\s+){0,2}\S+)", after)
+    if not_price_after or (in_not_price is not None and _NOT_PRICE.search(in_not_price.group(1))):
+        return False  # "a 0.3% uptick in the core CPI"
     src = re.sub(r"\(\s*$", "", before)
+    # a move word before the number needs its subject before it ("Added as Top 10 Utility Dividend Stock With
+    # 2.71% Yield")
+    until = len(before) - min(len(before), 45) + verbs[-1].start() if verbs and noun is None else None
+    if _priced(src, until):
+        return True
     starts = list(_CLAUSE_START.finditer(src))
     clause = src[starts[-1].end() :] if starts else src
-    if starts and _TENSED.match(
-        clause
-    ):  # "S&P 500 rises second week, adds 1.7%" ("Losses Deepen" is no verb)
-        clause = src[starts[-2].end() :] if len(starts) > 1 else src
-    return _priced(clause) or (
-        not _NOT_PRICE.search(clause) and _NAME_THEN_VERB.search(before[-60:]) is not None
-    )
+    name = _NAME_THEN_VERB.search(before[-60:])
+    return not _NOT_PRICE.search(clause) and name is not None and not _NOT_PRICE.search(name.group("name"))
 
 
 def market_move_count(text: str) -> int:
@@ -488,10 +590,10 @@ def market_move_count(text: str) -> int:
         )
         if (
             _INDEX_AT_LEVEL.search(sentence)
+            or _QUOTE_GLUED.search(sentence)
+            or _AMOUNT_THEN_MOVE.search(sentence)
             or _commodity_at_level(sentence)
-            or any(
-                _priced(sentence[max(0, p.start() - 60) : p.end()]) for p in _POINT_MOVES.finditer(sentence)
-            )
+            or any(_points_move(sentence, p) for p in _POINT_MOVES.finditer(sentence))
             or any(_moves_at(sentence, m, named) for m in _ANY_PCT.finditer(sentence))
         ):
             n += 1

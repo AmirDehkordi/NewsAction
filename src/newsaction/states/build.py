@@ -852,6 +852,8 @@ def build_market_states(sel: pd.DataFrame, spec: StateSpec, inp: Inputs, cfg: St
                         "timing": inp.cb.timing_word(a["t_avail"], session),
                     }
                 )
+        if not news:
+            continue  # every article lost its text (since revision 5, index wraps): no state, as for an event
         values = {
             **{str(k): v for k, v in mk.loc[session].to_dict().items()},
             "market_news_w2": None,
@@ -1042,7 +1044,10 @@ def run_states(layout: Layout | None = None) -> dict[str, Any]:
         "NA-04 S5 (A3.5, optional): market states per session (E3)",
         lay,
     )
-    stats["market_E3"] = {"rows": len(dm)}
+    stats["market_E3"] = {
+        "rows": len(dm),
+        "sessions_without_text": int(sel["session_w2"].nunique()) - len(dm),
+    }
 
     with_text = d0.loc[d0["event_id"].isin(set(a0["event_id"]))]
     enc_events, twin = sample_frames(with_text, cfg)
