@@ -20,8 +20,9 @@ import functools
 import re
 from pathlib import Path
 from typing import Final, Literal
+from zoneinfo import ZoneInfo
 
-from pydantic import BaseModel, ConfigDict, Field, field_validator
+from pydantic import BaseModel, ConfigDict, Field, ValidationInfo, field_validator
 
 from newsaction.config import SplitName, load_yaml
 from newsaction.paths import CONFIGS
@@ -114,14 +115,54 @@ class NonEnglishConfig(_Strict):
         return v
 
 
+class RunningStoryConfig(_Strict):
+    """The running-market-story rule of ``build.running_story_ids`` (W0 states only; PREREG §15 NA-04 row 10):
+    regexes searched in NA-02's raw title / snippet."""
+
+    live_title: str = Field(min_length=1)
+    live_snippet: str = Field(min_length=1)
+    clock: str = Field(min_length=1)  # groups: hour, minute, a / p
+    clock_before: str = Field(min_length=1)  # searched in the text before a clock time (anchored at its end)
+    clock_after: str = Field(min_length=1)  # matched right after a clock time
+    foreign_zone: str = Field(min_length=1)
+    european: str = Field(min_length=1)  # a text about a European market: its clock times are London time
+    european_zone: str = Field(min_length=1)
+    market_subject: str = Field(min_length=1)
+    close_verb: str = Field(min_length=1)
+    premarket: str = Field(min_length=1)
+    forecast: str = Field(min_length=1)
+    wire: str = Field(min_length=1)  # a wire whose style keeps "premarket" for before the open
+    schedule: str = Field(min_length=1)
+    asia: str = Field(min_length=1)
+    overseas: str = Field(min_length=1)
+    intraday: str = Field(min_length=1)
+    wrap_title: str = Field(min_length=1)
+    wrap_veto: str = Field(min_length=1)
+
+    @field_validator("*")
+    @classmethod
+    def _compiles(cls, v: str, info: ValidationInfo) -> str:
+        if info.field_name == "european_zone":
+            ZoneInfo(v)
+        else:
+            re.compile(v)
+        return v
+
+    @property
+    def patterns(self) -> tuple[str, ...]:
+        """The names of the regex fields."""
+        return tuple(n for n in type(self).model_fields if n != "european_zone")
+
+
 class NewsExclusionConfig(_Strict):
     """Articles left out of every state: regexes searched in NA-02's raw title / snippet and in the domain,
-    and non-English articles."""
+    and non-English articles; running market stories are left out of W0 states only."""
 
     title: str = Field(min_length=1)
     snippet: str = Field(min_length=1)
     domain: str = Field(min_length=1)
     non_english: NonEnglishConfig
+    running_story: RunningStoryConfig
 
     @field_validator("title", "snippet", "domain")
     @classmethod

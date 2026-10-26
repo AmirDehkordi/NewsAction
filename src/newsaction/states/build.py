@@ -18,7 +18,10 @@ Move explainers ("Why … Stock Is Up Today", StockStory's "What Happened? Share
 reposts (``excluded_ids``) are in no state, in any window: the explainers' text explains the session's move,
 and both are often stamped before their content (PREREG §15 NA-04 row 6). Non-English articles are in no
 state either (``non_english``; operator decision B, row 8): the masker and the price-talk scrubbers are
-English-only. The NA-03 lists are not refilled; an event left with no article gets no state.
+English-only. Running market stories (live blogs, running market reports; ``running_story_ids``, row 10) keep
+their first stamp while their text is the latest version, so they are in no W0 state: there they carry the
+session's own cash-market outcome; W2 ends at the close, so its states keep them. The NA-03 lists are not
+refilled; an event left with no article gets no state.
 
 **Availability.** A ``StateSpec`` lists, per block, every input column it reads (``context.block_columns``).
 ``validate_spec`` calls ``pit.check_inputs`` on each block at the decision point (D0 for W0, D2 for W2)
@@ -46,11 +49,12 @@ from collections.abc import Callable, Iterable, Mapping, Sequence
 from dataclasses import dataclass, field
 from datetime import date
 from typing import Any, Final, cast
+from zoneinfo import ZoneInfo
 
 import numpy as np
 import pandas as pd
 
-from newsaction import io, pit
+from newsaction import calendar, io, pit
 from newsaction.config import load_project, load_splits
 from newsaction.events import EVENTS_D0, EVENTS_D2, load_events_config, tokens
 from newsaction.news import ARTICLES
@@ -66,6 +70,7 @@ from newsaction.states import (
     Call,
     Encoding,
     NonEnglishConfig,
+    RunningStoryConfig,
     StatesConfig,
     StateWindow,
     load_states_config,
@@ -453,6 +458,185 @@ def excluded_ids(articles: pd.DataFrame, cfg: StatesConfig) -> frozenset[str]:
     return frozenset(articles.loc[hit, "id"].astype(str)) | non_english_ids(articles, cfg)
 
 
+# --- running market stories: W0 states only (PREREG §15 NA-04 row 10, revision 6) -----------------------
+
+SNIPPET_LEAD: Final = 40  # characters of a snippet where an overseas market would be its subject
+WEEKDAYS: Final = ("Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday")
+_STORY_SENTENCES: Final = re.compile(r"(?<=[.!?])\s+(?=[A-Z\"'“‘(])|\n+")
+_EXCHANGE_TICKER: Final = re.compile(  # "(NASDAQ:NDAQ)", "NYSE: DOW", "(DOW)" are tickers, not the index
+    r"\((?:NASDAQ|NYSE|NYSEAMERICAN|NYSEARCA|AMEX|ARCA|OTC\w*)[^)]*\)"
+    r"|\b(?:NASDAQ|NYSE|Nasdaq|NYSEAMERICAN|NYSEARCA)\s?:\s?[A-Z][A-Z.]*|\([A-Z][A-Z.\-]{0,6}\)"
+)
+# a ticker becomes this mark, not a space: "Nasdaq (NASDAQ:NDAQ) Trading 2% Higher" keeps the "(" that tells
+# the company from the index
+TICKER_MARK: Final = " (T) "
+
+
+@dataclass(frozen=True)
+class StoryRule:
+    """``configs/states.yaml`` ``news_exclusion.running_story``, compiled (``running_story``)."""
+
+    live_title: re.Pattern[str]
+    live_snippet: re.Pattern[str]
+    clock: re.Pattern[str]
+    clock_before: re.Pattern[str]
+    clock_after: re.Pattern[str]
+    foreign_zone: re.Pattern[str]
+    european: re.Pattern[str]
+    market_subject: re.Pattern[str]
+    close_verb: re.Pattern[str]
+    premarket: re.Pattern[str]
+    forecast: re.Pattern[str]
+    wire: re.Pattern[str]
+    schedule: re.Pattern[str]
+    asia: re.Pattern[str]
+    overseas: re.Pattern[str]
+    intraday: re.Pattern[str]
+    wrap_title: re.Pattern[str]
+    wrap_veto: re.Pattern[str]
+
+
+@functools.cache
+def story_rule(cfg: RunningStoryConfig) -> StoryRule:
+    return StoryRule(**{name: re.compile(getattr(cfg, name)) for name in cfg.patterns})
+
+
+_WEEKDAY: Final = re.compile(rf"\b({'|'.join(WEEKDAYS)})\b")
+
+
+def live_format(title: str, snippet: str, r: StoryRule) -> bool:
+    """Rule 1: a live blog or a running page ("Stock market today: …", "Markets News, July 16, 2025: …",
+    "Live Updates Live Coverage …"), whatever its stamp."""
+    return r.live_title.search(title) is not None or r.live_snippet.search(snippet) is not None
+
+
+def post_open_clock(text: str, open_minutes: int, shift: int, r: StoryRule) -> bool:
+    """Rule 2 (an article stamped on the calendar date of s): a live entry or an update at or after the open
+    ("4:15pm: Muted close", "10:54 am by …", "Updated at 10:28 AM EST"). ``open_minutes``: the open of s in
+    minutes after local midnight; ``shift``: minutes the text's clock runs ahead of New York (London's for an
+    article about a European market: "12.30pm" on a FTSE page is 07:30 ET)."""
+    if r.schedule.search(text):
+        return False
+    for m in r.clock.finditer(text):
+        hour, minute = int(m.group(1)), int(m.group(2))
+        if not 1 <= hour <= 12 or minute > 59:
+            continue
+        local = (hour % 12 + (12 if m.group(3).lower() == "p" else 0)) * 60 + minute - shift
+        after = text[m.end() :]
+        if local < open_minutes or r.foreign_zone.match(after):
+            continue
+        if r.clock_after.match(after) or r.clock_before.search(text[: m.start()]):
+            return True
+    return False
+
+
+def closed_on(text: str, weekday: str, r: StoryRule) -> bool:
+    """Rule 3: in one sentence, a market subject and a close verb whose nearest weekday is that of s ("The
+    S&P 500 ended Tuesday's choppy session", "closed modestly higher on Wednesday"), or "<weekday> close";
+    not pre-market, a schedule or an Asian market, which closes before the US open."""
+    noun = re.compile(rf"\b{weekday}(?:['’]s)?\s+close\b", re.IGNORECASE)
+    for sentence in _STORY_SENTENCES.split(_EXCHANGE_TICKER.sub(TICKER_MARK, text)):
+        if (
+            r.market_subject.search(sentence) is None
+            or r.premarket.search(sentence)
+            or r.schedule.search(sentence)
+            or r.asia.search(sentence)
+        ):
+            continue
+        if noun.search(sentence):
+            return True
+        for v in r.close_verb.finditer(sentence):
+            near = [
+                (d.start() - v.end(), d.group(1)) for d in _WEEKDAY.finditer(sentence, v.end(), v.end() + 75)
+            ]
+            near += [
+                (v.start() - d.end(), d.group(1))
+                for d in _WEEKDAY.finditer(sentence, max(0, v.start() - 45), v.start())
+            ]
+            if near and min(near)[1] == weekday:
+                return True
+    return False
+
+
+def intraday(text: str, weekday: str, same_day: bool, r: StoryRule) -> bool:
+    """Rule 4: running intraday wording about the market ("U.S. stocks are drifting", "Wall Street … in early
+    trading", "opened lower") in an article stamped on the calendar date of s or naming its weekday: a market
+    subject in the sentence, or a Reuters text (its style keeps "premarket" for before the open). Not with
+    pre-market words or another weekday in the sentence, nor a forecast or an overseas market before the
+    phrase ("stocks may show a lack of direction in early trading"; "European stock indexes opened lower":
+    overseas markets trade before the US open). A company's "shares rose in early trading" before the open is
+    mostly pre-market and does not count."""
+    wire = r.wire.search(text) is not None
+    for sentence in _STORY_SENTENCES.split(_EXCHANGE_TICKER.sub(TICKER_MARK, text)):
+        phrase = r.intraday.search(sentence)
+        if phrase is None or r.premarket.search(sentence):
+            continue
+        if not wire and r.market_subject.search(sentence) is None:
+            continue
+        before = sentence[: phrase.start()]
+        if r.forecast.search(before) or r.overseas.search(before):
+            continue
+        days = set(_WEEKDAY.findall(sentence))
+        if days - {weekday}:
+            continue
+        if same_day or weekday in days:
+            return True
+    return False
+
+
+def morning_wrap(title: str, snippet: str, same_day: bool, r: StoryRule) -> bool:
+    """Rule 5 (an article stamped on the calendar date of s): a title opening, or opening a clause, with a
+    US-market subject and a move or close word ("Dow Swings To Drop 224 Points; Nasdaq Ekes Out A Gain" at
+    08:07 ET). Not with futures, pre-market or question words in the title, a forecast or an overseas word up
+    to the move word ("RBC sees S&P 500 …"), pre-market words in the snippet, or an overseas market opening
+    its first sentence ("EU mid-market update: Stocks open higher")."""
+    if not same_day or r.wrap_veto.search(title):
+        return False
+    bare = _EXCHANGE_TICKER.sub(TICKER_MARK, title)
+    m = r.wrap_title.search(bare)
+    if m is None or r.forecast.search(bare[: m.end()]) or r.overseas.search(bare[: m.end()]):
+        return False
+    first = _STORY_SENTENCES.split(snippet, maxsplit=1)[0]
+    return not (r.premarket.search(snippet) or r.overseas.search(first[:SNIPPET_LEAD]))
+
+
+def running_story(title: str, snippet: str, t_avail: pd.Timestamp, cfg: RunningStoryConfig) -> bool:
+    """A running market story in W0 of its session (PREREG §15 NA-04 row 10): live blogs and running market
+    reports keep their first stamp while their text is the latest version, so in W0 they carry the session's
+    own cash-market outcome. Rules 1–5 are in ``configs/states.yaml``. False outside every W0."""
+    s = calendar.session_of_w0(t_avail)
+    if s is None:
+        return False
+    r = story_rule(cfg)
+    tz = ZoneInfo(load_project().timezone)
+    opens = calendar.open_utc(s).tz_convert(tz)
+    weekday = WEEKDAYS[s.weekday()]
+    same_day = t_avail.tz_convert(tz).date() == s
+    london = opens.tz_convert(ZoneInfo(cfg.european_zone))
+    european = r.european.search(f"{title} {snippet}") is not None
+    shift = (london.hour - opens.hour) * 60 + london.minute - opens.minute if european else 0
+    texts = (title, snippet)
+    return (
+        live_format(title, snippet, r)
+        or (same_day and any(post_open_clock(t, opens.hour * 60 + opens.minute, shift, r) for t in texts))
+        or any(closed_on(t, weekday, r) or intraday(t, weekday, same_day, r) for t in texts)
+        or morning_wrap(title, snippet, same_day, r)
+    )
+
+
+def running_story_ids(articles: pd.DataFrame, cfg: StatesConfig) -> frozenset[str]:
+    """Ids of the running market stories (``running_story``), left out of W0 states only: W2 ends at the
+    close, so there the same text is inside the window. ``articles``: id, ``t_avail`` and NA-02's raw
+    ``title`` and ``snippet``. Chunks that read W0 articles directly should leave these out too."""
+    rule = cfg.news_exclusion.running_story
+    t_avail = pd.to_datetime(articles["t_avail"], utc=True)
+    hit = [
+        running_story(_text(t), _text(s), ts, rule)
+        for t, s, ts in zip(articles["title"], articles["snippet"], t_avail, strict=True)
+    ]
+    return frozenset(articles.loc[hit, "id"].astype(str))
+
+
 def market_selection(lay: Layout, cfg: StatesConfig) -> pd.DataFrame:
     """A3.5 market-state articles: per W2 session, third-party-OK market-index articles with text, excluded
     articles left out (``excluded_ids``), near-identical titles dropped, ordered by source class then t_avail,
@@ -606,18 +790,22 @@ class Inputs:
         frozenset()
     )  # explainers, TradingView reposts and non-English articles (``excluded_ids``), in no state
     non_english: frozenset[str] = frozenset()  # the non-English ones among them (counted apart)
+    excluded_w0: frozenset[str] = frozenset()  # running market stories (``running_story_ids``): no W0 state
     cb: Codebook = field(default_factory=load_codebook)
 
 
 def load_inputs(lay: Layout, masked_frame: pd.DataFrame | None = None) -> Inputs:
-    """Context, reaction, masked texts and the excluded articles; ``masked_frame`` replaces
-    work/states/articles_masked.parquet (the determinism check rebuilds it from scratch)."""
+    """Context, reaction, masked texts and the excluded articles (in every window, and in W0 only);
+    ``masked_frame`` replaces work/states/articles_masked.parquet (the determinism check rebuilds it from
+    scratch)."""
     masked = (
         io.read_parquet(ARTICLES_MASKED, columns=["id", "title_masked", "snippet_masked"], layout=lay)
         if masked_frame is None
         else masked_frame
     )
-    tp = io.read_parquet(ARTICLES, columns=["id", "third_party_ok", "domain", "title", "snippet"], layout=lay)
+    tp = io.read_parquet(
+        ARTICLES, columns=["id", "third_party_ok", "domain", "title", "snippet", "t_avail"], layout=lay
+    )
     tp = tp.loc[tp["id"].isin(set(masked["id"]))]
     mk = masked.set_index("id")
     cfg = load_states_config()
@@ -631,22 +819,30 @@ def load_inputs(lay: Layout, masked_frame: pd.DataFrame | None = None) -> Inputs
         third_party=dict(zip(tp["id"], tp["third_party_ok"].astype(bool), strict=True)),
         excluded=excluded_ids(tp, cfg),
         non_english=non_english_ids(tp, cfg),
+        excluded_w0=running_story_ids(tp, cfg),
     )
 
 
+def skipped(inp: Inputs, window: StateWindow) -> frozenset[str]:
+    """The articles no state of ``window`` carries: ``Inputs.excluded``, and in W0 also the running market
+    stories (``Inputs.excluded_w0``)."""
+    return inp.excluded | inp.excluded_w0 if window == "W0" else inp.excluded
+
+
 def news_items(
-    items: Sequence[Mapping[str, Any]], session: date, masked: bool, inp: Inputs
+    items: Sequence[Mapping[str, Any]], session: date, masked: bool, inp: Inputs, window: StateWindow
 ) -> tuple[list[dict[str, str]], list[str]]:
     """The ``news`` block and its article ids, in list order. Raises if an article is not third-party OK
-    (CLAUDE.md D15); an excluded article (``Inputs.excluded``) and an article whose title and snippet are both
-    empty are left out."""
+    (CLAUDE.md D15); an excluded article (``skipped``) and an article whose title and snippet are both empty
+    are left out."""
     out: list[dict[str, str]] = []
     ids: list[str] = []
+    skip = skipped(inp, window)
     for a in items:
         aid = str(a["id"])
         if inp.third_party.get(aid) is not True:
             raise StatesError(f"article {aid} is not third-party OK (CLAUDE.md D15)")
-        if aid in inp.excluded:
+        if aid in skip:
             continue
         if masked:
             title, snippet = inp.masked[aid]
@@ -786,9 +982,10 @@ def build_event_states(
     if spec.call == "B":
         frame = frame.merge(inp.reaction, on=["session", "symbol_id"], how="left")
     rows, kept = [], {}
+    skip = skipped(inp, spec.window)
     for rec in _records(frame):
         eid = str(rec["event_id"])
-        news, ids = news_items(rec[f"news_{sfx}"], rec["session"], spec.masked, inp)
+        news, ids = news_items(rec[f"news_{sfx}"], rec["session"], spec.masked, inp, spec.window)
         if keep is not None:
             want = set(keep[eid])
             news = [n for n, i in zip(news, ids, strict=True) if i in want]
@@ -825,7 +1022,7 @@ def build_event_states(
                 "n_articles": len(state["news"]),
                 "third_party_ok_all": True,
                 "_cut": cut,
-                "_listed": sum(str(a["id"]) not in inp.excluded for a in rec[f"news_{sfx}"]),
+                "_listed": sum(str(a["id"]) not in skip for a in rec[f"news_{sfx}"]),
             }
         )
     return pd.DataFrame(rows), kept
@@ -965,21 +1162,30 @@ def write_states(df: pd.DataFrame, rel: str, description: str, lay: Layout) -> N
 
 
 def exclusion_counts(
-    events: pd.DataFrame, col: str, excluded: frozenset[str], non_english: frozenset[str] = frozenset()
-) -> tuple[int, int, int]:
+    events: pd.DataFrame,
+    col: str,
+    excluded: frozenset[str],
+    non_english: frozenset[str] = frozenset(),
+    running: frozenset[str] = frozenset(),
+) -> tuple[int, int, int, int]:
     """(listed excluded articles, events whose every listed article is excluded, listed non-English
-    articles) of an event frame."""
+    articles, listed running market stories not excluded otherwise) of an event frame; ``excluded`` includes
+    ``running`` for a W0 frame."""
     ids = [[str(a["id"]) for a in items] for items in events[col]]
     flags = [[i in excluded for i in row] for row in ids]
     n_foreign = sum(i in non_english for row in ids for i in row)
-    return sum(sum(f) for f in flags), sum(bool(f) and all(f) for f in flags), n_foreign
+    n_running = sum(i in running for row in ids for i in row)
+    return sum(sum(f) for f in flags), sum(bool(f) and all(f) for f in flags), n_foreign, n_running
 
 
-def _budget_stats(df: pd.DataFrame, n_events: int, excl: tuple[int, int, int] = (0, 0, 0)) -> dict[str, int]:
+def _budget_stats(
+    df: pd.DataFrame, n_events: int, excl: tuple[int, int, int, int] = (0, 0, 0, 0)
+) -> dict[str, int]:
     return {
         "rows": len(df),
         "articles_excluded": excl[0],
         "articles_excluded_non_english": excl[2],
+        "articles_excluded_running": excl[3],
         "events_all_excluded": excl[1],
         "events_without_text": n_events - len(df) - excl[1],
         "states_with_dropped_articles": int((df["n_articles"] < df["_listed"]).sum()),
@@ -1000,7 +1206,10 @@ def run_states(layout: Layout | None = None) -> dict[str, Any]:
     stats: dict[str, Any] = {"caps": {w: b.cap for w, b in bud.items()}, "question_tokens": qtok}
 
     def emit(df: pd.DataFrame, ev: pd.DataFrame, col: str, rel: str, description: str, name: str) -> None:
-        stats[name] = _budget_stats(df, len(ev), exclusion_counts(ev, col, inp.excluded, inp.non_english))
+        window: StateWindow = "W0" if col == "news_w0" else "W2"
+        running = inp.excluded_w0 - inp.excluded if window == "W0" else frozenset()
+        counts = exclusion_counts(ev, col, skipped(inp, window), inp.non_english, running)
+        stats[name] = _budget_stats(df, len(ev), counts)
         write_states(add_tokens(df, tok, qtok), rel, description, lay)
         print(f"states {name}: {stats[name]}", flush=True)
 
