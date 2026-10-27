@@ -99,7 +99,13 @@ def test_run_plan_order_and_pilot() -> None:
     kinds = [("pilot" if r.mode == "pilot" else r.name.split("-")[0]) for r in k.runs]
     # operator decisions after the pilot: one seed per model this week, the other seeds deferred (PREREG §15)
     assert kinds == ["pilot", "shuffle", "laya", "anchor", "repro", "laya", "laya", "anchor", "anchor"]
-    assert [r.name for r in k.runs if r.deferred] == ["laya-s17", "laya-s23", "anchor-s17", "anchor-s23"]
+    assert [r.name for r in k.runs if r.deferred] == [
+        "repro-s13",
+        "laya-s17",
+        "laya-s23",
+        "anchor-s17",
+        "anchor-s23",
+    ]  # repro-s13: the operator-approved AC3 deferral (PREREG §15 NA-08 row 2)
     assert "| NA-08 | §9.1 (seeds {13, 17, 23}" in PREREG  # the deviation row
     assert all(r.epochs == 1 for r in k.runs if r.mode == "train")  # one epoch fits a session (pilot)
     assert {r.name: r.predict for r in k.runs if r.predict != ("val_a", "val_b", "test")} == {

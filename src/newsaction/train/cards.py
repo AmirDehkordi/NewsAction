@@ -211,11 +211,16 @@ def controls(
             "diff": diff,
             "pass": bool(all(abs(v) <= c.repro_ic_tol for v in diff.values())),
         }
+    elif cfg.kaggle.run(b).deferred:
+        out["reproducibility"] = {
+            "runs": [a, b],
+            "status": f"deferred: {b} is the operator-approved deferral under AC3 (planned, not run yet; "
+            "it does not block NA-11)",
+        }
     else:
         out["reproducibility"] = {
             "runs": [a, b],
-            "status": f"pending: {[r for r in (a, b) if not have(r)]} not imported; if this week's quota "
-            "does not allow it, the operator-approved deferral under AC3 (it does not block NA-11)",
+            "status": f"pending: {[r for r in (a, b) if not have(r)]} not imported",
         }
     return out
 

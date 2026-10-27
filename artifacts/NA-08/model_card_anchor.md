@@ -57,7 +57,7 @@ The reported model is the single seed anchor-s13; its temperatures are fit on va
 ## Controls
 
 - Shuffled labels (shuffle-s13): D0 N̂ vs e5 IC -0.0072, NW t -0.48: PASS (|NW t| of the val-A mean daily IC of N̂ vs e5 (D0) < 2.0).
-- Reproducibility: pending: ['repro-s13'] not imported; if this week's quota does not allow it, the operator-approved deferral under AC3 (it does not block NA-11).
+- Reproducibility: deferred: repro-s13 is the operator-approved deferral under AC3 (planned, not run yet; it does not block NA-11).
 
 ## Governance and limits
 

@@ -92,6 +92,6 @@
       "laya-s13",
       "repro-s13"
     ],
-    "status": "pending: ['repro-s13'] not imported; if this week's quota does not allow it, the operator-approved deferral under AC3 (it does not block NA-11)"
+    "status": "deferred: repro-s13 is the operator-approved deferral under AC3 (planned, not run yet; it does not block NA-11)"
   }
 }
