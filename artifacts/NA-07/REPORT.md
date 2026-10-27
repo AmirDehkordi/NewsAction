@@ -207,8 +207,10 @@ Mean daily IC of N̂ vs z_cc,t (t) [bootstrap 95% CI]; rank within the model.
    - the numeracy design (NA-05's grid; synthetic reaction block; strict monotonicity, tolerance 1e-9);
    - anchoring on D2 Call A vs Call B, combined over models by "any";
    - the trial records.
-2. **Numeracy gate and E3 reference,** written after the val-A selection (E1) and before any val-B or numeracy
-   answer:
+2. **Numeracy gate and E3 reference,** written after the val-A selection (E1), before the val-B check was
+   computed and before any numeracy answer. `docs/PREREG.md` was saved at 10:56:53, 41 s after the first val-B
+   answer was cached and while S2 was still running. No val-B result existed before all 9,000 answers were in
+   (11:07:00), and the first numeracy answer came at 11:07:26 (NA-07 verification, finding 2):
    - a non-E3 encoding is kept for a model only if its monotone share is ≥ 0.90;
    - `chosen` follows the leading model (PRD AC1);
    - an E3 reference run is added, report-only.
