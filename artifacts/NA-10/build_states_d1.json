@@ -1,0 +1,14 @@
+{
+  "rows": 37562,
+  "articles_excluded": 29311,
+  "articles_excluded_non_english": 20115,
+  "articles_excluded_running": 3984,
+  "events_all_excluded": 543,
+  "events_without_text": 59,
+  "states_with_dropped_articles": 2533,
+  "articles_dropped": 2621,
+  "texts_cut": 0,
+  "cap": 875,
+  "sha256": "500962d70d8caa53c2daed5de6a37fbb5205bad96c81393e39328de0d3b18ea9",
+  "reaction_missing": 603
+}

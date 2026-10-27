@@ -1,0 +1,414 @@
+{
+ "chunk": "NA-10",
+ "probe_date": "2026-10-27T10:51:45.570331+00:00",
+ "git_sha": "7bc114b8732f930c5ec31ca14079827ada31002d",
+ "endpoint": {
+  "base_url": "https://financialmodelingprep.com",
+  "path": "/stable/historical-chart/30min",
+  "interval": "30min"
+ },
+ "vendor_timezone": "America/New_York",
+ "bar_label": "start (first regular bar at the open; ATOM IR-04)",
+ "requests_sent_this_run": 0,
+ "probe_requests_total": 6,
+ "ledger_requests_before": 6,
+ "ledger_requests_after": 6,
+ "probes": [
+  {
+   "name": "1_default_1y",
+   "request": {
+    "interval": "30min",
+    "symbol": "AAPL",
+    "from": "2025-01-02",
+    "to": "2025-12-31"
+   },
+   "from_cache": true,
+   "rows": 267,
+   "first_bar": "2025-12-02 09:30",
+   "last_bar": "2025-12-31 15:30",
+   "rows_outside_window_or_grid": 0,
+   "sessions_expected": 250,
+   "sessions_with_regular_bars": 21,
+   "sessions_served": [
+    "2025-12-02",
+    "2025-12-03",
+    "2025-12-04",
+    "2025-12-05",
+    "2025-12-08",
+    "2025-12-09",
+    "2025-12-10",
+    "2025-12-11",
+    "2025-12-12",
+    "2025-12-15",
+    "2025-12-16",
+    "2025-12-17",
+    "2025-12-18",
+    "2025-12-19",
+    "2025-12-22",
+    "2025-12-23",
+    "2025-12-24",
+    "2025-12-26",
+    "2025-12-29",
+    "2025-12-30",
+    "2025-12-31"
+   ],
+   "sessions_complete": 21,
+   "first_missing_session": "2025-01-02",
+   "regular_bars": 267,
+   "regular_bars_expected": 3232,
+   "bars_outside_regular_hours": 0,
+   "sessions_with_pre_market_bar": 0,
+   "post_market_bars": 0,
+   "whole": false,
+   "first_open_vs_eod_open": {
+    "sessions": 21,
+    "within_5bp": 19,
+    "within_1pct": 21,
+    "ratio_median": 1.0
+   }
+  },
+  {
+   "name": "2_extended_1y",
+   "request": {
+    "interval": "30min",
+    "symbol": "AAPL",
+    "from": "2025-01-02",
+    "to": "2025-12-31",
+    "extended": "true"
+   },
+   "from_cache": true,
+   "rows": 666,
+   "first_bar": "2025-12-02 04:00",
+   "last_bar": "2025-12-31 19:30",
+   "rows_outside_window_or_grid": 0,
+   "sessions_expected": 250,
+   "sessions_with_regular_bars": 21,
+   "sessions_served": [
+    "2025-12-02",
+    "2025-12-03",
+    "2025-12-04",
+    "2025-12-05",
+    "2025-12-08",
+    "2025-12-09",
+    "2025-12-10",
+    "2025-12-11",
+    "2025-12-12",
+    "2025-12-15",
+    "2025-12-16",
+    "2025-12-17",
+    "2025-12-18",
+    "2025-12-19",
+    "2025-12-22",
+    "2025-12-23",
+    "2025-12-24",
+    "2025-12-26",
+    "2025-12-29",
+    "2025-12-30",
+    "2025-12-31"
+   ],
+   "sessions_complete": 21,
+   "first_missing_session": "2025-01-02",
+   "regular_bars": 267,
+   "regular_bars_expected": 3232,
+   "bars_outside_regular_hours": 399,
+   "sessions_with_pre_market_bar": 21,
+   "post_market_bars": 168,
+   "whole": false,
+   "first_open_vs_eod_open": {
+    "sessions": 21,
+    "within_5bp": 19,
+    "within_1pct": 21,
+    "ratio_median": 1.0
+   }
+  },
+  {
+   "name": "3_nonadjusted_split",
+   "request": {
+    "interval": "30min",
+    "symbol": "NVDA",
+    "from": "2024-06-03",
+    "to": "2024-06-14",
+    "nonadjusted": "true"
+   },
+   "from_cache": true,
+   "rows": 130,
+   "first_bar": "2024-06-03 09:30",
+   "last_bar": "2024-06-14 15:30",
+   "rows_outside_window_or_grid": 0,
+   "sessions_expected": 10,
+   "sessions_with_regular_bars": 10,
+   "sessions_served": [
+    "2024-06-03",
+    "2024-06-04",
+    "2024-06-05",
+    "2024-06-06",
+    "2024-06-07",
+    "2024-06-10",
+    "2024-06-11",
+    "2024-06-12",
+    "2024-06-13",
+    "2024-06-14"
+   ],
+   "sessions_complete": 10,
+   "first_missing_session": null,
+   "regular_bars": 130,
+   "regular_bars_expected": 130,
+   "bars_outside_regular_hours": 0,
+   "sessions_with_pre_market_bar": 0,
+   "post_market_bars": 0,
+   "whole": true,
+   "first_open_vs_eod_open": {
+    "sessions": 10,
+    "within_5bp": 10,
+    "within_1pct": 10,
+    "ratio_median": 1.0
+   }
+  },
+  {
+   "name": "4_two_years",
+   "request": {
+    "interval": "30min",
+    "symbol": "NVDA",
+    "from": "2024-01-02",
+    "to": "2025-12-31",
+    "nonadjusted": "true"
+   },
+   "from_cache": true,
+   "rows": 267,
+   "first_bar": "2025-12-02 09:30",
+   "last_bar": "2025-12-31 15:30",
+   "rows_outside_window_or_grid": 0,
+   "sessions_expected": 502,
+   "sessions_with_regular_bars": 21,
+   "sessions_served": [
+    "2025-12-02",
+    "2025-12-03",
+    "2025-12-04",
+    "2025-12-05",
+    "2025-12-08",
+    "2025-12-09",
+    "2025-12-10",
+    "2025-12-11",
+    "2025-12-12",
+    "2025-12-15",
+    "2025-12-16",
+    "2025-12-17",
+    "2025-12-18",
+    "2025-12-19",
+    "2025-12-22",
+    "2025-12-23",
+    "2025-12-24",
+    "2025-12-26",
+    "2025-12-29",
+    "2025-12-30",
+    "2025-12-31"
+   ],
+   "sessions_complete": 21,
+   "first_missing_session": "2024-01-02",
+   "regular_bars": 267,
+   "regular_bars_expected": 6490,
+   "bars_outside_regular_hours": 0,
+   "sessions_with_pre_market_bar": 0,
+   "post_market_bars": 0,
+   "whole": false,
+   "first_open_vs_eod_open": {
+    "sessions": 21,
+    "within_5bp": 20,
+    "within_1pct": 21,
+    "ratio_median": 1.0
+   }
+  },
+  {
+   "name": "5_one_year",
+   "request": {
+    "interval": "30min",
+    "symbol": "NVDA",
+    "from": "2024-01-02",
+    "to": "2024-12-31",
+    "nonadjusted": "true"
+   },
+   "from_cache": true,
+   "rows": 267,
+   "first_bar": "2024-12-02 09:30",
+   "last_bar": "2024-12-31 15:30",
+   "rows_outside_window_or_grid": 0,
+   "sessions_expected": 252,
+   "sessions_with_regular_bars": 21,
+   "sessions_served": [
+    "2024-12-02",
+    "2024-12-03",
+    "2024-12-04",
+    "2024-12-05",
+    "2024-12-06",
+    "2024-12-09",
+    "2024-12-10",
+    "2024-12-11",
+    "2024-12-12",
+    "2024-12-13",
+    "2024-12-16",
+    "2024-12-17",
+    "2024-12-18",
+    "2024-12-19",
+    "2024-12-20",
+    "2024-12-23",
+    "2024-12-24",
+    "2024-12-26",
+    "2024-12-27",
+    "2024-12-30",
+    "2024-12-31"
+   ],
+   "sessions_complete": 21,
+   "first_missing_session": "2024-01-02",
+   "regular_bars": 267,
+   "regular_bars_expected": 3258,
+   "bars_outside_regular_hours": 0,
+   "sessions_with_pre_market_bar": 0,
+   "post_market_bars": 0,
+   "whole": false,
+   "first_open_vs_eod_open": {
+    "sessions": 21,
+    "within_5bp": 21,
+    "within_1pct": 21,
+    "ratio_median": 1.0
+   }
+  },
+  {
+   "name": "6_v3_1y",
+   "request": {
+    "interval": "30min",
+    "symbol": "AAPL",
+    "from": "2025-01-02",
+    "to": "2025-12-31",
+    "api": "v3"
+   },
+   "from_cache": true,
+   "rows": 267,
+   "first_bar": "2025-12-02 09:30",
+   "last_bar": "2025-12-31 15:30",
+   "rows_outside_window_or_grid": 0,
+   "sessions_expected": 250,
+   "sessions_with_regular_bars": 21,
+   "sessions_served": [
+    "2025-12-02",
+    "2025-12-03",
+    "2025-12-04",
+    "2025-12-05",
+    "2025-12-08",
+    "2025-12-09",
+    "2025-12-10",
+    "2025-12-11",
+    "2025-12-12",
+    "2025-12-15",
+    "2025-12-16",
+    "2025-12-17",
+    "2025-12-18",
+    "2025-12-19",
+    "2025-12-22",
+    "2025-12-23",
+    "2025-12-24",
+    "2025-12-26",
+    "2025-12-29",
+    "2025-12-30",
+    "2025-12-31"
+   ],
+   "sessions_complete": 21,
+   "first_missing_session": "2025-01-02",
+   "regular_bars": 267,
+   "regular_bars_expected": 3232,
+   "bars_outside_regular_hours": 0,
+   "sessions_with_pre_market_bar": 0,
+   "post_market_bars": 0,
+   "whole": false,
+   "first_open_vs_eod_open": {
+    "sessions": 21,
+    "within_5bp": 19,
+    "within_1pct": 21,
+    "ratio_median": 1.0
+   }
+  }
+ ],
+ "facts": {
+  "one_year_whole_default": false,
+  "two_year_window_whole": false,
+  "window_cap_days": {
+   "lo": 30,
+   "hi": 30
+  },
+  "window_cap_per_probe": {
+   "1_default_1y": {
+    "lo": 30,
+    "hi": 30
+   },
+   "2_extended_1y": {
+    "lo": 30,
+    "hi": 30
+   },
+   "4_two_years": {
+    "lo": 30,
+    "hi": 30
+   },
+   "5_one_year": {
+    "lo": 30,
+    "hi": 32
+   }
+  },
+  "window_cap_kind": "calendar days ending at `to`, oldest dropped",
+  "extended_served": true,
+  "pre_market_bar_share_of_served_sessions": 1.0,
+  "extended_adds_rows_not_days": true,
+  "extended_regular_bars_equal_default": true,
+  "nonadjusted_honoured": true,
+  "nonadjusted_check": {
+   "first_open_over_eod_open": {
+    "2024-06-07": 1.0,
+    "2024-06-10": 1.0
+   },
+   "as_traded": true
+  },
+  "extended_with_nonadjusted": "not tested",
+  "v3_window_whole": {
+   "6_v3_1y": false
+  },
+  "v3_window_cap_days": {
+   "6_v3_1y": {
+    "lo": 30,
+    "hi": 30
+   }
+  },
+  "v3_errors": {}
+ },
+ "decision": {
+  "api": "stable",
+  "extended": true,
+  "nonadjusted": true,
+  "basis": "as_traded",
+  "window_days": 30
+ },
+ "projection": {
+  "scopes": {
+   "prd_span_2024_06_03_to_test_end": 13039,
+   "val_a_to_test_end": 6524,
+   "test_only": 3511,
+   "val_a_and_val_b_only": 3013
+  },
+  "window_days": 30,
+  "symbols": 547,
+  "spy": true,
+  "windows": 15826,
+  "windows_by_part": {
+   "public": 12273,
+   "test": 3553
+  },
+  "windows_cached": 0,
+  "requests_needed": 15826,
+  "requests_prd_formula": 15802,
+  "ledger_requests_used": 6,
+  "cap": 17000,
+  "headroom_after_fetch": 1168,
+  "stop": false,
+  "reason": "within the cap"
+ },
+ "fmp_request_cap": 17000,
+ "ledger_requests_remaining": 16994,
+ "corroboration": "ATOM IR-04 (docs/runbooks/fmp_intraday_capability.json, intervals.30min): a 30-day request 2023-12-21 .. 2024-01-19 came back whole (247 rows, 19 sessions)"
+}
