@@ -179,7 +179,7 @@ per GPU, then rehearsed the output path on 2,000 / 500 / 500 val-A / val-B / tes
 | Run | Pushed (UTC) | Session h | Epochs | Train seq/s | Val-A loss | T react / mag / cont | Quota before push | Verified |
 |---|---|---|---|---|---|---|---|---|
 | pilot (3 launches) | 10-26 20:22 | 0.35 | (200 steps) | 8.24 / 8.21 | – | (rehearsal) | 30 h left | yes (`plan`) |
-| shuffle-s13 | 10-26 20:55 | 6.76 | 1 | 8.02 | – | 0.95 / 0.85 / 20.0 | – | yes |
+| shuffle-s13 | 10-26 20:55 | 6.76 | 1 | 7.89 | 1.6421 (shuffled labels) | 0.95 / 0.85 / 20.0 | – | yes |
 | laya-s13 | 10-27 05:04 | 7.59 | 1 | 7.94 | 1.5761 | 1.00 / 1.00 / 2.36 | – | yes |
 | anchor-s13 | 10-27 12:41 | running | | | | | 15.30 h left; needs 8.18 (7.44 + 10%) | |
 
