@@ -176,14 +176,15 @@ def log_trial(
     metric: str,
     value: float | None,
     *,
+    chunk: str = CHUNK,
     layout: Layout | None = None,
 ) -> bool:
     """Append one ``ledgers/trials.jsonl`` record (CLAUDE.md B10) unless an identical one exists; True when
     appended. A deterministic rerun of the report therefore does not inflate the trial count. A value that is
-    not finite (no valid answer) is logged as null."""
+    not finite (no valid answer) is logged as null. NA-07 logs through here with its own ``chunk``."""
     v = None if value is None or not math.isfinite(float(value)) else float(value)
     rec = TrialRecord(
-        chunk=CHUNK,
+        chunk=chunk,
         kind=kind,
         name=name,
         params_hash=params_hash(dict(params)),

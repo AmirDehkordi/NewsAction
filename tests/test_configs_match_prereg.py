@@ -111,8 +111,15 @@ def test_frozen_skeleton() -> None:
     f = load_frozen()
     assert f.frozen_requested is False
     assert f.frozen is False
-    for section in ("encoding", "anchoring", "selection", "thresholds", "calibration"):
+    for section in ("selection", "thresholds", "calibration"):
         assert getattr(f, section) is None
+    # NA-07 (PRD S5) owns ``encoding:`` and ``anchoring:`` (PREREG §8.4); its report writes both together
+    assert (f.encoding is None) is (f.anchoring is None)
+    if f.encoding:
+        assert {"chosen", "val_a_best", "val_a_table_sha", "val_b_check"} <= set(f.encoding)
+        assert f.encoding["chosen"] in ("E0", "E1", "E2", "E3", "E4")
+        assert {"present", "slope", "corr", "calls_per_event"} <= set(f.anchoring)
+        assert f.anchoring["calls_per_event"] == (2 if f.anchoring["present"] else 1)
     # NA-06 (PRD S6) owns ``tournament:`` and opens val-B only once it is recorded (CLAUDE.md C13)
     assert f.allow_val_b is bool(f.tournament)
     if f.tournament:

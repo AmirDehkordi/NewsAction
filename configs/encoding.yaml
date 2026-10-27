@@ -1,0 +1,58 @@
+# NA-07: the encoding ("numbers as words") and anchoring study (PREREG §8.4, §6.11, §7, §11.1, §11.4; PRD NA-07).
+# Read by newsaction.encoding (EncodingConfig). Hashed into the NA-11 freeze with every configs/*.yaml (PREREG
+# §4.4). tests/test_encoding_config.py checks every number PREREG gives against docs/PREREG.md; the rule tests
+# recompute the decisions from artifacts/NA-07 with these thresholds.
+
+version: 1
+seed: 2026                        # PREREG §11.4 bootstrap; NA-04's sample draw
+groups: [core]                    # PREREG A2.1: the encoding and anchoring study asks the core battery only
+encodings: [E0, E1, E2, E3, E4]   # PREREG §6.11
+default_encoding: E3              # PREREG §6.11: the default before NA-07; ties go to it (PRD NA-07 S1)
+
+models:                           # PREREG §15 row of 2026-10-27 (operator): the 3 stage-2 models with the highest
+  n: 3                            # stage-2 Call A IC (artifacts/NA-06/leaderboard.csv ic2_a_z_cc; ties to the
+  expected:                       # cheaper, cost_per_1000_a2). Recomputed from the leaderboard and asserted equal.
+    - liquid/d1-ultra             # Screen-failing (PREREG §8.3): every NA-07 result is model-specific (§1.3).
+    - respan/span-02
+    - nace-ai/drex-v2.0
+
+state_files:                      # registered NA-04 state files (work/…)
+  sample: "states/samples/callA_d0_{encoding}.parquet"   # 1,500 val-A + 1,500 val-B D0 events in E0–E4
+  call_a_d2: states/callA_d2_E3.parquet                  # Call A on D2 (W2 news only, PREREG A3.1)
+  call_b_d2: states/callB_d2_E3.parquet                  # Call B on D2 (W2 news + reaction)
+
+samples:
+  val_a: 1500                     # PRD NA-07 S1, S4
+  val_b: 1500                     # PRD NA-07 S2
+  strata: [tier, month]           # NA-04's states.build.stratified_sample (the numeracy draw)
+
+metric:                           # PREREG §8.2 / §11.1, NA-06's operationalization (§15 row of 2026-10-26)
+  target: z_cc                    # mean daily Spearman IC of N̂ vs z_cc,t
+  min_names_per_day: 5            # a daily IC needs >= 5 events with both values
+  nw_lags: 5                      # PREREG §11.1
+
+bootstrap:                        # PREREG §11.4: stationary block bootstrap over days
+  block: 5
+  reps: 10000
+  ci: 0.95                        # percentile interval
+
+rule:                             # PREREG §8.4 encoding rule
+  confirm_se: 1.0                 # val-B: keep the best unless it is worse than E3 by more than 1 bootstrap SE
+  tie_decimals: 12                # ICs and mean ranks equal to 12 decimals are ties
+
+numeracy:                         # PRD NA-07 S3 (outcome-free)
+  n_news: 30                      # real masked val-A news blocks (Call B states of the anchoring sample)
+  magnitudes: [0.3, 0.7, 1.5, 2.5, 4.0, 6.0, 9.0]   # |z|, negligible … extreme: NA-05's grid (dm.canary)
+  market_z: 0.1                   # the synthetic block's S&P 500 move (NA-05's canary value)
+  volume_multiple: 2.0            # volume vs normal ("busy"; NA-05's canary value)
+  e0_stock_sigma: 0.015           # E0 only: raw change = z × 1.5% (a typical S&P 500 daily σ)
+  e0_market_sigma: 0.008          # E0 only: the S&P 500's raw change = market_z × 0.8%
+  target_share: 0.90              # monotone share target per model
+  tol: 1.0e-9                     # float tolerance of "non-decreasing" / "non-increasing"
+
+anchoring:                        # PREREG §8.4: anchoring is present if slope >= 0.30 or corr(N̂_A, N̂_B) < 0.70
+  slope_min: 0.30
+  corr_max: 0.70                  # present when corr < corr_max
+  combine: any                    # across the 3 models: present if any model anchors (PREREG §15 NA-07 row)
+
+concurrency: 16                   # API calls in flight per batch (NA-05 pilot: no rate limit up to 16)
