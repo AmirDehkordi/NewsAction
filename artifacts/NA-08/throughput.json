@@ -293,7 +293,7 @@
     }
   ],
   "chosen": {
-    "option": "full",
+    "option": "seeds: laya 1, anchor 1",
     "runs": [
       {
         "run": "shuffle-s13",
@@ -304,24 +304,6 @@
       },
       {
         "run": "laya-s13",
-        "epochs": 1,
-        "predict": [
-          "val_a",
-          "val_b",
-          "test"
-        ]
-      },
-      {
-        "run": "laya-s17",
-        "epochs": 1,
-        "predict": [
-          "val_a",
-          "val_b",
-          "test"
-        ]
-      },
-      {
-        "run": "laya-s23",
         "epochs": 1,
         "predict": [
           "val_a",
@@ -344,25 +326,13 @@
         "predict": [
           "val_a"
         ]
-      },
-      {
-        "run": "anchor-s17",
-        "epochs": 1,
-        "predict": [
-          "val_a",
-          "val_b",
-          "test"
-        ]
-      },
-      {
-        "run": "anchor-s23",
-        "epochs": 1,
-        "predict": [
-          "val_a",
-          "val_b",
-          "test"
-        ]
       }
+    ],
+    "deferred": [
+      "laya-s17",
+      "laya-s23",
+      "anchor-s17",
+      "anchor-s23"
     ]
   },
   "quota": {

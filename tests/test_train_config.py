@@ -97,8 +97,10 @@ def test_run_plan_order_and_pilot() -> None:
     k = load_training_config().kaggle
     assert "throughput pilot → shuffled-label → Laya-Fin seeds → anchor seeds → repro" in PRD_NA08
     kinds = [("pilot" if r.mode == "pilot" else r.name.split("-")[0]) for r in k.runs]
-    # the operator's plan after the pilot: the PRD order with repro before the last two anchor seeds
-    assert kinds == ["pilot", "shuffle", "laya", "laya", "laya", "anchor", "repro", "anchor", "anchor"]
+    # operator decisions after the pilot: one seed per model this week, the other seeds deferred (PREREG §15)
+    assert kinds == ["pilot", "shuffle", "laya", "anchor", "repro", "laya", "laya", "anchor", "anchor"]
+    assert [r.name for r in k.runs if r.deferred] == ["laya-s17", "laya-s23", "anchor-s17", "anchor-s23"]
+    assert "| NA-08 | §9.1 (seeds {13, 17, 23}" in PREREG  # the deviation row
     assert all(r.epochs == 1 for r in k.runs if r.mode == "train")  # one epoch fits a session (pilot)
     assert {r.name: r.predict for r in k.runs if r.predict != ("val_a", "val_b", "test")} == {
         "shuffle-s13": ("val_a",),

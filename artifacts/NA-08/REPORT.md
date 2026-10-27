@@ -11,12 +11,12 @@ model. The dataset is on Kaggle (private), and its download is byte-identical to
 The pilot ran on 2×T4 and its outputs passed the import's verification: 8.2 seq/s training, 31.9 seq/s
 inference, 10.5 GB peak (§3.3). One epoch takes 5.9 h, so each run trains 1 epoch (≈ 7.4 h a run).
 
-The operator decided on 2026-10-26 (§8):
-- MAX_LEN 1,036, so that no state is cut;
-- I run the Kaggle steps;
-- the block-dropout copies stay;
-- the full plan, hedged: this week shuffle-s13 and laya-s13/17/23; next week anchor-s13, repro-s13,
-  anchor-s17 and anchor-s23 (58 GPU-hours, about two weekly quotas).
+The operator decided (§8):
+- 2026-10-26: MAX_LEN 1,036, so that no state is cut; I run the Kaggle steps; the block-dropout copies stay;
+- 2026-10-27: **finish within this week's quota with one seed per model** (PREREG §15 NA-08 row 2). The runs
+  are shuffle-s13 (done), laya-s13 (running), then anchor-s13 and repro-s13. Seeds 17 and 23 are deferred.
+  Before each push the remaining quota is checked against the run's projection plus 10%; repro-s13 waits
+  for the reset (an AC3 deferral) if it does not fit.
 
 The controls (S5), the imported predictions (S7) and the model cards' numbers (S8) wait for those runs; this
 report is updated when they come back.
@@ -258,11 +258,14 @@ outputs of a program whose sha256 is not the committed `train_ddp.py`.
 
 ## 7. Deviations from PREREG
 
-One row was appended to the §15 Deviations log (2026-10-26, NA-08, before the freeze). As in earlier chunks it
-is **in the working tree, not committed**, for the operator to commit on main:
+Two rows were appended to the §15 Deviations log (NA-08, before the freeze). As in earlier chunks they are
+**in the working tree, not committed**, for the operator to commit on main:
 
 1. **§9.1 max length 1024 → 1,036** for the trained models: the head is the longest trained question in Laya's
    rendering (143 + 3 tokens), and at 1,024 five Call A D0 states would be cut. Operator decision 2026-10-26.
+2. **§9.1–9.2 seeds {13, 17, 23} → one seed (13) per model for now**, the other seeds deferred; also a
+   departure from the PRD's seed targets and reduction order. Every run trains 1 epoch (within ≤ 3). Operator
+   decision 2026-10-27.
 
 PRD-level choices are in `docs/decisions/NA-08.md`: H-mag on Call A D2, block dropout as copies with the
 context block = attention + company + market, the embargo applied to fitting, the warm-up, the frozen act head,
@@ -289,10 +292,15 @@ Owner decisions:
 3. **Decided (2026-10-26): keep the reaction-dropout copies** as PREREG §9.1 specifies (§3.2: they duplicate
    Call A D2 examples). If the quota plan does not fit, they (and the 9,481 D0 / D2 twin duplicates, ~5% each)
    can be dropped via `TRAIN_VARIANTS` before cutting seeds; that would be a §9.1 deviation.
-4. **Decided (2026-10-26): the full plan, hedged** (§3.3): 1 epoch per run, 58 GPU-hours over two weekly
-   quotas, with repro-s13 before the last two anchor seeds. Kaggle is assumed to count a T4 ×2 session's
-   wall-clock hours once against the 30-hour quota. The account's quota page should show about 0.35 h used
-   by the pilot.
+4. **Decided (2026-10-26), then replaced (2026-10-27).** The full plan, hedged (§3.3), was replaced by the
+   operator's decision to finish within this week's quota with one seed per model.
+   - Runs: shuffle-s13, laya-s13, anchor-s13, repro-s13. laya-s17/23 and anchor-s17/23 are deferred.
+   - Recorded in PREREG §15 (NA-08 row 2) and `docs/decisions/NA-08.md`.
+   - `kaggle quota` reads the weekly GPU hours, so no manual reading is needed. At 09:59 UTC on 2026-10-27 it
+     showed 12.02 h used of 30, including the running laya-s13; it resets 2026-10-31 00:00 UTC.
+   - Expected after laya-s13: ~15.2 h left. That is enough for anchor-s13 (8.2 h with the margin) but not
+     for both runs at once (15.3 h). repro-s13 is decided after anchor-s13 finishes; if it does not fit, it is
+     the operator-approved AC3 deferral.
 5. **Ledger merge.** NA-05 runs in parallel. Both branches may append to `ledgers/trials.jsonl`, whose lines
    are hash-chained, so merging both needs a re-chain of one branch's lines. NA-08 appends trials only at the
    cards stage, after the runs.

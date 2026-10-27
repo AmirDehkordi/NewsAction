@@ -149,12 +149,25 @@ def options(
 
 
 def chosen(cfg: TrainingConfig) -> dict[str, Any]:
-    """The plan in ``configs/training.yaml`` (the operator's choice): its runs, in order, and their epochs."""
+    """The plan of ``configs/training.yaml`` (the operator's choice): runs in order, and the deferred ones."""
     train = [r for r in cfg.kaggle.runs if r.mode == "train"]
-    anchors = sum(r.init == "modernbert" and not r.shuffle_labels for r in train)
+    active = [r for r in train if not r.deferred]
+    seeds = {
+        i: sum(
+            r.init == i and not r.shuffle_labels and r.name not in cfg.controls.repro_runs[1:] for r in active
+        )
+        for i in ("laya", "modernbert")
+    }
+    n = len(cfg.model.seeds)
+    option = (
+        "full"
+        if seeds == {"laya": n, "modernbert": n}
+        else f"seeds: laya {seeds['laya']}, anchor {seeds['modernbert']}"
+    )
     return {
-        "option": "full" if anchors == len(cfg.model.seeds) else f"anchor seeds -> {anchors}",
-        "runs": [{"run": r.name, "epochs": r.epochs, "predict": list(r.predict)} for r in train],
+        "option": option,
+        "runs": [{"run": r.name, "epochs": r.epochs, "predict": list(r.predict)} for r in active],
+        "deferred": [r.name for r in train if r.deferred],
     }
 
 

@@ -219,6 +219,22 @@ def _fmt(x: Any, nd: int = 4) -> str:
     return str(x)
 
 
+def reported(ctx: Mapping[str, Any], cfg: TrainingConfig) -> str:
+    """What the card reports: the seeds' ensemble, or a single seed while the others are deferred."""
+    runs, planned = ctx["runs"], len(cfg.model.seeds)
+    if len(runs) == planned:
+        return f"the {planned}-seed ensemble (mean of calibrated probabilities) of runs {', '.join(runs)}"
+    what = (
+        f"the single seed run {runs[0]}"
+        if len(runs) == 1
+        else f"the {len(runs)}-seed ensemble of runs {', '.join(runs)}"
+    )
+    return (
+        f"{what}: {len(runs)} of the {planned} seeds of PREREG §9.1; the others are deferred (PREREG §15 "
+        "NA-08 row, operator decision) and enter the ensemble when they are imported"
+    )
+
+
 def card_text(model: str, ctx: Mapping[str, Any]) -> str:
     """The model card's markdown (``ctx`` from ``card_context``)."""
     cfg: TrainingConfig = ctx["cfg"]
@@ -248,8 +264,7 @@ def card_text(model: str, ctx: Mapping[str, Any]) -> str:
         "(checked before loading) |",
         "| Architecture | ModernBERT-large encoder (fully fine-tuned) + decision head: 2 transformer "
         "layers and an option-marker scorer (Laya `DecisionModel`); the act head is frozen and unused |",
-        f"| Reported model | the {ctx['n_seeds']}-seed ensemble (mean of calibrated probabilities) of "
-        f"runs {', '.join(ctx['runs'])} |",
+        f"| Reported model | {reported(ctx, cfg)} |",
         "| Inputs | the NA-04 masked E3 states (PREREG §6.10–6.11), identical to the API models' states |",
         "| Outputs | probabilities per head; common prediction schema `work/kaggle/predictions/"
         f"{model}_{{val_a,val_b,test_callA}}.parquet` |",

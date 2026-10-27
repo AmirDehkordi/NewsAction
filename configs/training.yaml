@@ -96,17 +96,17 @@ kaggle:                           # PRD NA-08 S4, S6
         required: false
         hparams: {grad_checkpointing: false, micro_batch: 4, grad_accum: 8}   # same effective batch
       - {name: modernbert, init: modernbert, rehearse: true, required: true}
-  runs:                           # operator plan 2026-10-26 after the pilot: 1 epoch per run (2 do not fit a
-                                  # 12-hour session); the PRD order hedged so that a short quota drops anchor seeds
+  runs:                           # operator decision 2026-10-27: one seed per model within this week's quota
+                                  # (PREREG §15 NA-08 row); 1 epoch per run: 2 do not fit a 12-hour session
     - {name: pilot, mode: pilot, inits: [laya, modernbert]}
     - {name: shuffle-s13, mode: train, init: laya, seed: 13, epochs: 1, shuffle_labels: true, predict: [val_a]}
     - {name: laya-s13, mode: train, init: laya, seed: 13, epochs: 1}
-    - {name: laya-s17, mode: train, init: laya, seed: 17, epochs: 1}
-    - {name: laya-s23, mode: train, init: laya, seed: 23, epochs: 1}
     - {name: anchor-s13, mode: train, init: modernbert, seed: 13, epochs: 1}
     - {name: repro-s13, mode: train, init: laya, seed: 13, epochs: 1, predict: [val_a]}   # controls: val-A only
-    - {name: anchor-s17, mode: train, init: modernbert, seed: 17, epochs: 1}
-    - {name: anchor-s23, mode: train, init: modernbert, seed: 23, epochs: 1}
+    - {name: laya-s17, mode: train, init: laya, seed: 17, epochs: 1, deferred: true}
+    - {name: laya-s23, mode: train, init: laya, seed: 23, epochs: 1, deferred: true}
+    - {name: anchor-s17, mode: train, init: modernbert, seed: 17, epochs: 1, deferred: true}
+    - {name: anchor-s23, mode: train, init: modernbert, seed: 23, epochs: 1, deferred: true}
 
 derived:                          # PREREG §7
   react_midpoints: [-3.5, -2.5, -1.5, -0.75, 0.0, 0.75, 1.5, 2.5, 3.5]
