@@ -174,6 +174,31 @@ per GPU, then rehearsed the output path on 2,000 / 500 / 500 val-A / val-B / tes
   seeds wait or drop (the PRD's reduction) without losing the reproducibility control.
 - **Kaggle time used so far:** the pilot, ~21 min (pushed 20:22, complete 20:43 local time).
 
+### 3.4 Kaggle runs (each downloaded with `--file-pattern na08_` and verified by `import_preds verify`)
+
+| Run | Pushed (UTC) | Session h | Epochs | Train seq/s | Val-A loss | T react / mag / cont | Quota before push | Verified |
+|---|---|---|---|---|---|---|---|---|
+| pilot (3 launches) | 10-26 20:22 | 0.35 | (200 steps) | 8.24 / 8.21 | – | (rehearsal) | 30 h left | yes (`plan`) |
+| shuffle-s13 | 10-26 20:55 | 6.76 | 1 | 8.02 | – | 0.95 / 0.85 / 20.0 | – | yes |
+| laya-s13 | 10-27 05:04 | 7.59 | 1 | 7.94 | 1.5761 | 1.00 / 1.00 / 2.36 | – | yes |
+| anchor-s13 | 10-27 12:41 | running | | | | | 15.30 h left; needs 8.18 (7.44 + 10%) | |
+
+- **laya-s13, val-A** (first 5 sessions excluded; the model cards add CIs):
+
+  | Reading | IC | NW t |
+  |---|---|---|
+  | D0 N̂ vs z_cc,t | +0.055 | 4.30 |
+  | D0 N̂ vs e5 | +0.027 | 1.02 |
+  | D2 Call A N̂ vs e5 | +0.036 | 1.56 |
+  | D0 H-mag vs \|z_cc,t\| | +0.172 | 6.85 |
+  | Call B C vs sign(G)·y2 | +0.023 | 1.61 |
+
+  - Call B N̂ vs e5 is +0.448: Call B reads the day's own reaction, which is part of e5.
+  - Calibration: react ECE 0.018 at T = 1.00 (already calibrated), mag ECE 0.017; the cont head is close to
+    uniform (NLL 1.098 ≈ ln 3; T 2.36).
+- **shuffle-s13** (the AC3 control): D0 N̂ vs e5 IC −0.007, NW t −0.48 (|t| < 2). The other heads' ICs are in
+  `controls.json` once the cards stage runs (H-mag −0.044, t −2.39).
+
 ## 4. Operator runbook (S6)
 
 Run from the repository root (`/Users/amir/Research/NewsAction-NA08`, or the main repository after the merge).
