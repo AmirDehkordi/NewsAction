@@ -228,7 +228,7 @@ def test_fmp_ledger_refuses_request_over_cap(tmp_path: Path) -> None:
         led.reserve({"symbol": "D"})
     assert FmpLedger(p, cap=3).count() == 3
     assert len(p.read_text(encoding="utf-8").splitlines()) == 3
-    assert FmpLedger(p).cap == 3000
+    assert FmpLedger(p).cap == 17000  # PREREG §13 as raised in §15 (NA-10)
 
 
 def test_trial_ledger(tmp_path: Path) -> None:
