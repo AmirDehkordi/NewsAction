@@ -573,7 +573,7 @@ offline client. The committed files below live under `artifacts/NA-05/` and are 
 - **Producer:** `newsaction.dm.cache.DecisionCache`, written only by the client (every chunk that calls a decision model)
 - **Schema:** table `responses`: `key` TEXT PK, `model`, `state_sha256`, `questions_sha256`, `provider_json`, `params_json`, `repeat_idx` INT, `request_json` (the body as sent, without the key), `response_json` (the raw response text), `model_build`, `provider`, `input_tokens` INT, `output_tokens` INT, `cost` REAL, `cost_source` (`usage` = the response's usage.cost, `computed` = catalog price × tokens, `local`), `latency_ms` REAL, `created_at`, `chunk`, `tag`, `meta_json` (the state's provenance: source, file, event_id, session, split, call, masked, third_party_ok_all, probe), `valid` INT (strict parse), `problems_json`. Table `attempts`: `id`, `key`, `model`, `attempt`, `status` (NULL for a transport error), `error`, `latency_ms`, `headers_json` (rate-limit headers), `concurrency`, `created_at`, `chunk`, `tag`.
 - **Key:** `responses.key` = sha256 of the canonical JSON of {model, state, questions (ordered: [[id, [type, instructions, criteria]], …]), provider, params, repeat_idx}; local models add their checkpoint settings (revision, subfolder, max_len, head_max_len, device, fp32) to `params`; the session id is not part of the key
-- **Rows / coverage (end of NA-05):** 2,227 responses with `chunk = NA-05` (1,949 API, all HTTP 200, 278 local Laya), 2,014 API attempts (1,949 × 200, 61 × 400, 3 × 429, 1 × 502). Sessions of the sent states: 1,976 train-split states (2024-07-01 … 2025-06-30) and 251 synthetic ones. **NA-06 (2026-10-26):** 65,289 responses with `chunk = NA-06` (63,889 API, all HTTP 200 and valid; 1,400 local Laya), 65,004 API attempts (63,889 × 200, 916 × 429, 198 × 502, 1 × 503; 12 requests to openai/gpt-6-luna-decisions refused for good: "OpenAI refused to answer question justified_move"). Every NA-06 state is a val-A state after the embargo (2025-07-09 … 2025-09-30), masked except the 5,940 `unmasked_twin` probe rows (`artifacts/NA-06/cache_audit.json`). GAC4: NA-06's recorded spend $3.526621699 equals Σ `responses.cost` of its rows (difference −2.7e-14)
+- **Rows / coverage (end of NA-05):** 2,227 responses with `chunk = NA-05` (1,949 API, all HTTP 200, 278 local Laya), 2,014 API attempts (1,949 × 200, 61 × 400, 3 × 429, 1 × 502). Sessions of the sent states: 1,976 train-split states (2024-07-01 … 2025-06-30) and 251 synthetic ones. **NA-06 (2026-10-26):** 65,289 responses with `chunk = NA-06` (63,889 API, all HTTP 200 and valid; 1,400 local Laya), 65,004 API attempts (63,889 × 200, 916 × 429, 198 × 502, 1 × 503; 12 requests to openai/gpt-6-luna-decisions refused for good: "OpenAI refused to answer question justified_move"). Every NA-06 state is a val-A state after the embargo (2025-07-09 … 2025-09-30), masked except the 5,940 `unmasked_twin` probe rows (`artifacts/NA-06/cache_audit.json`). GAC4: NA-06's recorded spend $3.526621699 equals Σ `responses.cost` of its rows (difference −2.7e-14) **NA-07 (2026-10-27):** 32,016 responses with `chunk = NA-07` (all API, HTTP 200 and valid), 33,300 attempts (32,016 × 200, 1,284 × 429 retried; one request needed a second pass). States: 23,256 val-A (S1 18,000, S3 1,260 numeracy probes, S4 3,756 Call A D2), 9,000 val-B (S2), all after the embargo (`artifacts/NA-07/cache_audit.json`). NA-07's recorded spend $1.240485312 equals Σ `responses.cost` of its rows.
 - **Availability:** n/a (decision-model outputs). GAC4: Σ `responses.cost` where `chunk = X` equals chunk X's recorded spend in `ledgers/spend.jsonl` (NA-05: $0.103922341, difference 9.7e-17)
 - **Note:** gitignored like `work/`; the verifier and later chunks need this file next to the branch (copy it with `work/` when merging). `valid` / `problems_json` are the parser's verdict when the row was written; the client re-parses every hit with the current parser, so since the renormalization rule (2026-10-26) a stored row can say invalid for an answer that now parses as valid and `renormalized`. A row is written once and never edited
 
@@ -761,3 +761,157 @@ val-B or test outcome was read.
 - **Rows / coverage:** 200 pairs
 - **Availability:** n/a (decision-model outputs and their evaluation on val-A; no val-B or test value)
 - **sha256:** `5267d8d750e812c96278e427000aba8921ce35ca46a54bdc515333e7e3b285f2`
+
+## NA-07 — encoding ("numbers as words") and anchoring study
+
+Producer: `newsaction.encoding` (NA-07), one stage per process:
+`uv run python -m newsaction.encoding.run --stage samples | dryrun | search | anchoring | select | confirm | numeracy | report`.
+Configuration: `configs/encoding.yaml` (PREREG §8.4, §6.11, §11.1, §11.4; PRD NA-07; checked against the PREREG and PRD
+text by `tests/test_encoding_config.py`). Every request goes through `dm.client.DecisionClient("NA-07")` and is cached in
+`cache/decisions.sqlite` (`chunk = NA-07`); the E3 val-A search states and the Call B D2 twins are NA-06's cached answers.
+`report` rebuilds every number below from the cache with an offline client. Models: liquid/d1-ultra, respan/span-02,
+nace-ai/drex-v2.0 (screen-failing, PREREG §15 operator row of 2026-10-27): every value is model-specific. S1, S3 and S4
+states are val-A after the embargo (2025-07-09 … 2025-09-30); S2 states are val-B after the embargo (2025-10-08 …
+2025-12-31). Targets: z_cc,t from `work/panel/panel_public.parquet` (same-session reaction). No test state was sent and
+no test outcome was read.
+
+### `work/dm/encoding/samples.parquet`
+- **Producer:** `newsaction.encoding.run --stage samples`
+- **Inputs:** `work/states/samples/callA_d0_E{0..4}.parquet` (event ids), `work/events/events_d0.parquet` (keys, tier, month, embargo), `work/states/{callA_d2_E3,callB_d2_E3}.parquet` (twin checks), `configs/encoding.yaml`
+- **Schema:** `event_id`, `split` (val_a | val_b), `company_id` int64, `symbol_id` int64, `session` date32, `month`, `tier`, `d2_event_id` (the "W2:" twin), `anchoring` bool (val-A twins with both D2 states), `numeracy` bool (the 30 numeracy events, tier × month, seed 2026)
+- **Key:** `event_id` unique
+- **Rows / coverage:** 3,000 rows: NA-04's 1,500 val-A + 1,500 val-B D0 sample events (embargo excluded); 1,500 anchoring twins; 30 numeracy events
+- **Availability:** design file (no outcome)
+- **sha256:** `8082520badb2caf967fb4475abd1b3a76fa4af82d201041f3fb0e628b3c7f732`
+
+### `work/dm/encoding/search.parquet`
+- **Producer:** `newsaction.encoding.run --stage report` (offline)
+- **Inputs:** `cache/decisions.sqlite`, the samples, `work/states/samples/callA_d0_E{0..4}.parquet`
+- **Schema:** one row per (model, encoding, event): `model`, `event_id`, `session` date32, `call`, `tag`, `probe`, `ok`, `valid`, `key`, `paid_chunk`, `paid_tag` (NA-06 for the cached E3 answers), `model_build`, `provider`, `input_tokens`, `cost`, `latency_ms`, the PREREG §7 quantities `n_hat`, `abs_n_hat`, `m`, `surprise`, `tone`, `n_renormalized`, `p_fall`, `p_flat`, `p_rise`, `encoding`, `split` (no target column)
+- **Key:** (`model`, `encoding`, `event_id`)
+- **Rows / coverage:** 22,500 rows: 3 models × 5 encodings × 1,500 val-A events (S1)
+- **Availability:** decision-model outputs at 09:15 ET of `session` (Call A on W0 news, masked)
+- **sha256:** `6c1d353280661c8a8718237dfc392d63f22781887244e68e9a304b424eee8825`
+
+### `work/dm/encoding/confirm.parquet`
+- **Producer:** `newsaction.encoding.run --stage report` (offline)
+- **Inputs:** as `search.parquet` (val-B rows of the samples)
+- **Schema:** as `search.parquet`
+- **Key:** (`model`, `encoding`, `event_id`)
+- **Rows / coverage:** 9,000 rows: 3 models × {E1, E3} × 1,500 val-B events (S2, written because the val-A best E1 is not E3)
+- **Availability:** decision-model outputs at 09:15 ET of `session` (val-B; NA-07's confirmation and NA-11's selection only, CLAUDE.md B9)
+- **sha256:** `a02322e5c82db0aa9ad59d6267ba345958fbe916da61f5a3c8de21d5b83a10d7`
+
+### `work/dm/encoding/numeracy.parquet`
+- **Producer:** `newsaction.encoding.run --stage report` (offline)
+- **Inputs:** `cache/decisions.sqlite`, `work/states/callB_d2_E3.parquet` (the 30 numeracy states), `configs/codebook_v1.yaml`
+- **Schema:** `model`, `event_id` (the D2 state whose non-reaction blocks were used), `session` date32, `encoding`, `direction` (rise | fall), `magnitude_idx` int64 (0–6), `z` (signed synthetic move), `reaction_text` (the synthetic move phrase), `ok`, `key`, `paid_chunk`, `p_wrong_direction`, `p_too_small`, `p_much_too_small`, `p_about_right`, `p_too_large`, `p_much_too_large`, `p_large`, `p_small` (Q5 probabilities)
+- **Key:** (`model`, `encoding`, `event_id`, `direction`, `magnitude_idx`)
+- **Rows / coverage:** 1,260 rows: 3 models × 30 states × 2 directions × 7 magnitudes, in E3
+- **Availability:** outcome-free probe (synthetic `reaction_so_far`; no realized reaction shown or read)
+- **sha256:** `c3f76ef1d60bb79bb35e9fcbf70b213fa166351c5c3f63cd821a5edf40f10d1f`
+
+### `work/dm/encoding/anchoring.parquet`
+- **Producer:** `newsaction.encoding.run --stage report` (offline)
+- **Inputs:** `cache/decisions.sqlite`, `work/states/{callA_d2_E3,callB_d2_E3}.parquet` (the 1,500 val-A twins)
+- **Schema:** one row per (model, D2 event): `event_id`, `session` date32, `ok_a`, `valid_a`, `n_hat_a`, `paid_chunk_a`, `cost_a` (Call A on W2 news), `ok_b`, `valid_b`, `n_hat_b`, `paid_chunk_b`, `cost_b`, `j`, `w`, `c` (Call B), `model` (G is not stored)
+- **Key:** (`model`, `event_id`)
+- **Rows / coverage:** 4,500 rows (3 models × 1,500 events; 9,000 requests)
+- **Availability:** Call A at close(`session`) on W2 news; Call B after close(`session`) with the D2 reaction
+- **sha256:** `beb50a9d99f0ce4c273fc9b66fe946772025af4782186114c20b677d92a90f19`
+
+### `artifacts/NA-07/encoding_ic.csv`
+- **Producer:** `newsaction.encoding.run --stage report`
+- **Schema:** `split`, `model` (or `pooled`), `encoding`, `n_events`, `n_answered`, `n_paid_na07`, `ic` (mean daily IC of N̂ vs z_cc,t; for `pooled` the mean over models), `t`, `nw_se` (Newey–West, 5 lags), `boot_se`, `ci_low`, `ci_high` (stationary bootstrap, block 5, 10,000 reps, seed 2026, 95% percentile), `n_days`, `rank` (within model; for `pooled` the mean rank), `best` (the val-A rule's encoding), `chosen` (`frozen.yaml` `encoding.chosen`)
+- **Key:** (`split`, `model`, `encoding`)
+- **Rows / coverage:** 26 rows: val-A 3 models × 5 encodings, val-B 3 models × {E1, E3}, 5 pooled val-A rows
+- **Availability:** n/a (decision-model outputs and their evaluation on val-A; val-B only in the S2 check; no test value)
+- **sha256:** `04c2c0d40a8a9c9a14bb658830ea9c81652f6109048d80737fba2d6297806140`
+
+### `artifacts/NA-07/encoding_daily_ic.csv`
+- **Producer:** `newsaction.encoding.run --stage report`
+- **Schema:** `split`, `model`, `encoding`, `session`, `ic` (daily Spearman of N̂ with z_cc,t), `n` (events with both values)
+- **Key:** (`split`, `model`, `encoding`, `session`)
+- **Rows / coverage:** the daily series behind `encoding_ic.csv` (59 val-A and 59 val-B sessions)
+- **Availability:** n/a (decision-model outputs and their evaluation on val-A; val-B only in the S2 check; no test value)
+- **sha256:** `2b119288a97c0a9c726571feff0779301ca45fdb39f12b6ef7366eb74d214a20`
+
+### `artifacts/NA-07/encoding_check.csv`
+- **Producer:** `newsaction.encoding.run --stage report`
+- **Schema:** row `scope = rule`: `needed`, `best`, `default`, `chosen` (the encoding the val-B check keeps), `delta`, `se`, `threshold` (−1·SE), `n_days`, `kept_best`; rows `scope = pooled` and per model: `delta` (mean daily IC(best) − IC(E3) on val-B), `t`, `nw_se`, `boot_se`, `ci_low`, `ci_high`, `n_days`
+- **Key:** `scope`
+- **Rows / coverage:** 5 rows (rule, pooled, 3 models)
+- **Availability:** n/a (decision-model outputs and their evaluation on val-A; val-B only in the S2 check; no test value)
+- **sha256:** `084c20f939dd972b4f4fdcdf8653c3cd68cbcf937657dc86f0aa48e19883ff06`
+
+### `artifacts/NA-07/numeracy.csv`
+- **Producer:** `newsaction.encoding.run --stage report`
+- **Schema:** `model`, `encoding`, `role` (gate: the encoding the val-B check kept; reference: E3 beside a non-E3 gate), `n_series`, `n_complete`, `n_monotone`, `share_large_non_decreasing`, `share_small_non_increasing`, `share` (monotone series / series), `target` (0.90), `passes`, `leading` (liquid/d1-ultra)
+- **Key:** (`model`, `encoding`)
+- **Rows / coverage:** 3 rows (E3 gate rows; no reference run since the kept encoding is E3)
+- **Availability:** outcome-free probe
+- **sha256:** `86af0d6997a91cc4f58db9c112c922d75fd3cbde135ec37a2511992b34a3cc4d`
+
+### `artifacts/NA-07/numeracy_series.csv`
+- **Producer:** `newsaction.encoding.run --stage report`
+- **Schema:** `model`, `event_id`, `direction`, `complete`, `large_non_decreasing`, `small_non_increasing`, `monotone` bool, `p_large`, `p_small` (JSON lists over the 7 magnitudes, rounded to 6 decimals), `encoding`
+- **Key:** (`model`, `encoding`, `event_id`, `direction`)
+- **Rows / coverage:** 180 rows (3 models × 30 states × 2 directions)
+- **Availability:** outcome-free probe
+- **sha256:** `564bd6e4bd47a87dddf2af56e23bd680b39b2c28a525b3e1159169fe6469d674`
+
+### `artifacts/NA-07/anchoring.csv`
+- **Producer:** `newsaction.encoding.run --stage report`
+- **Schema:** per model: `model`, `n`, `n_sessions`, `slope` (b in N̂_B = a + b·G + c·N̂_A), `slope_se_hc1`, `slope_se_cluster` (by session), `coef_n_hat_a`, `intercept`, `r2`, `corr` (Pearson N̂_A, N̂_B), `spearman`, `slope_without_control`, `present`; row `all`: the largest slope, the smallest corr, `present` (any model), `calls_per_event`; `slope_min` 0.30, `corr_max` 0.70 on every row
+- **Key:** `model`
+- **Rows / coverage:** 4 rows (3 models + all)
+- **Availability:** n/a (decision-model outputs and their evaluation on val-A; val-B only in the S2 check; no test value)
+- **sha256:** `db55a940ebcced410ecb8c7472a744ae2dedb823f061c7f9f0c209b368a98214`
+
+### `artifacts/NA-07/spend.json`
+- **Producer:** `newsaction.encoding.run --stage report`
+- **Schema:** {`ledger` (NA-07, total, by chunk, cap), `reconcile` (ledger − Σ cache cost), `n_rows`, `actual_by_part`, `calls_by_part`, `by_model` (usd, calls, cost_ratio), `projection_vs_actual` (per part: projected, actual, ratio, within_20pct), `projection_total`, `actual_total`, `actual_over_projected_total`, `within_20pct_total`}
+- **Key:** n/a
+- **Rows / coverage:** one record; NA-07 $1.240485 of $2.00
+- **Availability:** n/a
+- **sha256:** `6c748331dbe333c3d371b4e31f4bc2e9d561d7a40ef56a7bbd3b20767b2eb7b1`
+
+### `artifacts/NA-07/cache_audit.json`
+- **Producer:** `newsaction.encoding.run --stage report`
+- **Schema:** {`chunk`, `n_rows_na07`, `na07_rows_by_part`, `na07_rows_by_part_split`, `used_requests_by_part` (every request the report uses, NA-06-paid included: requests, outside, by split), `allowed` (session ranges), `part_split`, `violations`, `n_violations`, `ok`}
+- **Key:** n/a
+- **Rows / coverage:** AC3: 32,016 NA-07 cache rows and 41,760 used requests, 0 outside their part's split
+- **Availability:** n/a
+- **sha256:** `0dfe8bf6cedc2dce32049d681db1825d0acf95d5f9aceb6b25a2889bcc13193a`
+
+### `artifacts/NA-07/dry_run.json`
+- **Producer:** `newsaction.encoding.run --stage dryrun | search | anchoring | confirm | numeracy`
+- **Schema:** list of {`label` (plan_s1, plan_s4, plan_s2_worst, plan_s3_worst; s1, s4, s2, s3 just before the paid calls), `ts`, `n_requests`, `n_unique`, `n_cached`, `n_send`, `tokens`, `usd`, `by_model`, `left_usd`, `credit_remaining`}
+- **Key:** (`label`, `ts`)
+- **Rows / coverage:** every projection made (worst case $1.4026; the paid parts $1.3748)
+- **Availability:** n/a
+- **sha256:** `223217d879f03daa4ed07c1fa4c6dcb7befc1f1a5cbac2a4b6f457cef43f1c8d`
+
+### `artifacts/NA-07/key_usage.json`
+- **Producer:** `newsaction.encoding.run` (`record_credit`; GET /api/v1/key and /api/v1/credits, no spend)
+- **Schema:** list of {`label`, `ts`, `usage`, `usage_daily`, `limit`, `limit_remaining`, `is_free_tier`, `total_credits`, `total_usage`, `credit_remaining`, `ledger_chunk_usd`}
+- **Key:** (`label`, `ts`)
+- **Rows / coverage:** 10 snapshots from the dry run to the final reconciliation (credit $11.37 → $10.13)
+- **Availability:** n/a
+- **sha256:** `f40593d7bd7d84830771eff10ae1f4ad4ceae5aa11b2c331dcd7607f0d21aa2d`
+
+### `artifacts/NA-07/selection.json`
+- **Producer:** `newsaction.encoding.run --stage select` (offline)
+- **Schema:** {`best`, `choice` (best, reason, tied, mean_rank, mean_ic), `ts`}
+- **Key:** n/a
+- **Rows / coverage:** one record (the val-A rule's result, written before any val-B call)
+- **Availability:** n/a
+- **sha256:** `e5d7a63ebb3a5e5a144512e9ccaacac941538a8284de5b998b2f8f47d048a800`
+
+### `artifacts/NA-07/summary.json`
+- **Producer:** `newsaction.encoding.run --stage report`
+- **Schema:** {`models`, `val_a_best`, `val_b_check`, `val_b_kept`, `chosen`, `by_model`, `numeracy`, `anchoring`, `trials_appended` (this run), `trials_na07` (ledger totals by kind), `spend`, `audit_ok`}
+- **Key:** n/a
+- **Rows / coverage:** one record
+- **Availability:** n/a
+- **sha256:** `7586758528db865d23a4dc4a8f0da47458df9960cffd28e3519d78b2e5c5840e`

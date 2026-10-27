@@ -1,0 +1,57 @@
+{
+ "chunk": "NA-07",
+ "n_rows_na07": 32016,
+ "na07_rows_by_part": {
+  "s1": 18000,
+  "s4": 3756,
+  "s2": 9000,
+  "s3": 1260
+ },
+ "na07_rows_by_part_split": {
+  "s1:val_a": 18000,
+  "s4:val_a": 3756,
+  "s2:val_b": 9000,
+  "s3:val_a": 1260
+ },
+ "used_requests_by_part": {
+  "s1": {
+   "requests": 22500,
+   "outside": 0,
+   "val_a": 22500
+  },
+  "s2": {
+   "requests": 9000,
+   "outside": 0,
+   "val_b": 9000
+  },
+  "s3": {
+   "requests": 1260,
+   "outside": 0,
+   "val_a": 1260
+  },
+  "s4": {
+   "requests": 9000,
+   "outside": 0,
+   "val_a": 9000
+  }
+ },
+ "allowed": {
+  "val_a": [
+   "2025-07-09",
+   "2025-09-30"
+  ],
+  "val_b": [
+   "2025-10-08",
+   "2025-12-31"
+  ]
+ },
+ "part_split": {
+  "s1": "val_a",
+  "s2": "val_b",
+  "s3": "val_a",
+  "s4": "val_a"
+ },
+ "violations": [],
+ "n_violations": 0,
+ "ok": true
+}

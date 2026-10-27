@@ -1,0 +1,73 @@
+{
+ "ledger": {
+  "na07_usd": 1.2404853120000043,
+  "total_usd": 4.871029351999978,
+  "by_chunk": {
+   "NA-05": 0.1039223410000001,
+   "NA-06": 3.526621698999973,
+   "NA-07": 1.2404853120000043
+  },
+  "cap_usd": 2.0
+ },
+ "reconcile": 4.440892098500626e-15,
+ "n_rows": 32016,
+ "actual_by_part": {
+  "s1": 0.694043998,
+  "s2": 0.326302124,
+  "s3": 0.057647784,
+  "s4": 0.162491406
+ },
+ "calls_by_part": {
+  "s1": 18000,
+  "s2": 9000,
+  "s3": 1260,
+  "s4": 3756
+ },
+ "by_model": {
+  "liquid/d1-ultra": {
+   "usd": 0.433421772,
+   "calls": 10672,
+   "cost_ratio": 1.0
+  },
+  "nace-ai/drex-v2.0": {
+   "usd": 0.49924092,
+   "calls": 10672,
+   "cost_ratio": 1.0
+  },
+  "respan/span-02": {
+   "usd": 0.30782262,
+   "calls": 10672,
+   "cost_ratio": 1.0
+  }
+ },
+ "projection_vs_actual": {
+  "s1": {
+   "projected": 0.7709283430804923,
+   "actual": 0.694043998,
+   "actual_over_projected": 0.9002704391782042,
+   "within_20pct": true
+  },
+  "s4": {
+   "projected": 0.18066913529855436,
+   "actual": 0.162491406,
+   "actual_over_projected": 0.8993866369675385,
+   "within_20pct": true
+  },
+  "s2": {
+   "projected": 0.36016101716278054,
+   "actual": 0.326302124,
+   "actual_over_projected": 0.9059895670289119,
+   "within_20pct": true
+  },
+  "s3": {
+   "projected": 0.06304264280940318,
+   "actual": 0.057647784,
+   "actual_over_projected": 0.9144252434703054,
+   "within_20pct": true
+  }
+ },
+ "projection_total": 1.3748011383512304,
+ "actual_total": 1.2404853120000001,
+ "actual_over_projected_total": 0.9023016328657449,
+ "within_20pct_total": true
+}

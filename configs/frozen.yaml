@@ -18,8 +18,34 @@ filter:              # NA-03: PREREG §6.8 val-A comparison (artifacts/NA-03/fil
   constraint_binding: false
   comparison_file: artifacts/NA-03/filter_comparison.csv
   comparison_sha: 6ca1b1923783eb9ef0443ffd1da625d07feb5ece93c07a400ae6837062dd1326
-encoding: null      # NA-07: encoding and calls_per_event (PREREG §8.4)
-anchoring: null     # NA-07: anchoring verdict (PREREG §8.4)
+encoding:            # NA-07: PREREG §8.4 (artifacts/NA-07/encoding_ic.csv, encoding_check.csv)
+  chosen: E3
+  by_model: {liquid/d1-ultra: E3, nace-ai/drex-v2.0: E3, respan/span-02: E3}
+  val_a_best: E1
+  val_a_rule: lowest mean rank
+  val_a_mean_rank: {E0: 3.0, E1: 1.6666666666666667, E2: 3.6666666666666665, E3: 3.6666666666666665, E4: 3.0}
+  val_a_table_file: artifacts/NA-07/encoding_ic.csv
+  val_a_table_sha: 04c2c0d40a8a9c9a14bb658830ea9c81652f6109048d80737fba2d6297806140
+  val_b_check: {needed: true, delta: -0.011038988773162287, se: 0.004568790395611675, kept_best: false, n_days: 59}
+  val_b_kept: E3
+  numeracy_gate:
+    applies: false
+    leading_model: liquid/d1-ultra
+    leading_share: 0.16666666666666666
+    target: 0.9
+    shares: {liquid/d1-ultra: 0.16666666666666666, nace-ai/drex-v2.0: 0.06666666666666667, respan/span-02: 0.08333333333333333}
+    file: artifacts/NA-07/numeracy.csv
+  models: [liquid/d1-ultra, respan/span-02, nace-ai/drex-v2.0]
+  model_specific: true
+anchoring:           # NA-07: PREREG §8.4 (artifacts/NA-07/anchoring.csv)
+  present: true
+  slope: 0.3487024930866692
+  corr: 0.6506156327505171
+  calls_per_event: 2
+  by_model: {liquid/d1-ultra: false, respan/span-02: true, nace-ai/drex-v2.0: false}
+  encoding: E3
+  table_file: artifacts/NA-07/anchoring.csv
+  table_sha: db55a940ebcced410ecb8c7472a744ae2dedb823f061c7f9f0c209b368a98214
 tournament:          # NA-06: PREREG §8.2–8.3 (artifacts/NA-06/leaderboard.csv, mcs.json)
   stage1_survivors: ["cloudflare/clef", "cloudflare/clef-flash", "cloudflare/clef-omni", "inception/mercury-decide", "jaredpalmer/kev-4b", "liquid/d1", "liquid/d1-ultra", "local/laya-base", "local/laya-typed-decisions", "microsoft/microsoft-decision-1", "nace-ai/drex-max", "nace-ai/drex-v1.5", "nace-ai/drex-v2.0", "openai/gpt-6-luna-decisions", "perplexity/pplx-decider-flash-v1.2", "perplexity/pplx-decider-v1.2", "respan/span-02", "scaledown/classify-1", "togethercomputer/tev1-4b-experimental", "typesafe/jev-1.13", "typesafe/jev-1.14"]
   stage2_models: ["inception/mercury-decide", "respan/span-02", "liquid/d1-ultra", "cloudflare/clef", "openai/gpt-6-luna-decisions", "nace-ai/drex-v2.0"]
