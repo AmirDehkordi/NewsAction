@@ -1,0 +1,422 @@
+{
+ "stage1": {
+  "models": [
+   "cloudflare/clef",
+   "cloudflare/clef-flash",
+   "cloudflare/clef-omni",
+   "inception/mercury-decide",
+   "jaredpalmer/kev-4b",
+   "liquid/d1",
+   "liquid/d1-ultra",
+   "local/laya-base",
+   "local/laya-typed-decisions",
+   "microsoft/microsoft-decision-1",
+   "nace-ai/drex-max",
+   "nace-ai/drex-v1.5",
+   "nace-ai/drex-v2.0",
+   "openai/gpt-6-luna-decisions",
+   "perplexity/pplx-decider-flash-v1.2",
+   "perplexity/pplx-decider-v1.2",
+   "respan/span-02",
+   "scaledown/classify-1",
+   "togethercomputer/tev1-4b-experimental",
+   "typesafe/jev-1.13",
+   "typesafe/jev-1.14"
+  ],
+  "pvalues": {
+   "scaledown/classify-1": 0.6116,
+   "jaredpalmer/kev-4b": 0.6422,
+   "typesafe/jev-1.13": 0.6818,
+   "liquid/d1": 0.7725,
+   "nace-ai/drex-v1.5": 0.777,
+   "typesafe/jev-1.14": 0.8371,
+   "togethercomputer/tev1-4b-experimental": 0.8852,
+   "perplexity/pplx-decider-flash-v1.2": 0.9077,
+   "microsoft/microsoft-decision-1": 0.9462,
+   "cloudflare/clef-flash": 0.9462,
+   "cloudflare/clef-omni": 0.9462,
+   "local/laya-base": 0.9462,
+   "local/laya-typed-decisions": 0.9529,
+   "nace-ai/drex-max": 0.9535,
+   "perplexity/pplx-decider-v1.2": 0.9855,
+   "nace-ai/drex-v2.0": 0.9855,
+   "openai/gpt-6-luna-decisions": 0.9855,
+   "cloudflare/clef": 0.9855,
+   "liquid/d1-ultra": 0.9855,
+   "respan/span-02": 0.9855,
+   "inception/mercury-decide": 1.0
+  },
+  "steps": [
+   {
+    "model": "scaledown/classify-1",
+    "step_pvalue": 0.6116,
+    "mcs_pvalue": 0.6116,
+    "statistic": 2.262543106236806
+   },
+   {
+    "model": "jaredpalmer/kev-4b",
+    "step_pvalue": 0.6422,
+    "mcs_pvalue": 0.6422,
+    "statistic": 2.2029994318544017
+   },
+   {
+    "model": "typesafe/jev-1.13",
+    "step_pvalue": 0.6818,
+    "mcs_pvalue": 0.6818,
+    "statistic": 2.114085753239235
+   },
+   {
+    "model": "liquid/d1",
+    "step_pvalue": 0.7725,
+    "mcs_pvalue": 0.7725,
+    "statistic": 1.9500568380599468
+   },
+   {
+    "model": "nace-ai/drex-v1.5",
+    "step_pvalue": 0.777,
+    "mcs_pvalue": 0.777,
+    "statistic": 1.9039611378212307
+   },
+   {
+    "model": "typesafe/jev-1.14",
+    "step_pvalue": 0.8371,
+    "mcs_pvalue": 0.8371,
+    "statistic": 1.7774935679125932
+   },
+   {
+    "model": "togethercomputer/tev1-4b-experimental",
+    "step_pvalue": 0.8852,
+    "mcs_pvalue": 0.8852,
+    "statistic": 1.6356827695515987
+   },
+   {
+    "model": "perplexity/pplx-decider-flash-v1.2",
+    "step_pvalue": 0.9077,
+    "mcs_pvalue": 0.9077,
+    "statistic": 1.541484257740106
+   },
+   {
+    "model": "microsoft/microsoft-decision-1",
+    "step_pvalue": 0.9462,
+    "mcs_pvalue": 0.9462,
+    "statistic": 1.3638262017904517
+   },
+   {
+    "model": "cloudflare/clef-flash",
+    "step_pvalue": 0.934,
+    "mcs_pvalue": 0.9462,
+    "statistic": 1.3563495713175033
+   },
+   {
+    "model": "cloudflare/clef-omni",
+    "step_pvalue": 0.9269,
+    "mcs_pvalue": 0.9462,
+    "statistic": 1.3346843994210038
+   },
+   {
+    "model": "local/laya-base",
+    "step_pvalue": 0.9448,
+    "mcs_pvalue": 0.9462,
+    "statistic": 1.2089343413666798
+   },
+   {
+    "model": "local/laya-typed-decisions",
+    "step_pvalue": 0.9529,
+    "mcs_pvalue": 0.9529,
+    "statistic": 1.1274976031623154
+   },
+   {
+    "model": "nace-ai/drex-max",
+    "step_pvalue": 0.9535,
+    "mcs_pvalue": 0.9535,
+    "statistic": 1.0592631157430201
+   },
+   {
+    "model": "perplexity/pplx-decider-v1.2",
+    "step_pvalue": 0.9855,
+    "mcs_pvalue": 0.9855,
+    "statistic": 0.7759571254398231
+   },
+   {
+    "model": "nace-ai/drex-v2.0",
+    "step_pvalue": 0.9841,
+    "mcs_pvalue": 0.9855,
+    "statistic": 0.6734995692071716
+   },
+   {
+    "model": "openai/gpt-6-luna-decisions",
+    "step_pvalue": 0.9777,
+    "mcs_pvalue": 0.9855,
+    "statistic": 0.5917100714925084
+   },
+   {
+    "model": "cloudflare/clef",
+    "step_pvalue": 0.9391,
+    "mcs_pvalue": 0.9855,
+    "statistic": 0.584005262904845
+   },
+   {
+    "model": "liquid/d1-ultra",
+    "step_pvalue": 0.9073,
+    "mcs_pvalue": 0.9855,
+    "statistic": 0.4364311629648874
+   },
+   {
+    "model": "respan/span-02",
+    "step_pvalue": 0.7533,
+    "mcs_pvalue": 0.9855,
+    "statistic": 0.31194879364557787
+   },
+   {
+    "model": "inception/mercury-decide",
+    "step_pvalue": 1.0,
+    "mcs_pvalue": 1.0,
+    "statistic": null
+   }
+  ],
+  "included": [
+   "cloudflare/clef",
+   "cloudflare/clef-flash",
+   "cloudflare/clef-omni",
+   "inception/mercury-decide",
+   "jaredpalmer/kev-4b",
+   "liquid/d1",
+   "liquid/d1-ultra",
+   "local/laya-base",
+   "local/laya-typed-decisions",
+   "microsoft/microsoft-decision-1",
+   "nace-ai/drex-max",
+   "nace-ai/drex-v1.5",
+   "nace-ai/drex-v2.0",
+   "openai/gpt-6-luna-decisions",
+   "perplexity/pplx-decider-flash-v1.2",
+   "perplexity/pplx-decider-v1.2",
+   "respan/span-02",
+   "scaledown/classify-1",
+   "togethercomputer/tev1-4b-experimental",
+   "typesafe/jev-1.13",
+   "typesafe/jev-1.14"
+  ],
+  "statistic": "R",
+  "alpha": 0.1,
+  "reps": 10000,
+  "block": 5.0,
+  "seed": 2026,
+  "n_days": 57
+ },
+ "robustness_other_statistic": {
+  "models": [
+   "cloudflare/clef",
+   "cloudflare/clef-flash",
+   "cloudflare/clef-omni",
+   "inception/mercury-decide",
+   "jaredpalmer/kev-4b",
+   "liquid/d1",
+   "liquid/d1-ultra",
+   "local/laya-base",
+   "local/laya-typed-decisions",
+   "microsoft/microsoft-decision-1",
+   "nace-ai/drex-max",
+   "nace-ai/drex-v1.5",
+   "nace-ai/drex-v2.0",
+   "openai/gpt-6-luna-decisions",
+   "perplexity/pplx-decider-flash-v1.2",
+   "perplexity/pplx-decider-v1.2",
+   "respan/span-02",
+   "scaledown/classify-1",
+   "togethercomputer/tev1-4b-experimental",
+   "typesafe/jev-1.13",
+   "typesafe/jev-1.14"
+  ],
+  "pvalues": {
+   "scaledown/classify-1": 0.8012,
+   "jaredpalmer/kev-4b": 0.8202,
+   "typesafe/jev-1.13": 0.8202,
+   "nace-ai/drex-v1.5": 0.9401,
+   "typesafe/jev-1.14": 0.9446,
+   "togethercomputer/tev1-4b-experimental": 0.9462,
+   "liquid/d1": 0.9699,
+   "local/laya-typed-decisions": 0.9701,
+   "perplexity/pplx-decider-flash-v1.2": 0.9701,
+   "cloudflare/clef-flash": 0.9743,
+   "microsoft/microsoft-decision-1": 0.9743,
+   "local/laya-base": 0.9743,
+   "cloudflare/clef-omni": 0.9743,
+   "nace-ai/drex-max": 0.9743,
+   "perplexity/pplx-decider-v1.2": 0.983,
+   "nace-ai/drex-v2.0": 0.983,
+   "cloudflare/clef": 0.983,
+   "openai/gpt-6-luna-decisions": 0.983,
+   "liquid/d1-ultra": 0.983,
+   "respan/span-02": 0.983,
+   "inception/mercury-decide": 1.0
+  },
+  "steps": [
+   {
+    "model": "scaledown/classify-1",
+    "step_pvalue": 0.8012,
+    "mcs_pvalue": 0.8012,
+    "statistic": 1.3671718378964803
+   },
+   {
+    "model": "jaredpalmer/kev-4b",
+    "step_pvalue": 0.8202,
+    "mcs_pvalue": 0.8202,
+    "statistic": 1.331521410224222
+   },
+   {
+    "model": "typesafe/jev-1.13",
+    "step_pvalue": 0.7552,
+    "mcs_pvalue": 0.8202,
+    "statistic": 1.4064976617662064
+   },
+   {
+    "model": "nace-ai/drex-v1.5",
+    "step_pvalue": 0.9401,
+    "mcs_pvalue": 0.9401,
+    "statistic": 1.0336690129613415
+   },
+   {
+    "model": "typesafe/jev-1.14",
+    "step_pvalue": 0.9446,
+    "mcs_pvalue": 0.9446,
+    "statistic": 1.0098253968505098
+   },
+   {
+    "model": "togethercomputer/tev1-4b-experimental",
+    "step_pvalue": 0.9462,
+    "mcs_pvalue": 0.9462,
+    "statistic": 0.9840228275146942
+   },
+   {
+    "model": "liquid/d1",
+    "step_pvalue": 0.9699,
+    "mcs_pvalue": 0.9699,
+    "statistic": 0.8546346718147998
+   },
+   {
+    "model": "local/laya-typed-decisions",
+    "step_pvalue": 0.9701,
+    "mcs_pvalue": 0.9701,
+    "statistic": 0.824011307781899
+   },
+   {
+    "model": "perplexity/pplx-decider-flash-v1.2",
+    "step_pvalue": 0.9244,
+    "mcs_pvalue": 0.9701,
+    "statistic": 0.9552968222445296
+   },
+   {
+    "model": "cloudflare/clef-flash",
+    "step_pvalue": 0.9743,
+    "mcs_pvalue": 0.9743,
+    "statistic": 0.7479579372341547
+   },
+   {
+    "model": "microsoft/microsoft-decision-1",
+    "step_pvalue": 0.956,
+    "mcs_pvalue": 0.9743,
+    "statistic": 0.7909373130573579
+   },
+   {
+    "model": "local/laya-base",
+    "step_pvalue": 0.9576,
+    "mcs_pvalue": 0.9743,
+    "statistic": 0.7388952782735901
+   },
+   {
+    "model": "cloudflare/clef-omni",
+    "step_pvalue": 0.9124,
+    "mcs_pvalue": 0.9743,
+    "statistic": 0.847269748547876
+   },
+   {
+    "model": "nace-ai/drex-max",
+    "step_pvalue": 0.9271,
+    "mcs_pvalue": 0.9743,
+    "statistic": 0.7536870758589641
+   },
+   {
+    "model": "perplexity/pplx-decider-v1.2",
+    "step_pvalue": 0.983,
+    "mcs_pvalue": 0.983,
+    "statistic": 0.5313337333094628
+   },
+   {
+    "model": "nace-ai/drex-v2.0",
+    "step_pvalue": 0.9679,
+    "mcs_pvalue": 0.983,
+    "statistic": 0.5466071255756104
+   },
+   {
+    "model": "cloudflare/clef",
+    "step_pvalue": 0.9712,
+    "mcs_pvalue": 0.983,
+    "statistic": 0.43788619606521206
+   },
+   {
+    "model": "openai/gpt-6-luna-decisions",
+    "step_pvalue": 0.8865,
+    "mcs_pvalue": 0.983,
+    "statistic": 0.551451219724637
+   },
+   {
+    "model": "liquid/d1-ultra",
+    "step_pvalue": 0.8837,
+    "mcs_pvalue": 0.983,
+    "statistic": 0.3954890829249576
+   },
+   {
+    "model": "respan/span-02",
+    "step_pvalue": 0.7533,
+    "mcs_pvalue": 0.983,
+    "statistic": 0.3119487936455783
+   },
+   {
+    "model": "inception/mercury-decide",
+    "step_pvalue": 1.0,
+    "mcs_pvalue": 1.0,
+    "statistic": null
+   }
+  ],
+  "included": [
+   "cloudflare/clef",
+   "cloudflare/clef-flash",
+   "cloudflare/clef-omni",
+   "inception/mercury-decide",
+   "jaredpalmer/kev-4b",
+   "liquid/d1",
+   "liquid/d1-ultra",
+   "local/laya-base",
+   "local/laya-typed-decisions",
+   "microsoft/microsoft-decision-1",
+   "nace-ai/drex-max",
+   "nace-ai/drex-v1.5",
+   "nace-ai/drex-v2.0",
+   "openai/gpt-6-luna-decisions",
+   "perplexity/pplx-decider-flash-v1.2",
+   "perplexity/pplx-decider-v1.2",
+   "respan/span-02",
+   "scaledown/classify-1",
+   "togethercomputer/tev1-4b-experimental",
+   "typesafe/jev-1.13",
+   "typesafe/jev-1.14"
+  ],
+  "statistic": "max",
+  "alpha": 0.1,
+  "reps": 10000,
+  "block": 5.0,
+  "seed": 2026,
+  "n_days": 57
+ },
+ "no_daily_ic": [],
+ "n_common_days": 57,
+ "stage2_models": [
+  "inception/mercury-decide",
+  "respan/span-02",
+  "liquid/d1-ultra",
+  "cloudflare/clef",
+  "openai/gpt-6-luna-decisions",
+  "nace-ai/drex-v2.0"
+ ]
+}

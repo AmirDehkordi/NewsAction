@@ -1,0 +1,341 @@
+[
+ {
+  "by_model": {
+   "cloudflare/clef": {
+    "calls": 700.0,
+    "tokens": 842625.0237975095,
+    "usd": 0.03892927609944498
+   },
+   "cloudflare/clef-flash": {
+    "calls": 700.0,
+    "tokens": 842625.0237975095,
+    "usd": 0.01761086299736796
+   },
+   "cloudflare/clef-omni": {
+    "calls": 700.0,
+    "tokens": 839119.739841288,
+    "usd": 0.1384547570738126
+   },
+   "inception/mercury-decide": {
+    "calls": 700.0,
+    "tokens": 812548.9690146383,
+    "usd": 0.017876077318322036
+   },
+   "jaredpalmer/kev-4b": {
+    "calls": 700.0,
+    "tokens": 573462.1014422686,
+    "usd": 0.026493949086632843
+   },
+   "liquid/d1": {
+    "calls": 700.0,
+    "tokens": 700386.7478785616,
+    "usd": 0.015408508453328388
+   },
+   "liquid/d1-ultra": {
+    "calls": 700.0,
+    "tokens": 706606.6311164825,
+    "usd": 0.032645226357581485
+   },
+   "microsoft/microsoft-decision-1": {
+    "calls": 700.0,
+    "tokens": 566743.6487930717,
+    "usd": 0.026183556574239927
+   },
+   "nace-ai/drex-max": {
+    "calls": 700.0,
+    "tokens": 781407.1693110528,
+    "usd": 0.05157287317452957
+   },
+   "nace-ai/drex-v1.5": {
+    "calls": 700.0,
+    "tokens": 573462.1014422686,
+    "usd": 0.025232332463459847
+   },
+   "nace-ai/drex-v2.0": {
+    "calls": 700.0,
+    "tokens": 573462.1014422686,
+    "usd": 0.03784849869518979
+   },
+   "openai/gpt-6-luna-decisions": {
+    "calls": 700.0,
+    "tokens": 797165.1089745084,
+    "usd": 0.08768816198719588
+   },
+   "perplexity/pplx-decider-flash-v1.2": {
+    "calls": 700.0,
+    "tokens": 2022251.8175700244,
+    "usd": 0.02224476999327027
+   },
+   "perplexity/pplx-decider-v1.2": {
+    "calls": 700.0,
+    "tokens": 671326.8710866772,
+    "usd": 0.014769191163906906
+   },
+   "respan/span-02": {
+    "calls": 700.0,
+    "tokens": 2223064.9082368826,
+    "usd": 0.0244537139906057
+   },
+   "scaledown/classify-1": {
+    "calls": 700.0,
+    "tokens": 2438429.900905932,
+    "usd": 0.1072909156398611
+   },
+   "togethercomputer/tev1-4b-experimental": {
+    "calls": 700.0,
+    "tokens": 1931371.2595105676,
+    "usd": 0.08922935218938827
+   },
+   "typesafe/jev-1.13": {
+    "calls": 700.0,
+    "tokens": 970365.471570001,
+    "usd": 0.044830884786533985
+   },
+   "typesafe/jev-1.14": {
+    "calls": 700.0,
+    "tokens": 957378.3727317199,
+    "usd": 0.04423088082020554
+   }
+  },
+  "label": "stage1",
+  "left_usd": 4.0,
+  "limit_usd": 1.5,
+  "n_cached": 0,
+  "n_requests": 13300,
+  "n_send": 13300,
+  "n_unique": 13300,
+  "tokens": 19823802.96846328,
+  "ts": "2026-10-26T22:10:31.878843+00:00",
+  "usd": 0.8629937888648822
+ },
+ {
+  "by_model": {
+   "cloudflare/clef": {
+    "calls": 700.0,
+    "tokens": 842625.0237975095,
+    "usd": 0.03892927609944498
+   },
+   "cloudflare/clef-flash": {
+    "calls": 700.0,
+    "tokens": 842625.0237975095,
+    "usd": 0.01761086299736796
+   },
+   "cloudflare/clef-omni": {
+    "calls": 700.0,
+    "tokens": 839119.739841288,
+    "usd": 0.1384547570738126
+   },
+   "inception/mercury-decide": {
+    "calls": 700.0,
+    "tokens": 812548.9690146383,
+    "usd": 0.017876077318322036
+   },
+   "jaredpalmer/kev-4b": {
+    "calls": 700.0,
+    "tokens": 573462.1014422686,
+    "usd": 0.026493949086632843
+   },
+   "liquid/d1": {
+    "calls": 700.0,
+    "tokens": 700386.7478785616,
+    "usd": 0.015408508453328388
+   },
+   "liquid/d1-ultra": {
+    "calls": 700.0,
+    "tokens": 706606.6311164825,
+    "usd": 0.032645226357581485
+   },
+   "microsoft/microsoft-decision-1": {
+    "calls": 700.0,
+    "tokens": 566743.6487930717,
+    "usd": 0.026183556574239927
+   },
+   "nace-ai/drex-max": {
+    "calls": 700.0,
+    "tokens": 781407.1693110528,
+    "usd": 0.05157287317452957
+   },
+   "nace-ai/drex-v1.5": {
+    "calls": 700.0,
+    "tokens": 573462.1014422686,
+    "usd": 0.025232332463459847
+   },
+   "nace-ai/drex-v2.0": {
+    "calls": 700.0,
+    "tokens": 573462.1014422686,
+    "usd": 0.03784849869518979
+   },
+   "openai/gpt-6-luna-decisions": {
+    "calls": 700.0,
+    "tokens": 797165.1089745084,
+    "usd": 0.08768816198719588
+   },
+   "perplexity/pplx-decider-flash-v1.2": {
+    "calls": 700.0,
+    "tokens": 2022251.8175700244,
+    "usd": 0.02224476999327027
+   },
+   "perplexity/pplx-decider-v1.2": {
+    "calls": 700.0,
+    "tokens": 671326.8710866772,
+    "usd": 0.014769191163906906
+   },
+   "respan/span-02": {
+    "calls": 700.0,
+    "tokens": 2223064.9082368826,
+    "usd": 0.0244537139906057
+   },
+   "scaledown/classify-1": {
+    "calls": 700.0,
+    "tokens": 2438429.900905932,
+    "usd": 0.1072909156398611
+   },
+   "togethercomputer/tev1-4b-experimental": {
+    "calls": 700.0,
+    "tokens": 1931371.2595105676,
+    "usd": 0.08922935218938827
+   },
+   "typesafe/jev-1.13": {
+    "calls": 700.0,
+    "tokens": 970365.471570001,
+    "usd": 0.044830884786533985
+   },
+   "typesafe/jev-1.14": {
+    "calls": 700.0,
+    "tokens": 957378.3727317199,
+    "usd": 0.04423088082020554
+   }
+  },
+  "label": "stage1",
+  "left_usd": 4.0,
+  "limit_usd": 1.5,
+  "n_cached": 0,
+  "n_requests": 13300,
+  "n_send": 13300,
+  "n_unique": 13300,
+  "tokens": 19823802.96846328,
+  "ts": "2026-10-26T22:10:44.266882+00:00",
+  "usd": 0.8629937888648822
+ },
+ {
+  "by_model": {
+   "cloudflare/clef": {
+    "calls": 8350.0,
+    "tokens": 10115596.443544205,
+    "usd": 0.4673405556917423
+   },
+   "inception/mercury-decide": {
+    "calls": 8350.0,
+    "tokens": 9792917.66333949,
+    "usd": 0.21544418859346764
+   },
+   "liquid/d1-ultra": {
+    "calls": 8350.0,
+    "tokens": 8705189.201664768,
+    "usd": 0.40217974111691224
+   },
+   "nace-ai/drex-v2.0": {
+    "calls": 8350.0,
+    "tokens": 7064854.494954916,
+    "usd": 0.4662803966670255
+   },
+   "openai/gpt-6-luna-decisions": {
+    "calls": 8351.0,
+    "tokens": 9542545.957122995,
+    "usd": 1.049680055283532
+   },
+   "respan/span-02": {
+    "calls": 8350.0,
+    "tokens": 24199101.7137236,
+    "usd": 0.26619011885096
+   }
+  },
+  "label": "stage2",
+  "left_usd": 3.203187183000001,
+  "models": [
+   "inception/mercury-decide",
+   "respan/span-02",
+   "liquid/d1-ultra",
+   "cloudflare/clef",
+   "openai/gpt-6-luna-decisions",
+   "nace-ai/drex-v2.0"
+  ],
+  "n_cached": 4199,
+  "n_requests": 54366,
+  "n_send": 50101,
+  "n_unique": 54300,
+  "tokens": 69420205.47434948,
+  "ts": "2026-10-26T22:41:33.226292+00:00",
+  "usd": 2.867115056203654
+ },
+ {
+  "by_model": {
+   "cloudflare/clef": {
+    "calls": 8350.0,
+    "tokens": 10115596.443544205,
+    "usd": 0.4673405556917423
+   },
+   "inception/mercury-decide": {
+    "calls": 8350.0,
+    "tokens": 9792917.66333949,
+    "usd": 0.21544418859346764
+   },
+   "liquid/d1-ultra": {
+    "calls": 8350.0,
+    "tokens": 8705189.201664768,
+    "usd": 0.40217974111691224
+   },
+   "nace-ai/drex-v2.0": {
+    "calls": 8350.0,
+    "tokens": 7064854.494954916,
+    "usd": 0.4662803966670255
+   },
+   "openai/gpt-6-luna-decisions": {
+    "calls": 8351.0,
+    "tokens": 9542545.957122995,
+    "usd": 1.049680055283532
+   },
+   "respan/span-02": {
+    "calls": 8350.0,
+    "tokens": 24199101.7137236,
+    "usd": 0.26619011885096
+   }
+  },
+  "label": "stage2",
+  "left_usd": 3.203187183000001,
+  "models": [
+   "inception/mercury-decide",
+   "respan/span-02",
+   "liquid/d1-ultra",
+   "cloudflare/clef",
+   "openai/gpt-6-luna-decisions",
+   "nace-ai/drex-v2.0"
+  ],
+  "n_cached": 4199,
+  "n_requests": 54366,
+  "n_send": 50101,
+  "n_unique": 54300,
+  "tokens": 69420205.47434948,
+  "ts": "2026-10-26T22:41:58.240546+00:00",
+  "usd": 2.867115056203654
+ },
+ {
+  "by_model": {
+   "liquid/d1-ultra": {
+    "calls": 500.0,
+    "tokens": 810092.3105680348,
+    "usd": 0.0374262647482432
+   }
+  },
+  "label": "validity",
+  "left_usd": 0.50673386100003,
+  "model": "liquid/d1-ultra",
+  "n_cached": 0,
+  "n_requests": 500,
+  "n_send": 500,
+  "n_unique": 500,
+  "tokens": 810092.3105680348,
+  "ts": "2026-10-26T23:24:42.348344+00:00",
+  "usd": 0.0374262647482432
+ }
+]

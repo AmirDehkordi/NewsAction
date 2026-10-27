@@ -1,0 +1,27 @@
+{
+ "chunk": "NA-06",
+ "n_rows": 65289,
+ "by_source": {
+  "states": 65289
+ },
+ "by_probe": {
+  "None": 46862,
+  "company_identification": 2395,
+  "month_identification": 2400,
+  "counterfactual_edit": 1200,
+  "unmasked_twin": 5940,
+  "shuffled_news": 5992,
+  "reading_validity": 500
+ },
+ "min_session": "2025-07-09",
+ "max_session": "2025-09-30",
+ "allowed": {
+  "after": "2025-07-08",
+  "through": "2025-09-30",
+  "split": "val_a"
+ },
+ "violations": [],
+ "n_violations": 0,
+ "shuffle_donors_in_val_a_after_embargo": true,
+ "ok": true
+}

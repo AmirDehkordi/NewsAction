@@ -1,0 +1,96 @@
+# NA-06: the zero-shot decision-model tournament on val-A and its contamination probes (PREREG §8.2–8.3,
+# §11.1–11.2, §11.4, A2.5; PRD NA-06). Read by newsaction.tournament (TournamentConfig). Hashed into the NA-11
+# freeze with every configs/*.yaml (PREREG §4.4). tests/test_tournament_config.py checks every number PREREG
+# gives against docs/PREREG.md; the screen test recomputes pass/fail with these thresholds.
+
+version: 1
+seed: 2026                        # PREREG §8.2 samples, §11.4 bootstrap
+encoding: E3                      # PREREG §6.11: the default encoding before NA-07
+groups: [core]                    # PREREG A2.1: the tournament asks the core battery only
+
+state_files:                      # registered NA-04 state files (work/…)
+  call_a: states/callA_d0_E3.parquet          # Call A on D0 (W0 news), masked
+  call_b: states/callB_d2_E3.parquet          # Call B on D2 (W2 news + reaction), masked
+  unmasked: states/samples/unmasked.parquet   # NA-04's unmasked twins of 1,000 val-A D0 events (probe d)
+
+samples:                          # PREREG §8.2–8.3, §4.2; PRD NA-06 S1
+  split: val_a
+  strata: [tier, month]           # NA-04's states.build.stratified_sample: proportional allocation (largest
+                                  # remainder), then the smallest u = sha256("{seed}:{event_id}") per stratum,
+                                  # so every smaller sample is a subset of every larger one
+  exclude_embargo: true           # PREREG §4.2: the first 5 sessions of val-A are not evaluated
+  stage1: 700                     # PREREG §8.2
+  stage2: 3000                    # PREREG §8.3 (a superset of stage 1); D2 twins where a Call B state exists
+  identification: 400             # probes a (company) and b (month), PRD S1
+  counterfactual: 200             # probe c, PREREG §8.3
+  shuffled: 1000                  # probe e on the 1,000 unmasked-twin events (PRD S4e fixes no size)
+  reading_validity: 500           # PREREG A2.1 / A2.5 (extended battery, the top stage-2 model)
+
+metric:
+  primary_target: z_cc            # PREREG §8.2: mean daily Spearman IC of N̂ vs z_cc,t
+  secondary_target: e5            # PRD NA-06 S2
+  min_names_per_day: 5            # a daily IC needs >= 5 events with both values (PREREG §11.1 sets none;
+                                  # fixed from event counts before any answer: stage 1 has 4–24 per day, and
+                                  # 5 keeps 57 of its 59 sessions, 10 would keep 35)
+  nw_lags: 5                      # PREREG §11.1
+  ece_bins: 15                    # PREREG §11.2
+  class_band: 0.5                 # PREREG §11.2: 3 classes split at ±0.5σ
+
+mcs:                              # PREREG §8.2, §11.4: Hansen, Lunde and Nason (2011)
+  alpha: 0.10
+  block: 5                        # stationary bootstrap over days, mean block length
+  reps: 10000
+  statistic: R                    # T_R (range of the standardized pairwise loss differences); T_max reported
+  loss: neg_daily_ic              # loss = −daily IC
+
+stage1:
+  max_projected_usd: 1.5          # PRD NA-06 S2: the stage-1 dry run aborts above this
+stage2:
+  max_models: 6                   # PREREG §8.3: <= 6 survivors, highest stage-1 IC, ties to the cheaper
+
+concurrency: 16                   # API calls in flight per batch (NA-05 pilot: no rate limit up to 16)
+
+screens:                          # PREREG §8.3: failing any one excludes the model from headline use
+  company_id_max: 0.40            # company identification accuracy (1 of 4; chance 0.25) <= 40%
+  flip_rate_min: 0.70             # counterfactual flip rate >= 70%
+  flip_min_abs_n_hat: 0.25        # PRD NA-06 S4c: pairs with |N̂_orig| >= 0.25
+  unmasked_minus_masked_max: 0.02 # unmasked − masked IC <= 0.02, or
+  unmasked_paired_t: 2.0          #   paired |t| < 2
+  shuffled_t: 2.0                 # shuffled-news mean daily IC: |t| < 2 (Newey–West)
+
+probes:                           # PRD NA-06 S4
+  option_keys: [candidate_1, candidate_2, candidate_3, candidate_4]   # neutral keys (PREREG §7)
+  company:                        # a: the true company + 3 S&P 500 members of the session with its GICS sector
+    qid: company_identity         # and size tier (both are in the state); nearest size rank in the sector
+    instructions: "Which company is this news most likely about?"     # when the tier has fewer than 3
+  month:                          # b: the true month + 3 others of first..last (report only)
+    qid: publication_month
+    instructions: "In which month was the news in `news` most likely published?"
+    first: 2024-07
+    last: 2025-12
+  tags:                           # StateInfo.probe of each probe request (the cache audit reads them)
+    company: company_identification
+    month: month_identification
+    counterfactual: counterfactual_edit
+    unmasked: unmasked_twin       # configs/dm.yaml registered probe (refusal d)
+    shuffled: shuffled_news
+    reading_validity: reading_validity
+
+reading_validity:                 # PREREG A2.5 (report only, never a screen)
+  groups: [core, extended]        # the request NA-11 would send to the primary instrument (A2.1)
+  event_type_map:                 # vendor tag_type -> Q8 option (NA-06 mapping; raw tables are also reported)
+    earnings_results: earnings_results
+    guidance_outlook: guidance_outlook
+    analyst_action: analyst_action
+    ma_deal: deal_ma_partnership
+    partnership_customer: deal_ma_partnership
+    legal_regulatory: legal_regulatory
+    product_launch: product_operations
+    operations_supply: product_operations
+    leadership_governance: management_governance
+    capital_returns: capital_returns_financing
+    financing_dilution: capital_returns_financing
+    macro_sector: sector_or_macro
+    competition: sector_or_macro
+    other_corporate: other
+    insider_ownership: other

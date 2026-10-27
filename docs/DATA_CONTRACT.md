@@ -573,7 +573,7 @@ offline client. The committed files below live under `artifacts/NA-05/` and are 
 - **Producer:** `newsaction.dm.cache.DecisionCache`, written only by the client (every chunk that calls a decision model)
 - **Schema:** table `responses`: `key` TEXT PK, `model`, `state_sha256`, `questions_sha256`, `provider_json`, `params_json`, `repeat_idx` INT, `request_json` (the body as sent, without the key), `response_json` (the raw response text), `model_build`, `provider`, `input_tokens` INT, `output_tokens` INT, `cost` REAL, `cost_source` (`usage` = the response's usage.cost, `computed` = catalog price × tokens, `local`), `latency_ms` REAL, `created_at`, `chunk`, `tag`, `meta_json` (the state's provenance: source, file, event_id, session, split, call, masked, third_party_ok_all, probe), `valid` INT (strict parse), `problems_json`. Table `attempts`: `id`, `key`, `model`, `attempt`, `status` (NULL for a transport error), `error`, `latency_ms`, `headers_json` (rate-limit headers), `concurrency`, `created_at`, `chunk`, `tag`.
 - **Key:** `responses.key` = sha256 of the canonical JSON of {model, state, questions (ordered: [[id, [type, instructions, criteria]], …]), provider, params, repeat_idx}; local models add their checkpoint settings (revision, subfolder, max_len, head_max_len, device, fp32) to `params`; the session id is not part of the key
-- **Rows / coverage (end of NA-05):** 2,227 responses with `chunk = NA-05` (1,949 API, all HTTP 200, 278 local Laya), 2,014 API attempts (1,949 × 200, 61 × 400, 3 × 429, 1 × 502). Sessions of the sent states: 1,976 train-split states (2024-07-01 … 2025-06-30) and 251 synthetic ones
+- **Rows / coverage (end of NA-05):** 2,227 responses with `chunk = NA-05` (1,949 API, all HTTP 200, 278 local Laya), 2,014 API attempts (1,949 × 200, 61 × 400, 3 × 429, 1 × 502). Sessions of the sent states: 1,976 train-split states (2024-07-01 … 2025-06-30) and 251 synthetic ones. **NA-06 (2026-10-26):** 65,289 responses with `chunk = NA-06` (63,889 API, all HTTP 200 and valid; 1,400 local Laya), 65,004 API attempts (63,889 × 200, 916 × 429, 198 × 502, 1 × 503; 12 requests to openai/gpt-6-luna-decisions refused for good: "OpenAI refused to answer question justified_move"). Every NA-06 state is a val-A state after the embargo (2025-07-09 … 2025-09-30), masked except the 5,940 `unmasked_twin` probe rows (`artifacts/NA-06/cache_audit.json`). GAC4: NA-06's recorded spend $3.526621699 equals Σ `responses.cost` of its rows (difference −2.7e-14)
 - **Availability:** n/a (decision-model outputs). GAC4: Σ `responses.cost` where `chunk = X` equals chunk X's recorded spend in `ledgers/spend.jsonl` (NA-05: $0.103922341, difference 9.7e-17)
 - **Note:** gitignored like `work/`; the verifier and later chunks need this file next to the branch (copy it with `work/` when merging). `valid` / `problems_json` are the parser's verdict when the row was written; the client re-parses every hit with the current parser, so since the renormalization rule (2026-10-26) a stored row can say invalid for an answer that now parses as valid and `renormalized`. A row is written once and never edited
 
@@ -617,3 +617,147 @@ offline client. The committed files below live under `artifacts/NA-05/` and are 
 - **Key:** list order
 - **Availability:** n/a. The key's usage lags a call by up to about a minute; at the report its change since the first snapshot equals the ledger's to 1e-16
 - **sha256:** `17a255df0311e8662ddf3339ef04bcf6b546d692efe27f13e78884302ef26a1d`
+
+## NA-06 — zero-shot decision-model tournament and contamination probes
+
+Producer: `newsaction.tournament` (NA-06), one stage per process:
+`uv run python -m newsaction.tournament.run --stage samples | dryrun1 | stage1 | select | dryrun2 | stage2 | validity | report | handoff`.
+Configuration: `configs/tournament.yaml` (PREREG §8.2–8.3, §11.1–11.2, A2.5; checked against PREREG by
+`tests/test_tournament_{config,screens}.py`). Every request goes through `dm.client.DecisionClient("NA-06")` and is
+cached in `cache/decisions.sqlite` (`chunk = NA-06`), so `report` rebuilds every number below from the cache with an
+offline client. All states are val-A D0 / D2 states after the embargo (sessions 2025-07-09 … 2025-09-30); every target
+comes from `work/panel/panel_public.parquet` (val-A rows, purged by split). No val-B or test state was sent and no
+val-B or test outcome was read.
+
+### `work/dm/tournament/samples.parquet`
+- **Producer:** `newsaction.tournament.run --stage samples` (`tournament.sample`, `tournament.probes`, `tournament.edits`)
+- **Inputs:** `work/events/events_d0.parquet` (keys, tier, month, embargo), `work/states/{callA_d0_E3,callB_d2_E3}.parquet`, `work/states/samples/unmasked.parquet` (event ids), `work/panel/panel_public.parquet` (val-A member rows: sector, tier, rank), `work/panel/companies.parquet` (names), `configs/tournament.yaml`
+- **Schema:** `event_id`, `company_id` int64, `symbol_id` int64, `session` date32, `month`, `tier` string; flags `stage1`, `identification`, `reading_validity`, `shuffled`, `stage2`, `unmasked_twin`, `counterfactual` bool; `b_event_id` (the D2 twin with a Call B state), `shuffle_donor` (probe e's donor event), `company_options` (JSON [[key, company_id, name], …]), `company_true_key`, `company_draw` (sector_tier | sector_rank_fill), `month_options` (JSON [[key, YYYY-MM, label], …]), `month_true_key` string
+- **Key:** `event_id` unique
+- **Rows / coverage:** 3,061 rows: the 3,000 stage-2 events (stage 1 700, identification 400, reading validity 500, probe sample 1,000 = NA-04's unmasked twins) and 61 counterfactual-only events; val-A sessions 2025-07-09 … 2025-09-30 (embargo excluded)
+- **Availability:** design file (no outcome); the probe options use t−1 tier and sector of the session
+- **sha256:** `be0ea9112d9f746119da269b90157620c869bedf1ab32e106feda87f5f5934f3`
+
+### `work/dm/tournament/counterfactual.parquet`
+- **Producer:** `newsaction.tournament.run --stage samples` (`tournament.edits.select`)
+- **Inputs:** `work/states/callA_d0_E3.parquet` (val-A pool states), the stage-2 sample
+- **Schema:** `event_id`, `in_stage2` bool, `polarity` int64 (+1 positive original outcome, −1 negative), `families`, `edits_json` (list of {item, field, from, to, family}), `n_edits` int64, `state_sha256` (the original state), `edited_state_json` (canonical JSON), `edited_state_sha256` string
+- **Key:** `event_id` unique
+- **Rows / coverage:** 200 edited val-A Call A states (139 in stage 2) of the 398 editable among the 8,376 pool states
+- **Availability:** the state's own availability (09:15 ET of `session`); a synthetic edit of masked text, never sent outside the probe. Contains masked NewsWitch text (gitignored)
+- **sha256:** `818e9874cb56bff781c09d9f99e159892636428d6b321425e9b1c6df1919f56c`
+
+### `work/dm/tournament/stage1.parquet`
+- **Producer:** `newsaction.tournament.run --stage report` (offline)
+- **Inputs:** `cache/decisions.sqlite`, the samples, `work/states/callA_d0_E3.parquet`
+- **Schema:** one row per (model, event): `model`, `event_id`, `session` date32, `symbol_id` int64, `call`, `tag` (the request's stage tag), `probe`, `ok` (a cached answer exists), `valid` (strict parse), `key` (cache key), `paid_chunk`, `paid_tag` (the chunk and tag that paid for the answer), `model_build`, `provider`, `input_tokens`, `cost`, `latency_ms`, the PREREG §7 quantities `n_hat`, `abs_n_hat`, `m`, `surprise`, `tone`, `n_renormalized`, and `p_fall`, `p_flat`, `p_rise` (Q1 collapsed to 3 classes)
+- **Key:** (`model`, `event_id`)
+- **Rows / coverage:** 14,700 rows: 21 eligible models × 700 stage-1 events
+- **Availability:** decision-model outputs at 09:15 ET of `session` (Call A on W0 news, masked, E3)
+- **sha256:** `a734ea98dfb250f855d255b79ad9c7c822546266865acfbebd96f6fcd4d5e6b5`
+
+### `work/dm/tournament/stage2.parquet`
+- **Producer:** `newsaction.tournament.run --stage report` (offline)
+- **Inputs:** as stage 1, plus `work/states/callB_d2_E3.parquet`
+- **Schema:** as `stage1.parquet` plus `part` (A | B) and the Call B quantities `j`, `w`, `c`
+- **Key:** (`model`, `part`, `event_id`)
+- **Rows / coverage:** 36,000 rows: 6 stage-2 models × (3,000 Call A + 3,000 Call B)
+- **Availability:** Call A at 09:15 ET; Call B after close(`session`) (D2 reaction)
+- **sha256:** `3b6909ed5b543ece72e326a12c2d7f570242499fd534519d7443d3e8eadf0f5b`
+
+### `work/dm/tournament/probes.parquet`
+- **Producer:** `newsaction.tournament.run --stage report` (offline)
+- **Inputs:** as stage 2, plus `work/states/samples/unmasked.parquet`, `work/dm/tournament/counterfactual.parquet`
+- **Schema:** the `stage1.parquet` columns plus `probe` (company | month | counterfactual_edit | counterfactual_orig | unmasked | masked | shuffled | reading_validity), `true_key`, `argmax_key`, `p_true`, `correct` (a, b), `polarity` (c), `donor_event_id` (e), and the extended-battery labels and quantities of probe f (`label_*`, `plabel_*`, `h`, `p_no_material_effect`, `u_unc`, `p_mixed`)
+- **Key:** (`model`, `probe`, `event_id`)
+- **Rows / coverage:** 25,700 (per stage-2 model: company 400, month 400, counterfactual_edit 200, counterfactual_orig 200, masked 1,000, unmasked 1,000, shuffled 1,000; reading_validity 500 for liquid/d1-ultra) rows
+- **Availability:** decision-model outputs on probe states (masked, edited, unmasked, shuffled) of val-A events
+- **sha256:** `bee48db10f93344829dc048f19bae7a273b6193c86ba728882159fcc23f5c2e1`
+
+### `artifacts/NA-06/leaderboard.csv`
+- **Producer:** `newsaction.tournament.run --stage report`
+- **Schema:** every eligible model (21): `model`, `rank1`, `kind`, `price_prompt_usd_per_m`, `billing_basis`; stage 1 `n1`, `ok1`, `valid1`, `q1_valid1`, `invalid_rate1`, `ic1_z_cc` (+ `_t`, `_se`, `_days`), `ic1_e5` (+ …), `cost_per_1000_a`, `latency_p50_ms_1`, `latency_p95_ms_1`, `providers1`, `builds1`; `mcs_pvalue`, `mcs_member`, `stage2`; stage 2 `ic2_a_z_cc`, `ic2_a_e5`, `ic2_j_y2`, `ic2_b_z_cc` (each + `_t`, `_se`, `_days`), `ece2_a_z_cc`, `ece2_a_e5_lvl`, `cost_per_1000_a2`, `cost_per_1000_b2`, `n2_a`, `n2_b`, `invalid_rate2_a`, `invalid_rate2_b`, `failed2_a`, `failed2_b`, `latency_p50_ms`, `latency_p95_ms`; probes `company_id_acc`, `company_id_p_true`, `company_id_n`, `month_id_acc`, `month_id_p_true`, `month_id_n`, `flip_rate`, `flip_n`, `flip_pairs_valid`, `edit_mean_shift`, `ic_masked`, `ic_unmasked`, `unmasked_minus_masked`, `ic_shuffled` (each IC + `_t`, `_se`, `_days`); `screen_company_identification`, `screen_counterfactual_flip`, `screen_masked_vs_unmasked`, `screen_shuffled_news`, `screen_all`, `screens_pass`, `contamination_score` (company-ID accuracy − 0.25)
+- **Key:** `model`
+- **Rows / coverage:** 21 rows (19 API models + 2 local Laya); stage-2 and probe columns for the 6 stage-2 models
+- **Availability:** n/a (decision-model outputs and their evaluation on val-A; no val-B or test value)
+- **sha256:** `a7d1abd833dc6c99a10a1f56f9d02b55fd3d0429d10c948d52ab6a0e6158bf89`
+
+### `artifacts/NA-06/fig3_data.csv`
+- **Producer:** `newsaction.tournament.run --stage report`
+- **Schema:** `model`, `kind`, `cost_per_1000_decisions` (stage-1 realized USD per 1,000 Call A requests; local 0), `ic` (stage-1 mean daily IC vs z_cc), `ci_low`, `ci_high` (± 1.96 Newey–West se), `mcs_member`, `stage2`, `screen` (pass | fail | not_tested)
+- **Key:** `model`
+- **Rows / coverage:** 21 rows (Figure 3 data, NA-14)
+- **Availability:** n/a (decision-model outputs and their evaluation on val-A; no val-B or test value)
+- **sha256:** `df891edfeadd2843c3a4e062774b85b2e0e8eadf5ee3bd683d8be8e984a4e3ef`
+
+### `artifacts/NA-06/probe_details.csv`
+- **Producer:** `newsaction.tournament.run --stage report`
+- **Schema:** `model`, `probe` (company_identification | month_identification | counterfactual_flip | masked_vs_unmasked | shuffled_news), `value` (accuracy, flip rate, unmasked − masked mean daily IC, shuffled mean daily IC), `t` (Newey–West t where one applies), `n` (answers, pairs or days), `passed` (PREREG §8.3; empty for the report-only month probe)
+- **Key:** (`model`, `probe`)
+- **Rows / coverage:** 30 rows (6 stage-2 models × 5 probes); `tests/test_tournament_screens.py` recomputes `passed` with the PREREG thresholds
+- **Availability:** n/a (decision-model outputs and their evaluation on val-A; no val-B or test value)
+- **sha256:** `9806e9e2b7d558b37af80689ed8f5923e7a803cd73b592644d61c08e9a5c458b`
+
+### `artifacts/NA-06/reading_validity.csv`
+- **Producer:** `newsaction.tournament.run --stage report`
+- **Schema:** `model` (the decision model), `comparison` (event_type | quantified | scheduled | credibility | event_type_vs_raw_tag), `label` (the model's argmax label, credibility as rumor / not_rumor), `reference` (vendor tag mapped by `configs/tournament.yaml`, the earnings-in-W0 flag, `tag_rumor`; the raw `tag_type` for the last table), `n`
+- **Key:** (`comparison`, `label`, `reference`)
+- **Rows / coverage:** probe f: liquid/d1-ultra on the 500 reading-validity events (PREREG A2.5, report only)
+- **Availability:** n/a (decision-model outputs and their evaluation on val-A; no val-B or test value)
+- **sha256:** `455933fa0f38ae38939b6b3e1c2bebc18190049cf15d27c59a06cae87056f718`
+
+### `artifacts/NA-06/stage1_daily_ic.csv`
+- **Producer:** `newsaction.tournament.run --stage select`
+- **Schema:** `model`, `session`, `ic` (daily Spearman IC of N̂ with z_cc,t), `n` (events with an N̂ that day)
+- **Key:** (`model`, `session`)
+- **Rows / coverage:** 21 models × 57 sessions; the MCS input (`python -m newsaction.tournament.mcs --seed N` reruns it)
+- **Availability:** n/a (decision-model outputs and their evaluation on val-A; no val-B or test value)
+- **sha256:** `9e9f920944c6ae5ffb1f094fb95192762fef88de5ec3435b66b654f2700b9152`
+
+### `artifacts/NA-06/mcs.json`
+- **Producer:** `newsaction.tournament.run --stage select` (`tournament.mcs`)
+- **Schema:** {`stage1`: {models, pvalues, steps (elimination order with step and MCS p-values), included, statistic, alpha, reps, block, seed, n_days}, `robustness_other_statistic`: the same with T_max, `no_daily_ic`, `n_common_days`, `stage2_models`}
+- **Key:** n/a
+- **Rows / coverage:** one record; T_R, α 0.10, block 5, 10,000 reps, seed 2026, 57 sessions
+- **Availability:** n/a (decision-model outputs and their evaluation on val-A; no val-B or test value)
+- **sha256:** `336fa0e5a92fee971f40125685eb9c311fd98fd5a8fe604f906475a57af818ca`
+
+### `artifacts/NA-06/dry_run.json`
+- **Producer:** `newsaction.tournament.run --stage dryrun1 | stage1 | dryrun2 | stage2 | validity`
+- **Schema:** list of {`label` (stage1 | stage2 | validity), `ts`, `n_requests`, `n_unique`, `n_cached`, `n_send`, `tokens`, `usd`, `by_model` {calls, tokens, usd}, `left_usd`, …}: every projection, recorded before the stage sent anything
+- **Key:** list order
+- **Rows / coverage:** 5 records (stage1 ×2, stage2 ×2, validity)
+- **Availability:** n/a (decision-model outputs and their evaluation on val-A; no val-B or test value)
+- **sha256:** `28e3fef7a5cd644a43c16c9553cd05dbb389f20937ed18d89d611f32f435b5ed`
+
+### `artifacts/NA-06/spend.json`
+- **Producer:** `newsaction.tournament.run --stage report`
+- **Schema:** {`ledger` (NA-06 and total USD, by chunk, cap), `reconcile` (ledger − Σ cache cost), `n_rows`, `actual_by_stage`, `calls_by_stage`, `by_model` {usd, calls, cost_ratio = Σ cost / Σ (catalog price × input tokens), cost_ratio_max}, `projection_vs_actual` per stage and model (the first projection of each stage), `projection_total`, `actual_total`, `actual_over_projected_total`}
+- **Key:** n/a
+- **Rows / coverage:** one record
+- **Availability:** n/a (decision-model outputs and their evaluation on val-A; no val-B or test value)
+- **sha256:** `3dc299e32fe0abf173d7ee78124afbe8a04c74714fb233e39e15cca203b5f0f4`
+
+### `artifacts/NA-06/cache_audit.json`
+- **Producer:** `newsaction.tournament.run --stage report`
+- **Schema:** {`chunk`, `n_rows`, `by_source`, `by_probe`, `min_session`, `max_session`, `allowed`, `violations`, `n_violations`, `shuffle_donors_in_val_a_after_embargo`, `ok`}
+- **Key:** n/a
+- **Rows / coverage:** AC1: 65,289 NA-06 cache rows, all val-A states 2025-07-09 … 2025-09-30
+- **Availability:** n/a (decision-model outputs and their evaluation on val-A; no val-B or test value)
+- **sha256:** `4308ad6de68ff5755929d9f2b1929fdf28a194b2be24ca92edf711d785be3972`
+
+### `artifacts/NA-06/summary.json`
+- **Producer:** `newsaction.tournament.run --stage report`
+- **Schema:** {`stage1_survivors`, `stage1_survivors_other_statistic`, `stage2_models`, `stage2_survivors_passing`, `rank_vs_contamination` (Spearman of stage-1 / stage-2 IC with the contamination score; exact permutation p), `reading_validity` (model, n, agreement per comparison), `spend` (as spend.json), `audit_ok`, `leaderboard_sha256`}
+- **Key:** n/a
+- **Rows / coverage:** one record (deterministic: a rerun of the report reproduces it)
+- **Availability:** n/a (decision-model outputs and their evaluation on val-A; no val-B or test value)
+- **sha256:** `288620cc7c15a134ce33834979581ee7b41d18775c1c8fb49291816e91a5765a`
+
+### `artifacts/NA-06/counterfactual_edits.jsonl`
+- **Producer:** `newsaction.tournament.run --stage samples` (`tournament.edits`)
+- **Schema:** one canonical-JSON object per line: `event_id`, `in_stage2`, `polarity`, `families`, `edits` [{item, field, from, to, family}], `state_sha256`, `edited_state_sha256` (no article text; the states are in `work/dm/tournament/counterfactual.parquet`)
+- **Key:** `event_id`
+- **Rows / coverage:** 200 pairs
+- **Availability:** n/a (decision-model outputs and their evaluation on val-A; no val-B or test value)
+- **sha256:** `5267d8d750e812c96278e427000aba8921ce35ca46a54bdc515333e7e3b285f2`

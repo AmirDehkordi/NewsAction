@@ -109,11 +109,15 @@ def test_fmp_cap_and_seed() -> None:
 
 def test_frozen_skeleton() -> None:
     f = load_frozen()
-    assert f.allow_val_b is False
     assert f.frozen_requested is False
     assert f.frozen is False
-    for section in ("encoding", "anchoring", "tournament", "selection", "thresholds", "calibration"):
+    for section in ("encoding", "anchoring", "selection", "thresholds", "calibration"):
         assert getattr(f, section) is None
+    # NA-06 (PRD S6) owns ``tournament:`` and opens val-B only once it is recorded (CLAUDE.md C13)
+    assert f.allow_val_b is bool(f.tournament)
+    if f.tournament:
+        keys = {"stage1_survivors", "stage2_models", "stage2_survivors_passing", "leaderboard_sha"}
+        assert keys <= set(f.tournament) and len(str(f.tournament["leaderboard_sha"])) == 64
 
 
 def test_frozen_filter_section_from_na03() -> None:

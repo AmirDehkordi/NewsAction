@@ -20,7 +20,13 @@ filter:              # NA-03: PREREG §6.8 val-A comparison (artifacts/NA-03/fil
   comparison_sha: 6ca1b1923783eb9ef0443ffd1da625d07feb5ece93c07a400ae6837062dd1326
 encoding: null      # NA-07: encoding and calls_per_event (PREREG §8.4)
 anchoring: null     # NA-07: anchoring verdict (PREREG §8.4)
-tournament: null    # NA-06: stage-1/2 survivors and screens (PREREG §8.2–8.3)
+tournament:          # NA-06: PREREG §8.2–8.3 (artifacts/NA-06/leaderboard.csv, mcs.json)
+  stage1_survivors: ["cloudflare/clef", "cloudflare/clef-flash", "cloudflare/clef-omni", "inception/mercury-decide", "jaredpalmer/kev-4b", "liquid/d1", "liquid/d1-ultra", "local/laya-base", "local/laya-typed-decisions", "microsoft/microsoft-decision-1", "nace-ai/drex-max", "nace-ai/drex-v1.5", "nace-ai/drex-v2.0", "openai/gpt-6-luna-decisions", "perplexity/pplx-decider-flash-v1.2", "perplexity/pplx-decider-v1.2", "respan/span-02", "scaledown/classify-1", "togethercomputer/tev1-4b-experimental", "typesafe/jev-1.13", "typesafe/jev-1.14"]
+  stage2_models: ["inception/mercury-decide", "respan/span-02", "liquid/d1-ultra", "cloudflare/clef", "openai/gpt-6-luna-decisions", "nace-ai/drex-v2.0"]
+  stage2_survivors_passing: []
+  leaderboard_file: "artifacts/NA-06/leaderboard.csv"
+  leaderboard_sha: "a7d1abd833dc6c99a10a1f56f9d02b55fd3d0429d10c948d52ab6a0e6158bf89"
+  mcs_statistic: "R"
 selection: null     # NA-11: primary instrument and comparators (PREREG §8.5)
 thresholds: null    # NA-11: delta/RG thresholds and confidence gates
 calibration: null   # NA-11: calibration maps and their val-A fit ranges
@@ -64,6 +70,6 @@ eligible_models:   # NA-05: every catalog id (snapshot sha256 205464ea1b0c36a2�
   - {id: "local/laya-typed-decisions", include: true, reason: "local open-weight Laya (PREREG §8.1)"}
   - {id: "local/laya-base", include: true, reason: "local open-weight Laya (PREREG §8.1)"}
 
-allow_val_b: false       # NA-06 sets true after the tournament (CLAUDE.md C13)
+allow_val_b: true        # NA-06 set it after the tournament: val-B for NA-07's confirmation and NA-11's selection only (CLAUDE.md C13)
 frozen_requested: false  # NA-11 sets true; lock.freeze() refuses otherwise
 frozen: false            # written by lock.freeze() just before hashing; never edit by hand
