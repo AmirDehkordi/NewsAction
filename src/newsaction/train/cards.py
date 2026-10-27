@@ -18,7 +18,7 @@ predictions are stored by ``import_preds`` and never evaluated in NA-08 (NA-11 d
 from __future__ import annotations
 
 import json
-from collections.abc import Mapping
+from collections.abc import Mapping, Sequence
 from typing import Any, Final
 
 import numpy as np
@@ -214,7 +214,8 @@ def controls(
     else:
         out["reproducibility"] = {
             "runs": [a, b],
-            "status": "not run (an operator-approved deferral is needed)",
+            "status": f"pending: {[r for r in (a, b) if not have(r)]} not imported; if this week's quota "
+            "does not allow it, the operator-approved deferral under AC3 (it does not block NA-11)",
         }
     return out
 
@@ -244,6 +245,28 @@ def reported(ctx: Mapping[str, Any], cfg: TrainingConfig) -> str:
         f"{what}: {len(runs)} of the {planned} seeds of PREREG §9.1; the others are deferred (PREREG §15 "
         "NA-08 row, operator decision) and enter the ensemble when they are imported"
     )
+
+
+def epochs_text(records: Sequence[Mapping[str, Any]], cfg: TrainingConfig) -> str:
+    """How many epochs the runs trained, and why (the pilot: one epoch fits a 12-hour session)."""
+    ran = sorted({int(r["epochs_run"]) for r in records})
+    if ran == [1]:
+        return (
+            f"1 epoch per run (PREREG §9.1 allows ≤ {cfg.model.max_epochs}): the pilot measured an epoch at "
+            "5.9 h on 2×T4, so two do not fit a 12-hour session (artifacts/NA-08/throughput.json); the "
+            "val-A cross-entropy is recorded, and early stopping has one epoch to choose."
+        )
+    return (
+        f"≤ {cfg.model.max_epochs} epochs (runs trained {', '.join(map(str, ran))}), early stopping on the "
+        "val-A cross-entropy (patience 0)."
+    )
+
+
+def shown(by_model: Mapping[str, Any], runs: Sequence[str]) -> dict[str, Any]:
+    """Table rows to show: with a single seed the ensemble is that seed, so only the seed is shown."""
+    if len(runs) == 1:
+        return {f"{runs[0]} (reported)": by_model[runs[0]]}
+    return dict(by_model)
 
 
 def card_text(model: str, ctx: Mapping[str, Any]) -> str:
@@ -329,8 +352,7 @@ def card_text(model: str, ctx: Mapping[str, Any]) -> str:
         f"effective batch {hp['micro_batch']} × {ctx['world_size']} GPUs × {hp['grad_accum']}, fp16 "
         f"autocast, gradient checkpointing {'on' if hp['grad_checkpointing'] else 'off'}. Loss: Laya's "
         "official RLCD objective (`laya.train.rlcd_loss`: a proper-scoring policy-gradient term over "
-        "noisy logits plus soft cross-entropy). ≤ 3 epochs, early stopping on the val-A cross-entropy "
-        "(patience 0).",
+        f"noisy logits plus soft cross-entropy). {epochs_text(ctx['records'], cfg)}",
         "",
         "| Run | Seed | Epochs run | Best epoch | Val-A loss by epoch | Stopped by time | GPU | Hours |",
         "|---|---|---|---|---|---|---|---|",
@@ -348,7 +370,7 @@ def card_text(model: str, ctx: Mapping[str, Any]) -> str:
         "| | Model | IC | NW t | 95% CI (block bootstrap) | Days | Events |",
         "|---|---|---|---|---|---|---|",
     ]
-    for who, rows in ctx["ics"].items():
+    for who, rows in shown(ctx["ics"], ctx["runs"]).items():
         for row in rows:
             ci = row.get("ci95")
             ci_s = f"[{_fmt(ci[0])}, {_fmt(ci[1])}]" if ci else "–"
@@ -362,9 +384,9 @@ def card_text(model: str, ctx: Mapping[str, Any]) -> str:
         "| Head | Model | Temperature | ECE before | ECE after | NLL before | NLL after | n |",
         "|---|---|---|---|---|---|---|---|",
     ]
-    for who, heads in ctx["calibration"].items():
+    for who, heads in shown(ctx["calibration"], ctx["runs"]).items():
         for head, h in heads.items():
-            t = ctx["temperatures"].get(who, {}).get(head)
+            t = ctx["temperatures"].get(who.removesuffix(" (reported)"), {}).get(head)
             lines.append(
                 f"| {head} | {who} | {_fmt(t, 3)} | {_fmt(h.get('ece_before'))} | {_fmt(h['ece_after'])} | "
                 f"{_fmt(h.get('nll_before'))} | {_fmt(h['nll_after'])} | {h['n']:,} |"
@@ -372,7 +394,9 @@ def card_text(model: str, ctx: Mapping[str, Any]) -> str:
     lines += [
         "",
         "The ensemble averages calibrated probabilities, so it has no temperature of its own "
-        "(ECE before = –).",
+        "(ECE before = –)."
+        if len(ctx["runs"]) > 1
+        else f"The reported model is the single seed {ctx['runs'][0]}; its temperatures are fit on val-A.",
         "",
         "## Controls",
         "",

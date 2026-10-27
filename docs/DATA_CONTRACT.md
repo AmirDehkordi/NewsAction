@@ -622,7 +622,62 @@ sha256 on a rerun (labels and export were run twice: 8 of 8 files identical).
 - **Schema:** JSON `{title, id, licenses: [{name: other}], isPrivate: true}`
 - **sha256:** `f3538aea683d833f88d9cc417d02f0c17d3dd8a995b2de6ff874e15b0a607353`
 
-#### Written after the Kaggle runs (import stage; entries with sha256 are added then)
-- `work/kaggle/predictions/<run>/na08_*`: a run's downloaded outputs (Arrow IPC predictions, calibration, run record, run config, `na08_outputs.json`), checked against their sha256 before use; not parquet, not registered (their sha256 are recorded in the run file below).
-- `work/kaggle/predictions/runs/<run>.parquet`: one verified run, every split: `run`, `init`, `seed`, `split`, `example_id`, `event_id`, `call`, `window`, `question_id`, `k`, `logits`, `probabilities` (val-A-calibrated).
-- `work/kaggle/predictions/{laya_fin,anchor}_{val_a,val_b,test_callA}.parquet`: the 3-seed ensembles in the common prediction schema, one row per (event, call, question): `event_id`, `company_id`, `session`, `split`, `window`, `decision_point`, `call`, `question`, `model`, `n_seeds`, `runs`, `k`, `probabilities` (options in Laya's order), `n_hat`, `e_abs_n` (react), `mag_mean`, `p_mag_ge1` (mag), `p_reverse`, `p_stall`, `p_continue`, `c_cont`, `j_cont`, `w_cont` (cont), `confidence`. Val-B and test files are stored, never evaluated in NA-08.
+#### Downloaded run outputs (not registered)
+- `work/kaggle/predictions/<run>/na08_*`: a run's Kaggle outputs (Arrow IPC predictions, calibration, run record, run config, `na08_outputs.json`) and the kernel log, downloaded with `--file-pattern na08_`; checked against their sha256 (`import_preds.verify_run`) before the import reads them. Not parquet, so `make manifest` does not take them for unregistered artifacts.
+
+### Run files (schema shared by the run files below)
+- **Producer:** `newsaction.train.build --stage import` (`train.import_preds`, S7), from the verified download of the run
+- **Schema:** `run`, `init` (laya | modernbert) string, `seed` int64, `split` (val_a | val_b | test), `example_id`, `event_id`, `call`, `window`, `question_id` string, `k` int8, `logits` list<double> (the run's raw logits), `probabilities` list<double> (softmax(logits / T) with the run's val-A temperature per head; options in Laya's order)
+- **Key:** `(split, example_id)` unique
+- **Availability:** model outputs at the state's decision point (the inputs are the NA-04 states). Val-B and test rows are stored, never evaluated in NA-08.
+
+### `work/kaggle/predictions/runs/shuffle-s13.parquet`
+- **Producer / schema:** as "Run files" above; the shuffled-label control (Laya init, seed 13, 1 epoch, labels permuted within split and question; val-A only)
+- **Rows:** 62,404 (val-A 62,404)
+- **sha256:** `6c0f7557e99b4b929fca0ec314354e8f06984209c45a063288b55bc033bbf539`
+
+### `work/kaggle/predictions/runs/laya-s13.parquet`
+- **Producer / schema:** as "Run files" above; Laya-Fin, seed 13, 1 epoch
+- **Rows:** 170,990 (val-A 62,404 + val-B 43,382 + test 65,204)
+- **sha256:** `ae03f6e92df888e6d58bf1cd69478ce616d88766dc60d7222363d03d16bd24c8`
+
+### `work/kaggle/predictions/runs/anchor-s13.parquet`
+- **Producer / schema:** as "Run files" above; the anchor (ModernBERT-large, fresh head), seed 13, 1 epoch
+- **Rows:** 170,990 (val-A 62,404 + val-B 43,382 + test 65,204)
+- **sha256:** `4c844aa5047d062e8f545ac5d12bd1bc61a2896e6b61b858893d88e5c74c59cd`
+
+### Prediction files (schema shared by the six files below)
+- **Producer:** `newsaction.train.build --stage import` (`train.import_preds`, S7): per model, the mean of its seed runs' calibrated probabilities (PREREG §9.1). Each model has one seed for now (PREREG §15 NA-08 row 2: seeds 17 and 23 deferred), so its file holds that seed's probabilities; a deferred seed joins on a rerun of the import.
+- **Schema (the common prediction schema):** `event_id`, `company_id` int64, `session` date32, `split`, `window` (W0 | W2), `decision_point` (D0 | D2), `call` (A | B), `question` (react | mag | cont), `model` (laya_fin | anchor), `n_seeds` int64, `runs` (comma-separated run names) string, `k` int8, `probabilities` list<double>, derived double (NaN where not applicable): `n_hat`, `e_abs_n` (react; PREREG §7 midpoints), `mag_mean` (midpoints 0.25, 0.75, 1.5, 2.5, 3.5), `p_mag_ge1` (mag), `p_reverse`, `p_stall`, `p_continue`, `c_cont` (= P(continue) − P(reverse)), `j_cont` (J analogue = c_cont), `w_cont` (W analogue = P(reverse)) (cont), `confidence` (max probability)
+- **Key:** `(event_id, call, question)` unique
+- **Availability:** model outputs at the state's decision point. Val-B and test files are stored, never evaluated in NA-08 (NA-11 evaluates val-B; test after the freeze and unblinding).
+
+### `work/kaggle/predictions/laya_fin_val_a.parquet`
+- **Producer / schema:** as "Prediction files" above; laya_fin, val-A: Call A D0 / D2 (react, mag) and Call B (react, cont)
+- **Rows:** 62,404
+- **sha256:** `f1544b79f3bb7d149990083f5745c27166a42ffca4b4bdc12d331504a4aa9d8a`
+
+### `work/kaggle/predictions/laya_fin_val_b.parquet`
+- **Producer / schema:** as "Prediction files" above; laya_fin, val-B: as val-A; stored, not evaluated
+- **Rows:** 43,382
+- **sha256:** `e57d9ee831932f932426cccb29a1ed94c6f18e2f74d0446d0bf6dd2f83673c7e`
+
+### `work/kaggle/predictions/laya_fin_test_callA.parquet`
+- **Producer / schema:** as "Prediction files" above; laya_fin, test: Call A D0 and D2 (react, mag); stored, not evaluated
+- **Rows:** 65,204
+- **sha256:** `c256836331623f652d7b85299000002ba92f27032fb2536f4cd18d2be86593c1`
+
+### `work/kaggle/predictions/anchor_val_a.parquet`
+- **Producer / schema:** as "Prediction files" above; anchor, val-A: Call A D0 / D2 (react, mag) and Call B (react, cont)
+- **Rows:** 62,404
+- **sha256:** `a26d094e6d7fc18522a02a5a9700d4bcccebeacdd45743e1e199ae44ac717970`
+
+### `work/kaggle/predictions/anchor_val_b.parquet`
+- **Producer / schema:** as "Prediction files" above; anchor, val-B: as val-A; stored, not evaluated
+- **Rows:** 43,382
+- **sha256:** `6cced05c5e499aba76c6256941bfb5ecd6a8829e479178d0f8ef981d9fe6b334`
+
+### `work/kaggle/predictions/anchor_test_callA.parquet`
+- **Producer / schema:** as "Prediction files" above; anchor, test: Call A D0 and D2 (react, mag); stored, not evaluated
+- **Rows:** 65,204
+- **sha256:** `d659d3659c2abe819dc454ef06f3b5db848263b2877d3f96061346549f289376`

@@ -181,7 +181,8 @@ per GPU, then rehearsed the output path on 2,000 / 500 / 500 val-A / val-B / tes
 | pilot (3 launches) | 10-26 20:22 | 0.35 | (200 steps) | 8.24 / 8.21 | – | (rehearsal) | 30 h left | yes (`plan`) |
 | shuffle-s13 | 10-26 20:55 | 6.76 | 1 | 7.89 | 1.6421 (shuffled labels) | 0.95 / 0.85 / 20.0 | – | yes |
 | laya-s13 | 10-27 05:04 | 7.59 | 1 | 7.94 | 1.5761 | 1.00 / 1.00 / 2.36 | – | yes |
-| anchor-s13 | 10-27 12:41 | running | | | | | 15.30 h left; needs 8.18 (7.44 + 10%) | |
+| anchor-s13 | 10-27 12:41 | 8.11 | 1 | 7.65 | 1.6136 | 0.97 / 0.90 / 20.0 | 15.30 h left; needs 8.18 (7.44 + 10%) | yes |
+| repro-s13 | 10-27 20:57 | running (budget 7.0 h) | | | | | 7.19 h left; needs 7.14 (6.49 + 10%) | |
 
 - **laya-s13, val-A** (first 5 sessions excluded; the model cards add CIs):
 
@@ -196,8 +197,25 @@ per GPU, then rehearsed the output path on 2,000 / 500 / 500 val-A / val-B / tes
   - Call B N̂ vs e5 is +0.448: Call B reads the day's own reaction, which is part of e5.
   - Calibration: react ECE 0.018 at T = 1.00 (already calibrated), mag ECE 0.017; the cont head is close to
     uniform (NLL 1.098 ≈ ln 3; T 2.36).
-- **shuffle-s13** (the AC3 control): D0 N̂ vs e5 IC −0.007, NW t −0.48 (|t| < 2). The other heads' ICs are in
-  `controls.json` once the cards stage runs (H-mag −0.044, t −2.39).
+- **anchor-s13, val-A:**
+
+  | Reading | IC | NW t |
+  |---|---|---|
+  | D0 N̂ vs z_cc,t | +0.024 | 1.86 (CI −0.001 … 0.049) |
+  | D0 N̂ vs e5 | +0.009 | 0.65 |
+  | D2 Call A N̂ vs e5 | −0.001 | –0.11 |
+  | D0 H-mag vs \|z_cc,t\| | +0.169 | 6.32 |
+  | Call B C vs sign(G)·y2 | −0.027 | −2.19 |
+
+  - Call B N̂ vs e5 is +0.003: unlike Laya-Fin (+0.448), the anchor's react head does not use the reaction
+    block after one epoch.
+  - The cont head is uniform (T on the bound 20).
+  - The NLL-optimal temperatures lower NLL slightly but raise the 15-bin ECE of react (0.004 → 0.012) and mag
+    (0.003 → 0.022).
+- **shuffle-s13** (the AC3 control): D0 N̂ vs e5 IC −0.007, NW t −0.48 (|t| < 2): PASS. Every head's IC is in
+  `controls.json` (H-mag −0.044, t −2.39).
+- **repro-s13** was pushed with a 7.0 h time budget: 7.19 h of quota was left at the push. If the budget stops
+  it before the end of its epoch, `controls.json` reports the comparison as not comparable.
 
 ## 4. Operator runbook (S6)
 
