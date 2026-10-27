@@ -181,7 +181,7 @@ per GPU, then rehearsed the output path on 2,000 / 500 / 500 val-A / val-B / tes
 | pilot (3 launches) | 10-26 20:22 | 0.35 | (200 steps) | 8.24 / 8.21 | – | (rehearsal) | 30 h left | yes (`plan`) |
 | shuffle-s13 | 10-26 20:55 | 6.76 | 1 | 7.89 | 1.6421 (shuffled labels) | 0.95 / 0.85 / 20.0 | – | yes |
 | laya-s13 | 10-27 05:04 | 7.59 | 1 | 7.94 | 1.5761 | 1.00 / 1.00 / 2.36 | – | yes |
-| anchor-s13 | 10-27 12:41 | 8.11 | 1 | 7.65 | 1.6136 | 0.97 / 0.90 / 20.0 | 15.30 h left; needs 8.18 (7.44 + 10%) | yes |
+| anchor-s13 | 10-27 12:41 | 8.11 | 1 | 7.41 | 1.6136 | 0.97 / 0.90 / 20.0 | 15.30 h left; needs 8.18 (7.44 + 10%) | yes |
 | repro-s13 | 10-27 20:57 | running (budget 7.0 h) | | | | | 7.19 h left; needs 7.14 (6.49 + 10%) | |
 
 - **laya-s13, val-A** (first 5 sessions excluded; the model cards add CIs):
@@ -203,7 +203,7 @@ per GPU, then rehearsed the output path on 2,000 / 500 / 500 val-A / val-B / tes
   |---|---|---|
   | D0 N̂ vs z_cc,t | +0.024 | 1.86 (CI −0.001 … 0.049) |
   | D0 N̂ vs e5 | +0.009 | 0.65 |
-  | D2 Call A N̂ vs e5 | −0.001 | –0.11 |
+  | D2 Call A N̂ vs e5 | −0.001 | −0.11 |
   | D0 H-mag vs \|z_cc,t\| | +0.169 | 6.32 |
   | Call B C vs sign(G)·y2 | −0.027 | −2.19 |
 
