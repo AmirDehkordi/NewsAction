@@ -42,6 +42,7 @@ from newsaction.states.questions import canonical_json
 PROB_TOL: Final = 1e-6
 RENORM_TOL: Final = 0.0105  # one step of a 0.01 grid (and float noise); flagged beyond PROB_TOL
 SCORE_TOL: Final = 1e-3  # |score − Σ i·p_i| above this is noted (item 7 of the pilot)
+SUM_EPS: Final = 1e-9  # chat answers: a sum of exactly 1 ± sum_tol is inside the rule despite float rounding
 MAX_SCORE_LEVELS: Final = 10
 QuestionType = Literal["choice", "score"]
 
@@ -231,19 +232,7 @@ def _probabilities(probs: Mapping[str, Any], options: list[str]) -> _Probs:
     vals = [probs[k] for k in options]
     if not all(isinstance(v, int | float) and not isinstance(v, bool) for v in vals):
         return _Probs(["a probability is not a number"], None)
-    p = tuple(float(v) for v in vals)
-    out = []
-    if not all(math.isfinite(v) and 0.0 <= v <= 1.0 for v in p):
-        out.append("a probability is outside [0, 1]")
-    total = math.fsum(p) if all(math.isfinite(v) for v in p) else math.nan
-    off = abs(total - 1.0)
-    if not off <= RENORM_TOL:
-        out.append(f"probabilities sum to {total:.9f}")
-    if out:
-        return _Probs(out, None, raw_sum=total)
-    if off > PROB_TOL:
-        return _Probs([], tuple(v / total for v in p), renormalized=True, raw_sum=total)
-    return _Probs([], p, raw_sum=total)
+    return _sum_rule(tuple(float(v) for v in vals), RENORM_TOL)
 
 
 def _argmax_ok(p: tuple[float, ...], options: list[str], chosen: str) -> bool:
@@ -312,6 +301,23 @@ def parse_answer(qid: str, raw: Any, question: QuestionSpec) -> ParsedAnswer:
     )
 
 
+def _sum_rule(p: tuple[float, ...], tol: float) -> _Probs:
+    """Finite values in [0, 1] whose sum is 1 within ``tol``: off by more than PROB_TOL is renormalized and
+    flagged, off by more than ``tol`` is a problem."""
+    out = []
+    if not all(math.isfinite(v) and 0.0 <= v <= 1.0 for v in p):
+        out.append("a probability is outside [0, 1]")
+    total = math.fsum(p) if all(math.isfinite(v) for v in p) else math.nan
+    off = abs(total - 1.0)
+    if not off <= tol:
+        out.append(f"probabilities sum to {total:.9f}")
+    if out:
+        return _Probs(out, None, raw_sum=total)
+    if off > PROB_TOL:
+        return _Probs([], tuple(v / total for v in p), renormalized=True, raw_sum=total)
+    return _Probs([], p, raw_sum=total)
+
+
 def parse_response(raw: Any, questions: Mapping[str, QuestionSpec]) -> ParsedResponse:
     """Strict parse of a decision response against the questions asked (see the module docstring)."""
     if not isinstance(raw, dict):
@@ -328,3 +334,165 @@ def parse_response(raw: Any, questions: Mapping[str, QuestionSpec]) -> ParsedRes
         qid: parse_answer(qid, resp.answers[qid], q) for qid, q in questions.items() if qid in resp.answers
     }
     return ParsedResponse(resp, answers, tuple(problems))
+
+
+# --- chat completions with a JSON-schema answer (PRD NA-09 S7) --------------------------------------
+
+
+class ChatProvider(BaseModel):
+    """Provider preferences of a chat request: ``data_collection`` deny, the only value the schema accepts
+    (CLAUDE.md C12), and ``require_parameters``, so a request is routed only to an endpoint that supports
+    every parameter it sends (a structured-output request is never answered by one that ignores the
+    schema)."""
+
+    model_config = ConfigDict(extra="forbid", frozen=True)
+
+    data_collection: Literal["deny"] = "deny"
+    require_parameters: Literal[True] = True
+
+
+class ChatMessage(BaseModel):
+    model_config = ConfigDict(extra="forbid", frozen=True)
+
+    role: Literal["system", "user"]
+    content: str = Field(min_length=1)
+
+
+class ChatRequest(BaseModel):
+    """The body of POST /api/v1/chat/completions asking for one JSON object (``response_format`` json_schema,
+    strict): every property required, no other property allowed, ``required`` in answer order."""
+
+    model_config = ConfigDict(extra="forbid", frozen=True)
+
+    model: str = Field(min_length=1)
+    messages: tuple[ChatMessage, ...] = Field(min_length=1)
+    schema_name: str = Field(pattern=r"^[A-Za-z0-9_-]{1,64}$")
+    json_schema: dict[str, Any]
+    temperature: float = Field(ge=0, le=2)
+    seed: int | None = None
+    max_tokens: int = Field(gt=0)
+    provider: ChatProvider = Field(default_factory=ChatProvider)
+
+    @model_validator(mode="after")
+    def _object_schema(self) -> ChatRequest:
+        s = self.json_schema
+        props, req = s.get("properties"), s.get("required")
+        if s.get("type") != "object" or not isinstance(props, dict) or not props:
+            raise ValueError("json_schema must be an object schema with properties")
+        if not isinstance(req, list) or sorted(req) != sorted(props) or len(set(req)) != len(req):
+            raise ValueError("json_schema must require every property exactly once")
+        if s.get("additionalProperties") is not False:
+            raise ValueError("json_schema must set additionalProperties: false")
+        return self
+
+    def keys(self) -> list[str]:
+        """The answer's keys in order (``required``)."""
+        return [str(k) for k in self.json_schema["required"]]
+
+    def body(self, params: Mapping[str, Any]) -> dict[str, Any]:
+        clash = set(params) & {"model", "messages", "response_format", "provider", "temperature", "seed"}
+        if clash:
+            raise SchemaError(f"params may not set {sorted(clash)}")
+        body: dict[str, Any] = {
+            "model": self.model,
+            "messages": [m.model_dump() for m in self.messages],
+            "response_format": {
+                "type": "json_schema",
+                "json_schema": {"name": self.schema_name, "strict": True, "schema": self.json_schema},
+            },
+            "temperature": self.temperature,
+            "max_tokens": self.max_tokens,
+            "provider": self.provider.model_dump(),
+            "usage": {"include": True},
+        }
+        if self.seed is not None:
+            body["seed"] = self.seed
+        body.update(params)
+        return body
+
+    def messages_sha256(self) -> str:
+        return hashlib.sha256(canonical_json([m.model_dump() for m in self.messages]).encode()).hexdigest()
+
+    def schema_sha256(self) -> str:
+        return hashlib.sha256(canonical_json([self.schema_name, self.json_schema]).encode()).hexdigest()
+
+
+class ChatUsage(BaseModel):
+    model_config = ConfigDict(extra="allow", frozen=True)
+
+    prompt_tokens: int = Field(ge=0)
+    completion_tokens: int = Field(ge=0)
+    cost: float | None = Field(default=None, ge=0)
+
+
+class ChatResponse(BaseModel):
+    """The envelope of a 200 chat completion; the answer is ``choices[0].message.content``."""
+
+    model_config = ConfigDict(extra="allow", frozen=True)
+
+    id: str | None = None
+    model: str = Field(min_length=1)
+    provider: str | None = None
+    choices: list[dict[str, Any]] = Field(min_length=1)
+    usage: ChatUsage
+
+
+@dataclass(frozen=True)
+class ParsedChat:
+    response: ChatResponse | None
+    content: str | None
+    finish_reason: str | None
+    values: dict[str, Any] | None  # the JSON object as returned (never altered)
+    probs: tuple[float, ...] | None  # probability answers: in key order, renormalized if flagged
+    problems: tuple[str, ...]
+    renormalized: bool = False
+    raw_sum: float | None = None
+
+    @property
+    def valid(self) -> bool:
+        return not self.problems
+
+    def problem_list(self) -> list[str]:
+        return list(self.problems)
+
+
+def parse_chat_response(raw: Any, keys: list[str], sum_tol: float | None) -> ParsedChat:
+    """Strict parse of a chat completion: an envelope with usage, ``finish_reason`` "stop", content that is
+    one JSON object with exactly ``keys``. With ``sum_tol`` the values are probabilities: numbers in [0, 1]
+    whose sum is 1 within ``sum_tol`` (``SUM_EPS`` absorbs float rounding: 0.4 + 0.4 + 0.25 is 0.05 + 4e-17
+    away from 1; off by more than 1e-6: renormalized and flagged). Nothing is repaired beyond that rule."""
+    if not isinstance(raw, dict):
+        return ParsedChat(None, None, None, None, None, ("the response is not a JSON object",))
+    try:
+        resp = ChatResponse.model_validate(raw)
+    except ValidationError as exc:
+        err = exc.errors()[0]
+        where = ".".join(str(x) for x in err["loc"])
+        return ParsedChat(None, None, None, None, None, (f"envelope {where}: {err['msg']}",))
+    choice = resp.choices[0]
+    message = choice.get("message") if isinstance(choice.get("message"), dict) else {}
+    content = message.get("content") if isinstance(message, dict) else None
+    finish = choice.get("finish_reason")
+    finish = str(finish) if finish is not None else None
+    problems: list[str] = []
+    if finish != "stop":
+        problems.append(f"finish_reason {finish!r}")
+    if not isinstance(content, str):
+        return ParsedChat(resp, None, finish, None, None, (*problems, "no message content"))
+    try:
+        values = json.loads(content)
+    except json.JSONDecodeError:
+        return ParsedChat(resp, content, finish, None, None, (*problems, "content is not JSON"))
+    if not isinstance(values, dict):
+        return ParsedChat(resp, content, finish, None, None, (*problems, "content is not a JSON object"))
+    if sorted(values) != sorted(keys):
+        problems.append(f"answer keys {sorted(values)} differ from {sorted(keys)}")
+    if sum_tol is None or problems:
+        return ParsedChat(resp, content, finish, values, None, tuple(problems))
+    vals = [values[k] for k in keys]
+    if not all(isinstance(v, int | float) and not isinstance(v, bool) for v in vals):
+        return ParsedChat(resp, content, finish, values, None, ("a probability is not a number",))
+    pr = _sum_rule(tuple(float(v) for v in vals), sum_tol + SUM_EPS)
+    return ParsedChat(
+        resp, content, finish, values, pr.probs, tuple(pr.problems), pr.renormalized, pr.raw_sum
+    )

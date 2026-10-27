@@ -1,0 +1,85 @@
+# NA-09: the pre-registered baselines (PREREG §10; PRD NA-09). Read by newsaction.baselines (BaselinesConfig).
+# Hashed into the NA-11 freeze with every configs/*.yaml (PREREG §4.4). Every fitted baseline is fit on train
+# only and tuned on val-A only (CLAUDE.md B9); val-B and test are predicted, never evaluated here (PRD S8).
+
+version: 1
+seed: 2026                        # CLAUDE.md F20; PRD S7 subsample
+
+state_files:                      # registered NA-04 state files (work/…): the event sets of every baseline
+  call_a: states/callA_d0_E3.parquet          # D0 events (W0 news), masked, E3: the news baselines, price-only D0
+  call_b: states/callB_d2_E3.parquet          # D2 events (W2 news + reaction), masked, E3: price-only D2, Laya B
+
+fit_split: train                  # PREREG §10: fit on train
+tune_split: val_a                 # λ, hyper-parameters and calibration maps on val-A (CLAUDE.md B9)
+
+metric:                           # PRD S8 (val-A only); the NA-06 tournament's operationalization (PREREG §15)
+  min_names_per_day: 5            # a daily IC needs >= 5 events with both values
+  nw_lags: 5                      # PREREG §11.1
+  exclude_embargo: true           # PREREG §4.2: the first 5 sessions of val-A are not evaluated
+  class_band: 0.5                 # PREREG §11.2: P_up = P(e5 >= +0.5), P_down = P(e5 <= -0.5)
+  tiers: [top100, mid, rest]       # PREREG §3.3 (panel.tiers codes)
+
+sentiment:                        # PRD S2; PREREG §10.1
+  scale:                          # NewsWitch sentiment_direction -> -2..+2
+    Strongly Negative: -2
+    Negative: -1
+    Neutral: 0
+    Positive: 1
+    Strongly Positive: 2
+  timely: [Immediate, Short-Term] # sentiment_intensity counted as timely (PRD S2)
+
+embed_ridge:                      # PRD S3; PREREG §10.2: bge-small (title + snippet) mean-pooled per event + ridge
+  lambdas: [0.01, 0.1, 1.0, 10.0, 100.0, 1000.0, 10000.0, 100000.0, 1000000.0]   # log grid; each a trial
+  standardize: true               # features standardized with train means and sds
+
+tags_gbm:                         # PRD S4; PREREG §10.3
+  learning_rate: 0.03
+  subsample: 0.8
+  subsample_freq: 1
+  colsample_bytree: 0.8
+  grid:                           # 2 x 2 x 2 = 8 configurations per target, each a trial
+    num_leaves: [7, 31]
+    min_child_samples: [50, 400]
+    n_estimators: [200, 800]
+
+price_only:                       # PRD S5; PREREG §10.4
+  learning_rate: 0.03
+  subsample: 0.8
+  subsample_freq: 1
+  colsample_bytree: 0.8
+  grid:
+    num_leaves: [7, 31]
+    min_child_samples: [50, 400]
+    n_estimators: [200, 800]
+
+laya_zeroshot:                    # PRD S6; PREREG §10.5
+  model: local/laya-typed-decisions
+  groups: [core]                  # PREREG A2.1: comparators use the core battery
+  chunk_size: 500                 # requests per client batch (each answer is cached as it arrives)
+  order:                          # (split, call) in run order: validation first, train after, robustness last
+    - [val_a, A]
+    - [val_b, A]
+    - [val_a, B]
+    - [val_b, B]
+    - [train, A]
+    - [train, B]
+    - [robustness, A]
+
+llm:                              # PRD S7; PREREG §10.7; fixed before any LLM call (docs/decisions/NA-09.md)
+  sample: 2000                    # val-B D0 events with a Call A state, after the embargo (PREREG §4.2)
+  strata: [tier, month]           # NA-04's stratified_sample (seed above)
+  temperature: 0.0
+  seed: 2026                      # sent: the chosen model supports it (selection.required_parameters)
+  max_tokens: 300                 # the JSON answer is about 100 tokens
+  sum_tol: 0.05                   # verbalized probabilities: |Σp − 1| <= 0.05 renormalized and flagged, else invalid
+  concurrency: 8
+  selection:                      # the model: one rule, applied to the live catalog snapshot (artifacts/NA-09/llm_catalog.json)
+    max_prompt_usd_per_m: 0.30    # PRD NA-09: a catalog model priced <= $0.30/M input
+    developers: [openai, google, meta-llama, mistralai, qwen, deepseek, microsoft, amazon, cohere, anthropic]
+    exclude_id_words: ["guard", "coder", "codestral", "-vl-", ":free", ":batch", "~"]   # classifiers, code, vision, aliases
+    required_parameters: [response_format, structured_outputs, seed, temperature]     # strict JSON, seed, temperature 0
+    reasoning: false              # no reasoning model (hidden tokens, no temperature 0)
+    cutoff_before: 2024-07-01     # the train start: no sample-period news in the model's pre-training data
+    reference: artifacts/NA-06/leaderboard.csv   # matched cost: the median cost_per_1000_a of the API decision models
+    bytes_per_token: 4.0          # projection: input tokens = (state + prompt bytes) / 4, output tokens = output_tokens
+    output_tokens: 120

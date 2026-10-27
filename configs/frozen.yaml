@@ -70,6 +70,9 @@ eligible_models:   # NA-05: every catalog id (snapshot sha256 205464ea1b0c36a2�
   - {id: "local/laya-typed-decisions", include: true, reason: "local open-weight Laya (PREREG §8.1)"}
   - {id: "local/laya-base", include: true, reason: "local open-weight Laya (PREREG §8.1)"}
 
+chat_models:       # NA-09 S7: the generative-LLM baseline, the only models chat_json may call (artifacts/NA-09/llm_catalog.json)
+  - {id: "mistralai/mistral-nemo", include: true, prompt_usd_per_token: "0.000000029", completion_usd_per_token: "0.00000003", reason: "NA-09 S7 rule (configs/baselines.yaml llm.selection): closest projected cost per 1,000 Call A decisions (0.0340 USD) to the NA-06 API median (0.0422); knowledge cutoff 2024-04-30; catalog 68f740f25ae349ad"}
+
 allow_val_b: true        # NA-06 set it after the tournament: val-B for NA-07's confirmation and NA-11's selection only (CLAUDE.md C13)
 frozen_requested: false  # NA-11 sets true; lock.freeze() refuses otherwise
 frozen: false            # written by lock.freeze() just before hashing; never edit by hand

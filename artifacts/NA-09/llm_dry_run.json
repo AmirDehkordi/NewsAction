@@ -1,0 +1,27 @@
+[
+  {
+    "ts": "2026-10-27T11:04:25.407554+00:00",
+    "send": false,
+    "model": "mistralai/mistral-nemo",
+    "n_requests": 2000,
+    "n_send": 2000,
+    "projected_usd": 0.15535958249999984,
+    "projected_tokens": 2950795.000000002,
+    "budget_left_usd": 2.0
+  },
+  {
+    "ts": "2026-10-27T11:39:24.677777+00:00",
+    "send": true,
+    "model": "mistralai/mistral-nemo",
+    "n_requests": 2000,
+    "n_send": 1999,
+    "projected_usd": 0.15527033449999986,
+    "projected_tokens": 2949053.666666669,
+    "budget_left_usd": 1.999978322,
+    "account_left_usd": 10.263368794,
+    "answered": 2000,
+    "valid": 1802,
+    "spent_usd": 0.038862738,
+    "reconcile": 0.0
+  }
+]

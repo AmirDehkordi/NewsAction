@@ -1,0 +1,29 @@
+{
+  "model": "mistralai/mistral-nemo",
+  "builds": [
+    "mistralai/mistral-nemo"
+  ],
+  "providers": [
+    "DeepInfra",
+    "DekaLLM",
+    "Parasail"
+  ],
+  "n": 2000,
+  "answered": 2000,
+  "valid": 1978,
+  "invalid": 22,
+  "problems": {
+    "probabilities": 21,
+    "finish_reason 'error'": 1,
+    "content is not JSON": 1
+  },
+  "renormalized": 234,
+  "raw_sum_min": 0.95,
+  "raw_sum_max": 1.05,
+  "input_tokens_mean": 826.5975,
+  "output_tokens_mean": 115.6085,
+  "cost_usd": 0.038884416,
+  "cost_per_1000": 0.019442208,
+  "latency_ms_p50": 6818.43408397981,
+  "latency_ms_p95": 18137.515999987954
+}

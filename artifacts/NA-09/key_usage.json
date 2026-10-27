@@ -1,0 +1,41 @@
+[
+  {
+    "label": "before NA-09 S7 probe",
+    "ts": "2026-10-27T11:05:17.145937+00:00",
+    "usage": 4.716240548,
+    "usage_daily": 1.085696508,
+    "limit": 15,
+    "limit_remaining": 10.283759452,
+    "is_free_tier": false,
+    "total_credits": 15.0,
+    "total_usage": 4.716240548,
+    "remaining": 10.283759452,
+    "ledger_chunk_usd": 0.0
+  },
+  {
+    "label": "before NA-09 S7",
+    "ts": "2026-10-27T11:05:49.299161+00:00",
+    "usage": 4.736631206,
+    "usage_daily": 1.106087166,
+    "limit": 15,
+    "limit_remaining": 10.263368794,
+    "is_free_tier": false,
+    "total_credits": 15.0,
+    "total_usage": 4.736631206,
+    "remaining": 10.263368794,
+    "ledger_chunk_usd": 2.1678e-05
+  },
+  {
+    "label": "after NA-09 S7",
+    "ts": "2026-10-27T11:39:24.197454+00:00",
+    "usage": 4.909397414,
+    "usage_daily": 1.278853374,
+    "limit": 15,
+    "limit_remaining": 10.090602586,
+    "is_free_tier": false,
+    "total_credits": 15.0,
+    "total_usage": 4.909397414,
+    "remaining": 10.090602586,
+    "ledger_chunk_usd": 0.038884416
+  }
+]

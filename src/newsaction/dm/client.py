@@ -31,12 +31,21 @@ model, remote (OpenRouter Decisions API) or local (``laya_local``).
 
 Every HTTP 200 is stored in the cache, valid or not, with its cost; every attempt is logged in the cache's
 ``attempts`` table. ``reconcile()`` is the chunk's recorded spend minus Σ cost of its cached responses (GAC4).
+
+**Chat completions** (PRD NA-09 S7). ``chat_json(model, messages, json_schema, info=…)`` (one request) and
+``chat_json_batch(specs)`` send a ``ChatRequest`` (one JSON object answer, strict json_schema) to
+``api.chat_url`` through the same steps: the refusals (a)–(f) and the pilot rule, with eligibility read from
+``frozen.yaml`` ``chat_models`` instead of ``eligible_models`` and no local backend; the same cache (the key
+payload carries ``endpoint: chat``, so it can never equal a decision key), the offline mode, the projection
+check (``costmodel.estimate_chat``), the per-call reservation and record in the spend ledger, the retries and
+the semaphore. The provider object can only say ``data_collection: deny`` (with ``require_parameters``).
 """
 
 from __future__ import annotations
 
 import asyncio
 import contextlib
+import hashlib
 import json
 import os
 import random
@@ -56,7 +65,15 @@ from newsaction.config import load_frozen, load_splits
 from newsaction.dm import CATALOG_FILE, CacheMiss, DmConfig, DMError, Refused, dm_config, is_local
 from newsaction.dm.cache import CachedRow, DecisionCache, request_key
 from newsaction.dm.costmodel import CostModel, Estimate
-from newsaction.dm.schemas import DecisionRequest, ParsedResponse, parse_response
+from newsaction.dm.schemas import (
+    ChatMessage,
+    ChatRequest,
+    DecisionRequest,
+    ParsedChat,
+    ParsedResponse,
+    parse_chat_response,
+    parse_response,
+)
 from newsaction.ledger import SPEND, BudgetExceeded, Reservation, SpendLedger
 from newsaction.paths import Layout, resolve_layout
 from newsaction.provenance import utc_now_iso
@@ -74,6 +91,7 @@ class Rules:
     val_b: tuple[date, date]
     train_end: date
     eligible: frozenset[str]
+    chat_eligible: frozenset[str]
     free_approved: frozenset[str]
     allow_val_b: bool
     frozen: bool
@@ -130,6 +148,40 @@ class CallResult:
     @property
     def ok(self) -> bool:
         return self.row is not None
+
+
+@dataclass(frozen=True)
+class ChatSpec:
+    """One chat request with its provenance. ``state_sha256`` is that of the state the messages carry (audit);
+    ``sum_tol`` makes the answer a probability vector over the schema's keys (``parse_chat_response``)."""
+
+    request: ChatRequest
+    info: StateInfo
+    state_sha256: str | None = None
+    sum_tol: float | None = None
+    params: Mapping[str, Any] = field(default_factory=dict)
+    repeat_idx: int = 0
+    tag: str = ""
+
+
+@dataclass(frozen=True)
+class ChatResult:
+    spec: ChatSpec
+    key: str
+    cached: bool
+    row: CachedRow | None
+    parsed: ParsedChat | None
+    status: int | None
+    error: str | None
+    attempts: int
+    latency_ms: float | None
+
+    @property
+    def ok(self) -> bool:
+        return self.row is not None
+
+
+AnySpec = CallSpec | ChatSpec
 
 
 @dataclass(frozen=True)
@@ -191,8 +243,8 @@ def read_api_key(env: str, root: Path) -> str:
     raise DMError(f"{env} is not set (environment or .env)")
 
 
-def _eligible(frozen: Any) -> set[str]:
-    rows = getattr(frozen, "eligible_models", None) or []
+def _eligible(frozen: Any, section: str = "eligible_models") -> set[str]:
+    rows = getattr(frozen, section, None) or []
     return {str(r["id"]) for r in rows if isinstance(r, Mapping) and r.get("include") is True}
 
 
@@ -229,7 +281,11 @@ class DecisionClient:
         self.cost_model = (
             cost_model
             if cost_model is not None
-            else CostModel.from_files(self.config.costmodel, self.lay.root / CATALOG_FILE)
+            else CostModel.from_files(
+                self.config.costmodel,
+                self.lay.root / CATALOG_FILE,
+                self.lay.root / self.config.api.chat_catalog,
+            )
         )
         self._transport = transport
         self._local: dict[str, LocalModel] = dict(local_models or {})
@@ -257,20 +313,25 @@ class DecisionClient:
             val_b=(splits["val_b"].start, splits["val_b"].end),
             train_end=splits["train"].end,
             eligible=frozenset(_eligible(frozen)),
+            chat_eligible=frozenset(_eligible(frozen, "chat_models")),
             free_approved=frozenset(_approved_free(frozen)),
             allow_val_b=bool(frozen.allow_val_b),
             frozen=lock.is_frozen(self.lay),
         )
 
-    def check(self, spec: CallSpec, rules: Rules | None = None) -> None:
+    def check(self, spec: AnySpec, rules: Rules | None = None) -> None:
         """Raise ``Refused`` if ``spec`` may not be sent (rules (a)–(f) of the module docstring)."""
         r = self.rules() if rules is None else rules
         model, info = spec.request.model, spec.info
+        chat = isinstance(spec, ChatSpec)
         local = is_local(model)
+        if chat and local:
+            raise Refused("eligibility", f"{model}: chat_json has no local backend")
         if model.endswith(":free") and model not in r.free_approved:
             raise Refused("free", f"{model} is a :free endpoint without operator approval (CLAUDE.md C13)")
-        if not self.pilot and model not in r.eligible:
-            raise Refused("eligibility", f"{model} is not in configs/frozen.yaml eligible_models")
+        if not self.pilot and model not in (r.chat_eligible if chat else r.eligible):
+            section = "chat_models" if chat else "eligible_models"
+            raise Refused("eligibility", f"{model} is not in configs/frozen.yaml {section}")
         if not local and not info.third_party_ok_all:
             raise Refused("third_party", f"state {info.event_id} holds an article that is not third-party OK")
         in_test = info.split == "test" or (info.session is not None and info.session >= r.test_start)
@@ -288,7 +349,7 @@ class DecisionClient:
             if late or info.split not in PILOT_SPLITS:
                 raise Refused("pilot_period", f"pilot state {info.event_id} is after the train split")
 
-    def check_all(self, specs: Sequence[CallSpec]) -> None:
+    def check_all(self, specs: Sequence[AnySpec]) -> None:
         rules = self.rules()
         for s in specs:
             self.check(s, rules)
@@ -444,7 +505,8 @@ class DecisionClient:
     async def _remote_call(self, http: httpx.AsyncClient, key: str, spec: CallSpec, conc: int) -> CallResult:
         est = self.estimate(spec)
         hold: Reservation = self.ledger.reserve(est.usd, note=f"{spec.request.model} {key[:16]}")
-        out = await self._post(http, key, spec, conc)  # a cancellation here keeps the hold (maybe billed)
+        url, body = self.config.api.decisions_url, self._body(spec)
+        out = await self._post(http, key, spec.request.model, spec.tag, url, body, conc)  # cancel: hold kept
         if out.status != 200:
             self.ledger.release(hold)
             return CallResult(
@@ -518,6 +580,196 @@ class DecisionClient:
             problems_json=json.dumps(parsed.problem_list(), ensure_ascii=False),
         )
 
+    # --- chat completions (NA-09 S7) -------------------------------------------------------------
+
+    def chat_key(self, spec: ChatSpec) -> str:
+        """sha256 of {endpoint: chat, the request body, repeat_idx}; never equal to a decision key, whose
+        payload has no ``endpoint``."""
+        payload = {"endpoint": "chat", "body": spec.request.body(spec.params), "repeat_idx": spec.repeat_idx}
+        return hashlib.sha256(canonical_json(payload).encode("utf-8")).hexdigest()
+
+    def dry_run_chat(self, specs: Sequence[ChatSpec]) -> Projection:
+        """Projected tokens and USD of the chat requests that would be sent (refusals checked first)."""
+        self.check_all(specs)
+        unique: dict[str, ChatSpec] = {}
+        for s in specs:
+            unique.setdefault(self.chat_key(s), s)
+        send = {k: s for k, s in unique.items() if self.cache.get(k) is None}
+        by_model: dict[str, dict[str, float]] = {}
+        tokens = usd = 0.0
+        for s in send.values():
+            est = self.cost_model.estimate_chat(s.request.model, s.request)
+            m = by_model.setdefault(s.request.model, {"calls": 0.0, "tokens": 0.0, "usd": 0.0})
+            m["calls"] += 1
+            m["tokens"] += est.tokens
+            m["usd"] += est.usd
+            tokens += est.tokens
+            usd += est.usd
+        return Projection(
+            n_requests=len(specs),
+            n_unique=len(unique),
+            n_cached=len(unique) - len(send),
+            n_send=len(send),
+            tokens=tokens,
+            usd=usd,
+            by_model=by_model,
+        )
+
+    def chat_json(
+        self,
+        model: str,
+        messages: Sequence[Mapping[str, str]],
+        json_schema: Mapping[str, Any],
+        *,
+        info: StateInfo,
+        schema_name: str = "answer",
+        temperature: float = 0.0,
+        seed: int | None = None,
+        max_tokens: int = 300,
+        sum_tol: float | None = None,
+        state_sha256: str | None = None,
+        tag: str = "",
+        repeat_idx: int = 0,
+    ) -> ChatResult:
+        """One chat request whose answer is a JSON object (PRD NA-09 S7), through every guard of ``run``."""
+        request = ChatRequest(
+            model=model,
+            messages=tuple(ChatMessage.model_validate(dict(m)) for m in messages),
+            schema_name=schema_name,
+            json_schema=dict(json_schema),
+            temperature=temperature,
+            seed=seed,
+            max_tokens=max_tokens,
+        )
+        spec = ChatSpec(request, info, state_sha256, sum_tol, repeat_idx=repeat_idx, tag=tag)
+        return self.chat_json_batch([spec])[0]
+
+    def chat_json_batch(
+        self, specs: Sequence[ChatSpec], *, concurrency: int | None = None
+    ) -> list[ChatResult]:
+        return asyncio.run(self.run_chat(specs, concurrency=concurrency))
+
+    async def run_chat(
+        self, specs: Sequence[ChatSpec], *, concurrency: int | None = None
+    ) -> list[ChatResult]:
+        self.check_all(specs)
+        keys = [self.chat_key(s) for s in specs]
+        done: dict[str, ChatResult] = {}
+        send: dict[str, ChatSpec] = {}
+        for k, s in zip(keys, specs, strict=True):
+            if k in done or k in send:
+                continue
+            row = self.cache.get(k)
+            if row is None:
+                send[k] = s
+            else:
+                parsed = parse_chat_response(row.response, s.request.keys(), s.sum_tol)
+                done[k] = ChatResult(s, k, True, row, parsed, 200, None, 0, row.latency_ms)
+        if send and self.offline:
+            raise CacheMiss(f"{len(send)} of {len(keys)} chat requests are not in the cache (offline client)")
+        if send:
+            self._check_budget(self.dry_run_chat(list(send.values())))
+            conc = concurrency or self.concurrency
+            sem = asyncio.Semaphore(conc)
+            try:
+                async with self._http() as http, asyncio.TaskGroup() as tg:
+                    tasks = [tg.create_task(self._chat_one(http, sem, k, s, conc)) for k, s in send.items()]
+            except ExceptionGroup as eg:  # surface the first failure (budget, ledger, cache) as itself
+                raise eg.exceptions[0] from None
+            for t in tasks:
+                r = t.result()
+                done[r.key] = r
+        return [
+            done[k] if done[k].spec is s else replace(done[k], spec=s)
+            for k, s in zip(keys, specs, strict=True)
+        ]
+
+    async def _chat_one(
+        self, http: httpx.AsyncClient, sem: asyncio.Semaphore, key: str, spec: ChatSpec, conc: int
+    ) -> ChatResult:
+        async with sem:
+            req = spec.request
+            est = self.cost_model.estimate_chat(req.model, req)
+            hold = self.ledger.reserve(est.usd, note=f"{req.model} {key[:16]}")
+            body = json.dumps(req.body(spec.params), ensure_ascii=False).encode("utf-8")
+            out = await self._post(http, key, req.model, spec.tag, self.config.api.chat_url, body, conc)
+            if out.status != 200:
+                self.ledger.release(hold)
+                return ChatResult(
+                    spec, key, False, None, None, out.status, out.error, out.attempt, out.latency_ms
+                )
+            try:
+                raw: Any = json.loads(out.text)
+            except json.JSONDecodeError:
+                raw = None
+            parsed = parse_chat_response(raw, req.keys(), spec.sum_tol)
+            cost, source = self._chat_cost(spec, parsed, est)
+            row = self._chat_row(key, spec, body, out.text, parsed, cost, source, out.latency_ms)
+            try:
+                self.ledger.record(
+                    cost,
+                    {"model": req.model, "key": key, "cost_source": source, "tag": spec.tag},
+                    reservation=hold,
+                )
+            finally:
+                self.cache.put(row)  # paid for: keep it even if the record raised over a cap
+            return ChatResult(spec, key, False, row, parsed, 200, None, out.attempt, out.latency_ms)
+
+    def _chat_cost(self, spec: ChatSpec, parsed: ParsedChat, est: Estimate) -> tuple[float, str]:
+        resp = parsed.response
+        if resp is not None and resp.usage.cost is not None:
+            return float(resp.usage.cost), "usage"
+        if resp is not None:
+            u = resp.usage
+            return self.cost_model.price(spec.request.model).usd(
+                u.prompt_tokens, u.completion_tokens
+            ), "computed"
+        return est.usd, "estimated"  # an unreadable 200: the projection (an upper bound) is recorded
+
+    def _chat_row(
+        self,
+        key: str,
+        spec: ChatSpec,
+        body: bytes,
+        response_text: str,
+        parsed: ParsedChat,
+        cost: float,
+        cost_source: str,
+        latency_ms: float | None,
+    ) -> CachedRow:
+        req, resp = spec.request, parsed.response
+        meta = {**spec.info.model_dump(mode="json"), "tag": spec.tag, "endpoint": "chat"}
+        params = {
+            "temperature": req.temperature,
+            "seed": req.seed,
+            "max_tokens": req.max_tokens,
+            **spec.params,
+        }
+        return CachedRow(
+            key=key,
+            model=req.model,
+            state_sha256=spec.state_sha256 or req.messages_sha256(),
+            questions_sha256=req.schema_sha256(),
+            provider_json=canonical_json(req.provider.model_dump()),
+            params_json=canonical_json(params),
+            repeat_idx=spec.repeat_idx,
+            request_json=body.decode("utf-8"),
+            response_json=response_text,
+            model_build=None if resp is None else resp.model,
+            provider=None if resp is None else resp.provider,
+            input_tokens=None if resp is None else resp.usage.prompt_tokens,
+            output_tokens=None if resp is None else resp.usage.completion_tokens,
+            cost=cost,
+            cost_source=cost_source,
+            latency_ms=latency_ms,
+            created_at=utc_now_iso(),
+            chunk=self.chunk,
+            tag=spec.tag,
+            meta_json=canonical_json(meta),
+            valid=parsed.valid,
+            problems_json=json.dumps(parsed.problem_list(), ensure_ascii=False),
+        )
+
     # --- transport -------------------------------------------------------------------------------
 
     def _wait(self, state: RetryCallState) -> float:
@@ -531,7 +783,15 @@ class DecisionClient:
         return wait
 
     async def _attempt(
-        self, http: httpx.AsyncClient, key: str, spec: CallSpec, n: int, conc: int
+        self,
+        http: httpx.AsyncClient,
+        key: str,
+        model: str,
+        tag: str,
+        url: str,
+        body: bytes,
+        n: int,
+        conc: int,
     ) -> _Outcome:
         api = self.config.api
         headers = {"Authorization": f"Bearer {self._api_key()}", "Content-Type": "application/json"}
@@ -539,7 +799,7 @@ class DecisionClient:
         status: int | None = None
         text, error, kept = "", None, {}
         try:
-            resp = await http.post(api.decisions_url, content=self._body(spec), headers=headers)
+            resp = await http.post(url, content=body, headers=headers)
             status, text = resp.status_code, resp.text
             kept = {h: resp.headers[h] for h in api.record_headers if h in resp.headers}
             if status != 200:
@@ -549,7 +809,7 @@ class DecisionClient:
         latency = (time.perf_counter() - t0) * 1000.0
         self.cache.log_attempt(
             key=key,
-            model=spec.request.model,
+            model=model,
             attempt=n,
             status=status,
             error=error,
@@ -557,11 +817,13 @@ class DecisionClient:
             headers=kept,
             concurrency=conc,
             chunk=self.chunk,
-            tag=spec.tag,
+            tag=tag,
         )
         return _Outcome(status, text, kept, latency, n, error)
 
-    async def _post(self, http: httpx.AsyncClient, key: str, spec: CallSpec, conc: int) -> _Outcome:
+    async def _post(
+        self, http: httpx.AsyncClient, key: str, model: str, tag: str, url: str, body: bytes, conc: int
+    ) -> _Outcome:
         retrying = AsyncRetrying(
             stop=stop_after_attempt(self.config.api.retry.max_attempts),
             wait=self._wait,
@@ -571,7 +833,8 @@ class DecisionClient:
         try:
             async for att in retrying:
                 with att:
-                    out = await self._attempt(http, key, spec, att.retry_state.attempt_number, conc)
+                    n = att.retry_state.attempt_number
+                    out = await self._attempt(http, key, model, tag, url, body, n, conc)
                     if out.retryable:
                         raise _Retry(out)
                     return out
@@ -609,6 +872,18 @@ class DecisionClient:
         data = self.get_json(self.config.api.key_url)["data"]
         fields = ("usage", "usage_daily", "limit", "limit_remaining", "is_free_tier")
         return {k: data.get(k) for k in fields}
+
+    def credits(self) -> dict[str, Any]:
+        """The account's credits (GET /api/v1/credits; USD): purchased, used and what is left."""
+        data = self.get_json(self.config.api.credits_url)["data"]
+        total, used = float(data.get("total_credits", 0.0)), float(data.get("total_usage", 0.0))
+        return {"total_credits": total, "total_usage": used, "remaining": total - used}
+
+    def account_left(self) -> float:
+        """USD this key can still spend: the account's remaining credits, and the key's own limit if set."""
+        left = float(self.credits()["remaining"])
+        limit = self.key_usage().get("limit_remaining")
+        return left if limit is None else min(left, float(limit))
 
     def reconcile(self) -> float:
         """Recorded spend of this chunk minus Σ cost of its cached responses (GAC4: ~0)."""

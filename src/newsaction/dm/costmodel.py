@@ -9,6 +9,9 @@
 - **USD** = (prompt price × tokens + request price) × (1 − discount) × cost_ratio × safety, with the prices of
   the catalog snapshot (``artifacts/NA-05/catalog.json``; USD per token). Output tokens are free for decision
   models, and a ``completion`` price is never charged here because no output tokens are projected.
+- **Chat requests** (NA-09 ``chat_json``): input tokens from the bytes of the messages and the answer schema
+  (``costmodel.chat``), output tokens = the request's ``max_tokens``, priced with the prompt and completion
+  prices of the chat-model snapshot (``api.chat_catalog``).
 
 A model without a pilot calibration uses ``configs/dm.yaml`` ``costmodel.default``: per-question billing,
 3.0 bytes per token and a safety factor of 1.5, which over-projects on purpose. ``calibrate`` fits a model's
@@ -29,7 +32,7 @@ from typing import Any, Final
 import numpy as np
 
 from newsaction.dm import BillingBasis, CostCalibration, CostConfig, DMError, is_local
-from newsaction.dm.schemas import DecisionRequest
+from newsaction.dm.schemas import ChatRequest, DecisionRequest
 from newsaction.states.questions import canonical_json
 
 CALIBRATED_SAFETY: Final = 1.1
@@ -40,6 +43,7 @@ class Price:
     prompt: float  # USD per input token
     request: float  # USD per request
     discount: float  # fraction off
+    completion: float = 0.0  # USD per output token (chat models; decision models bill no output)
 
     @classmethod
     def from_catalog(cls, pricing: Mapping[str, Any]) -> Price:
@@ -50,10 +54,15 @@ class Price:
                 raise DMError(f"catalog price {key}={raw!r} is not a non-negative number")
             return v
 
-        return cls(prompt=num("prompt"), request=num("request"), discount=num("discount"))
+        return cls(
+            prompt=num("prompt"),
+            request=num("request"),
+            discount=num("discount"),
+            completion=num("completion"),
+        )
 
-    def usd(self, tokens: float) -> float:
-        return (self.prompt * tokens + self.request) * (1.0 - self.discount)
+    def usd(self, tokens: float, output_tokens: float = 0.0) -> float:
+        return (self.prompt * tokens + self.completion * output_tokens + self.request) * (1.0 - self.discount)
 
 
 FREE: Final = Price(prompt=0.0, request=0.0, discount=0.0)
@@ -84,11 +93,18 @@ class CostModel:
         self.prices = dict(prices)
 
     @classmethod
-    def from_files(cls, config: CostConfig, catalog_path: Path) -> CostModel:
+    def from_files(cls, config: CostConfig, catalog_path: Path, *more: Path) -> CostModel:
+        """Prices of the decision-model catalog snapshot and of any further snapshots of the same shape (the
+        NA-09 chat-model snapshot); a missing file adds nothing, a model priced twice is an error."""
         prices: dict[str, Price] = {}
-        if catalog_path.is_file():
-            snap = json.loads(catalog_path.read_text(encoding="utf-8"))
-            prices = {str(m["id"]): Price.from_catalog(m["pricing"]) for m in snap["models"]}
+        for path in (catalog_path, *more):
+            if not path.is_file():
+                continue
+            snap = json.loads(path.read_text(encoding="utf-8"))
+            for m in snap["models"]:
+                if str(m["id"]) in prices:
+                    raise DMError(f"{m['id']} is priced in two catalog snapshots")
+                prices[str(m["id"])] = Price.from_catalog(m["pricing"])
         return cls(config, prices)
 
     def price(self, model: str) -> Price:
@@ -117,6 +133,14 @@ class CostModel:
         cal = self.calibration(model)
         ratio, safety = (1.0, self.config.default.safety) if cal is None else (cal.cost_ratio, cal.safety)
         return Estimate(tokens=tokens, usd=self.price(model).usd(tokens) * ratio * safety)
+
+    def estimate_chat(self, model: str, request: ChatRequest) -> Estimate:
+        """A chat request: input tokens = overhead + bytes of the messages and the schema / bytes_per_token,
+        output tokens = ``max_tokens`` (an upper bound), times the chat safety factor."""
+        c = self.config.chat
+        sent = canonical_json([[m.model_dump() for m in request.messages], request.json_schema])
+        tokens = c.overhead_tokens + len(sent.encode("utf-8")) / c.bytes_per_token
+        return Estimate(tokens=tokens, usd=self.price(model).usd(tokens, request.max_tokens) * c.safety)
 
 
 # --- calibration (pilot items 1–2) ------------------------------------------------------------------
