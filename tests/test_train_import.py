@@ -392,6 +392,7 @@ def test_tiny_cards_and_controls(tiny: dict[str, Any]) -> None:
     ctl = json.loads((art / "controls.json").read_text())
     sh = ctl["shuffled_label"]
     assert sh["run"] == "shuffle-s13" and isinstance(sh["pass"], bool) and sh["ic_e5"]["days"] == 3
+    assert sh["all_heads"][0]["name"].startswith("D0 Call A: N̂ vs z_cc") and len(sh["all_heads"]) >= 5
     assert "deferral" in ctl["reproducibility"]["status"]
     trials = [json.loads(x) for x in (tiny["lay"].ledgers / "trials.jsonl").read_text().splitlines()]
     assert {t["name"] for t in trials} >= {"laya_fin/ensemble", "laya_fin/laya-s13", "anchor/anchor-s13"}

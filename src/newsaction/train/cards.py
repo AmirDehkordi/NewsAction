@@ -181,6 +181,7 @@ def controls(
             "ic_e5": e5,
             "ic_z_cc": zc,
             "pass": bool(abs(e5["nw_t"]) < c.shuffle_t_max),
+            "all_heads": ics(ev, cfg, ci=False),  # reported, not part of the rule
         }
     else:
         out["shuffled_label"] = {"run": c.shuffle_run, "status": "not run"}
