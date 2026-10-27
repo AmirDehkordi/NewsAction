@@ -30,9 +30,11 @@ Call B state, may read a ``d1`` or ``d2_reaction`` column; ``reaction_so_far`` r
 columns. Renderers see only the declared columns (``context.Row``).
 
 **Calls built here.** Call A on D0 (W0 news) and on D2 (W2 news, A3.1) for every split, test included
-(inputs only); Call B on D2 for train, val-A and val-B. No Call B state of the test period exists before the
-NA-11 freeze: ``build_call_b`` refuses test-period events, and the D2 reaction comes from
-``panel.reactions.build_reactions(period="public")``, which refuses test rows.
+(inputs only); Call B on D2 for train, val-A and val-B; and (stage ``d1``, NA-10) Call B on D1: W0 news with
+the reaction by 10:00, for train, val-A and val-B (``reaction_so_far`` at D1 reads ``d1`` columns only).
+No Call B state of the test period exists before the NA-11 freeze: ``build_call_b`` refuses test-period
+events, and the D2 and D1 reactions come from ``panel.reactions.build_reactions(period="public")``, which
+refuses test rows.
 """
 
 from __future__ import annotations
@@ -76,7 +78,7 @@ from newsaction.states import (
     load_states_config,
 )
 from newsaction.states import context as ctx
-from newsaction.states.codebook import Codebook, Move, load_codebook
+from newsaction.states.codebook import Codebook, Horizon, Move, load_codebook
 from newsaction.states.macro import cpi_release_dates, load_macro, session_flags
 from newsaction.states.mask import (
     SURNAME_MIN_COUNT,
@@ -89,6 +91,9 @@ from newsaction.states.mask import (
 from newsaction.states.questions import Battery, canonical_json, load_battery
 
 REACTION_D2: Final = f"{STATES_DIR}/reaction_d2.parquet"
+REACTION_D1: Final = f"{STATES_DIR}/reaction_d1.parquet"
+CALL_B_D1: Final = f"{STATES_DIR}/callB_d1_E3.parquet"
+PRODUCER_D1: Final = "newsaction.states.build --stage d1 (NA-10 S6)"
 PERSON_SURNAMES: Final = f"{STATES_DIR}/person_surnames.parquet"
 COMPANY_CJK_NAMES: Final = f"{STATES_DIR}/company_cjk_names.parquet"
 MARKET_NEWS: Final = "news/market_articles.parquet"
@@ -153,7 +158,10 @@ class StateSpec:
 
     @property
     def decision_point(self) -> pit.DecisionPoint:
-        return "D0" if self.window == "W0" else "D2"
+        """D0 for W0, D2 for W2; Call B on W0 news is the D1 state (10:00; PREREG §2.5, NA-10)."""
+        if self.window == "W0":
+            return "D1" if self.call == "B" else "D0"
+        return "D2"
 
 
 def make_spec(
@@ -191,10 +199,12 @@ def validate_spec(spec: StateSpec, registry: pit.AvailabilityRegistry | None = N
         if block == "reaction_so_far":
             if spec.call != "B":
                 raise pit.PITError(f"{spec.name}: only Call B states have reaction_so_far")
-            wrong = {c: k for c, k in kinds.items() if k != "d2_reaction"}
-            if spec.decision_point != "D2" or wrong:
+            want = "d1" if spec.decision_point == "D1" else "d2_reaction"
+            wrong = {c: k for c, k in kinds.items() if k != want}
+            if spec.decision_point not in ("D1", "D2") or wrong:
                 raise pit.PITError(
-                    f"{spec.name}: reaction_so_far at D2 accepts d2_reaction columns only: {wrong}"
+                    f"{spec.name}: reaction_so_far at {spec.decision_point} accepts {want} columns only: "
+                    f"{wrong}"
                 )
         else:
             late = {c: k for c, k in kinds.items() if k in NO_REACTION_KINDS}
@@ -786,6 +796,7 @@ class Inputs:
     reaction: pd.DataFrame  # reaction_d2 (session, symbol_id)
     masked: Mapping[str, tuple[str, str]]  # article id -> (title, snippet)
     third_party: Mapping[str, bool]  # article id -> third_party_ok
+    reaction_d1: pd.DataFrame | None = None  # reaction_d1 (session, symbol_id), the D1 stage only (NA-10)
     excluded: frozenset[str] = (
         frozenset()
     )  # explainers, TradingView reposts and non-English articles (``excluded_ids``), in no state
@@ -912,18 +923,20 @@ def budgets(
     }
 
 
-def worst_reaction(tok: Any, cb: Codebook) -> dict[str, Any]:
-    """The E3 ``reaction_so_far`` block with the longest phrase (in tokens) in every field."""
+def worst_reaction(tok: Any, cb: Codebook, point: str = "D2") -> dict[str, Any]:
+    """The E3 ``reaction_so_far`` block with the longest phrase (in tokens) in every field (at D2, or at D1
+    with its moves in typical close(prev) → 10:00 moves)."""
     zs = [round(x, 2) for x in np.arange(-10.0, 10.0001, 0.05)]
 
     def longest(phrases: Iterable[str]) -> str:
         size = {p: len(tok(json.dumps(p, ensure_ascii=False))["input_ids"]) for p in set(phrases)}
         return min(size, key=lambda p: (-size[p], p))
 
-    move = longest(cb.encode_move(Move(z=z), "E3") for z in zs)
+    horizon: Horizon = "d1" if point == "D1" else "day"
+    move = longest(cb.encode_move(Move(z=z, horizon=horizon), "E3") for z in zs)
     volume = longest([*cb.attention.words, cb.missing])
     return {
-        "time": cb.time_label_word("D2"),
+        "time": cb.time_label_word("D1" if point == "D1" else "D2"),
         "stock_move_vs_market_and_sector": move,
         "stock_market_move": move,
         "volume_vs_normal": volume,
@@ -946,7 +959,7 @@ def render_state(
         elif block == "attention":
             state["attention"] = ctx.attention_block(row, spec.window, inp.cb)
         elif block == "reaction_so_far":
-            state["reaction_so_far"] = ctx.reaction_block(row, spec.encoding, inp.cb)
+            state["reaction_so_far"] = ctx.reaction_block(row, spec.encoding, inp.cb, spec.decision_point)
         else:
             raise StatesError(f"unknown block {block!r}")
     return state
@@ -980,7 +993,10 @@ def build_event_states(
     frame = events.merge(inp.company, on=["session", "symbol_id"], how="left", suffixes=("", "_ctx"))
     frame = frame.merge(inp.market, on="session", how="left")
     if spec.call == "B":
-        frame = frame.merge(inp.reaction, on=["session", "symbol_id"], how="left")
+        react = inp.reaction_d1 if spec.decision_point == "D1" else inp.reaction
+        if react is None:
+            raise StatesError(f"{spec.name}: no D1 reaction inputs (the d1 stage loads them)")
+        frame = frame.merge(react, on=["session", "symbol_id"], how="left")
     rows, kept = [], {}
     skip = skipped(inp, spec.window)
     for rec in _records(frame):
@@ -1156,9 +1172,11 @@ def sample_frames(d0: pd.DataFrame, cfg: StatesConfig) -> tuple[pd.DataFrame, pd
 OUTPUTS: Final = ("callA_d0_E3", "callA_d2_E3", "callB_d2_E3", "market_E3")
 
 
-def write_states(df: pd.DataFrame, rel: str, description: str, lay: Layout) -> None:
+def write_states(
+    df: pd.DataFrame, rel: str, description: str, lay: Layout, producer: str = PRODUCER
+) -> dict[str, Any]:
     df = df.sort_values(["session", "company_id", "event_id"], kind="mergesort").reset_index(drop=True)
-    io.write_parquet(df, rel, producer=PRODUCER, description=description, layout=lay)
+    return io.write_parquet(df, rel, producer=producer, description=description, layout=lay)
 
 
 def exclusion_counts(
@@ -1287,9 +1305,88 @@ def run_states(layout: Layout | None = None) -> dict[str, Any]:
     return stats
 
 
+# --- D1 stage (NA-10 S6) ------------------------------------------------------------------------------
+
+
+def reaction_frame_d1(lay: Layout, cfg: StatesConfig) -> pd.DataFrame:
+    """D1 reaction inputs for the train / val-A / val-B D0 event keys (never the test period), from
+    ``work/panel/intraday_public.parquet`` through ``panel.reactions.build_reactions(..., "D1")``."""
+    from newsaction.bars import INTRADAY_PUBLIC, INTRADAY_SPY_PUBLIC
+    from newsaction.panel.reactions import D1_INPUT_COLUMNS, build_reactions
+
+    keys = io.read_parquet(EVENTS_D0, columns=["event_id", "session", "symbol_id", "split"], layout=lay)
+    d0 = keys.loc[keys["split"].isin(B_SPLITS), ["session", "symbol_id"]].drop_duplicates()
+    if bool((d0["session"] >= load_splits().splits["test"].start).any()):
+        raise StatesError("Call B D1 reactions requested for a test-period session")
+    intra = io.read_parquet(
+        INTRADAY_PUBLIC, columns=[*D1_INPUT_COLUMNS, "g_d1", "logv10_mad60"], layout=lay
+    ).loc[:, lambda f: ~f.columns.duplicated()]
+    react = d0.merge(
+        build_reactions(intra, "public", "D1", layout=lay), on=["session", "symbol_id"], how="left"
+    )
+    first, last = context_span()
+    grid = ctx.session_grid(first, last, cfg.context.history_sessions)
+    spy = io.read_parquet(INTRADAY_SPY_PUBLIC, columns=["session", "r_spy_c10"], layout=lay)
+    spy_change = spy.set_index("session")["r_spy_c10"].reindex(grid).to_numpy(dtype="float64")
+    out = ctx.reaction_d1(
+        react, intra[["session", "symbol_id", "g_d1", "logv10_mad60"]], spy_change, grid, cfg
+    )
+    return out.sort_values(["session", "symbol_id"], kind="mergesort").reset_index(drop=True)
+
+
+def run_d1(layout: Layout | None = None) -> dict[str, Any]:
+    """``callB_d1_E3``: Call B on W0 news with the reaction by 10:00, train / val-A / val-B (NA-10 S6).
+
+    NA-04's builder, masking and W0 exclusions (explainers, TradingView, non-English and running market
+    stories: the D1 state is decided before the close, so the W0 rule applies). The news list keeps the
+    leading articles that fit 1,024 tokens with Call B's longest core question and the longest possible D1
+    ``reaction_so_far`` (``worst_reaction``), so the cut never depends on the observed reaction; it can be
+    shorter than the Call A D0 state's list. Writes reaction_d1 and callB_d1_E3 only."""
+    lay = resolve_layout(layout)
+    cfg = load_states_config()
+    tok = tokens.tokenizer(load_events_config().events)
+    qtok = question_tokens(load_battery(), tok)
+    react = reaction_frame_d1(lay, cfg)
+    io.write_parquet(
+        react,
+        REACTION_D1,
+        producer=PRODUCER_D1,
+        description="NA-10 S6: D1 reaction inputs of Call B (train, val-A, val-B D0 events only)",
+        layout=lay,
+    )
+    inp = load_inputs(lay)
+    inp.reaction_d1 = react
+    t = cfg.tokens
+    budget = Budget(
+        tok, t.total_max - t.special_tokens - qtok["B"]["longest_core"], worst_reaction(tok, inp.cb, "D1")
+    )
+    d0 = io.read_parquet(EVENTS_D0, layout=lay)
+    b_events = d0.loc[d0["split"].isin(B_SPLITS)]
+    spec = make_spec("callB_d1_E3", "B", "W0", "E3", True, cfg)
+    df, _ = build_event_states(b_events, spec, inp, cfg, budget=budget)
+    running = inp.excluded_w0 - inp.excluded
+    stats: dict[str, Any] = _budget_stats(
+        df, len(b_events), exclusion_counts(b_events, "news_w0", skipped(inp, "W0"), inp.non_english, running)
+    )
+    stats["cap"] = budget.cap
+    entry = write_states(
+        add_tokens(df, tok, qtok),
+        CALL_B_D1,
+        "NA-10 S6: Call B on D1 (W0 news + reaction by 10:00), train/val-A/val-B, masked, E3",
+        lay,
+        PRODUCER_D1,
+    )
+    stats.update(rows=entry["rows"], sha256=entry["sha256"])
+    stats["reaction_missing"] = int(react["g_d1"].isna().sum())
+    out = lay.artifacts / "NA-10" / "build_states_d1.json"
+    out.parent.mkdir(parents=True, exist_ok=True)
+    out.write_text(json.dumps(stats, indent=2, default=str) + "\n", encoding="utf-8")
+    return stats
+
+
 # --- CLI ----------------------------------------------------------------------------------------------
 
-STAGES: Final = ("context", "mask", "states", "report")
+STAGES: Final = ("context", "mask", "states", "report", "d1")
 
 
 def _stage(name: str) -> Callable[[Layout | None], Any]:
@@ -1299,6 +1396,8 @@ def _stage(name: str) -> Callable[[Layout | None], Any]:
         return run_mask
     if name == "states":
         return run_states
+    if name == "d1":
+        return run_d1
     from newsaction.states.report import run_report
 
     return run_report

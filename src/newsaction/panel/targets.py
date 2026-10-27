@@ -16,6 +16,13 @@ sqrt(sigma_id^2 + k * sigma_cc^2) (PREREG §15 clarification); D0 targets use th
 D2 forward targets those of row t+1 (data through t). Same-day z_x are clipped at +-10 in the panel;
 multi-day z targets are not clipped. Level units (A1.2) divide by sigma_cc,t with no sqrt(h).
 
+D1 targets (NA-10; ``compute_d1_targets``): y1 = AR(10:00 -> C_t) / sigma_rest (clipped at +-10, a same-day
+z); AR(10:00 -> C_{t+k}) = AR(10:00 -> C_t) + Sum_{j=1..k} AR_cc,t+j and its z over
+sqrt(sigma_rest^2 + k * sigma_cc^2), k in {1, 5} (PREREG §5.6); the A1.2 forward pieces from the D1 entry
+in level units, AR(10:00 -> h) / sigma_cc,t for h in {C_t, C_{t+1}, C_{t+5}, C_{t+20}} (A1.5). All use the
+sigmas of row t (the D1 decision is at 10:00 of t, so data through t-1). The 10:00 -> C_t piece and the
+sigmas come from ``bars.derive``.
+
 Purge (§4.1): a target whose horizon ends after the last session of the split containing t is NaN.
 Sessions before the first split belong to ``"warmup"``, which ends the session before it.
 Delistings (§5.8): after a symbol's last traded session, AR_cc counts as 0 (the last price is
@@ -43,6 +50,10 @@ LADDER_DAYS: Final = (0, 1, 2, 5, 10, 20, 60)  # C_{t+k} rungs; the O_t rung is 
 D2_HORIZONS: Final = (1, 5, 20)
 D0_HORIZONS: Final = (1, 5)
 PLACEBO_LOOKBACK: Final = 5
+Z_CLIP: Final = 10.0  # PREREG §5.4: same-day z are clipped at +-10
+D1_HORIZONS: Final = (1, 5)  # PREREG §5.6 D1 secondaries: -> C_{t+1}, -> C_{t+5}
+D1_LADDER: Final = (0, 1, 5, 20)  # A1.5 gap closure from the D1 entry: h in {C_t, C_{t+1}, C_{t+5}, C_{t+20}}
+D1_INPUT_COLUMNS: Final = ("session", "symbol_id", "ar_10c", "sigma_rest")
 
 INPUT_COLUMNS: Final = (
     "session",
@@ -61,6 +72,11 @@ def blinded_price_files() -> tuple[str, str]:
     """Names of the blinded test-period price files, as the lock knows them."""
     year = load_splits().splits[TEST].start.year
     return f"prices_raw_{year}", f"total_return_check_{year}"
+
+
+def blinded_bars_file() -> str:
+    """Name of the blinded test-period 30-minute bars (NA-10), as the lock knows it."""
+    return f"bars30_{load_splits().splits[TEST].start.year}"
 
 
 def split_of_session(d: date) -> str:
@@ -166,6 +182,97 @@ def compute_targets(panel: pd.DataFrame, sessions: Sequence[date]) -> pd.DataFra
     out["delist_within_c20"] = (last_pos < len(index) - 1) & (r_pos <= last_pos) & (r_pos + 20 > last_pos)
     out["session"] = out["session"].dt.date
     return out
+
+
+def _purged(
+    rows: pd.DataFrame, index: pd.DatetimeIndex, symbols: list[int], t: dict[str, tuple[pd.DataFrame, int]]
+) -> pd.DataFrame:
+    """Each target of ``t`` on ``rows`` (session, symbol_id), NaN where its horizon leaves the row's split."""
+    r_pos = index.get_indexer(pd.Index(rows["session"]))
+    c_pos = pd.Index(symbols).get_indexer(pd.Index(rows["symbol_id"]))
+    if (r_pos < 0).any() or (c_pos < 0).any():
+        raise ValueError("target rows outside the grid")
+    split_names = [split_of_session(d.date()) for d in rows["session"]]
+    ends = {n: index.searchsorted(pd.Timestamp(split_end(n)), side="right") - 1 for n in set(split_names)}
+    end_pos = np.array([ends[n] for n in split_names], dtype=np.int64)
+    out = rows.reset_index(drop=True).copy()
+    out["split"] = split_names
+    for name, (values, horizon) in t.items():
+        v = values.to_numpy(dtype="float64")[r_pos, c_pos]
+        out[name] = np.where(r_pos + horizon <= end_pos, v, np.nan)
+    return out
+
+
+def compute_d1_targets(panel: pd.DataFrame, intraday: pd.DataFrame, sessions: Sequence[date]) -> pd.DataFrame:
+    """D1 targets (module docstring) for the ``intraday`` rows whose session is in ``sessions``.
+
+    ``panel``: the daily panel (session, symbol_id, ar_cc, sigma_cc) covering the horizons;
+    ``intraday``: ``bars.derive`` rows (session, symbol_id, ar_10c, sigma_rest)."""
+    missing = [c for c in ("session", "symbol_id", "ar_cc", "sigma_cc") if c not in panel.columns]
+    missing += [c for c in D1_INPUT_COLUMNS if c not in intraday.columns]
+    if missing:
+        raise ValueError(f"inputs lack columns {missing}")
+    p = panel[["session", "symbol_id", "ar_cc", "sigma_cc"]].copy()
+    q = intraday[list(D1_INPUT_COLUMNS)].copy()
+    for f in (p, q):
+        f["session"] = pd.to_datetime(f["session"]).dt.normalize()
+    lo, hi = p["session"].min().date(), p["session"].max().date()
+    index = pd.DatetimeIndex([pd.Timestamp(d) for d in calendar.sessions(lo, hi)], name="session")
+    symbols = sorted(q["symbol_id"].unique().tolist())
+
+    def grid(f: pd.DataFrame, col: str) -> pd.DataFrame:
+        g = f.pivot_table(index="session", columns="symbol_id", values=col, aggfunc="first")
+        return g.reindex(index=index, columns=symbols).astype("float64")
+
+    ar_cc, last = _held_after_last_trade(grid(p, "ar_cc"))
+    s_cc, ar_10c, s_rest = grid(p, "sigma_cc"), grid(q, "ar_10c"), grid(q, "sigma_rest")
+    t: dict[str, tuple[pd.DataFrame, int]] = {"y1": ((ar_10c / s_rest).clip(-Z_CLIP, Z_CLIP), 0)}
+    t["ar_10_c0"] = (ar_10c, 0)
+    for k in D1_HORIZONS:
+        ar = ar_10c + _fwd_sum(ar_cc, 1, k)
+        t[f"ar_10_c{k}"] = (ar, k)
+        t[f"z_10_c{k}"] = (ar / (s_rest**2 + k * s_cc**2).pow(0.5), k)
+    for k in D1_LADDER:
+        ar = ar_10c + _fwd_sum(ar_cc, 1, k) if k else ar_10c
+        t[f"fwd_lvl_10_c{k}"] = (ar / s_cc, k)
+    wanted = {pd.Timestamp(d) for d in sessions}
+    rows = q.loc[q["session"].isin(wanted), ["session", "symbol_id"]].drop_duplicates()
+    out = _purged(rows, index, symbols, t)
+    last_pos = last.to_numpy()[pd.Index(symbols).get_indexer(pd.Index(out["symbol_id"]))]
+    r_pos = index.get_indexer(pd.Index(out["session"]))
+    out["delist_within_c20_d1"] = (last_pos < len(index) - 1) & (r_pos <= last_pos) & (r_pos + 20 > last_pos)
+    out["session"] = out["session"].dt.date
+    return out
+
+
+def build_d1_targets(
+    panel: pd.DataFrame, intraday: pd.DataFrame, period: str, *, layout: Layout | None = None
+) -> pd.DataFrame:
+    """PREREG §5.6 D1 / A1.2 targets for ``period``; the test period only through ``newsaction.lock``
+    (the blinded bars first, then the blinded prices), after unblinding."""
+    test_start = load_splits().splits[TEST].start
+    if period == TEST:
+        bars = lock.read_sealed(blinded_bars_file(), "targets", layout=layout)
+        prices, total = (lock.read_sealed(n, "targets", layout=layout) for n in blinded_price_files())
+        from newsaction.bars import derive  # derive imports this module
+        from newsaction.panel import build  # build imports this module
+
+        test_panel = build.test_returns_panel(prices, total, layout=layout)
+        test_intraday = derive.test_intraday_panel(bars, prices, total, layout=layout)
+        test_sessions = calendar.sessions(test_start, load_splits().splits[TEST].end)
+        return compute_d1_targets(test_panel, test_intraday, test_sessions)
+    names = {*SPLIT_ORDER, WARMUP, PUBLIC} - {TEST}
+    if period not in names:
+        raise ValueError(f"unknown period {period!r}; expected one of {sorted(names | {TEST})}")
+    for f in (panel, intraday):
+        if bool((pd.to_datetime(f["session"]) >= pd.Timestamp(test_start)).any()):
+            raise LockError(
+                "public D1 targets refuse test-period rows: use period='test' (through newsaction.lock)"
+            )
+    days = sorted({pd.Timestamp(d).date() for d in intraday["session"]})
+    if period != PUBLIC:
+        days = [d for d in days if split_of_session(d) == period]
+    return compute_d1_targets(panel, intraday, days)
 
 
 def build_targets(panel: pd.DataFrame, period: str, *, layout: Layout | None = None) -> pd.DataFrame:

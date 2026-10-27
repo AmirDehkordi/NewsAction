@@ -30,11 +30,14 @@ encodings:                  # PREREG §6.11 / §8.4; only move values change wit
     week: a typical week's move
     month: a typical month's move
     three_months: a typical three-month move
+    d1: a typical move by this time of day   # NA-10: D1 moves (previous close -> 10:00) are in units of a typical
+                                              # move over that window: (σ_on² + σ_30²)^½ for the stock (PREREG §5.5)
   e4_period:                # E4 "larger than 97% of its daily moves in the past year"
     day: daily
     week: weekly
     month: monthly
     three_months: three-month
+    d1: same-time-of-day                      # NA-10
   e4_article: {up: a rise, down: a fall}
   e0_units:                 # E0 raw changes: percent for prices, basis points for rates, points for the VIX
     pct: {format: "{:+.1f}%", scale: 100.0}

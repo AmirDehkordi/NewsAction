@@ -32,7 +32,7 @@ thresholds: null    # NA-11: delta/RG thresholds and confidence gates
 calibration: null   # NA-11: calibration maps and their val-A fit ranges
 
 questions_v1_sha256: e602c6c0a354c7309756f929c0776ec8da0d4b2d29f8c3fb6c59199317a0c85a   # NA-04: sha256 of configs/questions_v1.yaml
-codebook_v1_sha256: 934e63253ac896c39cf5640940e53456d0114ee6672d5ec1414cd34f3d67e129   # NA-04: sha256 of configs/codebook_v1.yaml
+codebook_v1_sha256: 9f23123cc4adb696f01a3de46b4da6a4206482c06cb7ee23a2440a6a02cfb8f1   # NA-04: sha256 of configs/codebook_v1.yaml (NA-10: d1 move phrases)
 
 free_model_approvals: {}   # operator approvals of :free endpoints (CLAUDE.md C13): none; format {model_id: "approved by, date"}
 

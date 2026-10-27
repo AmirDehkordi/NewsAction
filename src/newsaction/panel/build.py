@@ -531,6 +531,15 @@ def test_returns_panel(
         "r_spy_cc",
         "z_vol",
         "member",
+        # the D1 route (bars.derive.test_intraday_panel, NA-10)
+        "is_rep",
+        "sector",
+        "raw_open",
+        "raw_close",
+        "r_on",
+        "r_spy_on",
+        "beta_m",
+        "beta_s",
     )
     return long_panel(asm, asm.sessions, cols, panel_rows(asm))
 

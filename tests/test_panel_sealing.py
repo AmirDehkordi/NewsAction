@@ -103,8 +103,9 @@ def test_public_routes_refuse_test_period_rows() -> None:
         targets.placebo_means(df.assign(tier="mid", y=0.0), ["y"], pd.Series([True]))
 
 
-def test_d1_is_a_stub_until_na10() -> None:
-    with pytest.raises(NotImplementedError):
+def test_d1_public_route_needs_the_intraday_columns() -> None:
+    """NA-10 replaced the NA-01 stub: the public D1 route reads the intraday panel's columns."""
+    with pytest.raises(ValueError, match="intraday panel lacks columns"):
         reactions.build_reactions(pd.DataFrame({"session": [date(2025, 1, 2)]}), "public", "D1")
 
 

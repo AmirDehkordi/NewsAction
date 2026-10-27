@@ -38,10 +38,10 @@ from newsaction import calendar
 from newsaction.config import load_project, load_yaml
 from newsaction.states import CODEBOOK_PATH, ENCODINGS, Encoding
 
-Horizon = Literal["day", "week", "month", "three_months"]
+Horizon = Literal["day", "week", "month", "three_months", "d1"]  # d1: previous close -> 10:00 (NA-10)
 Unit = Literal["pct", "bp", "points"]
 DecisionLabel = Literal["D1", "D2"]
-HORIZONS: Final[tuple[Horizon, ...]] = ("day", "week", "month", "three_months")
+HORIZONS: Final[tuple[Horizon, ...]] = ("day", "week", "month", "three_months", "d1")
 
 
 class CodebookError(ValueError):

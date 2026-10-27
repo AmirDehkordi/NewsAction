@@ -1,0 +1,65 @@
+# NA-10: 30-minute bars from FMP (PRD NA-10; PREREG §2.5, §5.4–5.6, A1.2; CLAUDE.md E18). Read by
+# newsaction.bars. Hashed into the NA-11 freeze with every configs/*.yaml. Bar times are never written here:
+# every bar is located from the session's open and close (newsaction.calendar), as CLAUDE.md A1 requires.
+
+vendor:
+  base_url: "https://financialmodelingprep.com"
+  path: "/stable/historical-chart/30min"   # ATOM IR-04 (docs/runbooks/fmp_intraday_capability.json)
+  path_v3: "/api/v3/historical-chart/30min/{symbol}"   # legacy form, symbol in the path (probe 6-7 only)
+  interval: 30min                          # the only interval: never 1-minute bars (CLAUDE.md E18)
+  bar_minutes: 30
+  timezone: America/New_York               # vendor labels are New York wall time, start-labelled (IR-04)
+  key_env: FMP_API_KEY                     # environment or .env; never printed, logged or stored
+  rate_limit_rps: 7.0                      # below IR-04's measured 8.1 requests per second at 30 minutes
+  timeout_s: 90.0
+  max_attempts: 4                          # every attempt is a request: reserved in the ledger first
+  backoff_s: 3.0
+
+probe:
+  max_requests: 5                          # PRD NA-10 S2
+  # Operator approval 2026-10-27, after the first five showed a 30-day cap on /stable: two more requests
+  # to check whether the legacy /api/v3 30-minute endpoint serves a longer window.
+  approved_extra: 2
+
+fetch:
+  # Symbols: the representative class of every company that is an index member at any session from
+  # membership_start to the test end (PRD S3 names 2024-06-03; the earlier start adds the companies that left
+  # in 2024-H1, so the leave-one-out sector of the warm-up sessions is complete).
+  membership_start: 2024-01-02
+  # Bars from the robustness start: σ_30 / σ_rest (126 sessions ending t-1, at least 60; PREREG §5.4) are
+  # then available from the first train session. A company's bars start at most history_sessions before its
+  # first member session in the range, and end at its last member session.
+  stock_start: 2024-01-02
+  history_sessions: 126
+  # SPY: the D1 market move is scored against SPY's 252 previous close -> 10:00 moves (configs/states.yaml
+  # context.history_sessions, at least 126), so its bars start a year earlier.
+  spy_symbol: SPY
+  spy_start: 2023-01-03
+  # A ticker under which FMP serves another company's bars for part of the range: those sessions come from
+  # the alias ticker (the plan adds its windows; assembly drops the primary ticker's bars there). Found by the
+  # basis check of the fetched bars; configs/news.yaml lists the same renames for the news (NA-02).
+  aliases:
+    # NYSE:DOC was Physicians Realty Trust until its 2024-03-01 merger into Healthpeak, which traded as PEAK:
+    # FMP's DOC bars of 2024-01-02 .. 02-29 sit at a constant 1/1.51 of Healthpeak's EOD level.
+    - {ticker: DOC, alias: PEAK, start: 2024-01-02, end: 2024-02-29}
+    # Renames FMP does not carry back: no CPAY bars before 2024-03-25 (FleetCor, FLT) and no DAY bars before
+    # 2024-02-01 (Ceridian, CDAY).
+    - {ticker: CPAY, alias: FLT, start: 2024-01-02, end: 2024-03-22}
+    - {ticker: DAY, alias: CDAY, start: 2024-01-02, end: 2024-01-31}
+  # Spans whose bars are not the company's and have no usable alias: their bars are dropped. FMP's PSKY bars
+  # before the 2025-08-07 Skydance merger follow another intraday path than Paramount Global's EOD prices
+  # (EOD close / bar close 0.985-1.023 at q10-q90; 2024-06-03: EOD 11.95 -> 12.51, bars 13.02 -> 12.90), and
+  # FMP's PARA is now another security (0.19-3.41 USD; 20 requests spent finding out).
+  exclude:
+    - {ticker: PSKY, start: 2024-01-02, end: 2025-08-06}
+
+reconcile:
+  open_tolerance_bp: 5.0                   # PRD AC2: first-bar open vs the EOD raw open
+  # Price basis of a session (newsaction.bars.basis), known at 10:00 (CLAUDE.md A1): the level of session t is
+  # the median over the symbol's previous trailing_sessions sessions of phi_close = EOD close / last bar close
+  # (known by close(t-1)); within basis_tolerance of 1 it is 1 (as traded). The open of t confirms it: phi_open
+  # = EOD open / first-bar open (both known at the open) must agree with that level within agree_tolerance;
+  # if not but it agrees with 1, the shift has ended (as traded); otherwise the session is not used.
+  basis_tolerance: 0.003
+  agree_tolerance: 0.015
+  trailing_sessions: 5
