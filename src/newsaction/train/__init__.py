@@ -168,9 +168,10 @@ class RunSpec(_Strict):
     epochs: int | None = Field(default=None, gt=0)
     shuffle_labels: bool = False
     predict: tuple[Literal["val_a", "val_b", "test"], ...] = ("val_a", "val_b", "test")
-    deferred: bool = (
-        False  # planned, not run yet (operator decision); the import ensembles the seeds that exist
-    )
+    # deferred: planned, not run yet (operator decision); the import ensembles the seeds that exist
+    deferred: bool = False
+    # time_budget_hours: this run's budget when it must be below the model's (e.g. the quota left at the push)
+    time_budget_hours: float | None = Field(default=None, gt=0)
 
     @model_validator(mode="after")
     def _shape(self) -> RunSpec:

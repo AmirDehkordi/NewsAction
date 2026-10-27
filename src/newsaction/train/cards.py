@@ -186,7 +186,18 @@ def controls(
     else:
         out["shuffled_label"] = {"run": c.shuffle_run, "status": "not run"}
     a, b = c.repro_runs
-    if have(a) and have(b):
+
+    def stopped_early(run: str) -> bool:
+        rec = read_json(lay.work / PREDICTIONS_DIR / run / f"{PREFIX}{run}_run_record.json")
+        return bool(rec["stopped_by_time_budget"])
+
+    stopped = [r for r in (a, b) if have(r) and stopped_early(r)]
+    if stopped:
+        out["reproducibility"] = {
+            "runs": [a, b],
+            "status": f"not comparable: {stopped} stopped by the time budget before the end of the epoch",
+        }
+    elif have(a) and have(b):
         res = {}
         for r in (a, b):
             ev = run_eval(r, keys, labels, cfg, lay)

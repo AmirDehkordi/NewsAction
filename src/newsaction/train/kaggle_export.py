@@ -540,7 +540,7 @@ def run_parameters(run: RunSpec, cfg: TrainingConfig) -> dict[str, Any]:
                 "amp",
             )
         },
-        "TIME_BUDGET_HOURS": m.time_budget_hours,
+        "TIME_BUDGET_HOURS": run.time_budget_hours or m.time_budget_hours,
         "PIP": list(m.pip),
         "PILOT": cfg.kaggle.pilot.model_dump(mode="json"),
         "ECE_BINS": cfg.evaluation.ece_bins,

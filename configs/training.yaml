@@ -102,7 +102,8 @@ kaggle:                           # PRD NA-08 S4, S6
     - {name: shuffle-s13, mode: train, init: laya, seed: 13, epochs: 1, shuffle_labels: true, predict: [val_a]}
     - {name: laya-s13, mode: train, init: laya, seed: 13, epochs: 1}
     - {name: anchor-s13, mode: train, init: modernbert, seed: 13, epochs: 1}
-    - {name: repro-s13, mode: train, init: laya, seed: 13, epochs: 1, predict: [val_a]}   # controls: val-A only
+    - {name: repro-s13, mode: train, init: laya, seed: 13, epochs: 1, predict: [val_a],   # controls: val-A only
+       time_budget_hours: 7.0}    # 7.19 h of quota left at the push: outputs are written before it runs out
     - {name: laya-s17, mode: train, init: laya, seed: 17, epochs: 1, deferred: true}
     - {name: laya-s23, mode: train, init: laya, seed: 23, epochs: 1, deferred: true}
     - {name: anchor-s17, mode: train, init: modernbert, seed: 17, epochs: 1, deferred: true}
