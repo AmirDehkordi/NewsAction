@@ -1,0 +1,4 @@
+model,encoding,role,n_series,n_complete,n_monotone,share_large_non_decreasing,share_small_non_increasing,share,target,passes,leading
+liquid/d1-ultra,E3,gate,60,60,10,0.4666666667,0.2166666667,0.1666666667,0.9,False,True
+nace-ai/drex-v2.0,E3,gate,60,60,4,0.15,0.06666666667,0.06666666667,0.9,False,False
+respan/span-02,E3,gate,60,60,5,0.3166666667,0.1166666667,0.08333333333,0.9,False,False
