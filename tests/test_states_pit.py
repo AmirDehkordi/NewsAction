@@ -112,8 +112,9 @@ def test_call_a_has_no_reaction_block() -> None:
     bad = replace(spec, blocks={**spec.blocks, "reaction_so_far": ("g_d2",)})
     with pytest.raises(pit.PITError, match="Call B"):
         validate_spec(bad)
-    with pytest.raises(ctx.ContextError):
-        ctx.block_columns("reaction_so_far", "W0", "E3", CFG)
+    # NA-10: the W0 reaction block is the D1 block (Call B on W0 news); it reads D1 columns only
+    reg = pit.default_registry()
+    assert {reg.kind(c) for c in ctx.block_columns("reaction_so_far", "W0", "E3", CFG)} == {"d1"}
 
 
 def test_build_validates_before_reading_rows() -> None:

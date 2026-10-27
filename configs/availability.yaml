@@ -275,3 +275,55 @@ columns:
   title_masked: w0                   # masked title_clean (PREREG §6.3)
   snippet_masked: w0
   market_news_w2: w2                 # A3.5 market-index articles of W2(s)
+  # --- NA-10 D1 (10:00 ET) inputs (work/panel/intraday_public.parquet, intraday_spy_public.parquet,
+  # work/states/reaction_d1.parquet; newsaction.bars.derive, panel.reactions, panel.targets). 10:00 is the close
+  # of the first 30-minute bar: what is known by then is `d1`; anything later in the session is `post`.
+  bars_d1: d1                   # the first regular bar (09:30-10:00) of s exists and its session is usable
+  bars_complete: post           # every regular bar of s is there (13; 7 on a half day): known at the close
+  first_open: d1                # open of the first regular bar (vendor), ATOM's raw level
+  p_open: d1                    # official open O_s (EOD raw open): known at the open
+  p10: d1                       # P_10:00: close of the first regular bar
+  v10: d1                       # volume of the first regular bar
+  p_pre: d1                     # close of the bar that ends at the open (pre-market, extended hours)
+  p1530: post                   # P_15:30
+  p_close: post                 # official close C_s (EOD raw close)
+  r_c10: d1                     # close(prev) -> 10:00
+  r_o10: d1                     # open -> 10:00
+  r_10c: post                   # 10:00 -> close
+  r_spy_c10: d1
+  r_spy_o10: d1
+  r_spy_10c: post
+  r_sec_c10: d1                 # leave-one-company-out sector, same windows (PREREG §5.2)
+  r_sec_o10: d1
+  r_sec_10c: post
+  r_sec_n10: d1
+  ar_c10: d1
+  ar_o10: d1
+  ar_10c: post
+  sigma_30: t_minus_1           # 1.4826 MAD of AR(open -> 10:00), 126 sessions ending t-1 (PREREG §5.4-5.5)
+  sigma_rest: t_minus_1         # ... of AR(10:00 -> close); half days scaled
+  logv10_med60: t_minus_1       # first-bar log volume: median / 1.4826 MAD over the 60 sessions ending t-1
+  logv10_mad60: t_minus_1
+  z_vol10: d1                   # first-bar abnormal volume of s
+  g_d1_lvl: d1                  # A1.2 G^lvl at D1: AR(close(prev) -> 10:00) / sigma_cc
+  react_d1_r: d1
+  react_d1_r_spy: d1
+  react_d1_z_vol: d1
+  react_d1_g_pct: d1            # |G_D1| vs the stock's previous 252 |G_D1| (E4)
+  react_d1_spy_z: d1            # SPY's close(prev) -> 10:00 return / its robust sigma of that window through t-1
+  react_d1_spy_pct: d1
+  react_d1_volume_multiple: d1  # first-bar volume / its median over the 60 sessions through t-1
+  car_lvl_10: post              # A1.2 10:00 rung of the convergence ladder (same value as g_d1_lvl): an outcome
+  ar_10_c0: post                # D1 targets (PREREG §5.6, A1.2/A1.5)
+  ar_10_c1: post
+  ar_10_c5: post
+  z_10_c1: post
+  z_10_c5: post
+  fwd_lvl_10_c0: post
+  fwd_lvl_10_c1: post
+  fwd_lvl_10_c5: post
+  fwd_lvl_10_c20: post
+  delist_within_c20_d1: post
+  spy_open: d1                  # intraday_spy_public: SPY's EOD open, close and P_10:00
+  spy_close: post
+  spy_p10: d1

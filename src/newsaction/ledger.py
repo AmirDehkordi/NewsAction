@@ -375,15 +375,26 @@ class AccessLedger:
 
 
 class FmpLedger:
-    """``ledgers/fmp_requests.jsonl``: one line per FMP request, reserved before it is sent."""
+    """``ledgers/fmp_requests.jsonl``: a ``request`` line for each FMP request, reserved before it is sent,
+    and a ``response`` line with its status and row count once it returns (NA-10). Only ``request`` lines
+    count toward the cap, so a request that never returned still counts."""
 
     def __init__(self, path: Path | None = None, cap: int | None = None) -> None:
         self._ledger = JsonlLedger(LEDGERS / FMP_REQUESTS if path is None else path)
         self.cap = load_project().fmp_request_cap if cap is None else cap
         self._count = 0
 
+    @property
+    def path(self) -> Path:
+        return self._ledger.path
+
     def _sync_locked(self) -> None:
-        self._count += len(self._ledger._read_new_locked())
+        for rec in self._ledger._read_new_locked():
+            event = rec.get("event")
+            if event == "request":
+                self._count += 1
+            elif event != "response":
+                raise LedgerCorrupt(f"{self.path}: unknown FMP event {event!r}")
 
     def count(self) -> int:
         with self._ledger._lock:
@@ -402,6 +413,25 @@ class FmpLedger:
             self._ledger._append_locked({"event": "request", "n": self._count + 1, "meta": dict(meta or {})})
             self._sync_locked()
             return self._count
+
+    def record_response(
+        self,
+        n: int,
+        *,
+        status: int | None,
+        rows: int | None,
+        nbytes: int | None = None,
+        error: str | None = None,
+    ) -> None:
+        """Log the outcome of request ``n`` (``status`` None: no HTTP answer, e.g. a timeout)."""
+        with self._ledger._lock:
+            self._ledger._append_locked(
+                {"event": "response", "n": n, "status": status, "rows": rows, "bytes": nbytes, "error": error}
+            )
+            self._sync_locked()
+
+    def records(self) -> list[dict[str, Any]]:
+        return self._ledger.records()
 
 
 # --- CLI ------------------------------------------------------------------------------------------

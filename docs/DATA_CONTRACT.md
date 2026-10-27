@@ -915,3 +915,117 @@ no test outcome was read.
 - **Rows / coverage:** one record
 - **Availability:** n/a
 - **sha256:** `7586758528db865d23a4dc4a8f0da47458df9960cffd28e3519d78b2e5c5840e`
+
+## NA-10 — 30-minute bars (FMP), D1 (10:00) inputs, sealed 2026
+
+Producer: `newsaction.bars` (`fetch`, `derive`; `uv run python -m newsaction.bars.<module>`) and
+`newsaction.states.build --stage d1`. Vendor: FMP `/stable/historical-chart/30min` with `extended=true&nonadjusted=true`
+(`configs/bars.yaml`; capability and request count in `artifacts/NA-10/capability.json`), every request in
+`ledgers/fmp_requests.jsonl`. Bars are start-labelled New York wall time; every bar is located by its slot after
+the session's open (`newsaction.calendar`), never by clock time.
+
+### `work/bars30/raw/` (gitignored cache, not an artifact)
+- **Producer:** `bars.fmp30.FmpClient` (public windows only: a window that reaches the test period is never cached here)
+- **Schema:** one gzip JSON per request, `<sha256 of interval + parameters>.json.gz`: {`version`, `request` (interval, symbol, from, to, switches), `status`, `n` (ledger request number), `fetched_at`, `text` (the vendor's answer)}; no key
+- **Availability:** as the bars below. Re-runs of `fetch --part public` read it and send nothing for a cached window.
+
+### `work/bars30/bars_public.parquet`
+- **Producer:** `bars.fetch --part public` (`fetch.frame_of` on the cached answers; aliases and exclusions of `configs/bars.yaml` applied)
+- **Inputs:** the cached FMP answers; `work/snapshot/prices_raw.parquet` (first EOD day per symbol, for the plan); `work/panel/panel_public.parquet`, `panel_test_inputs.parquet` (member, is_rep: the symbols)
+- **Schema:** `symbol_id` int64, `ticker` (FMP ticker asked, dictionary), `session` date32, `bar_start` timestamp[ns, UTC], `slot` int64 (30-minute steps after the open: 0 = the first regular bar, −1 = the bar that ends at the open, −11 … 20 with extended hours), `regular` bool (0 ≤ slot < 13, or < 7 on a half day), `open`, `high`, `low`, `close`, `volume` double (as served: levels before any basis factor, volume regular-hours venues), `request_key` (dictionary), `switches` (dictionary; one value, `extended=true&nonadjusted=true`)
+- **Key:** `(symbol_id, bar_start)`
+- **Rows / coverage:** 5,698,440 bars of 544 companies' representative classes + SPY, sessions 2023-01-03 (SPY) / 2024-01-02 … 2025-12-31; 3,302,680 regular, 1,300,777 pre-market
+- **Availability:** a bar is known at its end (`bar_start` + 30 minutes); the first regular bar of s at 10:00 ET (D1). Not a model input as such (`intraday_public` holds the D1 inputs).
+- **sha256:** `d6a92498f46d556265f335d7d43abb02d93825e38b9f5dfac7a38febce6b3790`
+
+### `work/bars30/session_qc.parquet`
+- **Producer:** `bars.derive` (`bars.basis.session_qc`)
+- **Inputs:** `bars_public.parquet`, `work/snapshot/prices_raw.parquet`, `work/panel/mapping.parquet` (`level_factor`)
+- **Schema:** `symbol_id` int64, `session` date32, `n_regular`, `n_expected` int64, `complete` bool, `first_open`, `bar_high`, `bar_low`, `last_close`, `eod_open`, `eod_high`, `eod_low`, `eod_close`, `level_factor`, `phi_open`, `phi_high`, `phi_low`, `phi_close`, `level_prev`, `open_dev_bp` double, `open_ok` bool, `basis` string (as_traded / rescaled / inconsistent / no_eod), `factor` double, `usable` bool
+- **Key:** `(symbol_id, session)`
+- **Rows / coverage:** 255,488 symbol-sessions with regular bars (public)
+- **Availability:** `factor` / `basis` / `usable` use the symbol's previous 5 sessions and the session's own open (known at 10:00); `complete`, `last_close`, `phi_close` are known at the close. QC table, not a model input.
+- **sha256:** `2bb1b1a3c65f1657f3f1d6f63c2a8c4169f980dd2b6c33e6e64c20f91fa01dde`
+
+### `work/panel/intraday_public.parquet`
+- **Producer:** `bars.derive` (`derive.compute`; `panel.reactions.build_reactions(..., "public", "D1")`; `panel.targets.build_d1_targets(..., "public")`)
+- **Inputs:** `bars_public.parquet`, `session_qc.parquet`, `work/panel/panel_public.parquet` (member, is_rep, sector, raw open / close, r_on, r_spy_on, ar_cc, β, σ), `work/snapshot/prices_raw.parquet` (SPY EOD), `work/snapshot/symbols.parquet`
+- **Schema:** `session` date32, `symbol_id`, `company_id` int64, `split` string, `member`, `is_rep`, `half_day`, `bars_complete`, `bars_d1` bool; `sigma_on`, `sigma_cc` (NA-01, t−1); `p_open`, `p_close`, `first_open`, `p10`, `v10`, `p1530`, `p_pre` (ATOM's raw level); `r_c10`, `r_o10`, `r_10c`, `r_spy_c10`, `r_spy_o10`, `r_spy_10c`, `r_sec_c10`, `r_sec_o10`, `r_sec_10c`, `r_sec_n10`, `ar_c10`, `ar_o10`, `ar_10c`; `sigma_30`, `sigma_rest`, `logv10_med60`, `logv10_mad60`, `z_vol10`; `g_d1`, `g_d1_lvl`, `car_lvl_10`, `react_d1_r`, `react_d1_r_spy`, `react_d1_z_vol`; `y1`, `ar_10_c0`, `ar_10_c1`, `z_10_c1`, `ar_10_c5`, `z_10_c5`, `fwd_lvl_10_c0`, `fwd_lvl_10_c1`, `fwd_lvl_10_c5`, `fwd_lvl_10_c20` double; `delist_within_c20_d1` bool (definitions: PREREG §15 NA-10 row 2)
+- **Key:** `(session, symbol_id)` unique
+- **Rows / coverage:** 252,309 panel rows of the 544 symbols with bars, 2024-01-02 … 2025-12-31 (249,950 with P_10:00); G_D1 from 2024-03-28 (σ_30 needs 60 sessions)
+- **Availability:** per column in `configs/availability.yaml`: `d1` (P_10:00, the close(prev) → 10:00 and open → 10:00 returns and AR, G_D1, G^lvl, z_vol10, P_pre), `t_minus_1` (σ_30, σ_rest, the volume baseline), `post` (P_15:30, the close, 10:00 → close pieces, `car_lvl_10`, the D1 targets). No test-period row.
+- **sha256:** `2c8b3722ba68ed0d728603d963cbbde028abccf7f718e8f2b42ac193ad3f9f2d`
+
+### `work/panel/intraday_spy_public.parquet`
+- **Producer:** `bars.derive` (`derive.spy_returns`)
+- **Inputs:** SPY's bars in `bars_public.parquet`, its EOD open / close (`work/snapshot/prices_raw.parquet`), `r_spy_on` (`work/panel/panel_public.parquet`)
+- **Schema:** `session` date32, `spy_open`, `spy_close`, `r_spy_on`, `spy_p10`, `r_spy_c10`, `r_spy_o10`, `r_spy_10c` double
+- **Key:** `session` unique
+- **Rows / coverage:** 628 sessions 2023-07-03 … 2025-12-31 (SPY's D1 history for the states)
+- **Availability:** `d1` (open, P_10:00, close(prev) → 10:00), `post` (close, 10:00 → close)
+- **sha256:** `fb82dd7b75a01ca8d152c5a1d0c841d08e28c50ebb56e0ce489611b29385207f`
+
+### `work/snapshot/sealed/bars30_2026.parquet`
+- **Producer:** `bars.fetch --part test` (`fetch.write_test_part` → `lock.write_sealed`; written once, never read in NA-10; one `write` entry in `ledgers/test_access.jsonl`)
+- **Schema:** as `bars_public.parquet`
+- **Key:** `(symbol_id, bar_start)`
+- **Rows / coverage:** 2,060,207 bars (test period); requests and answer counts in the FMP ledger
+- **Availability:** BLINDED. Readable only through `newsaction.lock` (`reactions` after the NA-11 freeze; `targets` after unblinding), by `panel.reactions.build_reactions(..., "test", "D1")` and `panel.targets.build_d1_targets(..., "test")` through `bars.derive.test_intraday_panel`.
+- **sha256:** `1d08a2447c07f5fc2f0b84e4a11eb0a00e4bd6edc07adfbd616b9ae9bcd37bdd`
+
+### `work/states/reaction_d1.parquet`
+- **Producer:** `newsaction.states.build --stage d1` (`states.build.reaction_frame_d1`, `states.context.reaction_d1`)
+- **Inputs:** `work/panel/intraday_public.parquet`, `intraday_spy_public.parquet`, `work/events/events_d0.parquet`
+- **Schema:** `session` date32, `symbol_id` int64, `g_d1`, `g_d1_lvl`, `car_lvl_10`, `react_d1_r`, `react_d1_r_spy`, `react_d1_z_vol`, `react_d1_g_pct`, `react_d1_spy_z`, `react_d1_spy_pct`, `react_d1_volume_multiple` double
+- **Key:** `(session, symbol_id)` unique
+- **Rows / coverage:** 38,164 = the D0 event keys of train, val-A and val-B (no test row)
+- **Availability:** `d1` (the reaction by 10:00 of s; σ and E4 histories through t−1); `car_lvl_10` `post` (carried along, not rendered). Never a Call A input.
+- **sha256:** `4daa36ad248d2f6a9a2490c3a84d4806b899d79813a9d690159c15001b61e6b3`
+
+### `work/states/callB_d1_E3.parquet`
+- **Producer:** `newsaction.states.build --stage d1` (`states.build.run_d1`; NA-04's builder, masking and W0 exclusions)
+- **Inputs:** as the NA-04 state files, plus `reaction_d1.parquet`
+- **Schema / key:** as "State files" (NA-04); `window` W0, `call` B
+- **Rows / coverage:** 37,562 D0 events of train, val-A and val-B with text ; 543 have every listed article excluded, 59 no text after masking; 597 states show 'not available' for the move (no G_D1 that session); 1,055 carry fewer articles than their Call A D0 twin
+- **Availability:** an input at D1 (10:00 ET of `session`); `pit.check_inputs` validated every block at D1 (`reaction_so_far` reads `d1` columns only). No test-period row before the freeze.
+- **sha256:** `500962d70d8caa53c2daed5de6a37fbb5205bad96c81393e39328de0d3b18ea9`
+
+### `artifacts/NA-10/capability.json`
+- **Producer:** `newsaction.bars.probe` (7 requests in all; re-runs read the cache)
+- **Schema:** {`endpoint`, `vendor_timezone`, `bar_label`, `requests_sent_this_run`, `probe_requests_total`, `probes` [per probe: request, rows, first / last bar, sessions served, completeness, extended bars, open vs EOD], `facts` (window cap in days with per-probe bounds, extended, nonadjusted, v3), `decision` {api, extended, nonadjusted, basis, window_days}, `projection` {windows, by part, requests needed, cap, headroom, stop, scopes}, `fmp_request_cap`, `ledger_requests_remaining`, `corroboration`}
+- **Key:** n/a
+- **Rows / coverage:** one record
+- **Availability:** n/a (vendor capability; no price statistic)
+- **sha256:** `6fad2a68e23dc04225295619a0ef4c60bcdcf6b2bc391c69a08357a160349b4c`
+
+### `artifacts/NA-10/summary.json`
+- **Producer:** `scripts/na10_report.py`
+- **Schema:** {`ledger` (requests by purpose, rows, empty answers, statuses), `capability`, `bars_public_rows`, `bars_test_rows_from_manifest`, `member_sessions` (complete, half days, usable, open within 5 bp, open deviation quantiles, basis counts, exceptions), `intraday_member_rows`, quantiles of `sigma_30`, `sigma_rest`, `g_d1`, `g_d1_lvl`, `y1`, `corr_g_d1_lvl_vs_g_d2_lvl`, `d1_events_train_val`, `spy_sessions`, `states_d1`, `states_d1_tokens`}
+- **Key:** n/a
+- **Rows / coverage:** one record (public sessions only; the test-period bars only as row counts from the manifest)
+- **Availability:** n/a
+- **sha256:** `d6f2591f5a9eae5b94458da365b7618d259eb3b34498269282b64f6fec756a95`
+
+### `artifacts/NA-10/build_states_d1.json`
+- **Producer:** `newsaction.states.build --stage d1`
+- **Schema:** {`rows`, `articles_excluded`, `articles_excluded_non_english`, `articles_excluded_running`, `events_all_excluded`, `events_without_text`, `states_with_dropped_articles`, `articles_dropped`, `texts_cut`, `cap` (state token budget), `sha256` (of `callB_d1_E3.parquet`), `reaction_missing`}
+- **Key:** n/a
+- **Rows / coverage:** one record
+- **Availability:** n/a
+- **sha256:** `cd005ed5547593b10949b558aa9225e90f973d520b2ea312c3c959395580edda`
+
+### `artifacts/NA-10/basis_by_symbol.csv`
+- **Producer:** `scripts/na10_report.py`
+- **Schema:** `symbol_id`, `ticker`, `sessions`, `as_traded`, `rescaled`, `inconsistent`, `factor_min`, `factor_max`, `first_rescaled`, `last_rescaled` (symbols with at least one rescaled or inconsistent public session)
+- **Key:** `symbol_id`
+- **Rows / coverage:** public sessions only
+- **Availability:** n/a (QC)
+- **sha256:** `38215a42d85dfb3e50e2971ef9dff7d7b2f835623dddb3eb20d077ec415bb8fb`
+
+### `artifacts/NA-10/member_session_exceptions.csv`
+- **Producer:** `scripts/na10_report.py`
+- **Schema:** `ticker`, `session`, `n_regular`, `n_expected`, `basis`, `phi_open`, `phi_close`, `level_prev`: the public member-sessions that are not complete or not usable (AC2's listed exceptions)
+- **Key:** `(ticker, session)`
+- **Rows / coverage:** public sessions only
+- **Availability:** n/a (QC)
+- **sha256:** `893e6e8e81925d71472f8ce63c97c0e2abdc7ceaee68d48dd3b001f3954b5f92`

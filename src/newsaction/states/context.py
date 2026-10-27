@@ -24,6 +24,10 @@ observation dated on or before each session; its daily change (return or differe
 ``z`` = change / (1.4826 · MAD), ``pct`` = percent of past |changes| below |change| (≥ 126). The VIX also gets
 its level percentile. ``mkt_spy_ret_m{k}`` is SPY's k-session return through t−1 (E0 benchmark).
 
+**Reaction at D1** (Call B on W0 news; NA-10, public sessions only): ``reaction_d1`` takes G_D1 and the
+stock's and SPY's close(prev) → 10:00 moves from ``panel.reactions.build_reactions(..., "D1")`` and scores SPY
+and the first bar's volume as below; moves are encoded in typical close(prev) → 10:00 moves (codebook ``d1``).
+
 **Reaction at D2** (Call B; public sessions only): ``panel.reactions.build_reactions`` gives G = z_cc,t and
 the stock's and SPY's close-to-close returns and z_vol,t; the state adds SPY's same-day z against its 252
 changes through t−1, the E4 percentiles, and the volume multiple exp(z_vol,t · 1.4826·MAD) = V_t / median V.
@@ -350,6 +354,66 @@ def reaction_d2(
     return react.drop(columns=["logv_mad60"])
 
 
+# --- D1 reaction (NA-10) -----------------------------------------------------------------------------
+
+
+def reaction_d1(
+    reactions: pd.DataFrame,
+    intraday: pd.DataFrame,
+    spy_change: FloatArray,
+    sessions: Sequence[date],
+    cfg: StatesConfig,
+) -> pd.DataFrame:
+    """Call B ``reaction_so_far`` inputs at D1 per (session, symbol_id) of ``reactions`` (public sessions).
+
+    ``reactions``: ``panel.reactions.build_reactions(..., "D1")`` output; ``intraday``: rows of
+    ``work/panel/intraday_public.parquet`` with ``g_d1`` (for the E4 history of the stock's own D1 moves, rows
+    before t) and ``logv10_mad60`` (t−1); ``spy_change``: SPY's close(prev) → 10:00 return on ``sessions``
+    (``intraday_spy_public``) for its σ and E4 history. As at D2: SPY's z against its 252 previous moves of
+    the same window, the E4 percentiles, and the first bar's volume multiple exp(z_vol10 · 1.4826·MAD), which
+    is V / median V.
+    """
+    w, m = cfg.context.history_sessions, cfg.context.history_min
+    zg = _grid(intraday, "g_d1", sessions)
+    react = reactions.merge(
+        intraday[["session", "symbol_id", "logv10_mad60"]], on=["session", "symbol_id"], how="left"
+    )
+    pos = {d: i for i, d in enumerate(sessions)}
+    pad = np.concatenate([np.full(w, np.nan), spy_change])
+    spy_win = sliding_window_view(pad, w)[: len(spy_change)]
+    spy_stats = history_stats(spy_change, w, m)
+    pct_g, spy_z, spy_pct = [], [], []
+    col_pos = {c: i for i, c in enumerate(zg.columns)}
+    zarr = zg.to_numpy()
+    for s, sym, g, r_spy in zip(
+        react["session"], react["symbol_id"], react["g_d1"], react["react_d1_r_spy"], strict=True
+    ):
+        i = pos.get(s)
+        if i is None:
+            raise ContextError(f"session {s} is not on the context grid")
+        j = col_pos.get(sym)
+        hist = zarr[max(0, i - w) : i, j] if j is not None else np.array([])
+        hist = hist[~np.isnan(hist)]
+        pct_g.append(
+            100.0 * float((np.abs(hist) < abs(g)).mean())
+            if len(hist) >= m and not math.isnan(g)
+            else math.nan
+        )
+        sh = spy_win[i][~np.isnan(spy_win[i])]
+        sigma = spy_stats.sigma[i]
+        spy_z.append(r_spy / sigma if not (math.isnan(sigma) or math.isnan(r_spy)) else math.nan)
+        spy_pct.append(
+            100.0 * float((np.abs(sh) < abs(r_spy)).mean())
+            if len(sh) >= m and not math.isnan(r_spy)
+            else math.nan
+        )
+    react["react_d1_g_pct"] = pct_g
+    react["react_d1_spy_z"] = spy_z
+    react["react_d1_spy_pct"] = spy_pct
+    react["react_d1_volume_multiple"] = np.exp(react["react_d1_z_vol"] * react["logv10_mad60"])
+    return react.drop(columns=["logv10_mad60"])
+
+
 # --- rendering ---------------------------------------------------------------------------------------
 
 
@@ -389,8 +453,13 @@ def block_columns(block: Block, window: StateWindow, encoding: Encoding, cfg: St
     if block == "news":
         return [f"news_{sfx}", "title_masked", "snippet_masked", "t_avail", "source_class_domain"]
     if block == "reaction_so_far":
-        if window != "W2":
-            raise ContextError("reaction_so_far exists only at D2 (D1 needs the NA-10 bars)")
+        if window == "W0":  # Call B on W0 news is the D1 state (PREREG §2.5; NA-10)
+            cols = ["react_d1_volume_multiple"]
+            cols += {
+                "E0": ["react_d1_r", "react_d1_r_spy"],
+                "E4": ["g_d1", "react_d1_g_pct", "react_d1_spy_z", "react_d1_spy_pct"],
+            }.get(encoding, ["g_d1", "react_d1_spy_z"])
+            return cols
         cols = ["react_volume_multiple"]
         cols += {
             "E0": ["react_r_cc", "react_r_spy_cc"],
@@ -497,7 +566,32 @@ def attention_block(row: Row, window: StateWindow, cb: Codebook) -> dict[str, An
     }
 
 
-def reaction_block(row: Row, encoding: Encoding, cb: Codebook) -> dict[str, Any]:
+def reaction_block(row: Row, encoding: Encoding, cb: Codebook, point: str = "D2") -> dict[str, Any]:
+    """The ``reaction_so_far`` block at D2 (by the close) or D1 (half an hour after the open; NA-10)."""
+    if point == "D1":
+        return {
+            "time": cb.time_label_word("D1"),
+            "stock_move_vs_market_and_sector": _move(
+                row,
+                cb,
+                encoding,
+                z="g_d1",
+                raw="react_d1_r",
+                pct="react_d1_g_pct",
+                bench="react_d1_r_spy",
+                horizon="d1",
+            ),
+            "stock_market_move": _move(
+                row,
+                cb,
+                encoding,
+                z="react_d1_spy_z",
+                raw="react_d1_r_spy",
+                pct="react_d1_spy_pct",
+                horizon="d1",
+            ),
+            "volume_vs_normal": cb.attention_word(row.num("react_d1_volume_multiple")),
+        }
     return {
         "time": cb.time_label_word("D2"),
         "stock_move_vs_market_and_sector": _move(

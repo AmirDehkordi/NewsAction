@@ -22,7 +22,7 @@ budget:                           # OpenRouter USD, PREREG §13
     NA-11: 18.0
     NA-15: 2.0
 
-fmp_request_cap: 3000             # PREREG §13 (NA-10 only)
+fmp_request_cap: 17000            # PREREG §13 (NA-10 only): 3,000, raised to 17,000 in §15 (NA-10, 2026-10-27)
 
 seeds:
   global: 2026                    # PREREG §8.2 stratified samples, §11.4 bootstrap

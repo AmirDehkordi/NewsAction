@@ -43,7 +43,7 @@ TIMEZONE, EXCHANGE = "America/New_York", "XNYS"  # PREREG §2.1
 D0_CUTOFF, D1_TIME = time(9, 15), time(10, 0)  # PREREG §2.4, §2.5
 TOTAL_USD, RESERVE_USD = 30.0, 1.8  # PREREG §13
 CHUNK_CAPS = {"NA-05": 0.2, "NA-06": 4.0, "NA-07": 2.0, "NA-09": 2.0, "NA-11": 18.0, "NA-15": 2.0}  # §13
-FMP_REQUEST_CAP = 3000  # PREREG §13
+FMP_REQUEST_CAP = 17000  # PREREG §13 (3,000), raised in the §15 row of NA-10 (operator decision 2026-10-27)
 GLOBAL_SEED = 2026  # PREREG §8.2, §11.4
 
 
@@ -103,6 +103,9 @@ def test_fmp_cap_and_seed() -> None:
     p = load_project()
     assert p.fmp_request_cap == FMP_REQUEST_CAP
     assert "**FMP:** ≤ 3,000 requests" in PREREG
+    log = PREREG[PREREG.index("## 15. Deviations log") :]
+    assert "| NA-10 (operator decision) | §13 (FMP ≤ 3,000 requests)" in log
+    assert "raised from 3,000 to **17,000**" in log
     assert p.seeds["global"] == GLOBAL_SEED
     assert "seed 2026" in PREREG
 
