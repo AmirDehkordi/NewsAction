@@ -36,7 +36,7 @@ The work is delivered as chunks NA-00…NA-15 in `NewsAction PRD.md`:
 - **Splits** (PREREG §4): train 2024-07-01→2025-06-30 · val-A 2025-07-01→2025-09-30 · val-B 2025-10-01→2025-12-31 · **test 2026-01-02→2026-07-31 (blinded)**.
 - **Budgets:**
   - OpenRouter: **hard cap $30 total**, plus per-chunk caps from the PRD.
-  - FMP: ≤ 3,000 requests, and only in NA-10.
+  - FMP: ≤ 17,000 requests (raised from 3,000 by the operator; PREREG §15, NA-10 rows), and only in NA-10.
   - Kaggle: free 2×T4 (NA-08).
 - **Secrets** live in `.env` (gitignored): `OPENROUTER_API_KEY`, `ATOM_DB_PASSWORD`, `FMP_API_KEY`. Never print, log or commit them.
 
@@ -126,7 +126,8 @@ cache/                  decision-model response cache (sqlite; gitignored)
 17. **ATOM is read-only** (NA-01's snapshot export only). Never write to the ATOM DB or repo.
 18. **FMP is used only in NA-10:**
     - 30-min bars, never 1-minute;
-    - ≤ 3,000 requests total, logged in `ledgers/fmp_requests.jsonl`;
+    - ≤ 17,000 requests total (raised from 3,000 by the operator after FMP proved to serve 30 days per
+      30-minute request; PREREG §15, NA-10 rows; 15,858 used), logged in `ledgers/fmp_requests.jsonl`;
     - if more would be needed, STOP and ask.
 19. **`Data/` is read-only.** All derived data goes under `work/` and is registered in `work/MANIFEST.json` and `docs/DATA_CONTRACT.md`.
 

@@ -54,7 +54,7 @@ LLM run and NA-11 use val-B after that; NA-08 and NA-09 produce val-B prediction
 | NA-07 | [Research] Encoding and anchoring study | 06 | $2 | — |
 | NA-08 | [Build] Trained decision models on Kaggle (Laya-Fin + ModernBERT anchor) | 04 | $0 | Kaggle free 2×T4 |
 | NA-09 | [Build] Baselines (incl. generative LLM at matched cost) | 04 | $2 | — |
-| NA-10 | [Build] 30-min bars (FMP, ≤ 3,000 requests), D1 inputs | 01, 04 | $0 | FMP ≤ 3,000 req |
+| NA-10 | [Build] 30-min bars (FMP, ≤ 3,000 requests), D1 inputs | 01, 04 | $0 | FMP ≤ 17,000 req (raised from 3,000; PREREG §15 NA-10) |
 | NA-11 | [Run] Final selection, **freeze**, production, ablations | 06–10 | $18 | Kaggle inference |
 | NA-12 | [Research] Unblinding and pre-registered analyses | 11 | $0 | — |
 | NA-13 | [Research] Strategies and economic significance | 12 | $0 | — |
@@ -1697,6 +1697,10 @@ Verdict: PASS / FAIL per AC1–AC5 and GAC with the val-A IC table (and confirm 
 ---
 
 ## NA-10 — [Build] 30-min bars from FMP (≤ 3,000 requests): D1 (10:00) inputs, sealed 2026
+
+> **Operator decision (2026-10-27):** the probe showed that FMP serves only 30 calendar days per 30-minute request,
+> so the cap was raised to 17,000 (PREREG §15, NA-10 rows; 15,858 used). The 3,000 figures below are the original
+> specification.
 
 **Category:** Phase 1b — optional but **recommended** data. 30-min bars make the post-open decision **tradeable**: decide at 10:00 with the gap plus the first half hour, enter at the 10:00 bar close. They also give exact 10:00/15:30 prices and (if served) a pre-market price. Hard cap: 3,000 FMP requests; never 1-minute.
 

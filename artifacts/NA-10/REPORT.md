@@ -114,6 +114,14 @@ PARA is now a different, penny-priced security: 20 requests spent finding out).
 the opening auction. P_10:00 and every D1 return use the official EOD open, so the 5 bp gap does not enter them;
 the basis decision uses the trailing close ratio confirmed by the open within 1.5% (§15 row 3).
 
+*Correction (NA-10 verification, 2026-10-27).* Not all of the gap is first trade vs auction.
+- About 1.3 percentage points of the 27.1% outside 5 bp are price-basis sessions. CTVA, for example, has a vendor
+  level about 0.150 of EOD.
+- After the per-session basis factor, 73.96% of usable sessions are within 5 bp. The remaining misses centre on
+  0 bp, and in 85% of them the official open lies inside the first bar's range.
+
+The first-bar open only decides whether a session's basis is usable; no value is computed from it.
+
 ### 3.5 D1 quantities (public)
 
 | | q10 | q50 | q90 |
