@@ -1,4 +1,5 @@
-"""A synthetic event frame with every column the NA-09 fitted baselines read (tests/test_baselines_*.py).
+"""A synthetic event frame with every column the NA-09 fitted baselines read (tests/test_baselines_*.py), and
+the fits that use it, run in a spawned process.
 
 Sessions every third business day of train, val-A, val-B and the test period; ``n`` events a session; the
 first five val-A sessions are the embargo. Targets carry a little signal from ``sent_mean`` and
@@ -7,7 +8,11 @@ first five val-A sessions are the embargo. Targets carry a little signal from ``
 
 from __future__ import annotations
 
+import multiprocessing
+from collections.abc import Callable
+from concurrent.futures import ProcessPoolExecutor
 from datetime import date
+from pathlib import Path
 from typing import Any
 
 import numpy as np
@@ -15,6 +20,7 @@ import pandas as pd
 
 from newsaction.baselines import BaselinesConfig, GbmConfig, GbmGrid
 from newsaction.baselines.data import ATTENTION, FLAGS, INTENSITIES, SOURCE_CLASSES, TAG_TYPES
+from newsaction.paths import Layout
 
 RANGES = {
     "train": (date(2024, 7, 1), date(2025, 6, 30)),
@@ -91,3 +97,70 @@ def small_config(cfg: BaselinesConfig) -> BaselinesConfig:
     )
     ridge = cfg.embed_ridge.model_copy(update={"lambdas": (1.0, 100.0)})
     return cfg.model_copy(update={"tags_gbm": gc, "price_only": gc, "embed_ridge": ridge})
+
+
+# --- fits in a spawned process -----------------------------------------------------------------------
+# LightGBM (Homebrew libomp) and torch (its own libomp) must not share a process (newsaction.baselines.gbm);
+# the live Laya test loads torch in the pytest process, so every LightGBM fit of the tests runs here.
+
+
+def fake_embeddings(events: pd.DataFrame, layout: Any = None) -> np.ndarray:
+    rng = np.random.default_rng(1)
+    return rng.normal(size=(len(events), 384)).astype(np.float32)
+
+
+def fit_all(root: str) -> dict[str, pd.DataFrame]:
+    """Every fitted baseline on ``frame()`` in the throwaway repository at ``root`` (via ``isolated``)."""
+    from newsaction.baselines import baselines_config, embed_ridge, price_only, sentiment, tags_gbm
+
+    embed_ridge.event_embeddings = fake_embeddings  # type: ignore[assignment]
+    lay = Layout(Path(root))
+    cfg = small_config(baselines_config(lay))
+    f = frame()
+    return {
+        "sentiment": sentiment.fit_predict(f, cfg, lay),
+        "embed_ridge": embed_ridge.fit_predict(f, cfg, lay),
+        "tags_gbm": tags_gbm.fit_predict(f, cfg, lay),
+        "price_only_d0": price_only.fit_predict_d0(f, cfg, lay),
+        "price_only_d2": price_only.fit_predict_d2(f, cfg, lay),
+    }
+
+
+def scrambled_val_a(root: str) -> list[tuple[str, np.ndarray, np.ndarray]]:
+    """(model, max |ΔN_hat|, max |Δmag_hat|) between fits on ``frame()`` and on a copy whose val-A targets are
+    scrambled, with one-point grids (run it with ``isolated``)."""
+    from newsaction.baselines import baselines_config, embed_ridge, sentiment, tags_gbm
+
+    embed_ridge.event_embeddings = fake_embeddings  # type: ignore[assignment]
+    lay = Layout(Path(root))
+    cfg = small_config(baselines_config(lay))
+    one = cfg.model_copy(
+        update={
+            "embed_ridge": cfg.embed_ridge.model_copy(update={"lambdas": (10.0,)}),
+            "tags_gbm": cfg.tags_gbm.model_copy(
+                update={"grid": cfg.tags_gbm.grid.model_copy(update={"num_leaves": (3,)})}
+            ),
+        }
+    )
+    f = frame()
+    g = f.copy()
+    va = g["split"] == "val_a"
+    g.loc[va, ["e5", "abs_z_cc"]] = np.random.default_rng(9).normal(size=(int(va.sum()), 2)) * 10
+    out = []
+    for name, fn in (("sentiment", sentiment.fit_predict), ("embed_ridge", embed_ridge.fit_predict),
+                     ("tags_gbm", tags_gbm.fit_predict)):  # fmt: skip
+        a, b = fn(f, one, lay), fn(g, one, lay)
+        out.append(
+            (
+                name,
+                a["N_hat"].to_numpy() - b["N_hat"].to_numpy(),
+                a["mag_hat"].to_numpy() - b["mag_hat"].to_numpy(),
+            )
+        )
+    return out
+
+
+def isolated[T](fn: Callable[..., T], *args: Any) -> T:
+    """``fn(*args)`` in a fresh (spawned) interpreter; its exceptions are raised here."""
+    with ProcessPoolExecutor(max_workers=1, mp_context=multiprocessing.get_context("spawn")) as ex:
+        return ex.submit(fn, *args).result()

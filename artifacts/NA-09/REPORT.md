@@ -1,11 +1,11 @@
 # NA-09 REPORT — the pre-registered baselines in one prediction schema
 
-Date: 2026-10-27 · Branch `feat/NA-09-baselines` (worktree `NewsAction-NA09`, cut from `main` @ `7bc114b`;
+Date: 2026-10-27 (S6 finished 2026-10-28 00:21 UTC) · Branch `feat/NA-09-baselines` (worktree `NewsAction-NA09`, cut from `main` @ `7bc114b`;
 NA-07, NA-08 and NA-10 ran in parallel in their own worktrees) · Decisions: `docs/decisions/NA-09.md` ·
 Artifacts: `artifacts/NA-09/{baseline_val_metrics.csv, llm_catalog.json, llm_dry_run.json, llm_summary.json,
 key_usage.json, summary.json}` · Work files: `work/baselines/*.parquet`, `work/baselines/models/*.json`.
 
-**Status.** Interim (2026-10-27 11:45 UTC). Everything is done except S6: the Laya zero-shot run is in progress (detached; val-A Call A 5,500 / 8,906 at 11:38 UTC; about 17 h left at ~0.73 s per request), so the Laya prediction file, its val-A metrics, AC5 and the full `make verify` (whose live Laya test contends with the run for the GPU) follow when it ends. This report is then updated.
+**Status.** Complete. An interim commit (`4cf4c2b`, 2026-10-27) held everything but S6. The S6 run ended on 2026-10-28 at 00:21 UTC; its predictions, metrics and checks are in this version.
 
 **Result.**
 - **One prediction schema** (`newsaction.baselines.schema`): {event_id, model, call, split, session, company_id,
@@ -33,7 +33,12 @@ key_usage.json, summary.json}` · Work files: `work/baselines/*.parquet`, `work/
   - The vendor signals' information lands in the overnight gap: IC with z_on 0.074 / 0.076 (t 7.5 / 8.1),
     with the post-decision open→close z_id 0.006 / 0.022 (t 0.5 / 1.7).
   - Magnitude: the tags model explains R² 0.28 of |z_cc| beyond the train mean.
-- **Laya zero-shot (S6).** Local `laya-typed-decisions`, core battery, on every non-test Call A D0 state and every Call B D2 state (88,552 requests, 720 cached by NA-05/06). The operator chose all splits after the >8 h projection. The run is in progress (§4).
+- **Laya zero-shot (S6).** Local `laya-typed-decisions`, core battery, on every non-test Call A D0 state (40,355)
+  and every Call B D2 state (48,197): 88,552 requests, all valid, 13 h 45 min. The operator chose all splits
+  after the >8 h projection. On val-A:
+  - Call A: IC of N̂ with z_cc,t 0.028 (t 2.8), in the gap (z_on 0.046, t 4.2) and not after the open (z_id 0.004);
+  - Call B: N̂ tracks the reaction it is shown (IC with z_cc 0.21, t 10.5); J and C carry no IC with the
+    subsequent drift y2 (−0.006, −0.023).
 - **Generative LLM (S7).** mistralai/mistral-nemo, picked by a rule fixed before any call: matched cost, knowledge cutoff 2024-04-30, before the train start. It answered Q1 as a strict JSON object on 2,000 val-B D0 events: 1,978 valid (234 renormalized), $0.0389 in total, **$0.0194 per 1,000 decisions** against $0.019–0.18 for the API decision models (median $0.042). No val-B metric is computed here.
 - **Spend.** NA-09 $0.038884 of the $2.00 cap: 2,000 chat calls; Laya is local, $0. Cumulative in this worktree's ledger $3.669428 of $30 (NA-05 0.1039, NA-06 3.5266, NA-09 0.0389). The ledger minus Σ cache cost for NA-09 = 0.0.
 - **No val-B or test metric** was computed. `test_access.jsonl` is unchanged (2 NA-01 lines). No D2 or D1 test
@@ -48,9 +53,9 @@ key_usage.json, summary.json}` · Work files: `work/baselines/*.parquet`, `work/
 | S3 embed + ridge | done | `baselines/embed_ridge.py`. Mean bge-small vector of the state's articles + log1p attention (5) → ridge for e5 and \|z_cc\|; λ ∈ {1e−2 … 1e6} on val-A, each a trial. Chosen λ: e5 10, \|z_cc\| 1e4 |
 | S4 tags + GBM | done | `baselines/tags_gbm.py`, `gbm.py`. 47 features (tag counts, flags, sentiment, intensity, source classes, novelty, duplicates, attention, tier, sector); 8-point grid on val-A, each a trial |
 | S5 price-only | done | `baselines/price_only.py`. D0: z_m5/20/60, z_vol(t−1), σ regime, tier, sector → e5, \|z_cc\|. D2: + G, z_on,t, z_vol,t → y2. No test prediction (NA-11, after the freeze, with the saved models) |
-| S6 Laya zero-shot | running | `baselines/laya_zeroshot.py`; `run --stage laya` (detached, log `work/baselines/laya_run.log`); predictions `work/baselines/laya_zeroshot.parquet` |
+| S6 Laya zero-shot | done | `baselines/laya_zeroshot.py`; `run --stage laya` (detached, log `work/baselines/laya_run.log`); predictions `work/baselines/laya_zeroshot.parquet` |
 | S7 generative LLM | done | `dm/client.py` `chat_json` / `chat_json_batch` (every guard); `baselines/llm_baseline.py`; mistralai/mistral-nemo on 2,000 val-B D0 events; `llm_summary.json` |
-| S8 val metrics | done for the fitted baselines; Laya rows follow | `artifacts/NA-09/baseline_val_metrics.csv` (val-A only; by tier); trials logged |
+| S8 val metrics | done | `artifacts/NA-09/baseline_val_metrics.csv` (val-A only; by tier); trials logged |
 
 Also:
 - `configs/baselines.yaml` (new);
@@ -66,15 +71,15 @@ Also:
 | AC | Evidence | Result |
 |---|---|---|
 | AC1 fit ranges | Each of the 9 fit records (`work/baselines/models/<model>_<target>.json`) has a fit range inside train and tuning and calibration ranges inside val-A, computed from the rows used. Example: e5 fit 2024-07-01 … 06-24, 22,267 rows; val-A 2025-07-09 … 09-24, 7,970 rows; \|z_cc\| 22,598 / 8,376; y2 28,673 / 9,751. `check_fit_record` refuses anything else before writing. `tests/test_baselines_fit_ranges.py` runs every baseline on a synthetic frame and checks the recorded ranges and row counts, refuses ranges outside their split (7 cases), refuses a fit fed val-A rows (nothing written), shows that scrambling val-A targets moves no train-fitted N̂, and checks the 9 stored records. **Mutation "embed_ridge fits on train + val-A" (the PRD's) and 5 more: RED** | PASS |
-| AC2 schema | `schema.validate` runs before every write. `tests/test_baselines_schema.py` checks the real files and 17 refused frames: duplicates, events that are not states, wrong company or split, P outside [0, 1], P_up + P_down > 1, negative mag_hat, infinities, neither N_hat nor y_hat, extra not an object, call-B test rows, test rows of price-only / Laya / LLM. Files: sentiment, embed_ridge, tags_gbm 54,332 rows each (every Call A state, the event set equal to the state file's); price_only 40,355 call A + 48,197 call B (every non-test state); llm 1,978. No duplicate (event_id, model, call) in any file | PASS (Laya's file follows) |
+| AC2 schema | `schema.validate` runs before every write. `tests/test_baselines_schema.py` checks the real files and 17 refused frames: duplicates, events that are not states, wrong company or split, P outside [0, 1], P_up + P_down > 1, negative mag_hat, infinities, neither N_hat nor y_hat, extra not an object, call-B test rows, test rows of price-only / Laya / LLM. Files: sentiment, embed_ridge, tags_gbm 54,332 rows each (every Call A state, the event set equal to the state file's); price_only and laya_zeroshot 40,355 call A + 48,197 call B each (every non-test state); llm 1,978. No duplicate (event_id, model, call) in any file | PASS |
 | AC3 no 2026 reactions | No call-B row in the test period; test rows only for sentiment, embed_ridge, tags_gbm (13,977 each). Price-only has no test row: D0 needs a 2026 volume, D2 the 2026 reactions. Laya has none: the client refuses test states before the freeze. `ledgers/test_access.jsonl`: 2 lines, both NA-01. Only 2026-01-02 has `z_vol_lag1` (its previous session is 2025-12-31); the price-only test rows are not made. Schema mutations "call-B test row allowed" and "any model in test": RED | PASS |
 | AC4 budget | NA-09 spend $0.038884 ≤ $2.00 (projection $0.155: bytes / 3 and max_tokens 300, conservative on purpose). The ledger minus Σ `responses.cost` (chunk NA-09; 2,000 chat rows plus 0-cost Laya rows) = 0.0. The account was checked before the first paid call: $10.28 left against $0.000089 for the probe and $0.155 for the batch (`key_usage.json`). The key's own usage moved by $0.173 during S7, because NA-07 spent from the same key in parallel (operator preamble), so the reconciliation is against the cache. `tests/test_chat_json_refusals.py` (36 tests, mock transport, online and offline): every refusal (a)–(f), no local backend, a bad request in a batch sends nothing, deny-only provider, cache hit and offline `CacheMiss`, key sensitivity, projection before the first send, reserve → record order, reconcile 0, HTTP error → release, usage without cost priced, the strict parser. Mutations: 11 chat_json mutations RED | PASS |
-| AC5 Laya | Run in progress (§4) | pending |
-| GAC1 | `make lint` (ruff check and format: 166 files) and `make type` (mypy --strict: 85 files): clean. pytest: 1,532 passed, 1 skipped, 1 xfailed, with `test_dm_laya_local.py::test_live_typed_decisions_on_three_canary_states` deselected. That test loads Laya on MPS and segfaults while the S6 run holds the GPU (two of three combined runs crashed while loading weights; alone it passes). `make manifest` OK (99 artifacts); `make ledgers` OK. The full `make verify` is rerun when S6 ends | pending (full run after S6) |
+| AC5 Laya | `work/baselines/laya_zeroshot.parquet` (88,552 rows, validated). Call A: robustness 2,793, train 22,621, val-A 8,906, val-B 6,035. Call B: train 29,221, val-A 11,148, val-B 7,828; equal to the Call A non-test and Call B state sets. Every answer valid, one build (`local/laya-typed-decisions@55cf4c4e…`). Built offline from the cache, so a rebuild sends nothing. `test_baselines_guards.py::test_laya_prediction_file` recomputes N̂, P_up, P_down and E\|N̂\| from the stored Q1 probabilities. Test Call A: NA-11 after the freeze | PASS |
+| GAC1 | `make verify` exit 0 on 2026-10-28 after S6: ruff "All checks passed!", "166 files already formatted"; mypy --strict "no issues found in 85 source files"; pytest **1,540 passed, 1 xfailed** (169 s), the live Laya test included; manifest "100 artifacts … OK"; ledgers OK (spend 135,870, trials 308, test_access 2, fmp 0). The interim run had crashed in `test_dm_laya_local.py`'s live test. The cause was not GPU contention, as the interim report said: LightGBM and torch load two OpenMP runtimes, and a process holding both segfaults. `baselines/gbm.py` now imports LightGBM lazily, the tests fit LightGBM in a spawned process, and a test checks that importing the package never loads it (§9) | PASS |
 | GAC2 | `git status --porcelain Data/` empty; `make manifest` OK (inputs size + mtime) | PASS |
 | GAC3 | `tests/test_blinding.py` passes (no 2026 literal, no sealed path in `src/`). `test_access.jsonl` unchanged. No 2026 return, volume or reaction was read: test features come from `context_company` (NA-04's t−1 context) and the state's articles | PASS |
 | GAC4 | NA-09 ledger $0.038884416 vs Σ cache cost (chunk NA-09) $0.038884416: difference 0.0. Chunk ≤ $2.00. Total in this worktree's ledger $3.669 ≤ $30; NA-07's spend sits in its own worktree's ledger (operator re-chains at merge) | PASS |
-| GAC5 | 23 new manifest entries (8 `work/baselines/*.parquet`, 9 `work/baselines/models/*.json`, 6 `artifacts/NA-09/*`), each with a DATA_CONTRACT entry and the same sha256 (`make manifest`: OK); the Laya file follows | PASS |
+| GAC5 | 23 new manifest entries (8 `work/baselines/*.parquet`, 9 `work/baselines/models/*.json`, 6 `artifacts/NA-09/*`), each with a DATA_CONTRACT entry and the same sha256 (`make manifest`: 100 artifacts OK) | PASS |
 
 ### 2.1 Mutations
 
@@ -121,10 +126,17 @@ The ranges end where `panel_public`'s purge ends each target inside its split (e
 | embed_ridge | 0.004 (0.4) | −0.016 (−1.2) | −0.039 | 0.017 (1.5) | −0.010 (−0.9) | 0.168 | 0.155 (6.1) |
 | tags_gbm | 0.068 (5.3) | 0.053 (2.4) | 0.013 | 0.076 (8.1) | 0.022 (1.7) | 0.283 | 0.180 (6.5) |
 | price_only (D0) | −0.006 (−0.4) | 0.005 (0.3) | −0.042 | −0.008 (−0.6) | −0.004 (−0.3) | 0.084 | 0.165 (7.3) |
+| laya_zeroshot (Call A) | 0.028 (2.8) | 0.009 (0.6) | −0.035 | 0.046 (4.2) | 0.004 (0.4) | −0.191 * | 0.043 (4.2) |
 
+\* Laya's mag_hat is E|N̂| on Q1's scale, not calibrated to |z_cc|, so its R² against the train mean is
+negative by construction. Its IC is the comparable number.
 
 - 59 sessions (55 for e5); 8,376 events (7,970 with e5).
 - Price-only D2: IC(y_hat, y2) 0.011 (t 1.4), R² vs 0 −0.013, on 9,751 events and 54 sessions.
+- Laya Call B (D2, 10,456 events):
+  - N̂ with z_cc,t: 0.212 (t 10.5); with e5: 0.108 (t 6.7);
+  - J with y2: −0.006 (t −0.5); C with y2: −0.023 (t −1.6), on 9,751 events and 54 sessions;
+  - E|N̂| with |z_cc|: 0.155 (t 4.8).
 
 
 By tier (top100 / mid / rest), IC(N̂, z_cc) and R²(|z_cc|) against the train mean:
@@ -135,6 +147,7 @@ By tier (top100 / mid / rest), IC(N̂, z_cc) and R²(|z_cc|) against the train m
 | embed_ridge | −0.012 (−0.6) | 0.021 (1.4) | 0.010 (0.6) | 0.107 | 0.155 | 0.200 |
 | tags_gbm | 0.055 (2.9) | 0.058 (2.6) | 0.066 (3.6) | 0.152 | 0.283 | 0.334 |
 | price_only | −0.018 (−0.8) | 0.008 (0.3) | −0.014 (−0.6) | 0.048 | 0.063 | 0.111 |
+| laya_zeroshot (A) | 0.013 (0.6) | 0.023 (1.0) | 0.038 (2.3) | * | * | * |
 
 **Reading.**
 - **Vendor signals carry D0 information.** The sentiment map and the tags model rank D0 events as well as the
@@ -146,6 +159,8 @@ By tier (top100 / mid / rest), IC(N̂, z_cc) and R²(|z_cc|) against the train m
 - **bge + ridge** learns magnitude (R² 0.17) but no direction: no λ gives a positive val-A IC with e5.
 - **Price-only** has no directional D0 signal, as expected. Its magnitude R² (0.08) is the volatility baseline
   for H4.
+- **Laya zero-shot** ranks D0 events about half as well as the vendor signals (0.028 vs 0.049–0.068), with the
+  same gap / open→close split. NA-06 stage 1 had 0.037 (t 0.9) on 700 of these events.
 - **Caveats.** Val-A P_up / P_down are in-sample for their maps, so no probability metric is reported here.
   These are val-A numbers, the split the grids were chosen on. Val-B and test are NA-11's.
 
@@ -162,10 +177,37 @@ By tier (top100 / mid / rest), IC(N̂, z_cc) and R²(|z_cc|) against the train m
   - two processes: 0.62 s per state combined.
 
   Batch 1 in one process is fastest. Projection: 13.4 h.
-- **Run:** started 10:36 UTC, detached (`caffeinate`), log `work/baselines/laya_run.log`; peak RSS 2.98 GB. Rate
-  ~0.73 s per request (the GPU is shared with the desktop and other worktrees), so it ends around 04:30 UTC on
-  2026-10-28.
-- **Next:** `--stage laya_predictions` (offline, from the cache), `metrics`, `report`, then the full `make verify`.
+- **Run:** one detached process (`caffeinate`), log `work/baselines/laya_run.log`, peak RSS 2.98 GB, every answer
+  valid (the run stops on an invalid one):
+
+  | Split, call | Requests | New | Cache hits | Start → end (UTC) | s per new request |
+  |---|---|---|---|---|---|
+  | val-A, A | 8,906 | 8,206 | 700 (NA-06 stage 1) | 10-27 10:36 → 12:13 | 0.714 |
+  | val-B, A | 6,035 | 6,014 | 21 (NA-09 smoke test) | 12:13 → 13:04 | 0.503 |
+  | val-A, B | 11,148 | 11,148 | 0 | 13:04 → 14:32 | 0.476 |
+  | val-B, B | 7,828 | 7,828 | 0 | 14:32 → 15:32 | 0.457 |
+  | train, A | 22,621 | 22,601 | 20 (NA-05 canary) | 15:32 → 18:49 | 0.524 |
+  | train, B | 29,221 | 29,221 | 0 | 18:49 → 23:55 | 0.628 |
+  | robustness, A | 2,793 | 2,793 | 0 | 23:55 → 10-28 00:21 | 0.551 |
+  | **total** | **88,552** | **87,811** | **741** | **13 h 45 min** | **0.564** |
+
+  The rate was slowest while the GPU was shared with other work (val-A Call A ran during this chunk's own fits and
+  tests). The cache key is NA-05's (model, state, questions, checkpoint settings), so NA-11's Laya zero-shot on
+  val-B is a cache hit.
+- **Answers:**
+  - one build, `local/laya-typed-decisions@55cf4c4ebb4e…`;
+  - laya reports truncation for 5 of 40,355 Call A states (4 train, 1 val-A; beyond 1,024 tokens with a question)
+    and none of Call B;
+  - probabilities are exact float64, recomputed from the logits (NA-05).
+- **Predictions** (`laya_zeroshot.parquet`): N_hat = N̂, P_up / P_down = Σ p of Q1's rise / fall levels,
+  mag_hat = E|N̂|. `extra` holds M, surprise and tone (Call A) or J, W and C (Call B), the nine Q1
+  probabilities, the build and the truncation flag. This is a zero-shot model: nothing is fitted, and its
+  calibration map (PREREG §7) is NA-11's.
+- **Val-A** (§3.2): Call A IC 0.028 (t 2.8) with z_cc,t, by tier 0.013 / 0.023 / 0.038. Call B's N̂ follows
+  the reaction it is shown (0.21), and its J and C carry no information about the subsequent drift on val-A,
+  as NA-06 found for the API models (IC(J, y2) −0.018 … −0.037).
+- **Test Call A** runs in NA-11 after the freeze. The client refuses it before then, and that guard was not
+  touched.
 
 ## 5. Generative LLM at matched cost (S7)
 
@@ -274,9 +316,21 @@ before the sample.
 
 ## 9. STOP conditions and owner decisions
 
+- **One OpenMP runtime per process** (found when S6 ended; not a STOP).
+  - What happens: LightGBM's library loads Homebrew's `libomp` (its rpath) and torch loads its own. A process
+    holding both segfaults, either way round: `import lightgbm` then loading Laya, or `import torch` then a
+    LightGBM fit, both exit with 139.
+  - How it showed: the new baselines tests imported `newsaction.baselines.gbm`, which had a top-level
+    `import lightgbm`, at pytest collection. The live Laya test (NA-05) then crashed in the same process.
+  - Fix: LightGBM is imported only inside the fitting functions (as NA-03's `events/learned.py` does). The
+    tests' LightGBM fits run in a spawned process (`tests/baselines_fakes.isolated`), and
+    `test_importing_the_baselines_never_loads_lightgbm` keeps it so.
+  - Check: a rerun of `fit` reproduces every `work/baselines` sha256 and adds no trial; torch is never loaded in
+    that process.
+  - For NA-11: run the saved LightGBM models (price-only test predictions) and Laya in separate processes.
+
 - **S6 runtime.** The projection was over ~8 h (13.4 h at batch 1; batching and two processes were slower). I
-  asked before starting, and the operator chose all splits. The run's rate was ~0.73 s per request (GPU shared
-  with the desktop and other worktrees).
+  asked before starting, and the operator chose all splits. The run took 13 h 45 min (0.564 s per new request).
 - **Credit.** Checked before the first paid call: $10.32 left against a $0.155 projection. No STOP fired.
 - **No PREREG §13 STOP condition applies.**
 
@@ -305,9 +359,8 @@ Owner decisions needed:
 - **Docs:** `docs/PREREG.md` §15 row; `docs/decisions/NA-09.md`; `docs/DATA_CONTRACT.md` (NA-09 section);
   `README.md` guard row.
 - **Tests:** `tests/test_baselines_schema.py` (29), `test_baselines_fit_ranges.py` (15),
-  `test_baselines_guards.py` (26), `test_chat_json_refusals.py` (36); fakes `tests/baselines_fakes.py`.
-- **Ledgers:** `ledgers/spend.jsonl` (NA-09: 2,000 reserve / spend pairs); `ledgers/trials.jsonl` (NA-09: 58
-  grid + the final val-A metrics); `test_access.jsonl` unchanged.
+  `test_baselines_guards.py` (27), `test_chat_json_refusals.py` (36); fakes `tests/baselines_fakes.py`.
+- **Ledgers:** `ledgers/spend.jsonl` (NA-09: 2,000 reserve / spend pairs); `ledgers/trials.jsonl` (NA-09: 108 lines, 58 grid points (`baseline_grid`) and 50 final val-A metrics over all tiers (`baseline`)); `test_access.jsonl` unchanged.
 - **Run records:** `artifacts/NA-09/{llm_dry_run.json, key_usage.json, llm_summary.json, summary.json}`;
   `work/baselines/laya_run.log`.
 - **Commands:**

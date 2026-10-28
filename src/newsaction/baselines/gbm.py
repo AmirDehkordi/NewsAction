@@ -5,6 +5,12 @@ each on val-A outside the embargo (mean daily IC with the target, or the R² of 
 logs every configuration as a trial, refits nothing (the selected configuration's train fit is the model)
 and returns it with its fit record. Determinism: fixed seed, ``deterministic`` and ``force_col_wise``, a
 fixed thread count; LightGBM's model text is saved in the record's JSON.
+
+**One OpenMP runtime per process.** LightGBM's library loads Homebrew's ``libomp`` (its rpath) and torch
+loads its own copy; on this machine a process holding both segfaults (LightGBM imported before a torch model
+loads, or torch imported before a LightGBM fit; NA-09 decisions). ``lightgbm`` is therefore imported only
+inside the functions that fit, as ``events.learned`` does, so importing ``newsaction.baselines`` never loads
+it; the ``fit`` stage never loads torch, and the tests run their LightGBM fits in a spawned process.
 """
 
 from __future__ import annotations
@@ -13,9 +19,8 @@ import itertools
 import math
 from collections.abc import Sequence
 from dataclasses import dataclass
-from typing import Any, Final
+from typing import TYPE_CHECKING, Any, Final
 
-import lightgbm as lgb
 import numpy as np
 import numpy.typing as npt
 import pandas as pd
@@ -24,6 +29,9 @@ from newsaction.baselines import BaselinesConfig, GbmConfig, log_trial
 from newsaction.baselines.fitting import fit_rows, ic, r2, save_model, tune_rows
 from newsaction.baselines.schema import FitRecord, Range, grid_rows, row_range
 from newsaction.paths import Layout
+
+if TYPE_CHECKING:
+    import lightgbm as lgb
 
 THREADS: Final = 4
 CATEGORICAL: Final = ("tier", "sector")
@@ -58,6 +66,8 @@ def configs(gc: GbmConfig) -> list[dict[str, Any]]:
 
 
 def regressor(gc: GbmConfig, params: dict[str, Any], seed: int) -> lgb.LGBMRegressor:
+    import lightgbm as lgb
+
     return lgb.LGBMRegressor(
         learning_rate=gc.learning_rate,
         subsample=gc.subsample,
@@ -86,6 +96,8 @@ def fit_select(
     layout: Layout | None = None,
 ) -> Fitted:
     """Grid on val-A, the best configuration's train fit, its predictions for every row of ``frame``."""
+    import lightgbm as lgb
+
     tr, tu = fit_rows(frame, cfg, target), tune_rows(frame, cfg, target)
     x = matrix(frame, features)
     xtr, xtu = x.loc[tr.index], x.loc[tu.index]

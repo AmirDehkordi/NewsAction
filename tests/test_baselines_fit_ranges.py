@@ -9,17 +9,14 @@ refuses to save it, so these tests go red. The stored records of the real run ar
 from __future__ import annotations
 
 import json
-from collections.abc import Callable
 from datetime import date
-from typing import Any
 
 import numpy as np
-import numpy.typing as npt
 import pandas as pd
 import pytest
 
-from baselines_fakes import frame, small_config
-from newsaction.baselines import BaselineError, baselines_config, embed_ridge, price_only, sentiment, tags_gbm
+from baselines_fakes import fit_all, frame, isolated, scrambled_val_a, small_config
+from newsaction.baselines import BaselineError, baselines_config, sentiment
 from newsaction.baselines.fitting import MODELS_DIR, fit_rows, load_record, tune_rows
 from newsaction.baselines.schema import FitRecord, Range, check_fit_record
 from newsaction.config import load_splits
@@ -34,36 +31,13 @@ FITTED = {
 }
 
 
-@pytest.fixture
-def fake_embeddings(monkeypatch: pytest.MonkeyPatch) -> None:
-    def emb(events: pd.DataFrame, layout: Any = None) -> npt.NDArray[np.float32]:
-        rng = np.random.default_rng(1)
-        return rng.normal(size=(len(events), embed_ridge.DIM)).astype(np.float32)
-
-    monkeypatch.setattr(embed_ridge, "event_embeddings", emb)
-
-
-def fit_all(layout: Layout) -> dict[str, pd.DataFrame]:
-    cfg = small_config(baselines_config(layout))
-    f = frame()
-    return {
-        "sentiment": sentiment.fit_predict(f, cfg, layout),
-        "embed_ridge": embed_ridge.fit_predict(f, cfg, layout),
-        "tags_gbm": tags_gbm.fit_predict(f, cfg, layout),
-        "price_only_d0": price_only.fit_predict_d0(f, cfg, layout),
-        "price_only_d2": price_only.fit_predict_d2(f, cfg, layout),
-    }
-
-
 def inside(r: Range, split: str) -> bool:
     rng = SPLITS[split]  # type: ignore[index]
     return r.split == split and rng.start <= r.start <= r.end <= rng.end
 
 
-def test_every_fit_is_train_only_and_every_tuning_val_a_only(
-    tmp_layout: Layout, fake_embeddings: None
-) -> None:
-    fit_all(tmp_layout)
+def test_every_fit_is_train_only_and_every_tuning_val_a_only(tmp_layout: Layout) -> None:
+    isolated(fit_all, str(tmp_layout.root))
     cfg = small_config(baselines_config(tmp_layout))
     f = frame()
     for model, targets in FITTED.items():
@@ -95,33 +69,12 @@ def test_fit_rows_are_the_train_split_only() -> None:
         assert set(tu["split"]) == {"val_a"} and not bool(tu["embargo"].any())
 
 
-def test_predictions_do_not_change_when_val_a_targets_change(
-    tmp_layout: Layout, fake_embeddings: None
-) -> None:
-    """The fit sees no val-A target: scrambling them moves no train-fitted N_hat (only the val-A choices of λ
-    and of the grid, and the val-A probability maps, may move; here with a one-point grid they cannot)."""
-    cfg = small_config(baselines_config(tmp_layout))
-    one = cfg.model_copy(
-        update={
-            "embed_ridge": cfg.embed_ridge.model_copy(update={"lambdas": (10.0,)}),
-            "tags_gbm": cfg.tags_gbm.model_copy(
-                update={"grid": cfg.tags_gbm.grid.model_copy(update={"num_leaves": (3,)})}
-            ),
-        }
-    )
-    f = frame()
-    g = f.copy()
-    va = g["split"] == "val_a"
-    g.loc[va, ["e5", "abs_z_cc"]] = np.random.default_rng(9).normal(size=(int(va.sum()), 2)) * 10
-    fns: list[Callable[..., pd.DataFrame]] = [
-        sentiment.fit_predict,
-        embed_ridge.fit_predict,
-        tags_gbm.fit_predict,
-    ]
-    for fn in fns:
-        a, b = fn(f, one, tmp_layout), fn(g, one, tmp_layout)
-        np.testing.assert_allclose(a["N_hat"], b["N_hat"])
-        np.testing.assert_allclose(a["mag_hat"], b["mag_hat"])
+def test_predictions_do_not_change_when_val_a_targets_change(tmp_layout: Layout) -> None:
+    """The fit sees no val-A target: scrambling them moves no train-fitted N_hat or mag_hat (only the val-A
+    choices of λ and of the grid, and the val-A probability maps, may move; one-point grids fix them)."""
+    for name, dn, dm in isolated(scrambled_val_a, str(tmp_layout.root)):
+        assert np.abs(dn).max() == pytest.approx(0.0, abs=1e-9), name
+        assert np.abs(dm).max() == pytest.approx(0.0, abs=1e-9), name
 
 
 def test_check_fit_record_refuses_ranges_outside_their_split(tmp_layout: Layout) -> None:
@@ -145,7 +98,7 @@ def test_check_fit_record_refuses_ranges_outside_their_split(tmp_layout: Layout)
             check_fit_record(base.model_copy(update=upd), tmp_layout)
 
 
-def test_a_fit_on_train_plus_val_a_is_refused(tmp_layout: Layout, fake_embeddings: None) -> None:
+def test_a_fit_on_train_plus_val_a_is_refused(tmp_layout: Layout) -> None:
     """The guard on the save path: copies of the val-A rows labelled train (so the fit takes them) leave the
     train dates, and nothing is written."""
     cfg = small_config(baselines_config(tmp_layout))

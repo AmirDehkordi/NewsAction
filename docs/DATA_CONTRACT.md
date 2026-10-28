@@ -800,6 +800,15 @@ val-B or test outcome was read.
 - **Availability:** call A: D0 (`t_minus_1`); call B: D2 (`d2_reaction`); fit on train, grid on val-A; no 2026 input
 - **sha256:** `b67b72aa41814a24c1a1e92b589f8ce077268bd43701b337f2da2d7a74a3bf95`
 
+### `work/baselines/laya_zeroshot.parquet`
+- **Producer:** `newsaction.baselines.run --stage laya_zeroshot_predictions`
+- **Inputs:** `work/states/callA_d0_E3.parquet`, `work/states/callB_d2_E3.parquet`, `cache/decisions.sqlite` (chunk NA-09 rows and NA-05 / NA-06 hits)
+- **Schema:** `event_id`, `model`, `call` (A: D0 event with a Call A state; B: D2 event with a Call B state), `split`, `session` (date), `company_id` (int64), `N_hat` (σ units, e5 scale), `P_up` = P(e5 ≥ +0.5), `P_down` = P(e5 ≤ −0.5), `mag_hat` (expected \|move\|), `y_hat` (price-only D2: predicted y2), `extra` (JSON object); `newsaction.baselines.schema`
+- **Key:** (`event_id`, `model`, `call`) unique; `schema.validate` (events match the state files)
+- **Rows / coverage:** PREREG §10.5: local Laya typed-decisions (@55cf4c4e), core battery, from the decision cache: N_hat = N̂, P_up / P_down = Σ p of Q1's rise / fall levels, mag_hat = E\|N̂\|; `extra` M, surprise, tone (A) or J, W, C (B), Q1 probabilities, build, truncation. Call A D0: robustness, train, val-A, val-B; Call B D2: train, val-A, val-B; no test row (NA-11 after the freeze) (88,552 rows)
+- **Availability:** the masked states (D0 / D2); zero-shot, nothing fitted
+- **sha256:** `7dd7b218b1cf974b0d653ed21947cbc384b31563446059fb9899e407e6ba820c`
+
 ### `work/baselines/llm.parquet`
 - **Producer:** `newsaction.baselines.run --stage llm_predictions`
 - **Inputs:** `work/baselines/llm_sample.parquet`, `cache/decisions.sqlite` (NA-09 chat rows)
@@ -951,7 +960,7 @@ val-B or test outcome was read.
 - **Key:** (`model`, `call`, `signal`, `target`, `metric`, `tier`)
 - **Rows / coverage:** val-A outside the embargo only (`metrics.evaluation_rows`); no val-B or test metric
 - **Availability:** n/a (val-A metrics, model choice and spend; no val-B or test value)
-- **sha256:** `889ec1ab30b807a816e1abb3270696d345868bb6f21166b0aa58fc337fdf8476`
+- **sha256:** `5cb239fa1cd3b3bcfed4afec6b7e5d24d0ff23d45f659d6661c770b1d6396d4f`
 
 ### `artifacts/NA-09/summary.json`
 - **Producer:** `newsaction.baselines.run --stage report`
@@ -960,4 +969,4 @@ val-B or test outcome was read.
 - **Key:** n/a
 - **Rows / coverage:** one record
 - **Availability:** n/a (val-A metrics, model choice and spend; no val-B or test value)
-- **sha256:** `e3210199d38b23e581b9345c6e33fe106a70bbce520d1e097ed186ebfff1834c`
+- **sha256:** `fbd0352853166b35025db104ad91404ce44d29abbb2678ad7c6066e707e83ce7`

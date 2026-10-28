@@ -5,6 +5,8 @@ the LLM's selection rule, prompt and answer schema, and the Laya prediction mapp
 from __future__ import annotations
 
 import json
+import subprocess
+import sys
 from datetime import date
 from typing import Any
 
@@ -220,3 +222,19 @@ def test_llm_sample() -> None:
     ev = io.read_parquet("events/events_d0.parquet", columns=["event_id", "embargo"])
     assert not bool(s.merge(ev, on="event_id")["embargo"].any())
     assert s["session"].min() > date(2025, 10, 1)
+
+
+# --- one OpenMP runtime per process ------------------------------------------------------------------------
+
+
+def test_importing_the_baselines_never_loads_lightgbm() -> None:
+    """LightGBM (Homebrew libomp) and torch (its own libomp) segfault in one process (``baselines.gbm``):
+    the package and the test helpers import LightGBM only inside the fitting functions."""
+    code = (
+        "import sys; sys.path.insert(0, 'tests');"
+        "import newsaction.baselines.run, newsaction.baselines.gbm, baselines_fakes;"
+        "assert 'lightgbm' not in sys.modules, 'lightgbm imported'"
+    )
+    r = subprocess.run([sys.executable, "-c", code], cwd=ROOT, capture_output=True, text=True)
+    assert r.returncode == 0, r.stderr[-2000:]
+    assert "lightgbm" not in sys.modules  # nor in this pytest process, which may load torch (live Laya test)
