@@ -70,8 +70,11 @@ class RetryConfig(_Strict):
 
 class ApiConfig(_Strict):
     decisions_url: str
+    chat_url: str
     models_url: str
     key_url: str
+    credits_url: str
+    chat_catalog: str  # the chat-model price snapshot (NA-09 S7), same shape as CATALOG_FILE
     catalog_params: dict[str, str]
     key_env: str
     timeout_s: float = Field(gt=0)
@@ -100,9 +103,18 @@ class CostCalibration(_Strict):
     n_calls: int = Field(ge=1)
 
 
+class ChatCost(_Strict):
+    """Projection of a chat request (``costmodel.estimate_chat``): conservative on purpose."""
+
+    bytes_per_token: float = Field(default=3.0, gt=0)
+    overhead_tokens: float = Field(default=64.0, ge=0)
+    safety: float = Field(default=1.5, ge=1)
+
+
 class CostConfig(_Strict):
     default: CostDefault
     models: dict[str, CostCalibration]
+    chat: ChatCost = Field(default_factory=ChatCost)
 
 
 class LayaConfig(_Strict):

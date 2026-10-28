@@ -327,3 +327,8 @@ columns:
   spy_open: d1                  # intraday_spy_public: SPY's EOD open, close and P_10:00
   spy_close: post
   spy_p10: d1
+  # --- NA-09 baselines (newsaction.baselines.data): inputs derived for the price-only and embedding baselines
+  z_vol_lag1: t_minus_1              # z_vol of prev(s) (price-only D0, PREREG §10.4)
+  react_z_on: d2_reaction            # z_on,s used as a D2 input (price-only D2; PREREG §11.5 R = {G, z_on, ...})
+  embedding: w0                      # bge-small vector of an article's own scrubbed text (NA-02 embeddings_ts)
+  text_sha: w0

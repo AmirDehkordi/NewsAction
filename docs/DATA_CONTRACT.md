@@ -1151,3 +1151,212 @@ sha256 on a rerun (labels and export were run twice: 8 of 8 files identical).
 - **Producer / schema:** as "Prediction files" above; anchor, test: Call A D0 and D2 (react, mag); stored, not evaluated
 - **Rows:** 65,204
 - **sha256:** `d659d3659c2abe819dc454ef06f3b5db848263b2877d3f96061346549f289376`
+
+## NA-09 — baselines (`newsaction.baselines`)
+
+### `work/baselines/sentiment.parquet`
+- **Producer:** `newsaction.baselines.run --stage fit`
+- **Inputs:** `work/baselines/state_articles.parquet`, `work/news/articles_clean.parquet`, `work/events/events_d0.parquet`, `work/states/context_company.parquet`, `work/panel/panel_public.parquet` (targets, train / val-A only)
+- **Schema:** `event_id`, `model`, `call` (A: D0 event with a Call A state; B: D2 event with a Call B state), `split`, `session` (date), `company_id` (int64), `N_hat` (σ units, e5 scale), `P_up` = P(e5 ≥ +0.5), `P_down` = P(e5 ≤ −0.5), `mag_hat` (expected \|move\|), `y_hat` (price-only D2: predicted y2), `extra` (JSON object); `newsaction.baselines.schema`
+- **Key:** (`event_id`, `model`, `call`) unique; `schema.validate` (events match the state files)
+- **Rows / coverage:** PREREG §10.1: mean vendor sentiment of the state's articles → isotonic N_hat (train), OLS mag_hat (train), val-A P maps. Every Call A D0 state, test included (54,332) (54,332 rows)
+- **Availability:** D0 (`w0` / `t_minus_1` inputs, vendor fields as pre-registered baseline signals, PREREG §10); fit on train, tuned and calibrated on val-A (fit records in `work/baselines/models/`); train and val-A rows are in-sample for the fit or the maps. Test rows use only inputs known before the open (no 2026 price, return or volume)
+- **sha256:** `a0350d0fc8bf8a227837fb71f851059236da7f47d43a534a4c21f83679bdc782`
+
+### `work/baselines/embed_ridge.parquet`
+- **Producer:** `newsaction.baselines.run --stage fit`
+- **Inputs:** the above + `work/news/embeddings_ts.parquet`
+- **Schema:** `event_id`, `model`, `call` (A: D0 event with a Call A state; B: D2 event with a Call B state), `split`, `session` (date), `company_id` (int64), `N_hat` (σ units, e5 scale), `P_up` = P(e5 ≥ +0.5), `P_down` = P(e5 ≤ −0.5), `mag_hat` (expected \|move\|), `y_hat` (price-only D2: predicted y2), `extra` (JSON object); `newsaction.baselines.schema`
+- **Key:** (`event_id`, `model`, `call`) unique; `schema.validate` (events match the state files)
+- **Rows / coverage:** PREREG §10.2: mean bge-small vector of the state's articles + attention → ridge (train; λ on val-A). Every Call A D0 state, test included (54,332) (54,332 rows)
+- **Availability:** D0 (`w0` / `t_minus_1` inputs, vendor fields as pre-registered baseline signals, PREREG §10); fit on train, tuned and calibrated on val-A (fit records in `work/baselines/models/`); train and val-A rows are in-sample for the fit or the maps. Test rows use only inputs known before the open (no 2026 price, return or volume)
+- **sha256:** `3fc6f18bf565f162ddddf89ac417178f3fa6f662a2e196aa6e511ecbccd521f4`
+
+### `work/baselines/tags_gbm.parquet`
+- **Producer:** `newsaction.baselines.run --stage fit`
+- **Inputs:** `work/baselines/state_articles.parquet`, `work/news/articles_clean.parquet`, `work/events/events_d0.parquet`, `work/states/context_company.parquet`, `work/panel/panel_public.parquet` (targets, train / val-A only)
+- **Schema:** `event_id`, `model`, `call` (A: D0 event with a Call A state; B: D2 event with a Call B state), `split`, `session` (date), `company_id` (int64), `N_hat` (σ units, e5 scale), `P_up` = P(e5 ≥ +0.5), `P_down` = P(e5 ≤ −0.5), `mag_hat` (expected \|move\|), `y_hat` (price-only D2: predicted y2), `extra` (JSON object); `newsaction.baselines.schema`
+- **Key:** (`event_id`, `model`, `call`) unique; `schema.validate` (events match the state files)
+- **Rows / coverage:** PREREG §10.3: vendor tags, flags, sentiment, intensity, source classes, novelty, attention, tier, sector → LightGBM (train; grid on val-A). Every Call A D0 state, test included (54,332) (54,332 rows)
+- **Availability:** D0 (`w0` / `t_minus_1` inputs, vendor fields as pre-registered baseline signals, PREREG §10); fit on train, tuned and calibrated on val-A (fit records in `work/baselines/models/`); train and val-A rows are in-sample for the fit or the maps. Test rows use only inputs known before the open (no 2026 price, return or volume)
+- **sha256:** `b3fd8859a8d50b55ad6ff71ab661743b18e61d51ad51c249dee2dff8432a7aba`
+
+### `work/baselines/price_only.parquet`
+- **Producer:** `newsaction.baselines.run --stage fit`
+- **Inputs:** `work/baselines/state_articles.parquet`, `work/news/articles_clean.parquet`, `work/events/events_d0.parquet`, `work/states/context_company.parquet`, `work/panel/panel_public.parquet` (targets, train / val-A only)
+- **Schema:** `event_id`, `model`, `call` (A: D0 event with a Call A state; B: D2 event with a Call B state), `split`, `session` (date), `company_id` (int64), `N_hat` (σ units, e5 scale), `P_up` = P(e5 ≥ +0.5), `P_down` = P(e5 ≤ −0.5), `mag_hat` (expected \|move\|), `y_hat` (price-only D2: predicted y2), `extra` (JSON object); `newsaction.baselines.schema`
+- **Key:** (`event_id`, `model`, `call`) unique; `schema.validate` (events match the state files)
+- **Rows / coverage:** PREREG §10.4: call A (D0) momentum, z_vol(t−1), σ regime, tier, sector → N_hat / mag_hat; call B (D2) + G, z_on,t, z_vol,t → y_hat (y2). Call A D0 states of robustness, train, val-A, val-B (40,355) and Call B states (48,197); **no test row** (NA-11 predicts test with the saved models after the freeze) (88,552 rows)
+- **Availability:** call A: D0 (`t_minus_1`); call B: D2 (`d2_reaction`); fit on train, grid on val-A; no 2026 input
+- **sha256:** `b67b72aa41814a24c1a1e92b589f8ce077268bd43701b337f2da2d7a74a3bf95`
+
+### `work/baselines/laya_zeroshot.parquet`
+- **Producer:** `newsaction.baselines.run --stage laya_zeroshot_predictions`
+- **Inputs:** `work/states/callA_d0_E3.parquet`, `work/states/callB_d2_E3.parquet`, `cache/decisions.sqlite` (chunk NA-09 rows and NA-05 / NA-06 hits)
+- **Schema:** `event_id`, `model`, `call` (A: D0 event with a Call A state; B: D2 event with a Call B state), `split`, `session` (date), `company_id` (int64), `N_hat` (σ units, e5 scale), `P_up` = P(e5 ≥ +0.5), `P_down` = P(e5 ≤ −0.5), `mag_hat` (expected \|move\|), `y_hat` (price-only D2: predicted y2), `extra` (JSON object); `newsaction.baselines.schema`
+- **Key:** (`event_id`, `model`, `call`) unique; `schema.validate` (events match the state files)
+- **Rows / coverage:** PREREG §10.5: local Laya typed-decisions (@55cf4c4e), core battery, from the decision cache: N_hat = N̂, P_up / P_down = Σ p of Q1's rise / fall levels, mag_hat = E\|N̂\|; `extra` M, surprise, tone (A) or J, W, C (B), Q1 probabilities, build, truncation. Call A D0: robustness, train, val-A, val-B; Call B D2: train, val-A, val-B; no test row (NA-11 after the freeze) (88,552 rows)
+- **Availability:** the masked states (D0 / D2); zero-shot, nothing fitted
+- **sha256:** `7dd7b218b1cf974b0d653ed21947cbc384b31563446059fb9899e407e6ba820c`
+
+### `work/baselines/llm.parquet`
+- **Producer:** `newsaction.baselines.run --stage llm_predictions`
+- **Inputs:** `work/baselines/llm_sample.parquet`, `cache/decisions.sqlite` (NA-09 chat rows)
+- **Schema:** `event_id`, `model`, `call` (A: D0 event with a Call A state; B: D2 event with a Call B state), `split`, `session` (date), `company_id` (int64), `N_hat` (σ units, e5 scale), `P_up` = P(e5 ≥ +0.5), `P_down` = P(e5 ≤ −0.5), `mag_hat` (expected \|move\|), `y_hat` (price-only D2: predicted y2), `extra` (JSON object); `newsaction.baselines.schema`
+- **Key:** (`event_id`, `model`, `call`) unique; `schema.validate` (events match the state files)
+- **Rows / coverage:** PREREG §10.7: mistralai/mistral-nemo via `DecisionClient.chat_json`: Q1 probabilities (verbalized) → N_hat, P_up, P_down, mag_hat; `extra` the probabilities, renormalized flag, raw sum, build, provider, cost. Valid answers only (invalid ones counted in `artifacts/NA-09/llm_summary.json`). The 2,000 val-B events of `work/baselines/llm_sample.parquet` (valid answers) (1,978 rows)
+- **Availability:** D0 (the masked Call A state); val-B only, no metric in NA-09
+- **sha256:** `fbaf22a7b97c502b8fd722678d53e074af576ea58995948cda53a18b34025b30`
+
+### `work/baselines/state_articles.parquet`
+- **Producer:** `newsaction.baselines.run --stage articles` (`data.rebuild_state_articles`)
+- **Inputs:** `work/states/callA_d0_E3.parquet`, `work/events/events_d0.parquet` (`news_w0`), `work/states/articles_masked.parquet`, `work/news/articles_clean.parquet` (NA-04's exclusions)
+- **Schema:** `event_id`, `article_id`, `rank` (int64; order in the state's `news` list)
+- **Key:** (`event_id`, `rank`)
+- **Rows / coverage:** 189,705 rows for the 54,332 Call A D0 states; every state's news items equal its rebuilt articles' masked title and snippet (the first may be cut by words) (189,705 rows)
+- **Availability:** `w0` (the state's own articles)
+- **sha256:** `008c0230ee0b1346f9be3850b98781249c03384e294e88987cb6049ecfc6fb0c`
+
+### `work/baselines/llm_sample.parquet`
+- **Producer:** `newsaction.baselines.run --stage llm_sample` (`llm_baseline.sample`)
+- **Inputs:** `work/states/callA_d0_E3.parquet`, `work/events/events_d0.parquet`
+- **Schema:** `event_id`, `tier`, `month`, then `dm.canary.STATE_COLUMNS` of the Call A state (`session`, `split`, `call`, `encoding`, `masked`, `state_json`, `state_sha256`, `n_tokens_state`, `third_party_ok_all`)
+- **Key:** `event_id`
+- **Rows / coverage:** 2,000 val-B D0 events after the embargo (2025-10-08 … 12-31), tier × month, seed 2026 (NA-04's `stratified_sample`) (2,000 rows)
+- **Availability:** D0 inputs only (no outcome)
+- **sha256:** `f9fb689a2d3cb0c0354196225600818a6737b3a4499b534ab19f2abc4b752fd2`
+
+### `work/baselines/models/sentiment_e5.json`
+- **Producer:** `newsaction.baselines.run --stage fit` (`fitting.save_model`)
+- **Inputs:** `work/baselines/sentiment.parquet`'s frame
+- **Schema:** {`record`: `schema.FitRecord` (model, target, point, features, `fit` / `tune` / `calibration` ranges {split, start, end, n_rows, n_sessions}, `selected`, `grid` with val-A scores, seed, library), `model`: isotonic thresholds, `prob_maps`: val-A isotonic P_up / P_down maps or null}
+- **Key:** n/a
+- **Rows / coverage:** sentiment → e5
+- **Availability:** fit range inside train, tuning and calibration ranges inside val-A (`check_fit_record`, AC1)
+- **sha256:** `f4a2a81f772b3bcff3e2657158f59aa97f6a17b13c128602e6fa214b15819e91`
+
+### `work/baselines/models/sentiment_abs_z_cc.json`
+- **Producer:** `newsaction.baselines.run --stage fit` (`fitting.save_model`)
+- **Inputs:** `work/baselines/sentiment.parquet`'s frame
+- **Schema:** {`record`: `schema.FitRecord` (model, target, point, features, `fit` / `tune` / `calibration` ranges {split, start, end, n_rows, n_sessions}, `selected`, `grid` with val-A scores, seed, library), `model`: OLS coefficients, `prob_maps`: val-A isotonic P_up / P_down maps or null}
+- **Key:** n/a
+- **Rows / coverage:** sentiment → abs_z_cc
+- **Availability:** fit range inside train, tuning and calibration ranges inside val-A (`check_fit_record`, AC1)
+- **sha256:** `d2b24183918bf386692eada42d62273b6376a9a154f9638b7172f6ee2bf01515`
+
+### `work/baselines/models/embed_ridge_e5.json`
+- **Producer:** `newsaction.baselines.run --stage fit` (`fitting.save_model`)
+- **Inputs:** `work/baselines/embed_ridge.parquet`'s frame
+- **Schema:** {`record`: `schema.FitRecord` (model, target, point, features, `fit` / `tune` / `calibration` ranges {split, start, end, n_rows, n_sessions}, `selected`, `grid` with val-A scores, seed, library), `model`: ridge coefficients, intercept, λ, standardization, `prob_maps`: val-A isotonic P_up / P_down maps or null}
+- **Key:** n/a
+- **Rows / coverage:** embed_ridge → e5
+- **Availability:** fit range inside train, tuning and calibration ranges inside val-A (`check_fit_record`, AC1)
+- **sha256:** `cb4b2a1d2924c47ade0ba8f98e35118e73cd39696785d26a2d2d2f43e66e4399`
+
+### `work/baselines/models/embed_ridge_abs_z_cc.json`
+- **Producer:** `newsaction.baselines.run --stage fit` (`fitting.save_model`)
+- **Inputs:** `work/baselines/embed_ridge.parquet`'s frame
+- **Schema:** {`record`: `schema.FitRecord` (model, target, point, features, `fit` / `tune` / `calibration` ranges {split, start, end, n_rows, n_sessions}, `selected`, `grid` with val-A scores, seed, library), `model`: ridge coefficients, intercept, λ, standardization, `prob_maps`: val-A isotonic P_up / P_down maps or null}
+- **Key:** n/a
+- **Rows / coverage:** embed_ridge → abs_z_cc
+- **Availability:** fit range inside train, tuning and calibration ranges inside val-A (`check_fit_record`, AC1)
+- **sha256:** `9073a80b69b229143cbbdec5a631f68732b87f70aae3f4b528453ab0e0929f96`
+
+### `work/baselines/models/tags_gbm_e5.json`
+- **Producer:** `newsaction.baselines.run --stage fit` (`fitting.save_model`)
+- **Inputs:** `work/baselines/tags_gbm.parquet`'s frame
+- **Schema:** {`record`: `schema.FitRecord` (model, target, point, features, `fit` / `tune` / `calibration` ranges {split, start, end, n_rows, n_sessions}, `selected`, `grid` with val-A scores, seed, library), `model`: LightGBM model text, `prob_maps`: val-A isotonic P_up / P_down maps or null}
+- **Key:** n/a
+- **Rows / coverage:** tags_gbm → e5
+- **Availability:** fit range inside train, tuning and calibration ranges inside val-A (`check_fit_record`, AC1)
+- **sha256:** `688ba83308f3095632456f141ff85137309bd8f0ad4092d9afaf284623023607`
+
+### `work/baselines/models/tags_gbm_abs_z_cc.json`
+- **Producer:** `newsaction.baselines.run --stage fit` (`fitting.save_model`)
+- **Inputs:** `work/baselines/tags_gbm.parquet`'s frame
+- **Schema:** {`record`: `schema.FitRecord` (model, target, point, features, `fit` / `tune` / `calibration` ranges {split, start, end, n_rows, n_sessions}, `selected`, `grid` with val-A scores, seed, library), `model`: LightGBM model text, `prob_maps`: val-A isotonic P_up / P_down maps or null}
+- **Key:** n/a
+- **Rows / coverage:** tags_gbm → abs_z_cc
+- **Availability:** fit range inside train, tuning and calibration ranges inside val-A (`check_fit_record`, AC1)
+- **sha256:** `452210b423948e2ebd9299b83e5f78559404b607a6d9b530888068ac52cb0014`
+
+### `work/baselines/models/price_only_e5.json`
+- **Producer:** `newsaction.baselines.run --stage fit` (`fitting.save_model`)
+- **Inputs:** `work/baselines/price_only.parquet`'s frame
+- **Schema:** {`record`: `schema.FitRecord` (model, target, point, features, `fit` / `tune` / `calibration` ranges {split, start, end, n_rows, n_sessions}, `selected`, `grid` with val-A scores, seed, library), `model`: LightGBM model text, `prob_maps`: val-A isotonic P_up / P_down maps or null}
+- **Key:** n/a
+- **Rows / coverage:** price_only → e5
+- **Availability:** fit range inside train, tuning and calibration ranges inside val-A (`check_fit_record`, AC1)
+- **sha256:** `cdaad7aeccd67188c16382f25959f6d87e3150601eb7d37d8fc47cd1ce23c435`
+
+### `work/baselines/models/price_only_abs_z_cc.json`
+- **Producer:** `newsaction.baselines.run --stage fit` (`fitting.save_model`)
+- **Inputs:** `work/baselines/price_only.parquet`'s frame
+- **Schema:** {`record`: `schema.FitRecord` (model, target, point, features, `fit` / `tune` / `calibration` ranges {split, start, end, n_rows, n_sessions}, `selected`, `grid` with val-A scores, seed, library), `model`: LightGBM model text, `prob_maps`: val-A isotonic P_up / P_down maps or null}
+- **Key:** n/a
+- **Rows / coverage:** price_only → abs_z_cc
+- **Availability:** fit range inside train, tuning and calibration ranges inside val-A (`check_fit_record`, AC1)
+- **sha256:** `01fb5cd61babe24192533c6c620876724dec33c42e8a104024ed10bf173ad45d`
+
+### `work/baselines/models/price_only_y2.json`
+- **Producer:** `newsaction.baselines.run --stage fit` (`fitting.save_model`)
+- **Inputs:** `work/baselines/price_only.parquet`'s frame
+- **Schema:** {`record`: `schema.FitRecord` (model, target, point, features, `fit` / `tune` / `calibration` ranges {split, start, end, n_rows, n_sessions}, `selected`, `grid` with val-A scores, seed, library), `model`: LightGBM model text, `prob_maps`: val-A isotonic P_up / P_down maps or null}
+- **Key:** n/a
+- **Rows / coverage:** price_only → y2
+- **Availability:** fit range inside train, tuning and calibration ranges inside val-A (`check_fit_record`, AC1)
+- **sha256:** `ed99ad1280df5a49ff665d4be13bd49557be30745fa7cbc93e74102be72566e2`
+
+### `artifacts/NA-09/llm_catalog.json`
+- **Producer:** `newsaction.baselines.run --stage llm_select`
+- **Inputs:** GET https://openrouter.ai/api/v1/models (no spend), `artifacts/NA-06/leaderboard.csv`, `work/baselines/llm_sample.parquet` (state sizes)
+- **Schema:** {`fetched_at`, `url`, `raw_sha256` (the full catalog response), `n_models`, `rule` (`configs/baselines.yaml` `llm.selection`), `reference_usd_per_1000`, `mean_input_bytes`, `order`, `chosen`, `models` (every candidate passing the rule: id, pricing, cutoff, parameters, projected USD per 1,000)}; the client's chat price snapshot (`configs/dm.yaml` `api.chat_catalog`)
+- **Key:** `models[].id`
+- **Rows / coverage:** 463 catalog models, 11 candidates; chosen mistralai/mistral-nemo
+- **Availability:** n/a (val-A metrics, model choice and spend; no val-B or test value)
+- **sha256:** `5dd90aed0bd23461d981b25e14ffdd6cb7aeb44ca41d4175edf64ee56a1dd71d`
+
+### `artifacts/NA-09/llm_dry_run.json`
+- **Producer:** `newsaction.baselines.run --stage llm_dry | llm_run`
+- **Inputs:** the 2,000 chat requests
+- **Schema:** list of {`ts`, `send`, `model`, `n_requests`, `n_send`, `projected_usd`, `projected_tokens`, `budget_left_usd`, and for a run `account_left_usd`, `answered`, `valid`, `spent_usd`, `reconcile`}
+- **Key:** list order
+- **Rows / coverage:** every projection and the run
+- **Availability:** n/a (val-A metrics, model choice and spend; no val-B or test value)
+- **sha256:** `c524571880925e1b3c348b9fd98b52e99ddaf1b01207cbb979c89bfb85f7cbf8`
+
+### `artifacts/NA-09/llm_summary.json`
+- **Producer:** `newsaction.baselines.run --stage llm_predictions` (`llm_baseline.summary`, offline)
+- **Inputs:** `cache/decisions.sqlite` (NA-09 chat rows)
+- **Schema:** {`model`, `builds`, `providers`, `n`, `answered`, `valid`, `invalid`, `problems`, `renormalized`, `raw_sum_min` / `max`, mean input / output tokens, `cost_usd`, `cost_per_1000`, latency p50 / p95}
+- **Key:** n/a
+- **Rows / coverage:** one record
+- **Availability:** n/a (val-A metrics, model choice and spend; no val-B or test value)
+- **sha256:** `52fda0efdf873d65fffb1862d8d6f92a20b424e9ce602b738d5b08d3ba298292`
+
+### `artifacts/NA-09/key_usage.json`
+- **Producer:** `llm_baseline.snapshot_key` (GET /api/v1/key and /api/v1/credits; no spend)
+- **Inputs:** OpenRouter
+- **Schema:** list of {`label`, `ts`, the key's `usage`, `usage_daily`, `limit`, `limit_remaining`, `is_free_tier`, the account's `total_credits`, `total_usage`, `remaining`, `ledger_chunk_usd`}
+- **Key:** list order
+- **Rows / coverage:** before / after the S7 probe and run
+- **Availability:** n/a (val-A metrics, model choice and spend; no val-B or test value)
+- **sha256:** `4e56533e93eeaf2dbfc86851187afa6b79013307f1bbd4b5dad9d0fb07e5b9d1`
+
+### `artifacts/NA-09/baseline_val_metrics.csv`
+- **Producer:** `newsaction.baselines.run --stage metrics` (`metrics.val_metrics`)
+- **Inputs:** `work/baselines/*.parquet`, `work/panel/panel_public.parquet`, `work/events/events_d{0,2}.parquet`
+- **Schema:** `model`, `call`, `signal` (N_hat, mag_hat, y_hat, j, c), `target` (z_cc, e5, abs_z_cc, y2), `metric` (ic: mean daily Spearman IC, ≥ 5 events a day; r2_vs_zero; r2_vs_train_mean), `tier` (all, top100, mid, rest), `value`, `t` (Newey–West, 5 lags), `se`, `n_days`, `n_events`
+- **Key:** (`model`, `call`, `signal`, `target`, `metric`, `tier`)
+- **Rows / coverage:** val-A outside the embargo only (`metrics.evaluation_rows`); no val-B or test metric
+- **Availability:** n/a (val-A metrics, model choice and spend; no val-B or test value)
+- **sha256:** `5cb239fa1cd3b3bcfed4afec6b7e5d24d0ff23d45f659d6661c770b1d6396d4f`
+
+### `artifacts/NA-09/summary.json`
+- **Producer:** `newsaction.baselines.run --stage report`
+- **Inputs:** `work/baselines/*`, `ledgers/spend.jsonl`
+- **Schema:** {`predictions`: rows by `call:split` per model, `fit_records`: {fit, tune, calibration, selected} per model and target, `spend`}
+- **Key:** n/a
+- **Rows / coverage:** one record
+- **Availability:** n/a (val-A metrics, model choice and spend; no val-B or test value)
+- **sha256:** `fbd0352853166b35025db104ad91404ce44d29abbb2678ad7c6066e707e83ce7`

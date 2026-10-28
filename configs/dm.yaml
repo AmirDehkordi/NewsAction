@@ -6,8 +6,11 @@ version: 1
 
 api:
   decisions_url: "https://openrouter.ai/api/alpha/decisions"   # POST, Bearer key (OpenRouter Decisions API, alpha)
+  chat_url: "https://openrouter.ai/api/v1/chat/completions"     # POST, chat_json only (NA-09 S7: the generative LLM)
   models_url: "https://openrouter.ai/api/v1/models"             # GET catalog (no spend)
   key_url: "https://openrouter.ai/api/v1/key"                   # GET the key's usage in USD (no spend)
+  credits_url: "https://openrouter.ai/api/v1/credits"           # GET the account's credits and usage (no spend)
+  chat_catalog: artifacts/NA-09/llm_catalog.json                # chat-model price snapshot (NA-09 S7), as catalog.json
   catalog_params: {output_modalities: decisions}
   key_env: OPENROUTER_API_KEY     # read from the environment or .env; never printed, logged or stored
   timeout_s: 120.0
@@ -52,6 +55,10 @@ registered_probes:
 # tokens = overhead + billed bytes / bytes_per_token, where the billed bytes are the canonical JSON of the
 # state once plus every question ("once"), or the state again with every question ("per_question").
 costmodel:
+  chat:                           # chat_json (NA-09 S7): tokens = overhead + bytes of messages and schema / bytes_per_token,
+    bytes_per_token: 3.0          # output = max_tokens; priced with prompt and completion prices; conservative on purpose
+    overhead_tokens: 64
+    safety: 1.5
   default:                        # used for a model without a pilot calibration; conservative on purpose
     billing_basis: per_question
     bytes_per_token: 3.0

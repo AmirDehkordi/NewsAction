@@ -1,0 +1,270 @@
+{
+  "predictions": {
+    "sentiment": {
+      "A:robustness": 2793,
+      "A:test": 13977,
+      "A:train": 22621,
+      "A:val_a": 8906,
+      "A:val_b": 6035
+    },
+    "embed_ridge": {
+      "A:robustness": 2793,
+      "A:test": 13977,
+      "A:train": 22621,
+      "A:val_a": 8906,
+      "A:val_b": 6035
+    },
+    "tags_gbm": {
+      "A:robustness": 2793,
+      "A:test": 13977,
+      "A:train": 22621,
+      "A:val_a": 8906,
+      "A:val_b": 6035
+    },
+    "price_only": {
+      "A:robustness": 2793,
+      "A:train": 22621,
+      "A:val_a": 8906,
+      "A:val_b": 6035,
+      "B:train": 29221,
+      "B:val_a": 11148,
+      "B:val_b": 7828
+    },
+    "laya_zeroshot": {
+      "A:robustness": 2793,
+      "A:train": 22621,
+      "A:val_a": 8906,
+      "A:val_b": 6035,
+      "B:train": 29221,
+      "B:val_a": 11148,
+      "B:val_b": 7828
+    },
+    "llm": {
+      "A:val_b": 1978
+    }
+  },
+  "fit_records": {
+    "embed_ridge_abs_z_cc": {
+      "fit": {
+        "split": "train",
+        "start": "2024-07-01",
+        "end": "2025-06-30",
+        "n_rows": 22598,
+        "n_sessions": 250
+      },
+      "tune": {
+        "split": "val_a",
+        "start": "2025-07-09",
+        "end": "2025-09-30",
+        "n_rows": 8376,
+        "n_sessions": 59
+      },
+      "calibration": null,
+      "selected": {
+        "lambda": 10000.0,
+        "r2_abs_z_cc": 0.16686671013756815
+      }
+    },
+    "embed_ridge_e5": {
+      "fit": {
+        "split": "train",
+        "start": "2024-07-01",
+        "end": "2025-06-24",
+        "n_rows": 22267,
+        "n_sessions": 246
+      },
+      "tune": {
+        "split": "val_a",
+        "start": "2025-07-09",
+        "end": "2025-09-24",
+        "n_rows": 7970,
+        "n_sessions": 55
+      },
+      "calibration": {
+        "split": "val_a",
+        "start": "2025-07-09",
+        "end": "2025-09-24",
+        "n_rows": 7970,
+        "n_sessions": 55
+      },
+      "selected": {
+        "lambda": 10.0,
+        "ic_e5": -0.015814748686261492
+      }
+    },
+    "price_only_abs_z_cc": {
+      "fit": {
+        "split": "train",
+        "start": "2024-07-01",
+        "end": "2025-06-30",
+        "n_rows": 22598,
+        "n_sessions": 250
+      },
+      "tune": {
+        "split": "val_a",
+        "start": "2025-07-09",
+        "end": "2025-09-30",
+        "n_rows": 8376,
+        "n_sessions": 59
+      },
+      "calibration": null,
+      "selected": {
+        "num_leaves": 7,
+        "min_child_samples": 400,
+        "n_estimators": 200,
+        "r2_abs_z_cc": 0.08314244838105267
+      }
+    },
+    "price_only_e5": {
+      "fit": {
+        "split": "train",
+        "start": "2024-07-01",
+        "end": "2025-06-24",
+        "n_rows": 22267,
+        "n_sessions": 246
+      },
+      "tune": {
+        "split": "val_a",
+        "start": "2025-07-09",
+        "end": "2025-09-24",
+        "n_rows": 7970,
+        "n_sessions": 55
+      },
+      "calibration": {
+        "split": "val_a",
+        "start": "2025-07-09",
+        "end": "2025-09-24",
+        "n_rows": 7970,
+        "n_sessions": 55
+      },
+      "selected": {
+        "num_leaves": 31,
+        "min_child_samples": 400,
+        "n_estimators": 800,
+        "ic_e5": 0.005062725756629939
+      }
+    },
+    "price_only_y2": {
+      "fit": {
+        "split": "train",
+        "start": "2024-07-01",
+        "end": "2025-06-23",
+        "n_rows": 28673,
+        "n_sessions": 245
+      },
+      "tune": {
+        "split": "val_a",
+        "start": "2025-07-09",
+        "end": "2025-09-23",
+        "n_rows": 9751,
+        "n_sessions": 54
+      },
+      "calibration": null,
+      "selected": {
+        "num_leaves": 31,
+        "min_child_samples": 400,
+        "n_estimators": 200,
+        "ic_y2": 0.011309908242920151
+      }
+    },
+    "sentiment_abs_z_cc": {
+      "fit": {
+        "split": "train",
+        "start": "2024-07-01",
+        "end": "2025-06-30",
+        "n_rows": 22598,
+        "n_sessions": 250
+      },
+      "tune": null,
+      "calibration": null,
+      "selected": {
+        "ols": {
+          "const": 0.9085305002040859,
+          "share_nonneutral": -0.11366970087726416,
+          "share_timely": 0.8050442042747399
+        }
+      }
+    },
+    "sentiment_e5": {
+      "fit": {
+        "split": "train",
+        "start": "2024-07-01",
+        "end": "2025-06-24",
+        "n_rows": 22267,
+        "n_sessions": 246
+      },
+      "tune": null,
+      "calibration": {
+        "split": "val_a",
+        "start": "2025-07-09",
+        "end": "2025-09-24",
+        "n_rows": 7970,
+        "n_sessions": 55
+      },
+      "selected": {
+        "map": "isotonic increasing, clipped"
+      }
+    },
+    "tags_gbm_abs_z_cc": {
+      "fit": {
+        "split": "train",
+        "start": "2024-07-01",
+        "end": "2025-06-30",
+        "n_rows": 22598,
+        "n_sessions": 250
+      },
+      "tune": {
+        "split": "val_a",
+        "start": "2025-07-09",
+        "end": "2025-09-30",
+        "n_rows": 8376,
+        "n_sessions": 59
+      },
+      "calibration": null,
+      "selected": {
+        "num_leaves": 31,
+        "min_child_samples": 50,
+        "n_estimators": 200,
+        "r2_abs_z_cc": 0.2817563224517089
+      }
+    },
+    "tags_gbm_e5": {
+      "fit": {
+        "split": "train",
+        "start": "2024-07-01",
+        "end": "2025-06-24",
+        "n_rows": 22267,
+        "n_sessions": 246
+      },
+      "tune": {
+        "split": "val_a",
+        "start": "2025-07-09",
+        "end": "2025-09-24",
+        "n_rows": 7970,
+        "n_sessions": 55
+      },
+      "calibration": {
+        "split": "val_a",
+        "start": "2025-07-09",
+        "end": "2025-09-24",
+        "n_rows": 7970,
+        "n_sessions": 55
+      },
+      "selected": {
+        "num_leaves": 7,
+        "min_child_samples": 50,
+        "n_estimators": 200,
+        "ic_e5": 0.05347157960371865
+      }
+    }
+  },
+  "spend": {
+    "chunk_usd": 0.038884416,
+    "total_usd": 3.6694284559999732,
+    "by_chunk": {
+      "NA-05": 0.1039223410000001,
+      "NA-06": 3.526621698999973,
+      "NA-09": 0.038884416
+    }
+  }
+}
