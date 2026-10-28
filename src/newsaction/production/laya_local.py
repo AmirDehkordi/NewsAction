@@ -123,8 +123,14 @@ def probe_table(readings_by_probe: pd.DataFrame, model: str, layout: Layout | No
         return tmx.daily_ic(f, "n_hat", "z_cc", mc.min_names_per_day)
 
     if (r["probe"] == "unmasked").any():
-        st = tmx.paired(ic_of("unmasked"), ic_of("masked_twin"), mc.nw_lags)
+        um, ma = ic_of("unmasked"), ic_of("masked_twin")
+        st = tmx.paired(um, ma, mc.nw_lags)
+        su, sm = tmx.ic_stats(um, mc.nw_lags), tmx.ic_stats(ma, mc.nw_lags)
         out |= {
+            "ic_masked": sm.mean,
+            "ic_masked_t": sm.t,
+            "ic_unmasked": su.mean,
+            "ic_unmasked_t": su.t,
             "unmasked_minus_masked": st.mean,
             "unmasked_minus_masked_t": st.t,
             "masked_screen": sc.unmasked_minus_masked_max,

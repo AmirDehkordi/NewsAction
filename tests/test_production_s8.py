@@ -185,3 +185,27 @@ def test_the_stored_isotonic_thresholds_predict_as_sklearn() -> None:
     m = {"x": iso.X_thresholds_.tolist(), "y": iso.y_thresholds_.tolist()}
     grid = np.linspace(-5, 5, 201)
     assert np.allclose(price_only_test._iso(grid, m), iso.predict(grid))
+
+
+def test_the_end_of_s6_canary_is_judged_by_the_recorded_rule() -> None:
+    from newsaction.production.canary_check import judge
+
+    before = {"noisy": {"noisy-1"}, "det": {"det-1"}}
+
+    def verdict(
+        stop: bool, fires: bool, model: str = "noisy", build: str = "", prod: set[str] | None = None
+    ) -> str:
+        b = build or f"{model}-1"
+        c = {"model": model, "stop": stop, "builds": b}
+        d = {"model": model, "fires": fires, "builds_now": f"{model}-1"}
+        return str(judge([c], [d], {model: prod or set()}, before, ["det"])[0]["verdict"])
+
+    assert verdict(False, False) == "pass"
+    assert (
+        verdict(True, False) == "noise" and verdict(False, True) == "noise"
+    )  # one check: noise, results stand
+    assert verdict(True, True) == "stop"  # both checks fire: updated
+    assert verdict(False, False, build="noisy-2") == "stop"  # a new build string in the canary
+    assert verdict(False, False, prod={"noisy-1", "noisy-2"}) == "stop"  # or in the production answers
+    assert verdict(True, False, model="det") == "stop" and verdict(False, True, model="det") == "stop"
+    assert verdict(False, False, model="det") == "pass"

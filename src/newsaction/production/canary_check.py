@@ -225,3 +225,91 @@ def compare_now(
     prior = pd.read_csv(path) if path.is_file() else pd.DataFrame()
     pd.concat([prior, pd.DataFrame(rows)], ignore_index=True).to_csv(path, index=False)
     return rows
+
+
+DRIFT_CHECK: Final = "canary_drift_check.csv"
+BASELINE_BUILDS: Final = "builds_now"
+
+
+def drift_now(
+    models: Sequence[str], repeat_idx: int, phase: str, layout: Layout | None = None
+) -> list[dict[str, Any]]:
+    """End of S6: the 100-state NA-06 drift check once more (same events and design) under ``repeat_idx``;
+    it fires when the mean |Δp| against the cached NA-06 answers exceeds the baseline's repeat noise."""
+    lay = resolve_layout(layout)
+    noise = pd.read_csv(artifacts_dir(lay) / DRIFT).set_index("model")["canary_noise_mean_abs_dp"]
+    rows = []
+    with DecisionClient(CHUNK, layout=lay) as cl:
+        for m in models:
+            ev = drift_events(m, lay)
+            old = cached_results(cl, drift_specs(m, ev, 0, lay))
+            if any(r is None for r in old):
+                raise ProductionError(
+                    f"{m}: {sum(r is None for r in old)} NA-06 answers are not in the cache"
+                )
+            new = cl.decide(drift_specs(m, ev, repeat_idx, lay))
+            drift, pairs = mean_abs_dp(old, new)
+            rows.append(
+                {
+                    "model": m,
+                    "phase": phase,
+                    "repeat_idx": repeat_idx,
+                    "drift_mean_abs_dp_vs_na06": drift,
+                    "drift_pairs": pairs,
+                    "repeat_noise": float(noise[m]),
+                    "fires": bool(drift > float(noise[m])),
+                    "builds_na06": ",".join(builds(old)),
+                    "builds_now": ",".join(builds(new)),
+                }
+            )
+    path = artifacts_dir(lay) / DRIFT_CHECK
+    prior = pd.read_csv(path) if path.is_file() else pd.DataFrame()
+    pd.concat([prior, pd.DataFrame(rows)], ignore_index=True).to_csv(path, index=False)
+    return rows
+
+
+def baseline_builds(layout: Layout | None = None) -> dict[str, set[str]]:
+    """Every model's builds in the pre-freeze drift check (``canary_drift_na06.csv``)."""
+    base = pd.read_csv(artifacts_dir(layout) / DRIFT).set_index("model")[BASELINE_BUILDS]
+    return {str(m): {b.strip(" '[]") for b in str(v).split(",")} for m, v in base.items()}
+
+
+def judge(
+    canary: Sequence[dict[str, Any]],
+    drift: Sequence[dict[str, Any]],
+    production_builds: dict[str, set[str]],
+    before: dict[str, set[str]],
+    deterministic: Sequence[str],
+) -> list[dict[str, Any]]:
+    """The end-of-S6 rule (PREREG §15, the post-freeze NA-11 row): a deterministic model's firing is a STOP;
+    a noisy model counts as updated, a STOP, only if a build string changed (against its pre-freeze
+    baseline, in the canary, the drift check or the production answers) or both checks fire; any other
+    firing is reported as noise and the results stand."""
+    by_drift = {d["model"]: d for d in drift}
+    out = []
+    for c in canary:
+        m = c["model"]
+        d = by_drift[m]
+        seen = (
+            set(str(c["builds"]).split(","))
+            | set(str(d["builds_now"]).split(","))
+            | production_builds.get(m, set())
+        )
+        changed = bool(seen - before[m])
+        if m in deterministic:
+            verdict = "stop" if c["stop"] or d["fires"] or changed else "pass"
+        elif changed or (c["stop"] and d["fires"]):
+            verdict = "stop"
+        else:
+            verdict = "noise" if c["stop"] or d["fires"] else "pass"
+        out.append(
+            {
+                "model": m,
+                "canary_fires": bool(c["stop"]),
+                "drift_fires": bool(d["fires"]),
+                "build_changed": changed,
+                "builds": sorted(seen),
+                "verdict": verdict,
+            }
+        )
+    return out
