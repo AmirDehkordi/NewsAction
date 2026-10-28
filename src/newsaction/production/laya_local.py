@@ -92,10 +92,20 @@ def run(part: str, layout: Layout | None = None) -> dict[str, Any]:
     raise ProductionError(f"unknown part {part!r} (test | probes)")
 
 
-def probe_table(readings_by_probe: pd.DataFrame, model: str, layout: Layout | None = None) -> dict[str, Any]:
+def probe_table(
+    readings_by_probe: pd.DataFrame,
+    model: str,
+    layout: Layout | None = None,
+    n_hat_sd: float | None = None,
+) -> dict[str, Any]:
     """NA-06's screen metrics on a model's probe readings (``probe``: flip_edit, flip_orig, unmasked,
-    masked_twin, shuffled; ``event_id``, ``n_hat``): flip rate, masked − unmasked paired daily IC with z_cc,
-    shuffled-news daily IC (Newey–West), each with NA-06's threshold beside it."""
+    masked_twin, shuffled, real; ``event_id``, ``n_hat``): flip rate, masked − unmasked paired daily IC with
+    z_cc, shuffled-news daily IC (Newey–West), each with NA-06's threshold beside it. Descriptive additions
+    (the operator's, after the freeze; the frozen screens stay as computed): ``right_way``, the share of the
+    edit pairs whose N̂ moves the way the edit points; ``shift_sd``, ``edit_mean_shift`` over ``n_hat_sd``
+    (the SD of the model's own val-A Call A D0 N̂); and, when ``real`` holds the model's readings of the
+    shuffled-probe events with their real news, ``ic_real_same_events`` and the paired real − shuffled
+    difference."""
     from newsaction.tournament import metrics as tmx
     from newsaction.tournament import probes as pr
     from newsaction.tournament import tournament_config
@@ -129,10 +139,17 @@ def probe_table(readings_by_probe: pd.DataFrame, model: str, layout: Layout | No
             "edit_mean_shift": float(np.mean((both["e"].to_numpy() - both["o"].to_numpy()) * -pol)),
             "flip_rate_all_pairs": float((np.sign(both["e"]) != np.sign(both["o"])).mean()),
             "flip_pairs_valid": len(both),
+            "right_way": float(np.mean((both["e"].to_numpy() - both["o"].to_numpy()) * -pol > 0)),
         }
+        if n_hat_sd:
+            out["n_hat_sd_val_a"] = n_hat_sd
+            out["shift_sd"] = out["edit_mean_shift"] / n_hat_sd
 
-    def ic_of(name: str) -> pd.Series:
-        f = r.loc[r["probe"] == name, ["event_id", "n_hat"]].merge(tgt, on="event_id", how="inner")
+    def ic_of(name: str, ids: set[str] | None = None) -> pd.Series:
+        f = r.loc[r["probe"] == name, ["event_id", "n_hat"]]
+        if ids is not None:
+            f = f.loc[f["event_id"].isin(ids)]
+        f = f.merge(tgt, on="event_id", how="inner")
         return tmx.daily_ic(f, "n_hat", "z_cc", mc.min_names_per_day)
 
     if (r["probe"] == "unmasked").any():
@@ -149,8 +166,24 @@ def probe_table(readings_by_probe: pd.DataFrame, model: str, layout: Layout | No
             "masked_screen": sc.unmasked_minus_masked_max,
         }
     if (r["probe"] == "shuffled").any():
-        st = tmx.ic_stats(ic_of("shuffled"), mc.nw_lags)
+        sh = ic_of("shuffled")
+        st = tmx.ic_stats(sh, mc.nw_lags)
         out |= {"ic_shuffled": st.mean, "ic_shuffled_t": st.t, "shuffled_screen_t": sc.shuffled_t}
+        if (r["probe"] == "real").any():
+            shuffled_ids = set(r.loc[r["probe"] == "shuffled", "event_id"])
+            real_ids = set(r.loc[r["probe"] == "real", "event_id"])
+            if real_ids - shuffled_ids:
+                raise ProductionError(f"{model}: real-news readings outside the shuffled-probe events")
+            ids = shuffled_ids & real_ids  # events with both readings valid
+            real, same = ic_of("real", ids), ic_of("shuffled", ids)
+            sr, sd = tmx.ic_stats(real, mc.nw_lags), tmx.paired(real, same, mc.nw_lags)
+            out |= {
+                "ic_real_same_events": sr.mean,
+                "ic_real_same_events_t": sr.t,
+                "real_minus_shuffled": sd.mean,
+                "real_minus_shuffled_t": sd.t,
+                "real_shuffled_events": len(ids),
+            }
     return {k: (float(v) if isinstance(v, np.floating) else v) for k, v in out.items()}
 
 

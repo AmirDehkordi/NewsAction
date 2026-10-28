@@ -101,7 +101,7 @@ def api_rows(elig: dict[tuple[str, str], int], layout: Layout | None = None) -> 
         df = io.read_parquet(path, layout=lay)
         for (comp, split), g in df.groupby(["component", "split"]):
             src = "m" if comp == "market" else str(comp)
-            out.append(_row(m, src, str(split), g, elig.get((str(comp), str(split)), 0)))
+            out.append(_row(m, src, str(split), g, elig.get((src, str(split)), 0)))
     local = f"{PRODUCTION_DIR}/{slug(plan.laya_zero_shot.model)}_test.parquet"
     if (lay.work / local).is_file():
         df = io.read_parquet(local, layout=lay)
