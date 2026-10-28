@@ -33,6 +33,8 @@ NA06_LEADERBOARD: Final = "artifacts/NA-06/leaderboard.csv"
 NA06_COLUMNS: Final = (
     "flip_rate",
     "flip_n",
+    "flip_pairs_valid",
+    "edit_mean_shift",
     "ic_masked",
     "ic_masked_t",
     "ic_unmasked",

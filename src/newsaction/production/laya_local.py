@@ -99,6 +99,7 @@ def probe_table(readings_by_probe: pd.DataFrame, model: str, layout: Layout | No
     from newsaction.tournament import metrics as tmx
     from newsaction.tournament import probes as pr
     from newsaction.tournament import tournament_config
+    from newsaction.tournament.run import COUNTERFACTUAL
 
     cfg = tournament_config(layout)
     sc, mc = cfg.screens, cfg.metric
@@ -116,7 +117,19 @@ def probe_table(readings_by_probe: pd.DataFrame, model: str, layout: Layout | No
     both = pd.concat([o.rename("o"), e.rename("e")], axis=1, join="inner").dropna()
     if len(both):
         rate, n = pr.flip_rate(both["o"].to_numpy(), both["e"].to_numpy(), sc.flip_min_abs_n_hat)
-        out |= {"flip_rate": rate, "flip_pairs": n, "flip_screen": sc.flip_rate_min}
+        cf = io.read_parquet(COUNTERFACTUAL, columns=["event_id", "polarity"], layout=layout)
+        pol = cf.set_index("event_id")["polarity"].reindex(both.index).astype(float).to_numpy()
+        out |= {
+            "flip_rate": rate,
+            "flip_pairs": n,
+            "flip_screen": sc.flip_rate_min,
+            # beside NA-06's metric, two that do not depend on the model's N̂ scale reaching 0.25:
+            # NA-06's edit_mean_shift (positive = N̂ moves the way the edit points) and the sign flips of
+            # every valid pair
+            "edit_mean_shift": float(np.mean((both["e"].to_numpy() - both["o"].to_numpy()) * -pol)),
+            "flip_rate_all_pairs": float((np.sign(both["e"]) != np.sign(both["o"])).mean()),
+            "flip_pairs_valid": len(both),
+        }
 
     def ic_of(name: str) -> pd.Series:
         f = r.loc[r["probe"] == name, ["event_id", "n_hat"]].merge(tgt, on="event_id", how="inner")
