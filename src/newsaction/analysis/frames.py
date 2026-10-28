@@ -19,6 +19,11 @@ computes no statistic, and ``spec`` applies every pre-registered sample rule (sp
   state JSON: ``price_move_text`` and ``live_format`` (``spec``'s frozen patterns). NA-03's W0 window
   counts give ``attention_mean`` / ``attention_ratio`` (operator row (7)–(8)) for D0 and D2 events alike;
   ``context_company`` gives the earnings flag.
+- **NA-12 (test split).** ``test_targets`` reads the unblinded outcomes
+  (``work/analysis/targets_test.parquet``, the only 2026 outcome file) with the t−1 columns of
+  ``panel_test_inputs``; ``readings_trained(..., s7=True)`` adds NA-11's S7 files (test Call B at D2 and D1,
+  val Call B at D1, the robustness split's Call A) under the same run pin; ``base`` adds NA-11's price-only D0
+  test reading; ``member_days`` takes the test rows.
 """
 
 from __future__ import annotations
@@ -45,6 +50,11 @@ STATE_ARTICLES_W0: Final = "baselines/state_articles.parquet"
 STATE_ARTICLES_W2: Final = "analysis/state_articles_w2.parquet"
 LAYA_ZEROSHOT: Final = "baselines/laya_zeroshot.parquet"
 PRICE_ONLY: Final = "baselines/price_only.parquet"
+PRICE_ONLY_TEST: Final = "dm/production/price_only_test.parquet"  # NA-11 S8 (D0, after the freeze)
+TARGETS_TEST: Final = "analysis/targets_test.parquet"  # NA-12 S1 (after unblinding)
+TEST_INPUTS: Final = "panel/panel_test_inputs.parquet"
+S7_FILES: Final = {"test": ("test_callB",), "val_a": ("val_callB_d1",), "val_b": ("val_callB_d1",)}
+S7_ROBUSTNESS: Final = "robustness_callA"
 PANEL_COLUMNS: Final = (
     "session",
     "symbol_id",
@@ -124,11 +134,35 @@ def _q1_conf(probs: Iterable[Any]) -> np.ndarray:
     return mx.entropy_confidence(arr) if len(arr) else np.zeros(0)
 
 
-def readings_trained(model: str, splits: Sequence[str], layout: Layout | None = None) -> pd.DataFrame:
-    """A frozen trained instrument's readings, one row per event (``read_instrument``: the pinned runs)."""
-    from newsaction.train.import_preds import read_instrument
+def _read_pinned(model: str, name: str, layout: Layout | None = None) -> pd.DataFrame:
+    """An NA-11 S7 prediction file of a frozen instrument, refused unless its runs are the pin."""
+    from newsaction.train import PREDICTIONS_DIR
+    from newsaction.train.import_preds import RunImportError, frozen_runs
 
-    parts = [read_instrument(model, s, layout) for s in splits]
+    pins = frozen_runs(layout)
+    if pins is None or model not in pins:
+        raise RunImportError(f"{model}: no frozen run pin in configs/frozen.yaml selection.trained_runs")
+    df = io.read_parquet(f"{PREDICTIONS_DIR}/{model}_{name}.parquet", layout=layout)
+    if set(df["runs"].astype(str).unique()) != {",".join(pins[model])}:
+        raise RunImportError(f"{model} {name}: the file's runs are not the pin {pins[model]}")
+    return df
+
+
+def readings_trained(
+    model: str, splits: Sequence[str], layout: Layout | None = None, *, s7: bool = False
+) -> pd.DataFrame:
+    """A frozen trained instrument's readings, one row per event (``read_instrument``: the pinned runs).
+    ``s7``: also NA-11's S7 inference files of these splits (test Call B at D2 and D1, val Call B at D1, the
+    robustness split's Call A), read under the same pin."""
+    from newsaction.train.import_preds import ENSEMBLE_FILES, read_instrument
+
+    parts = [read_instrument(model, s, layout) for s in splits if s in ENSEMBLE_FILES]
+    if s7:
+        for name in sorted({n for s in splits for n in S7_FILES.get(s, ())}):
+            f = _read_pinned(model, name, layout)
+            parts.append(f.loc[f["split"].isin(list(splits))])
+        if "robustness" in splits:
+            parts.append(_read_pinned(model, S7_ROBUSTNESS, layout))
     df = pd.concat(parts, ignore_index=True)
     out: dict[str, pd.DataFrame] = {}
     for (call, window), g in df.groupby(["call", "window"]):
@@ -177,10 +211,13 @@ def readings_zeroshot(splits: Sequence[str], layout: Layout | None = None) -> pd
     return _stack(out)
 
 
-def readings_api(path_rel: str, layout: Layout | None = None) -> pd.DataFrame:
+def readings_api(path_rel: str, layout: Layout | None = None, *, valid_only: bool = False) -> pd.DataFrame:
     """An API model's production readings (``production.run`` output: one row per event and source with
-    ``dm.parse`` names and ``source`` = the prefix without the underscore)."""
+    ``dm.parse`` names and ``source`` = the prefix without the underscore); ``valid_only`` drops the readings
+    marked invalid."""
     df = io.read_parquet(path_rel, layout=layout)
+    if valid_only:
+        df = df.loc[df["valid"].astype(bool)]
     out: dict[str, pd.DataFrame] = {}
     for src, g in df.groupby("source"):
         p = f"{src}_"
@@ -218,6 +255,24 @@ def public_targets(layout: Layout | None = None) -> tuple[pd.DataFrame, pd.DataF
         if bool((pd.to_datetime(f["session"]) >= pd.Timestamp(test_start)).any()):
             raise FrameError("public targets hold a test-period session")
     return panel, intraday
+
+
+def test_targets(layout: Layout | None = None) -> tuple[pd.DataFrame, pd.DataFrame, pd.DataFrame]:
+    """(panel rows, intraday rows, member rows) of the test sessions, in ``public_targets``' columns: the
+    outcomes from ``targets_test`` (NA-12 S1, written once after unblinding) and the t−1 columns (``dv_tier``,
+    momentum, the tier) from ``panel_test_inputs``. Member rows carry ``member_days``' panel columns."""
+    tt = io.read_parquet(TARGETS_TEST, layout=layout)
+    t1_cols = ["session", "symbol_id", "tier", "dv_tier", "z_m5", "z_m20", "z_m60"]
+    t1 = io.read_parquet(TEST_INPUTS, columns=t1_cols, layout=layout)
+    for f in (tt, t1):
+        f["session"] = pd.to_datetime(f["session"]).dt.date
+    if set(tt["split"]) != {"test"}:
+        raise FrameError("targets_test holds a row outside the test split")
+    df = tt.merge(t1, on=["session", "symbol_id"], how="left", validate="one_to_one")
+    members = df.loc[df["member"].astype(bool)]
+    if bool(members["tier"].isna().any()):
+        raise FrameError("a test member row has no tier in panel_test_inputs")
+    return df[list(PANEL_COLUMNS)].copy(), df[list(INTRADAY_COLUMNS)].copy(), df.copy()
 
 
 def state_articles_w2(layout: Layout | None = None) -> pd.DataFrame:
@@ -371,6 +426,9 @@ def base(
     df["abs_z_cc"] = df["z_cc"].abs()
     if point == "D0":
         po = io.read_parquet(PRICE_ONLY, columns=["event_id", "call", "N_hat"], layout=lay)
+        if "test" in splits and (lay.work / PRICE_ONLY_TEST).exists():
+            po_test = io.read_parquet(PRICE_ONLY_TEST, columns=["event_id", "call", "N_hat"], layout=lay)
+            po = pd.concat([po, po_test], ignore_index=True)
         po = po.loc[po["call"] == "A", ["event_id", "N_hat"]].rename(columns={"N_hat": "po_n_hat"})
         df = df.merge(po, on="event_id", how="left", validate="one_to_one")
     return df
@@ -396,13 +454,16 @@ def build(
 # --- covered member-days (A3.2 ladder, §5.7 placebo) -------------------------------------------------------
 
 
-def member_days(splits: Sequence[str], layout: Layout | None = None) -> pd.DataFrame:
+def member_days(
+    splits: Sequence[str], layout: Layout | None = None, panel: pd.DataFrame | None = None
+) -> pd.DataFrame:
     """Covered member company-days of ``splits`` (PREREG §3.4, A3.2): the representative class's public panel
     row
     of each member company-session in a covered company-month, with the split's embargo (its first sessions,
     §4.2), the session's D0 and D2 event ids (events with a Call A state) and ``placebo_eligible`` (no
     selected
-    D2 event of the company in the session or the previous 5 sessions, §5.7)."""
+    D2 event of the company in the session or the previous 5 sessions, §5.7). ``panel``: the rows to use
+    instead of ``panel_public`` (NA-12: the test rows of ``test_targets``)."""
     lay = resolve_layout(layout)
     cols = [
         "session",
@@ -419,7 +480,10 @@ def member_days(splits: Sequence[str], layout: Layout | None = None) -> pd.DataF
         "z_on",
         "z_id",
     ]
-    p = io.read_parquet("panel/panel_public.parquet", columns=cols, layout=lay)
+    if panel is None:
+        p = io.read_parquet("panel/panel_public.parquet", columns=cols, layout=lay)
+    else:
+        p = panel[cols].copy()
     p = p.loc[p["member"].astype(bool) & p["is_rep"].astype(bool) & p["split"].isin(list(splits))]
     p = p.drop(columns=["member", "is_rep"])
     p["session"] = pd.to_datetime(p["session"]).dt.date
