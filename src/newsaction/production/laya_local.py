@@ -103,7 +103,8 @@ def probe_table(
     z_cc, shuffled-news daily IC (Newey–West), each with NA-06's threshold beside it. Descriptive additions
     (the operator's, after the freeze; the frozen screens stay as computed): ``right_way``, the share of the
     edit pairs whose N̂ moves the way the edit points; ``shift_sd``, ``edit_mean_shift`` over ``n_hat_sd``
-    (the SD of the model's own val-A Call A D0 N̂); and, when ``real`` holds the model's readings of the
+    (the SD of the model's own val-A Call A D0 N̂), with ``edit_shift_t`` (one-sample t over the pairs); and,
+    when ``real`` holds the model's readings of the
     shuffled-probe events with their real news, ``ic_real_same_events`` and the paired real − shuffled
     difference."""
     from newsaction.tournament import metrics as tmx
@@ -141,6 +142,8 @@ def probe_table(
             "flip_pairs_valid": len(both),
             "right_way": float(np.mean((both["e"].to_numpy() - both["o"].to_numpy()) * -pol > 0)),
         }
+        shift = (both["e"].to_numpy() - both["o"].to_numpy()) * -pol
+        out["edit_shift_t"] = float(np.mean(shift) / (np.std(shift, ddof=1) / np.sqrt(len(shift))))
         if n_hat_sd:
             out["n_hat_sd_val_a"] = n_hat_sd
             out["shift_sd"] = out["edit_mean_shift"] / n_hat_sd

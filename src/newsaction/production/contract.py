@@ -364,7 +364,7 @@ _LISTED: Final = (
         "`panel/{targets,reactions}.py`, `analysis/{spec,inference,shapley,metrics}.py`",
         "{version, hash, files, freeze_files, deviations_log {bytes, sha256}, git_sha, ts, note}",
         "one object",
-        "the PREREG §4.4 freeze record (hash `523e7589…`, 2026-10-28T10:38:58Z)",
+        "the PREREG §4.4 freeze record (hash `523e7589…`; the freeze time is its `ts`)",
         "written once, before any 2026 state was built or sent",
     ),
     Entry(
