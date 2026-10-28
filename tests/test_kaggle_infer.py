@@ -114,3 +114,26 @@ def test_the_committed_notebook_is_the_built_one() -> None:
     src = "\n".join("".join(c["source"]) for c in nb["cells"])
     for banned in ("push_to_hub", "upload_folder", "create_repo", "HfApi"):
         assert banned not in src
+
+
+def test_the_inference_program_refuses_a_label_column(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    """``infer_ddp.read_file`` reads no file with a label column (the dataset holds none; CLAUDE.md D16)."""
+    import importlib.util
+    import sys
+    import types
+
+    stub = types.ModuleType("train_ddp")
+    stub.READ_COLUMNS = ("example_id", "state_json")  # type: ignore[attr-defined]
+    monkeypatch.setitem(sys.modules, "train_ddp", stub)
+    spec = importlib.util.spec_from_file_location("infer_ddp_under_test", nbi.INFER_PROGRAM)
+    assert spec is not None and spec.loader is not None
+    mod = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(mod)
+    rows = {"example_id": ["a"], "state_json": ["{}"], "split": ["test"]}
+    pd.DataFrame(rows | {"label": [1]}).to_parquet(tmp_path / "with_label.parquet")
+    with pytest.raises(ValueError, match="label"):
+        mod.read_file(tmp_path / "with_label.parquet")
+    pd.DataFrame(rows).to_parquet(tmp_path / "clean.parquet")
+    assert (mod.read_file(tmp_path / "clean.parquet")["label"] == -1).all()
