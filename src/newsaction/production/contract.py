@@ -272,6 +272,92 @@ ENTRIES: Final = (
         "val-A states; no target",
     ),
     Entry(
+        "work/dm/production/ablation_sample.parquet",
+        "`newsaction.production.ablations.write_sample` (S8)",
+        "`work/states/{callB_d2_E3,callB_d2_E3_test,callA_d0_E3}.parquet`, "
+        "`work/events/{events_d0,events_d2}.parquet` (tier, month, embargo)",
+        "`event_id`, `base` (`B_D2` / `A_D0`), `split`, `session`, `company_id`, `tier`, `month`, `donor` "
+        "(the shuffled-news donor of a `B_D2` event)",
+        "`event_id` unique",
+        "12,000 events per base outside the embargo, split × tier × month, the smallest "
+        "u = sha256('2026:ablation:<event_id>') per stratum (24,000 rows)",
+        "keys only",
+    ),
+    Entry(
+        "work/states/samples/unmasked_robustness.parquet",
+        "`newsaction.production.ablations.build_unmasked` (S8)",
+        "NA-04's builder inputs (`states.build.load_inputs`), `work/baselines/state_articles.parquet` (the "
+        "articles each masked D0 state kept), `work/dm/production/ablation_sample.parquet`",
+        "NA-04's state columns (`event_id`, …, `masked` false, `state_json`, `state_sha256`, tokens, "
+        "`third_party_ok_all`)",
+        "`event_id` unique",
+        "the unmasked twins of the 12,000 sampled Call A D0 events; the masked rebuild equals NA-04's state "
+        "for every one and the 439 NA-04 twins in the sample are unchanged",
+        "D0 (09:15 ET); unmasked: sent only under the registered probe tag `unmasked_robustness` "
+        "(PREREG §11.6), third-party-OK articles only",
+    ),
+    Entry(
+        "work/dm/production/liquid_d1_ultra_ablations.parquet",
+        "`newsaction.production.ablations.run` (S8)",
+        "`work/dm/production/ablation_sample.parquet`, the Call B D2 states, "
+        "`work/states/samples/unmasked_robustness.parquet`; `cache/decisions.sqlite` (chunk NA-11)",
+        "`newsaction.production.run.readings` plus `ablation` (`b2_no_news`, `b2_shuffled`, `a0_unmasked`) "
+        "and `donor`",
+        "(`ablation`, `event_id`) unique",
+        "d1-ultra, core battery: 12,000 events per ablation (36,000 rows)",
+        "D2 (Call B) / D0 (Call A); probes, compared with the S6 readings of the same events",
+    ),
+    Entry(
+        "work/dm/production/llm_sample_test.parquet",
+        "`newsaction.production.llm_test.write_sample` (S8)",
+        "`work/states/callA_d0_E3.parquet`, `work/events/events_d0.parquet` (NA-09's `d0_events`)",
+        "`event_id`, `tier`, `month` and the client's state columns",
+        "`event_id` unique",
+        "2,000 test D0 events outside the embargo, tier × month, seed 2026 (NA-09's val-B rule, "
+        "PREREG §10.7)",
+        "D0 (09:15 ET), masked",
+    ),
+    Entry(
+        "work/dm/production/llm_test.parquet",
+        "`newsaction.production.llm_test.run` (S8)",
+        "`work/dm/production/llm_sample_test.parquet`; NA-09's prompt and settings; `cache/decisions.sqlite`",
+        "NA-09's common prediction schema (`baselines.schema`)",
+        "`event_id` unique",
+        "mistralai/mistral-nemo's valid answers on the 2,000 test events (invalid ones counted in "
+        "`artifacts/NA-11/llm_test.json`)",
+        "D0 (09:15 ET)",
+    ),
+    Entry(
+        "work/dm/production/price_only_test.parquet",
+        "`newsaction.production.price_only_test.run` (S8)",
+        "`work/baselines/models/price_only_{e5,abs_z_cc}.json` (NA-09), "
+        "`work/states/context_company.parquet`, "
+        "`work/panel/panel_public.parquet`, the 2026 `react_z_vol` of `reactions.build_reactions` (lock)",
+        "NA-09's common prediction schema (`baselines.schema`)",
+        "`event_id` unique",
+        "every test Call A D0 event (13,977); the same code reproduces NA-09's val-A/val-B rows exactly",
+        "D0 (09:15 ET): t−1 context, z_vol of the previous session",
+    ),
+    Entry(
+        "artifacts/NA-11/ablation_runs.json",
+        "`newsaction.production.ablations.run` (S8)",
+        "`work/dm/production/liquid_d1_ultra_ablations.parquet`",
+        "list of {ablation, requests, ok, valid, cost}",
+        "one entry per ablation",
+        "the S8 ablation batches",
+        "counts and cost only",
+    ),
+    Entry(
+        "artifacts/NA-11/llm_test.json",
+        "`newsaction.production.llm_test.run` (S8)",
+        "`work/dm/production/llm_test.parquet`",
+        "{model, requests, send, projected_usd, cap_usd, budget_left_usd, answered, valid, invalid, "
+        "spent_usd}",
+        "one object",
+        "the LLM baseline's test batch",
+        "counts and cost only",
+    ),
+    Entry(
         "artifacts/NA-11/key_usage.json",
         "`newsaction.production.record_key_usage`",
         "OpenRouter GET /api/v1/key and /api/v1/credits; `ledgers/spend.jsonl`",

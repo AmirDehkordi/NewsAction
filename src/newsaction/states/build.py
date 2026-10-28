@@ -1135,9 +1135,10 @@ def add_tokens(df: pd.DataFrame, tok: Any, qtok: Mapping[str, Mapping[str, int]]
     return df[list(OUTPUT_COLUMNS)]
 
 
-def stratified_sample(events: pd.DataFrame, n: int, strata: Sequence[str], seed: int) -> pd.DataFrame:
+def stratified_sample(events: pd.DataFrame, n: int, strata: Sequence[str], seed: int | str) -> pd.DataFrame:
     """Proportional allocation over ``strata`` (largest remainder, ties by stratum order), then the ``n_h``
-    events with the smallest u = sha256("{seed}:{event_id}") in each stratum."""
+    events with the smallest u = sha256("{seed}:{event_id}") in each stratum (``seed`` may carry a purpose,
+    as NA-11's "2026:ablation")."""
     if n > len(events):
         raise StatesError(f"cannot sample {n} of {len(events)} events")
     ev = events.copy()

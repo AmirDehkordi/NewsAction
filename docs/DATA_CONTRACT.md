@@ -1408,6 +1408,15 @@ sha256 on a rerun (labels and export were run twice: 8 of 8 files identical).
 - **Availability:** val-A D0; run locally (the unmasked states never leave this machine); probes, not hypotheses
 - **sha256:** `9b970744dc75c9249a73b2dddefe23ebfbf175836cbce7ecfb10fce618ab9d06`
 
+### `work/dm/production/local_laya_typed_decisions_test.parquet`
+- **Producer:** `newsaction.production.laya_local.run("test")`
+- **Inputs:** `work/states/callA_d0_E3.parquet` (test rows, after the freeze); `cache/decisions.sqlite`
+- **Schema:** `newsaction.production.run.readings` (NA-06's `derived_frame` columns: `key`, `model`, `event_id`, `tag`, `repeat_idx`, `ok`, `valid`, `model_build`, `cost`, `latency_ms`, `n_hat`, `m`, `surprise`, `tone`, confidences; plus `q1`, `conf3`, `source`, `split`)
+- **Key:** `event_id` unique
+- **Rows / coverage:** Laya zero-shot's test Call A at D0, core battery (PREREG §10.5 comparator)
+- **Availability:** D0 (09:15 ET); local model, nothing sent to a third party
+- **sha256:** `df399845360d9e13078fd85d93ab26f63f9b70bfa6c80019a3a67f1fcc157e0a`
+
 ### `work/kaggle/dataset_na11/test_callB.parquet`
 - **Producer:** `newsaction.production.kaggle_infer.export` (S7)
 - **Inputs:** NA-04 / NA-11 state files of `configs/production.yaml` `trained.export`; `configs/training.yaml` questions (Laya's input format)
@@ -1498,6 +1507,42 @@ sha256 on a rerun (labels and export were run twice: 8 of 8 files identical).
 - **Availability:** val-A states; no target
 - **sha256:** `b6b9f058dd139b310c90f999ff49c291a5eecc6df27ac75ab3df90325b2f2cf4`
 
+### `work/dm/production/ablation_sample.parquet`
+- **Producer:** `newsaction.production.ablations.write_sample` (S8)
+- **Inputs:** `work/states/{callB_d2_E3,callB_d2_E3_test,callA_d0_E3}.parquet`, `work/events/{events_d0,events_d2}.parquet` (tier, month, embargo)
+- **Schema:** `event_id`, `base` (`B_D2` / `A_D0`), `split`, `session`, `company_id`, `tier`, `month`, `donor` (the shuffled-news donor of a `B_D2` event)
+- **Key:** `event_id` unique
+- **Rows / coverage:** 12,000 events per base outside the embargo, split × tier × month, the smallest u = sha256('2026:ablation:<event_id>') per stratum (24,000 rows)
+- **Availability:** keys only
+- **sha256:** `4b21ca97cb414c52d76e2ed936e97f7fd32f92e0e2190446fc7d47197269371d`
+
+### `work/states/samples/unmasked_robustness.parquet`
+- **Producer:** `newsaction.production.ablations.build_unmasked` (S8)
+- **Inputs:** NA-04's builder inputs (`states.build.load_inputs`), `work/baselines/state_articles.parquet` (the articles each masked D0 state kept), `work/dm/production/ablation_sample.parquet`
+- **Schema:** NA-04's state columns (`event_id`, …, `masked` false, `state_json`, `state_sha256`, tokens, `third_party_ok_all`)
+- **Key:** `event_id` unique
+- **Rows / coverage:** the unmasked twins of the 12,000 sampled Call A D0 events; the masked rebuild equals NA-04's state for every one and the 439 NA-04 twins in the sample are unchanged
+- **Availability:** D0 (09:15 ET); unmasked: sent only under the registered probe tag `unmasked_robustness` (PREREG §11.6), third-party-OK articles only
+- **sha256:** `1092922246b9adafb5a7e2084808c498aadb1d1e882a57db2d3948f3abf33c25`
+
+### `work/dm/production/llm_sample_test.parquet`
+- **Producer:** `newsaction.production.llm_test.write_sample` (S8)
+- **Inputs:** `work/states/callA_d0_E3.parquet`, `work/events/events_d0.parquet` (NA-09's `d0_events`)
+- **Schema:** `event_id`, `tier`, `month` and the client's state columns
+- **Key:** `event_id` unique
+- **Rows / coverage:** 2,000 test D0 events outside the embargo, tier × month, seed 2026 (NA-09's val-B rule, PREREG §10.7)
+- **Availability:** D0 (09:15 ET), masked
+- **sha256:** `ae28772ca585086b1fb5a70fad93d7fc7546e9f75c848b1bc070e0d618ecf7bc`
+
+### `work/dm/production/price_only_test.parquet`
+- **Producer:** `newsaction.production.price_only_test.run` (S8)
+- **Inputs:** `work/baselines/models/price_only_{e5,abs_z_cc}.json` (NA-09), `work/states/context_company.parquet`, `work/panel/panel_public.parquet`, the 2026 `react_z_vol` of `reactions.build_reactions` (lock)
+- **Schema:** NA-09's common prediction schema (`baselines.schema`)
+- **Key:** `event_id` unique
+- **Rows / coverage:** every test Call A D0 event (13,977); the same code reproduces NA-09's val-A/val-B rows exactly
+- **Availability:** D0 (09:15 ET): t−1 context, z_vol of the previous session
+- **sha256:** `613d555227462262d39ce7534582efd45c070259ed51732ae65dee61f188a145`
+
 ### `artifacts/NA-11/key_usage.json`
 - **Producer:** `newsaction.production.record_key_usage`
 - **Inputs:** OpenRouter GET /api/v1/key and /api/v1/credits; `ledgers/spend.jsonl`
@@ -1505,4 +1550,4 @@ sha256 on a rerun (labels and export were run twice: 8 of 8 files identical).
 - **Key:** one entry per check, in time order
 - **Rows / coverage:** the key's usage before and after each NA-11 paid batch (operator preamble item 6)
 - **Availability:** account metadata; no data
-- **sha256:** `8819ceab6a21688290006a869f347eeb4daacc8607d6706b6cc0b082f0886397`
+- **sha256:** `9b81bec367fe82582f7a3b53c4bb5bbdd38bd408905dfeda411e13f6f98460a8`
