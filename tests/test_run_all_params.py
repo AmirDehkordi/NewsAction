@@ -14,6 +14,7 @@
 from __future__ import annotations
 
 import math
+from datetime import date
 from pathlib import Path
 from typing import Any
 
@@ -25,7 +26,6 @@ from newsaction.analysis import inference as inf
 from newsaction.analysis import metrics as mx
 from newsaction.analysis import run_all, spec
 from newsaction.paths import ROOT, Layout
-from newsaction.production import ProductionError
 from spec_fakes import panel
 
 PREREG_BOOT = {"block": 5.0, "reps": 10_000, "seed": 2026, "ci": 0.95}
@@ -150,10 +150,16 @@ def test_the_secondary_families_are_the_recorded_ones() -> None:
 def test_model_roles_are_the_frozen_ones(tmp_layout: Layout) -> None:
     run_all.check_models()
     frozen = tmp_layout.configs / "frozen.yaml"
+    text = frozen.read_text()
     frozen.write_text(
-        frozen.read_text().replace("primary_instrument: laya_fin", "primary_instrument: anchor")
+        text.replace("\n  anchor: anchor\n", "\n  anchor: laya_fin\n")
+    )  # load_plan does not check it
+    with pytest.raises(run_all.RunAllError, match="anchor"):
+        run_all.check_models(tmp_layout)
+    frozen.write_text(
+        text.replace("comparators: [liquid/d1-ultra, respan/span-02", "comparators: [respan/span-02")
     )
-    with pytest.raises((run_all.RunAllError, ProductionError)):
+    with pytest.raises(run_all.RunAllError, match="comparators"):
         run_all.check_models(tmp_layout)
 
 
@@ -186,3 +192,32 @@ def test_answers_needs_values_on_every_split() -> None:
     assert run_all.answers(f, ["x"], ["val_a", "test"])
     assert not run_all.answers(f, ["x"], ["val_a", "val_b"])
     assert not run_all.answers(f, ["y"], ["val_a"])
+
+
+def test_test_targets_refuse_member_rows_missing_from_the_test_inputs(tmp_layout: Layout) -> None:
+    """A member row of targets_test without its t−1 row in panel_test_inputs is a join failure; a member
+    whose tier is missing (a spin-off joiner, as in the public panel) is kept."""
+    from newsaction import io
+    from newsaction.analysis import frames
+
+    keys = pd.DataFrame({"session": [date(2030, 1, 2)] * 3, "symbol_id": [1, 2, 3]})
+    tt = keys.assign(split="test", member=True, is_rep=True, company_id=[11, 12, 13])
+    for c in {*frames.PANEL_COLUMNS, *frames.INTRADAY_COLUMNS} - {
+        *tt.columns,
+        "dv_tier",
+        "z_m5",
+        "z_m20",
+        "z_m60",
+    }:
+        tt[c] = 0.0
+    t1 = keys.assign(tier=["top100", None, "rest"], dv_tier="mid", z_m5=0.0, z_m20=0.0, z_m60=0.0)
+    io.write_parquet(tt, frames.TARGETS_TEST, producer="test", description="synthetic", layout=tmp_layout)
+    io.write_parquet(t1, frames.TEST_INPUTS, producer="test", description="synthetic", layout=tmp_layout)
+    panel, intraday, members = frames.test_targets(tmp_layout)
+    assert len(intraday) == 3
+    assert len(panel) == 3 and members["tier"].isna().sum() == 1
+    io.write_parquet(
+        t1.iloc[:2], frames.TEST_INPUTS, producer="test", description="synthetic", layout=tmp_layout
+    )
+    with pytest.raises(frames.FrameError, match="missing from panel_test_inputs"):
+        frames.test_targets(tmp_layout)

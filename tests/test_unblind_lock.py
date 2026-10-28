@@ -175,6 +175,11 @@ def test_assemble_refuses_inconsistent_outcomes() -> None:
     path = keys.assign(car_lvl_b0=0.0)
     with pytest.raises(unblind.UnblindError, match="g_d2_vs_z_cc"):
         unblind.assemble(panel, tg, d1, rx2, rx1, path)
+    rx2 = keys.assign(g_d2=(panel["ar_cc"] / panel["sigma_cc"]).clip(-10, 10), g_d2_lvl=0.0)
+    with pytest.raises(unblind.UnblindError, match="path_b0_vs_car_lvl_10"):
+        unblind.assemble(panel, tg, d1, rx2, rx1, keys.assign(car_lvl_b0=1.0))
+    out, gaps = unblind.assemble(panel, tg, d1, rx2, rx1, path)
+    assert set(gaps.values()) == {0.0} and len(out) == len(panel)
 
 
 def test_real_repository_refuses_without_the_env(tmp_path: Path) -> None:
