@@ -63,6 +63,11 @@ class Table:
 
 
 def _num(x: Any) -> float:
+    if isinstance(x, str) and x in (
+        "inf",
+        "-inf",
+    ):  # the results JSON stores ±∞ as strings (a half-life "never")
+        return float(x)
     if x is None or isinstance(x, str | bool):
         return math.nan
     try:

@@ -55,6 +55,9 @@ def test_fmt_rules() -> None:
     assert tables.fmt(12.0, "nobs") == "12" and tables.fmt(math.inf, "lambda") == "∞"
     assert tables.fmt(float("nan"), "x") == "—" and tables.fmt(True, "in_family") == "yes"
     assert tables.fmt(0.00012, "kappa") == "1.20e-04"
+    assert (
+        tables._num("inf") == math.inf and math.isnan(tables._num("never")) and math.isnan(tables._num(None))
+    )
 
 
 def test_keys_are_unique_and_latex_has_a_line_per_row() -> None:

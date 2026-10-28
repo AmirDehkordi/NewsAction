@@ -2083,7 +2083,7 @@ sha256 on a rerun (labels and export were run twice: 8 of 8 files identical).
 - **Key:** one file
 - **Rows / coverage:** table file `keys.json`
 - **Availability:** test; outcomes from the test period's outcomes, after unblinding (NA-12 S1)
-- **sha256:** `172fdf8abb85794f0897e82dd60f1a4bfcb53dce371382879f7d0292c97f81f9`
+- **sha256:** `81ad60cdeaa61b5ff5483cd73308d6390e13806e34a95aff469261f1c32bb576`
 
 ### `artifacts/NA-12/tables/t10_explanation_ladder.csv`
 - **Producer:** `newsaction.analysis.tables.write`
@@ -2398,7 +2398,7 @@ sha256 on a rerun (labels and export were run twice: 8 of 8 files identical).
 - **Key:** `key`
 - **Rows / coverage:** table file `t7_gap_closure.csv`
 - **Availability:** test; outcomes from the test period's outcomes, after unblinding (NA-12 S1)
-- **sha256:** `b5c8a3a0373b832028f817eb0e4d47f263367d6571e70c7e42deb75ef2da79f9`
+- **sha256:** `33062977043288242b154d2ab05d7097f9211457fe7ecb6465b426daa09a8d48`
 
 ### `artifacts/NA-12/tables/t7_gap_closure.tex`
 - **Producer:** `newsaction.analysis.tables.write`
@@ -2407,7 +2407,7 @@ sha256 on a rerun (labels and export were run twice: 8 of 8 files identical).
 - **Key:** one file
 - **Rows / coverage:** table file `t7_gap_closure.tex`
 - **Availability:** test; outcomes from the test period's outcomes, after unblinding (NA-12 S1)
-- **sha256:** `161765245a094110de714d981f48b6f1129d5e43cc67d3856fbbdbdae0d6c4c0`
+- **sha256:** `265ab3c9e39af4c9311c1d9bf864ad05c2f154681362ac2ceaa3b0cf8982e0c2`
 
 ### `artifacts/NA-12/tables/t8_tracking_error.csv`
 - **Producer:** `newsaction.analysis.tables.write`
@@ -2434,7 +2434,7 @@ sha256 on a rerun (labels and export were run twice: 8 of 8 files identical).
 - **Key:** `key`
 - **Rows / coverage:** table file `t9_convergence_cuts.csv`
 - **Availability:** test; outcomes from the test period's outcomes, after unblinding (NA-12 S1)
-- **sha256:** `a46631d9c863242a08074aded174bc5758a17c9b16a56684075070067180c89b`
+- **sha256:** `a644adda42c8717329bdefe50f5b302895c6729ad119ddda3811e4dc5fbaa354`
 
 ### `artifacts/NA-12/tables/t9_convergence_cuts.tex`
 - **Producer:** `newsaction.analysis.tables.write`
@@ -2443,4 +2443,4 @@ sha256 on a rerun (labels and export were run twice: 8 of 8 files identical).
 - **Key:** one file
 - **Rows / coverage:** table file `t9_convergence_cuts.tex`
 - **Availability:** test; outcomes from the test period's outcomes, after unblinding (NA-12 S1)
-- **sha256:** `fb177a2e585e35a016aaf6d90fb76fa470001d41a83bebffc9e7d7742003632e`
+- **sha256:** `c89ddfc721e737bbb855f4b4070774ea3446d63c6d8eefda1ba7ded414fdfccd`
