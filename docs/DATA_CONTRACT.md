@@ -1029,3 +1029,125 @@ the session's open (`newsaction.calendar`), never by clock time.
 - **Rows / coverage:** public sessions only
 - **Availability:** n/a (QC)
 - **sha256:** `893e6e8e81925d71472f8ce63c97c0e2abdc7ceaee68d48dd3b001f3954b5f92`
+
+## NA-08 — trained decision models: labels, the private Kaggle dataset, predictions
+
+Producer for all files: `newsaction.train.build` (NA-08), one stage per process:
+`uv run python -m newsaction.train.build --stage labels | export | notebook | kernels | plan | import | cards`.
+Configuration: `configs/training.yaml` (PREREG §9, PRD NA-08). Only `labels` reads returns (`panel_public`,
+sessions ≤ 2025-12-31, asserted). No `newsaction.train` module imports `panel.targets` or the lock, and no
+module computes a statistic on val-B or test rows (`train.metrics.require_val_a`). Every stage reproduces its
+sha256 on a rerun (labels and export were run twice: 8 of 8 files identical).
+
+### `work/kaggle/labels.parquet`
+- **Producer:** `newsaction.train.build --stage labels` (`train.labels`, S1)
+- **Inputs:** `work/panel/panel_public.parquet` (session, symbol_id, split, e5, z_cc, g_d2, y2), `work/events/events_{d0,d2}.parquet` (event keys, symbol, split, embargo)
+- **Schema:** `company_id` int64, `session` date32, `symbol_id` int64, `split` string (train | val_a | val_b), `embargo` bool (first 5 sessions of val-A / val-B), `in_d0`, `in_d2` bool (the key has a D0 / D2 event), `e5`, `z_cc`, `g_d2`, `y2`, `cont_x` (= sign(G)·y2) double, `react_label` (0–8), `mag_label` (0–4), `cont_label` (0 reverse, 1 stall, 2 continue; only for |G| ≥ 0.5) Int8 nullable, `react_horizon_end` (t+4), `cont_horizon_end` (t+5) date32
+- **Key:** `(company_id, session)` unique
+- **Rows / coverage:** 48,649 event keys (every D0 key is also a D2 key): train 29,485, val-A 11,252, val-B 7,912. Labelled train: react 29,026, mag 29,456, cont 19,115. Bins: |z| in [0, 0.5) [0.5, 1) [1, 2) [2, 3) [3, ∞) (the codebook's move words), react level = 4 + sign(e5)·bin(|e5|), mag level = bin(|z_cc,t|); cont x ≤ −0.5 reverse, x ≥ 0.5 continue, else stall.
+- **Availability:** `post` (labels look at returns t … t+5; never a model input). Purged (PREREG §4.1): every label's horizon ends inside its split (asserted); the last train label horizon is 2025-06-30. Local only: never in the Kaggle dataset except as `label_index` of train and val-A rows. Val-B rows are kept for NA-11; NA-08 computes no statistic on them.
+- **sha256:** `a0bc7de7ae70efb7023c6c915bc396a1bdccd5204a8481ada1364d32cda3a3dc`
+
+### Kaggle dataset files (schema shared by the four example files below)
+- **Producer:** `newsaction.train.build --stage export` (`train.kaggle_export`, S2); uploaded privately to Kaggle as `amirdehkordi98/newsaction-na08-states` (runbook: artifacts/NA-08/REPORT.md).
+- **Inputs:** `work/states/{callA_d0_E3, callA_d2_E3, callB_d2_E3}.parquet` (masked E3 states, all `third_party_ok_all`, checked), `work/kaggle/labels.parquet`, `configs/{training, questions_v1}.yaml`, the ModernBERT-large tokenizer @ 45bb4654 (identical ids to Laya's typed-decisions tokenizer on 4,500 sampled states) and `laya.common.build_head` (head lengths)
+- **Example:** one (state variant, question) pair. `state_json` is the NA-04 state byte for byte (`variant` full), or a train copy (PREREG §9.1 block dropout, a sha256 draw per state, seed 2026): `no_reaction` (a Call B state without `reaction_so_far`, p = 0.3, asked react; byte-identical to the event's Call A D2 state) or `no_context` (without attention, company and market, p = 0.1, the source's questions). Questions by source: Call A D0 and D2 react + mag, Call B react + cont. `question_json` is Laya's input format `{type, instructions, criteria}` (react = Q1, cont = Q6 of `configs/questions_v1.yaml`, option order kept; mag = the internal H-mag question of `configs/training.yaml`).
+- **Schema:** `example_id` ("{event_id}|{call}|{variant}|{question_id}"), `event_id`, `split`, `call` (A | B), `window` (W0 | W2), `variant`, `question_id` (react | mag | cont), `state_json`, `question_json` string, `n_tokens_state` int64 (ModernBERT-large tokens; NA-04's count for full states, recounted for copies); train and val-A only: `label_index` int8 (val-A nullable: purged or missing); val-A only: `embargo` bool. **The val-B and test files have exactly the columns before `label_index`** (`kaggle_export.EVAL_COLUMNS`, asserted; tests/test_train_export_schema.py).
+- **Key:** `example_id` unique per file
+- **Availability:** a state is an input at its decision point (NA-04); labels `post`. Val-B and test labels never leave this machine (PREREG §9.3, CLAUDE.md D16). Sequence check (`dataset_info.json` `truncation`): with max length 1,036 (PREREG §15 NA-08 row) and head length 143 (react, Laya's rendering) no state is cut; at 1,024, 5 Call A D0 react examples (4 train, 1 val-A) would exceed the room by ≤ 12 tokens.
+
+### `work/kaggle/dataset/train.parquet`
+- **Producer / schema:** as "Kaggle dataset files" above (labelled examples only)
+- **Rows:** 174,320 examples of 83,749 distinct states: Call A D0 react 22,267 + mag 22,598; Call A D2 react 28,766 + mag 29,192; Call B react 28,766 + cont 18,946; copies no_reaction 8,680, no_context 15,105. Sessions 2024-07-01 … 2025-06-30; last label horizon 2025-06-30.
+- **sha256:** `41af9208ebdd51e206350240564bdb5e06a4c5b18fdcafd555cbd78cb98e6213`
+
+### `work/kaggle/dataset/val_a.parquet`
+- **Producer / schema:** as "Kaggle dataset files" above (`label_index` nullable, `embargo`)
+- **Rows:** 62,404 examples (every val-A state × its questions; full states only), 29,687 distinct states; 56,323 labelled; embargo rows 3,828.
+- **sha256:** `9bf4807754c5d405af29996f40a61054cf07790db1c5972b32902bfb594faf75`
+
+### `work/kaggle/dataset/val_b.parquet`
+- **Producer / schema:** as "Kaggle dataset files" above, **no label column**
+- **Rows:** 43,382 examples (Call A D0 / D2 and Call B states of val-B × their questions), 20,327 distinct states.
+- **sha256:** `744463ce1a75dd7fc41be33a98bf04717392cc266e2f502a700fcd030c61d043`
+
+### `work/kaggle/dataset/test_callA.parquet`
+- **Producer / schema:** as "Kaggle dataset files" above, **no label column**; Call A only (no test-period Call B state exists before the NA-11 freeze)
+- **Rows:** 65,204 examples (Call A D0 13,977 and D2 18,625 states × react, mag), 29,237 distinct states.
+- **Availability:** test-period t−1 context words: never summarized before the freeze.
+- **sha256:** `61271b3eb46127598b1cee51f7d04c4b8d7202d412e7e0397964fbf46667cbe6`
+
+### `work/kaggle/dataset/dataset_info.json`
+- **Producer:** `--stage export`; uploaded with the dataset
+- **Schema:** JSON: `questions` (Laya input format, type, k, option keys, head tokens: react 143, mag 77, cont 64), `questions_by_source`, `max_len` (1,036), `head_max_len` (143), `truncation` (room per question: react 889, mag 955, cont 968; cut example ids: none; `max_len_without_cut` 1,036), `files`, `counts` (examples / labelled / embargo by call, window, variant, question), `dates`, label definitions, export constants, `provenance` (sha256 of the three state files, the labels, `configs/training.yaml`, `configs/questions_v1.yaml`)
+- **sha256:** `4011235ee0b9182cf2ef87c267f67119edf14b79657ed6c7713ea6d220c002ae`
+
+### `work/kaggle/dataset/sha256_manifest.json`
+- **Producer:** `--stage export`; uploaded with the dataset. The notebook checks every file against it on Kaggle and records the sha256s in each run record; `import_preds` requires them to equal this manifest (AC1).
+- **Schema:** JSON `{version, files: {name: {sha256, bytes[, rows, columns]}}}` for the four parquet files and `dataset_info.json`
+- **sha256:** `2bafd1de3d40a705ab14c150672b83d0c251b88d7ee0db57db286f5b0e796992`
+
+### `work/kaggle/dataset/dataset-metadata.json`
+- **Producer:** `--stage export`; Kaggle's dataset metadata (not uploaded as data)
+- **Schema:** JSON `{title, id, licenses: [{name: other}], isPrivate: true}`
+- **sha256:** `f3538aea683d833f88d9cc417d02f0c17d3dd8a995b2de6ff874e15b0a607353`
+
+#### Downloaded run outputs (not registered)
+- `work/kaggle/predictions/<run>/na08_*`: a run's Kaggle outputs (Arrow IPC predictions, calibration, run record, run config, `na08_outputs.json`) and the kernel log, downloaded with `--file-pattern na08_`; checked against their sha256 (`import_preds.verify_run`) before the import reads them. Not parquet, so `make manifest` does not take them for unregistered artifacts.
+
+### Run files (schema shared by the run files below)
+- **Producer:** `newsaction.train.build --stage import` (`train.import_preds`, S7), from the verified download of the run
+- **Schema:** `run`, `init` (laya | modernbert) string, `seed` int64, `split` (val_a | val_b | test), `example_id`, `event_id`, `call`, `window`, `question_id` string, `k` int8, `logits` list<double> (the run's raw logits), `probabilities` list<double> (softmax(logits / T) with the run's val-A temperature per head; options in Laya's order)
+- **Key:** `(split, example_id)` unique
+- **Availability:** model outputs at the state's decision point (the inputs are the NA-04 states). Val-B and test rows are stored, never evaluated in NA-08.
+
+### `work/kaggle/predictions/runs/shuffle-s13.parquet`
+- **Producer / schema:** as "Run files" above; the shuffled-label control (Laya init, seed 13, 1 epoch, labels permuted within split and question; val-A only)
+- **Rows:** 62,404 (val-A 62,404)
+- **sha256:** `6c0f7557e99b4b929fca0ec314354e8f06984209c45a063288b55bc033bbf539`
+
+### `work/kaggle/predictions/runs/laya-s13.parquet`
+- **Producer / schema:** as "Run files" above; Laya-Fin, seed 13, 1 epoch
+- **Rows:** 170,990 (val-A 62,404 + val-B 43,382 + test 65,204)
+- **sha256:** `ae03f6e92df888e6d58bf1cd69478ce616d88766dc60d7222363d03d16bd24c8`
+
+### `work/kaggle/predictions/runs/anchor-s13.parquet`
+- **Producer / schema:** as "Run files" above; the anchor (ModernBERT-large, fresh head), seed 13, 1 epoch
+- **Rows:** 170,990 (val-A 62,404 + val-B 43,382 + test 65,204)
+- **sha256:** `4c844aa5047d062e8f545ac5d12bd1bc61a2896e6b61b858893d88e5c74c59cd`
+
+### Prediction files (schema shared by the six files below)
+- **Producer:** `newsaction.train.build --stage import` (`train.import_preds`, S7): per model, the mean of its seed runs' calibrated probabilities (PREREG §9.1). Each model has one seed for now (PREREG §15 NA-08 row 2: seeds 17 and 23 deferred), so its file holds that seed's probabilities; a deferred seed joins on a rerun of the import.
+- **Schema (the common prediction schema):** `event_id`, `company_id` int64, `session` date32, `split`, `window` (W0 | W2), `decision_point` (D0 | D2), `call` (A | B), `question` (react | mag | cont), `model` (laya_fin | anchor), `n_seeds` int64, `runs` (comma-separated run names) string, `k` int8, `probabilities` list<double>, derived double (NaN where not applicable): `n_hat`, `e_abs_n` (react; PREREG §7 midpoints), `mag_mean` (midpoints 0.25, 0.75, 1.5, 2.5, 3.5), `p_mag_ge1` (mag), `p_reverse`, `p_stall`, `p_continue`, `c_cont` (= P(continue) − P(reverse)), `j_cont` (J analogue = c_cont), `w_cont` (W analogue = P(reverse)) (cont), `confidence` (max probability)
+- **Key:** `(event_id, call, question)` unique
+- **Availability:** model outputs at the state's decision point. Val-B and test files are stored, never evaluated in NA-08 (NA-11 evaluates val-B; test after the freeze and unblinding).
+
+### `work/kaggle/predictions/laya_fin_val_a.parquet`
+- **Producer / schema:** as "Prediction files" above; laya_fin, val-A: Call A D0 / D2 (react, mag) and Call B (react, cont)
+- **Rows:** 62,404
+- **sha256:** `f1544b79f3bb7d149990083f5745c27166a42ffca4b4bdc12d331504a4aa9d8a`
+
+### `work/kaggle/predictions/laya_fin_val_b.parquet`
+- **Producer / schema:** as "Prediction files" above; laya_fin, val-B: as val-A; stored, not evaluated
+- **Rows:** 43,382
+- **sha256:** `e57d9ee831932f932426cccb29a1ed94c6f18e2f74d0446d0bf6dd2f83673c7e`
+
+### `work/kaggle/predictions/laya_fin_test_callA.parquet`
+- **Producer / schema:** as "Prediction files" above; laya_fin, test: Call A D0 and D2 (react, mag); stored, not evaluated
+- **Rows:** 65,204
+- **sha256:** `c256836331623f652d7b85299000002ba92f27032fb2536f4cd18d2be86593c1`
+
+### `work/kaggle/predictions/anchor_val_a.parquet`
+- **Producer / schema:** as "Prediction files" above; anchor, val-A: Call A D0 / D2 (react, mag) and Call B (react, cont)
+- **Rows:** 62,404
+- **sha256:** `a26d094e6d7fc18522a02a5a9700d4bcccebeacdd45743e1e199ae44ac717970`
+
+### `work/kaggle/predictions/anchor_val_b.parquet`
+- **Producer / schema:** as "Prediction files" above; anchor, val-B: as val-A; stored, not evaluated
+- **Rows:** 43,382
+- **sha256:** `6cced05c5e499aba76c6256941bfb5ecd6a8829e479178d0f8ef981d9fe6b334`
+
+### `work/kaggle/predictions/anchor_test_callA.parquet`
+- **Producer / schema:** as "Prediction files" above; anchor, test: Call A D0 and D2 (react, mag); stored, not evaluated
+- **Rows:** 65,204
+- **sha256:** `d659d3659c2abe819dc454ef06f3b5db848263b2877d3f96061346549f289376`

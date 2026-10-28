@@ -1,0 +1,97 @@
+{
+  "chunk": "NA-08",
+  "split": "val_a",
+  "embargo_excluded": true,
+  "shuffled_label": {
+    "run": "shuffle-s13",
+    "rule": "|NW t| of the val-A mean daily IC of N\u0302 vs e5 (D0) < 2.0",
+    "ic_e5": {
+      "signal": "n_hat",
+      "target": "e5",
+      "ic": -0.007230635737952142,
+      "nw_t": -0.47679735394297046,
+      "days": 55,
+      "events": 7970,
+      "ci95": [
+        -0.03423758939569037,
+        0.02041275028305846
+      ]
+    },
+    "ic_z_cc": {
+      "signal": "n_hat",
+      "target": "z_cc",
+      "ic": 0.0006454629630502139,
+      "nw_t": 0.06042355975817056,
+      "days": 59,
+      "events": 8376,
+      "ci95": [
+        -0.019050905323001313,
+        0.02204211978635301
+      ]
+    },
+    "pass": true,
+    "all_heads": [
+      {
+        "name": "D0 Call A: N\u0302 vs z_cc,t",
+        "signal": "n_hat",
+        "target": "z_cc",
+        "ic": 0.0006454629630502139,
+        "nw_t": 0.06042355975817056,
+        "days": 59,
+        "events": 8376
+      },
+      {
+        "name": "D0 Call A: N\u0302 vs e5",
+        "signal": "n_hat",
+        "target": "e5",
+        "ic": -0.007230635737952142,
+        "nw_t": -0.47679735394297046,
+        "days": 55,
+        "events": 7970
+      },
+      {
+        "name": "D2 Call A: N\u0302 vs e5",
+        "signal": "n_hat",
+        "target": "e5",
+        "ic": -0.006740131800707829,
+        "nw_t": -0.4438895608278807,
+        "days": 55,
+        "events": 9898
+      },
+      {
+        "name": "D2 Call B: N\u0302 vs e5",
+        "signal": "n_hat",
+        "target": "e5",
+        "ic": 0.011104682028324328,
+        "nw_t": 1.1589848012514024,
+        "days": 55,
+        "events": 9898
+      },
+      {
+        "name": "D0 Call A: H-mag E[level] vs |z_cc,t|",
+        "signal": "mag_mean",
+        "target": "abs_z_cc",
+        "ic": -0.043964592537438923,
+        "nw_t": -2.388142443823481,
+        "days": 59,
+        "events": 8376
+      },
+      {
+        "name": "D2 Call B: C vs sign(G)\u00b7y2 (|G| \u2265 0.5)",
+        "signal": "c_cont",
+        "target": "cont_x",
+        "ic": 0.019992428633159715,
+        "nw_t": 1.493719583303635,
+        "days": 54,
+        "events": 6136
+      }
+    ]
+  },
+  "reproducibility": {
+    "runs": [
+      "laya-s13",
+      "repro-s13"
+    ],
+    "status": "deferred: repro-s13 is the operator-approved deferral under AC3 (planned, not run yet; it does not block NA-11)"
+  }
+}

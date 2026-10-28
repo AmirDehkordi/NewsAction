@@ -1,0 +1,344 @@
+{
+  "chunk": "NA-08",
+  "pilot": {
+    "laya": {
+      "status": "ok",
+      "init": "laya",
+      "hparams": {
+        "micro_batch": 8,
+        "grad_accum": 4,
+        "grad_checkpointing": true
+      },
+      "train_seq_per_s": 8.244030554146535,
+      "micro_batch_s_median": 1.9169772863388062,
+      "eval_seq_per_s": 31.938936245919354,
+      "notebook_to_process_s": 62.3,
+      "process_to_training_s": 31.1,
+      "peak_gpu_gb": 10.522,
+      "probe_peak_gpu_gb": 5.456,
+      "gpu": {
+        "count": 2,
+        "names": [
+          "Tesla T4",
+          "Tesla T4"
+        ],
+        "memory_gb": [
+          15.64,
+          15.64
+        ]
+      },
+      "versions": {
+        "python": "3.13.15",
+        "torch": "2.11.0+cu128",
+        "cuda": "12.8",
+        "transformers": "5.20.2",
+        "laya": "0.4.14",
+        "numpy": "2.1.3",
+        "pandas": "2.3.3",
+        "pyarrow": "23.0.1"
+      },
+      "rows_full": {
+        "train": 174320,
+        "val_a": 62404,
+        "val_b": 43382,
+        "test": 65204
+      },
+      "rehearsal_rows": {
+        "val_a": 2000,
+        "val_b": 500,
+        "test": 500
+      },
+      "states_cut": {
+        "train": 0,
+        "val_a": 0,
+        "val_b": 0,
+        "test": 0
+      }
+    },
+    "laya-nockpt": {
+      "status": "failed",
+      "tag": "pilot-laya-nockpt",
+      "returncode": 1,
+      "hparams": {
+        "lr_backbone": 2e-05,
+        "lr_head": 0.0001,
+        "min_lr": 1e-06,
+        "warmup_frac": 0.03,
+        "weight_decay": 0.01,
+        "grad_clip": 1.0,
+        "micro_batch": 4,
+        "grad_accum": 8,
+        "grad_checkpointing": false,
+        "eval_batch": 32,
+        "loss": "rlcd",
+        "rl_samples": 4,
+        "sigma_start": 0.4,
+        "sigma_end": 0.1,
+        "w_sph": 0.75,
+        "w_rps": 1.0,
+        "amp": "fp16"
+      }
+    },
+    "modernbert": {
+      "status": "ok",
+      "init": "modernbert",
+      "hparams": {
+        "micro_batch": 8,
+        "grad_accum": 4,
+        "grad_checkpointing": true
+      },
+      "train_seq_per_s": 8.206860080685892,
+      "micro_batch_s_median": 1.9256442785263062,
+      "eval_seq_per_s": 31.97961463850094,
+      "notebook_to_process_s": 625.3,
+      "process_to_training_s": 24.4,
+      "peak_gpu_gb": 10.542,
+      "probe_peak_gpu_gb": 5.456,
+      "gpu": {
+        "count": 2,
+        "names": [
+          "Tesla T4",
+          "Tesla T4"
+        ],
+        "memory_gb": [
+          15.64,
+          15.64
+        ]
+      },
+      "versions": {
+        "python": "3.13.15",
+        "torch": "2.11.0+cu128",
+        "cuda": "12.8",
+        "transformers": "5.20.2",
+        "laya": "0.4.14",
+        "numpy": "2.1.3",
+        "pandas": "2.3.3",
+        "pyarrow": "23.0.1"
+      },
+      "rows_full": {
+        "train": 174320,
+        "val_a": 62404,
+        "val_b": 43382,
+        "test": 65204
+      },
+      "rehearsal_rows": {
+        "val_a": 2000,
+        "val_b": 500,
+        "test": 500
+      },
+      "states_cut": {
+        "train": 0,
+        "val_a": 0,
+        "val_b": 0,
+        "test": 0
+      }
+    }
+  },
+  "rows": {
+    "train": 174320,
+    "val_a": 62404,
+    "val_b": 43382,
+    "test": 65204
+  },
+  "chosen_hparams": {
+    "micro_batch": 8,
+    "grad_accum": 4,
+    "grad_checkpointing": true
+  },
+  "projection": {
+    "train_seq_per_s": 8.244030554146535,
+    "eval_seq_per_s": 31.938936245919354,
+    "epoch_hours": 5.87,
+    "val_a_eval_hours": 0.54,
+    "final_inference_hours": 0.94
+  },
+  "options": [
+    {
+      "option": "full",
+      "epochs": 1,
+      "run_hours": 7.44,
+      "runs": [
+        {
+          "run": "shuffle-s13",
+          "epochs": 1,
+          "hours": 6.49
+        },
+        {
+          "run": "laya-s13",
+          "epochs": 1,
+          "hours": 7.44
+        },
+        {
+          "run": "laya-s17",
+          "epochs": 1,
+          "hours": 7.44
+        },
+        {
+          "run": "laya-s23",
+          "epochs": 1,
+          "hours": 7.44
+        },
+        {
+          "run": "anchor-s13",
+          "epochs": 1,
+          "hours": 7.44
+        },
+        {
+          "run": "anchor-s17",
+          "epochs": 1,
+          "hours": 7.44
+        },
+        {
+          "run": "anchor-s23",
+          "epochs": 1,
+          "hours": 7.44
+        },
+        {
+          "run": "repro-s13",
+          "epochs": 1,
+          "hours": 6.49
+        }
+      ],
+      "gpu_hours": 58.3,
+      "weeks": 2,
+      "fits_week": false,
+      "sessions_fit": true
+    },
+    {
+      "option": "anchor seeds -> 1",
+      "epochs": 1,
+      "run_hours": 7.44,
+      "runs": [
+        {
+          "run": "shuffle-s13",
+          "epochs": 1,
+          "hours": 6.49
+        },
+        {
+          "run": "laya-s13",
+          "epochs": 1,
+          "hours": 7.44
+        },
+        {
+          "run": "laya-s17",
+          "epochs": 1,
+          "hours": 7.44
+        },
+        {
+          "run": "laya-s23",
+          "epochs": 1,
+          "hours": 7.44
+        },
+        {
+          "run": "anchor-s13",
+          "epochs": 1,
+          "hours": 7.44
+        },
+        {
+          "run": "repro-s13",
+          "epochs": 1,
+          "hours": 6.49
+        }
+      ],
+      "gpu_hours": 43.4,
+      "weeks": 2,
+      "fits_week": false,
+      "sessions_fit": true
+    },
+    {
+      "option": "MAX_LEN 768",
+      "available": false,
+      "reason": "would cut states (27% of Call B, 4% of Call A D0); the operator's decision on NA-04 owner decision 2: no state is cut"
+    },
+    {
+      "option": "anchor seeds -> 1, epochs 2",
+      "epochs": 1,
+      "run_hours": 7.44,
+      "runs": [
+        {
+          "run": "shuffle-s13",
+          "epochs": 1,
+          "hours": 6.49
+        },
+        {
+          "run": "laya-s13",
+          "epochs": 1,
+          "hours": 7.44
+        },
+        {
+          "run": "laya-s17",
+          "epochs": 1,
+          "hours": 7.44
+        },
+        {
+          "run": "laya-s23",
+          "epochs": 1,
+          "hours": 7.44
+        },
+        {
+          "run": "anchor-s13",
+          "epochs": 1,
+          "hours": 7.44
+        },
+        {
+          "run": "repro-s13",
+          "epochs": 1,
+          "hours": 6.49
+        }
+      ],
+      "gpu_hours": 43.4,
+      "weeks": 2,
+      "fits_week": false,
+      "sessions_fit": true
+    }
+  ],
+  "chosen": {
+    "option": "seeds: laya 1, anchor 1",
+    "runs": [
+      {
+        "run": "shuffle-s13",
+        "epochs": 1,
+        "predict": [
+          "val_a"
+        ]
+      },
+      {
+        "run": "laya-s13",
+        "epochs": 1,
+        "predict": [
+          "val_a",
+          "val_b",
+          "test"
+        ]
+      },
+      {
+        "run": "anchor-s13",
+        "epochs": 1,
+        "predict": [
+          "val_a",
+          "val_b",
+          "test"
+        ]
+      },
+      {
+        "run": "repro-s13",
+        "epochs": 1,
+        "predict": [
+          "val_a"
+        ]
+      }
+    ],
+    "deferred": [
+      "laya-s17",
+      "laya-s23",
+      "anchor-s17",
+      "anchor-s23"
+    ]
+  },
+  "quota": {
+    "session_hours": 12.0,
+    "weekly_gpu_hours": 30.0,
+    "time_budget_hours": 11.25
+  },
+  "assumption": "a GPU T4 x2 session consumes weekly quota at the session's wall-clock rate"
+}
