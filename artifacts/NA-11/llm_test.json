@@ -1,0 +1,13 @@
+{
+ "model": "mistralai/mistral-nemo",
+ "requests": 2000,
+ "send": 0,
+ "projected_usd": 0.0,
+ "cap_usd": 1.0,
+ "budget_left_usd": 9.691357085254216,
+ "answered": 2000,
+ "valid": 1977,
+ "invalid": 23,
+ "spent_usd_this_run": 0.0,
+ "spent_usd": 0.040134491999999876
+}

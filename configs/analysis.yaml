@@ -1,0 +1,152 @@
+# NA-11 S1: the constants of the pre-registered analyses (PREREG §1, §11, A1.3–A1.6, A2.4–A2.5, A3.2–A3.5;
+# PREREG §15 rows "operator, before NA-11" and NA-11). Read by newsaction.analysis.spec (AnalysisConfig).
+# Hashed into the NA-11 freeze with every configs/*.yaml (PREREG §4.4). tests/test_analysis_config.py checks
+# every number PREREG gives against docs/PREREG.md.
+
+version: 1
+
+sample:                           # the evaluation sample of a split (PREREG §4.1–4.2)
+  embargo: true                   # §4.2: events in the first 5 sessions of val-A, val-B and test are left out
+  min_names_per_day: 5            # daily IC: sessions with >= 5 events having both values (NA-06 row (ii))
+  constant_day_ic: 0.0            # a session on which the signal or the target is constant has IC 0 (NA-06)
+
+metrics:                          # PREREG §11.1–11.2
+  nw_lags: 5                      # §11.1: Newey–West t of the daily IC series
+  quintiles: 5                    # §11.1 quintile spread: top − bottom quintile within each session
+  class_band: 0.5                 # §11.2: three classes split at ±0.5σ (fall / no move / rise)
+  ece_bins: 15                    # §11.2
+  auc_abs_z: 1.0                  # §11.2: AUC for |z| >= 1
+  q1_large_levels: [0, 1, 2, 6, 7, 8]   # Q1 levels of a move of 1 typical daily move or more (§7 bins)
+
+bootstrap:                        # PREREG §11.4: stationary block bootstrap over days
+  block: 5
+  reps: 10000
+  seed: 2026
+  ci: 0.95
+
+inference:                        # PREREG §11.3
+  fe: [session, tier]             # day × tier fixed effects
+  cluster: [session, company_id]  # two-way clustered standard errors (date, firm)
+  dk_lags: 5                      # Driscoll–Kraay robustness
+
+multiple_testing:
+  primary: {method: holm, alpha: 0.05, tests: [H1, H1b, H2, H3, H4]}     # §1.1 and H1b (PREREG §15 NA-11 row)
+  secondary: {method: bh, q: 0.10}                                         # §1.2, A1.4, A3.4
+  heterogeneity: {method: bh, q: 0.10}                                     # §1.2 cuts (operator row: one family)
+
+h1:                               # §1.1 H1: D0 events, Call A on W0 news
+  signal: a0_n_hat
+  gap: z_on
+  after_open: z_id
+h1b:                              # PREREG §15 NA-11 row (operator, before the freeze): not fully priced at the open
+  signal: a0_n_hat                # D0 events: mean daily IC(N̂_W0, z_id) > 0, one-sided, computed like H1
+  target: z_id
+h2:                               # §1.1 H2 (central): y = a + b·N̂ + c·G + day × tier FE
+  primary_point: D2               # §1.1: D2 primary; D1 with the NA-10 bars; D0 is the tradeable y0 version
+  points:
+    D2: {y: y2, g: g_d2, n_hat: a2_n_hat}
+    D1: {y: y1, g: g_d1, n_hat: a0_n_hat}
+    D0: {y: z_id, g: null, n_hat: a0_n_hat}
+  abs_g_bins: [1.0, 2.0]          # re-estimated within |G| < 1, 1–2, > 2 (PRD NA-12 S2)
+h3:                               # §1.1 H3 and §11.5: ΔIC = IC(R+N+J) − IC(R+N) for the subsequent return
+  point: D2
+  target: y2
+h4:                               # §1.1 H4 and A2.5: |z_cc,t| on D0 event days beyond HAR + earnings + tier
+  target: abs_z_cc
+  har_lags: [1, 5, 22]            # HAR: |z_cc| of t−1, the mean over t−5..t−1, the mean over t−22..t−1
+  har_min_obs: [1, 4, 16]         # the least lags present for each HAR term
+  r2_mean: fit                    # ΔR² against Σ(y − mean of the fit split's y)² (stated per table)
+
+groups:                           # §11.5 feature groups R, N, J (and the H4 sets); the subset a model answers
+  R: [g_d2, z_on, z_m5, z_m20, z_m60, z_vol, tier_top100, tier_mid]
+  N: [a2_n_hat, a2_m, a2_surprise, a2_tone]
+  J: [b2_j, b2_c, b2_w]
+  N_trained: [a2_n_hat]           # trained models answer Q1 only (no materiality, surprise or tone head)
+  J_trained: [b2_c, b2_w]         # trained models: C and P(reverse) of the H-cont head (NA-08: j_cont = C)
+  h4_bench: [har_d, har_w, har_m, earnings, tier_top100, tier_mid]
+  h4_news: [a0_m, a0_surprise, a0_abs_n_hat]
+  h4_news_trained: [a0_abs_n_hat, a0_mag_mean]   # the trained models' judged magnitude (H-mag head)
+  h4_a2: [a0_u_unc, a0_p_no_material_effect]      # A2.5: added to the H4 set (primary API instrument)
+
+ridge:                            # §11.5 fitting protocol (PREREG §15 NA-11 row: every model as the API protocol)
+  fit_split: val_b
+  lambda_split: val_a             # λ: the val-B fit scored on val-A by mean squared error
+  lambdas: [0.01, 0.1, 1.0, 10.0, 100.0, 1000.0, 10000.0]
+  standardize: true               # z-score with the fit split's means and SDs; intercept not penalized
+  eval_split: test
+
+shapley:                          # §11.5: exact Shapley shares over {R, N, J}, of OOS R² and of IC, by tier
+  groups: [R, N, J]
+
+convergence:                      # A1.2–A1.5
+  value: v                        # V = isotonic map of Call A N̂ → E[E5^lvl], fit on val-A (frozen.yaml calibration)
+  ladder:                         # CAR^lvl_h on V (D0 events, V from W0 news)
+    O_t: car_lvl_o0
+    "10:00": car_lvl_10
+    C_t: car_lvl_c0
+    C_t+1: car_lvl_c1
+    C_t+2: car_lvl_c2
+    C_t+5: car_lvl_c5
+    C_t+10: car_lvl_c10
+    C_t+20: car_lvl_c20
+  exploratory_rungs: {C_t+60: car_lvl_c60}
+  h_star: C_t+20                  # A1.4 equilibrium horizon
+  h_short: C_t+5                  # A1.4 short equilibrium
+  h_star_robust: C_t+10           # A1.5 robustness
+  plateau: [16, 20]               # A1.5 robustness: mean CAR^lvl over t+16..t+20
+  gap:                            # AR(τ→h)/σ_cc = a + λ_h·U_τ + ψ_h·V; U_τ = V − G^lvl_τ
+    D2: {value: a2_v, g_lvl: g_d2_lvl, rungs: {C_t+1: fwd_lvl_o1_c1, C_t+5: fwd_lvl_o1_c5, C_t+20: fwd_lvl_o1_c20}}
+    D1: {value: a0_v, g_lvl: g_d1_lvl, rungs: {C_t: fwd_lvl_10_c0, C_t+1: fwd_lvl_10_c1, C_t+5: fwd_lvl_10_c5, C_t+20: fwd_lvl_10_c20}}
+  rung_sessions: {O_t: 0, "10:00": 0, C_t: 0, C_t+1: 1, C_t+2: 2, C_t+5: 5, C_t+10: 10, C_t+20: 20, C_t+60: 60}
+  half_life_lambda: 0.5           # A1.5: the first h with λ_h >= 0.5
+  clean_flags: {C_t+1: clean_1, C_t+2: clean_2, C_t+5: clean_5, C_t+10: clean_10, C_t+20: clean_20}
+  benchmarks: [naive, price_only] # A1.4 tracking error: RMSE(CAR^lvl_h − V) vs 0 and vs the price-only V
+
+cuts:                             # §1.2 heterogeneity cuts (<= 8, one BH family), on H2 at D2
+  statistic: h2_interaction       # Wald F of (N̂·1[cut], G·1[cut]) = 0 with two-way clustered covariance
+  list:
+    tier_top100: {column: tier, equals: top100}
+    tier_mid: {column: tier, equals: mid}
+    tier_rest: {column: tier, equals: rest}
+    quantified: {column: vendor_quantified, equals: true}       # the first news item's tag_quantified
+    small_move: {column: abs_g, below: 1.0}                     # |G| < 1
+    press_wire: {column: press_wire, equals: true}              # the first news item's source class
+    usual_coverage_low: {column: attention_mean, below_median_by: [session, tier]}   # operator row (7)
+    busy_day: {column: attention_ratio, at_least: 1.5}          # operator row (8)
+
+mechanism:                        # A2.5: H2 and the A1 ladder by the model's own labels next to the vendor tags
+  model_labels: [label_event_type, label_quantified]
+  vendor: [vendor_event_type, vendor_quantified]
+horizon_validity:                 # A2.5: Spearman(H, share of the t+20 move realized by C_t) < 0
+  min_abs_car20: 1.0              # events with |CAR^lvl_{t+20}| >= 1 typical daily move
+explanation:                      # A3.2–A3.4
+  explained_x: 0.5                # A3.3: explained if X >= 0.5
+  ladder_target: z_cc             # A3.2: stock-specific daily move (covered member-days)
+  ladder_steps:
+    ex_ante: [has_d0, a0_n_hat, a0_abs_n_hat, a0_m, a0_surprise, a0_tone]
+    ex_post: [has_d2, a2_n_hat, a2_abs_n_hat, a2_m, a2_surprise, a2_tone]
+    explanation: [b2_x, b2_x_n_hat, reason_n_hat]   # X, X·N̂_W2 and each reason × N̂_W2
+  ladder_steps_trained:           # trained models: Q1 (N̂, E|N̂|) and the H-mag expected level
+    ex_ante: [has_d0, a0_n_hat, a0_abs_n_hat, a0_mag_mean]
+    ex_post: [has_d2, a2_n_hat, a2_abs_n_hat, a2_mag_mean]
+  persistence:                    # A3.4: sign(G)·y = a + θ·X + controls + day × tier FE
+    D2: {y: y2, g: g_d2, x: b2_x, n_hat: a2_n_hat, event_type: a2_label_event_type}
+    D1: {y: y1, g: g_d1, x: b1_x, n_hat: a0_n_hat, event_type: a0_label_event_type}
+market:                           # A3.5 (optional, exploratory): SPY's daily return on the market readings
+  fit_splits: [val_a, val_b]
+  eval_split: test
+  target: r_spy_cc
+  features: [m_n_hat]
+
+sector:                           # operator row: exploratory, outside every family
+  signal: a0_n_hat
+  targets: [z_cc, z_on, z_id]
+
+robustness:                       # §11.6 and the operator row (a)–(b); each re-runs H1 and H2 (D2)
+  date_only_hour_precision: [date_only, hour]
+  non_overlap_sessions: 5
+  sigma60: {window: 60, min_obs: 40}
+  timing_strata_et: ["04:00", "08:00", "09:15"]   # latest W0 article: before 04:00, 04:00–08:00, 08:00–09:15
+  cutoff_approx_et: "08:00"      # §11.6's 08:00 W0 cutoff, approximated: events whose latest W0 article is earlier
+  price_move_text: '(?i)\b(?:shares|stock)\b[^.;:|]{0,40}?\b(?:rose|rise[sn]?|rising|jump\w*|surg\w*|soar\w*|climb\w*|gain\w*|rall(?:y|ied|ies|ying)|advanc\w*|fell|fall(?:s|ing|en)?|drop\w*|slid\w*|slip\w*|slump\w*|tumbl\w*|plung\w*|sank|sink\w*|declin\w*|(?:edg|tick|trad|mov|head|trend)\w*\s+(?:up|down|higher|lower)|(?:are|is|was|were)\s+(?:up|down|higher|lower))\b|\bpre-?\s?market\b|\bafter[- ]?hours\b|\btoday\b|stock market (?:today|news today|live)\b|\blive (?:updates?|coverage|blog)\b|\bmarkets news,|\blive markets\b'
+  live_format: '(?i)stock market (?:today|news today|live)\b|\blive (?:updates?|coverage|blog)\b|\bmarkets news,|\blive markets\b|(?:nasdaq|dow jones|dow|s&p 500|s&p|wall street|markets?)\s+today\s*:'

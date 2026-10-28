@@ -45,6 +45,10 @@ FREEZE_FILES: Final[tuple[str, ...]] = (
     "src/newsaction/panel/targets.py",
     "src/newsaction/panel/reactions.py",
     "src/newsaction/analysis/spec.py",
+    # NA-11 (PREREG §15 NA-11 row): the modules spec.py runs, so no unhashed line can change a frozen analysis
+    "src/newsaction/analysis/inference.py",
+    "src/newsaction/analysis/shapley.py",
+    "src/newsaction/analysis/metrics.py",
 )
 FREEZE_RECORD: Final = "artifacts/NA-11/freeze.json"
 PREREG: Final = "docs/PREREG.md"

@@ -45,6 +45,7 @@ canary:
     - perplexity/pplx-decider-v1.2
     - local/laya-typed-decisions
     - local/laya-base
+    - nace-ai/drex-v2.0                   # NA-11: identical on all 5 baseline repeats and on 100 NA-06 states
 
 # Refusal (d): an unmasked state is sent only under one of these probe tags.
 registered_probes:

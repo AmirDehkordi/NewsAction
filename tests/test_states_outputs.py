@@ -116,7 +116,9 @@ def test_access_ledger_has_no_na04_entry() -> None:
     lines = (ROOT / "ledgers" / "test_access.jsonl").read_text(encoding="utf-8").splitlines()
     for ln in lines:
         rec = json.loads(ln)
-        assert "states" not in str(rec.get("caller", "")) and "NA-04" not in ln, ln
+        # the NA-04 builder (``src/newsaction/states/``) never reads the sealed data; NA-11's post-freeze S4
+        # (``production/states_test.py``) is the sanctioned reader of the test reactions
+        assert "newsaction/states/" not in str(rec.get("caller", "")) and "NA-04" not in ln, ln
 
 
 def _blocks(obj: dict[str, object]) -> list[str]:

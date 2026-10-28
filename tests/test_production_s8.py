@@ -1,0 +1,290 @@
+"""NA-11 S8 guards: the ablation sample, states and reproduction check (production.ablations), the LLM
+baseline's test step (production.llm_test) and the price-only test step (production.price_only_test)."""
+
+from __future__ import annotations
+
+import hashlib
+from datetime import date, timedelta
+from types import SimpleNamespace
+from typing import Any
+
+import numpy as np
+import pandas as pd
+import pytest
+from sklearn.isotonic import IsotonicRegression
+
+from newsaction.dm import load_dm_config
+from newsaction.production import ProductionError, llm_test, price_only_test
+from newsaction.production import ablations as ab
+from newsaction.production.plan import load_plan
+
+
+def _pool(base: str, per_split: int = 60) -> pd.DataFrame:
+    rows = []
+    for split, start in (
+        ("val_a", date(2025, 7, 1)),
+        ("val_b", date(2025, 10, 1)),
+        ("test", date(2026, 1, 5)),
+    ):
+        for i in range(per_split):
+            rows.append(
+                {
+                    "event_id": f"{base}:{i % 9}:{split}:{i}",
+                    "company_id": i % 9,
+                    "session": start + timedelta(days=i % 20),
+                    "split": split,
+                    "tier": ("top100", "mid", "rest")[i % 3],
+                    "month": f"{start.year}-{start.month + i % 2:02d}",
+                }
+            )
+    return pd.DataFrame(rows)
+
+
+def _small_plan(n: int) -> Any:
+    plan = load_plan()
+    return plan.model_copy(update={"ablations": plan.ablations.model_copy(update={"n": n})})
+
+
+def test_the_ablation_sample_is_stratified_and_deranged_within_splits(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    monkeypatch.setattr(ab, "pool", lambda plan, base, layout=None: _pool(base))
+    smp = ab.draw(_small_plan(45), None)
+    assert smp.groupby("base").size().to_dict() == {"A_D0": 45, "B_D2": 45}
+    assert smp.loc[smp["base"] == "A_D0", "donor"].isna().all()
+    b = smp.loc[smp["base"] == "B_D2"].set_index("event_id")
+    assert set(b["donor"]) == set(b.index)  # a permutation of the sampled events
+    for eid, rec in b.iterrows():
+        donor = b.loc[rec["donor"]]
+        assert rec["donor"] != eid and donor["split"] == rec["split"]
+        assert donor["company_id"] != rec["company_id"]
+    assert ab.draw(_small_plan(45), None).equals(smp)  # seeded
+
+
+def test_within_a_stratum_the_smallest_u_is_taken(monkeypatch: pytest.MonkeyPatch) -> None:
+    monkeypatch.setattr(ab, "pool", lambda plan, base, layout=None: _pool(base))
+    smp = ab.draw(_small_plan(45), None)
+    pool = _pool("B_D2")
+    pool["u"] = [
+        int(hashlib.sha256(f"2026:ablation:{e}".encode()).hexdigest()[:16], 16) for e in pool["event_id"]
+    ]
+    got = set(smp.loc[smp["base"] == "B_D2", "event_id"])
+    for _, g in pool.groupby(["split", "tier", "month"]):
+        taken = g.loc[g["event_id"].isin(got)]
+        if 0 < len(taken) < len(g):
+            assert taken["u"].max() < g.loc[~g["event_id"].isin(got), "u"].min()
+
+
+def test_ablated_states_change_only_the_news_block() -> None:
+    state = {"company": {"size": "large"}, "news": [{"headline": "a"}], "reaction_so_far": {"move": "up"}}
+    donor = {"company": {"size": "small"}, "news": [{"headline": "b"}], "reaction_so_far": {"move": "down"}}
+    assert ab.ablated_state("b2_no_news", state) == {
+        "company": {"size": "large"},
+        "reaction_so_far": {"move": "up"},
+    }
+    assert ab.ablated_state("b2_shuffled", state, donor) == {**state, "news": [{"headline": "b"}]}
+    assert state["news"] == [{"headline": "a"}]  # the original is untouched
+    with pytest.raises(ProductionError, match="donor"):
+        ab.ablated_state("b2_shuffled", state)
+    with pytest.raises(ProductionError, match="unknown ablation"):
+        ab.ablated_state("b2_other", state)
+
+
+def test_a_rebuild_that_differs_or_misses_a_state_is_caught() -> None:
+    ref = pd.DataFrame({"event_id": ["a", "b", "c"], "state_sha256": ["1", "2", "3"]})
+    assert ab.rebuild_differs(ref, ref) == 0
+    assert ab.rebuild_differs(ref.assign(state_sha256=["1", "x", "3"]), ref) == 1
+    assert ab.rebuild_differs(ref.iloc[:2], ref) == 1
+
+
+def test_the_unmasked_ablation_uses_a_registered_probe_tag() -> None:
+    calls = {c.name: c for c in load_plan().ablations.calls}
+    probe = calls["a0_unmasked"].probe
+    assert probe is not None and probe in load_dm_config().registered_probes
+    assert calls["b2_no_news"].probe is None and calls["b2_shuffled"].probe is None
+
+
+def test_the_llm_test_sample_waits_for_the_freeze(monkeypatch: pytest.MonkeyPatch) -> None:
+    monkeypatch.setattr(llm_test.lock, "is_frozen", lambda layout=None: False)
+    with pytest.raises(ProductionError, match="follows the freeze"):
+        llm_test.write_sample()
+
+
+class _Client:
+    def __init__(self, usd: float, left: float) -> None:
+        self.usd, self.left = usd, left
+
+    def __call__(self, *args: Any, **kwargs: Any) -> _Client:
+        return self
+
+    def __enter__(self) -> _Client:
+        return self
+
+    def __exit__(self, *exc: object) -> None:
+        return None
+
+    def dry_run_chat(self, specs: Any) -> SimpleNamespace:
+        return SimpleNamespace(n_requests=2000, n_send=2000, usd=self.usd)
+
+    def budget_left(self) -> float:
+        return self.left
+
+
+@pytest.mark.parametrize(("usd", "left"), [(1.5, 10.0), (0.5, 0.4)])
+def test_the_llm_test_stops_above_its_cap_or_what_is_left(
+    monkeypatch: pytest.MonkeyPatch, usd: float, left: float
+) -> None:
+    monkeypatch.setattr(llm_test, "specs", lambda layout=None: [])
+    monkeypatch.setattr(llm_test, "DecisionClient", _Client(usd, left))
+    with pytest.raises(ProductionError, match="STOP"):
+        llm_test.run(send=True)
+
+
+def test_the_llm_test_dry_run_sends_nothing(monkeypatch: pytest.MonkeyPatch) -> None:
+    monkeypatch.setattr(llm_test, "specs", lambda layout=None: [])
+    monkeypatch.setattr(
+        llm_test, "DecisionClient", _Client(0.2, 10.0)
+    )  # no chat_json_batch: a send would fail
+    out = llm_test.run()
+    assert out["projected_usd"] == 0.2 and "valid" not in out
+
+
+def test_the_price_only_test_step_waits_for_the_freeze(monkeypatch: pytest.MonkeyPatch) -> None:
+    monkeypatch.setattr(price_only_test.lock, "is_frozen", lambda layout=None: False)
+    with pytest.raises(ProductionError, match="follow the freeze"):
+        price_only_test.run()
+
+
+def test_the_price_only_check_fails_unless_na09_is_reproduced(monkeypatch: pytest.MonkeyPatch) -> None:
+    pred = pd.DataFrame(
+        {
+            "event_id": ["a", "b"],
+            "call": "A",
+            "split": "val_a",
+            "N_hat": [0.1, 0.2],
+            "P_up": [0.3, 0.4],
+            "P_down": [0.2, 0.1],
+            "mag_hat": [1.0, 1.1],
+        }
+    )
+    monkeypatch.setattr(price_only_test, "frame", lambda splits, layout=None: pd.DataFrame())
+    monkeypatch.setattr(price_only_test, "predict", lambda df, layout=None: pred)
+    monkeypatch.setattr(price_only_test.io, "read_parquet", lambda rel, layout=None: pred)
+    assert price_only_test.check()["rows"] == 2
+    off = pred.assign(N_hat=[0.1, 0.2001])
+    monkeypatch.setattr(price_only_test.io, "read_parquet", lambda rel, layout=None: off)
+    with pytest.raises(ProductionError, match="not reproduced"):
+        price_only_test.check()
+
+
+def test_the_stored_isotonic_thresholds_predict_as_sklearn() -> None:
+    rng = np.random.default_rng(0)
+    x = rng.normal(size=400)
+    y = (x + rng.normal(size=400) > 0.5).astype(float)
+    iso = IsotonicRegression(increasing=True, out_of_bounds="clip", y_min=0.0, y_max=1.0).fit(x, y)
+    m = {"x": iso.X_thresholds_.tolist(), "y": iso.y_thresholds_.tolist()}
+    grid = np.linspace(-5, 5, 201)
+    assert np.allclose(price_only_test._iso(grid, m), iso.predict(grid))
+
+
+def test_the_end_of_s6_canary_is_judged_by_the_recorded_rule() -> None:
+    from newsaction.production.canary_check import judge
+
+    before = {"noisy": {"noisy-1"}, "det": {"det-1"}}
+
+    def verdict(
+        stop: bool, fires: bool, model: str = "noisy", build: str = "", prod: set[str] | None = None
+    ) -> str:
+        b = build or f"{model}-1"
+        c = {"model": model, "stop": stop, "builds": b}
+        d = {"model": model, "fires": fires, "builds_now": f"{model}-1"}
+        return str(judge([c], [d], {model: prod or set()}, before, ["det"])[0]["verdict"])
+
+    assert verdict(False, False) == "pass"
+    assert (
+        verdict(True, False) == "noise" and verdict(False, True) == "noise"
+    )  # one check: noise, results stand
+    assert verdict(True, True) == "stop"  # both checks fire: updated
+    assert verdict(False, False, build="noisy-2") == "stop"  # a new build string in the canary
+    assert verdict(False, False, prod={"noisy-1", "noisy-2"}) == "stop"  # or in the production answers
+    assert verdict(True, False, model="det") == "stop" and verdict(False, True, model="det") == "stop"
+    assert verdict(False, False, model="det") == "pass"
+
+
+def test_importing_the_production_steps_never_loads_lightgbm() -> None:
+    """LightGBM and torch segfault in one process (NA-09): ``price_only_test`` loads it only to predict."""
+    import subprocess
+    import sys
+
+    code = (
+        "import sys; import newsaction.production.price_only_test, newsaction.production.summary;"
+        "assert 'lightgbm' not in sys.modules, 'lightgbm imported'"
+    )
+    r = subprocess.run([sys.executable, "-c", code], capture_output=True, text=True, check=False)
+    assert r.returncode == 0, r.stderr[-2000:]
+    assert "lightgbm" not in sys.modules
+
+
+@pytest.mark.parametrize(
+    ("status", "expected"),
+    [(None, True), (float("nan"), True), (429, True), (500, True), (503, True), (400, False), (403, False)],
+)
+def test_transient_outcomes_are_the_clients_retryable_ones(status: object, expected: bool) -> None:
+    from newsaction.production.run import transient
+
+    assert transient(status) is expected
+
+
+def test_the_retry_pass_resends_only_transient_failures(
+    monkeypatch: pytest.MonkeyPatch, tmp_path: Any
+) -> None:
+    from newsaction.production import run as pr
+
+    df = pd.DataFrame(
+        {
+            "event_id": ["e1", "e2", "e3", "e4", "m1"],
+            "component": ["a0", "a0", "a0", "a0", "market"],
+            "ok": [True, False, False, False, False],
+            "valid": [True, False, False, False, False],
+            "status": [None, 503, 403, None, None],
+            "source": ["a0", "a0", "a0", "a0", "m"],
+        }
+    )
+    written: dict[str, pd.DataFrame] = {}
+    specs = [SimpleNamespace(info=SimpleNamespace(event_id=e)) for e in ("e1", "e2", "e3", "e4")]
+    sent: list[str] = []
+
+    class FakeClient:
+        def __init__(self, *args: Any, **kwargs: Any) -> None:
+            pass
+
+        def __enter__(self) -> FakeClient:
+            return self
+
+        def __exit__(self, *exc: object) -> None:
+            return None
+
+        def decide(self, sp: list[Any], concurrency: int = 16) -> list[Any]:
+            sent.extend(s.info.event_id for s in sp)
+            return [SimpleNamespace(ok=True, spec=s) for s in sp]
+
+    def fake_readings(res: list[Any], src: str) -> pd.DataFrame:
+        ids = [r.spec.info.event_id for r in res]
+        return pd.DataFrame({"event_id": ids, "ok": True, "valid": True, "status": None, "source": src})
+
+    monkeypatch.setattr(pr, "load_plan", lambda: SimpleNamespace())
+    monkeypatch.setattr(pr, "jobs", lambda plan, w: [("M", "a0", object())] if w == "api" else [])
+    monkeypatch.setattr(pr, "specs_of", lambda plan, m, comp, lay: specs)
+    monkeypatch.setattr(pr.io, "read_parquet", lambda rel, layout=None: df.copy())
+    monkeypatch.setattr(pr.io, "write_parquet", lambda d, rel, **kw: written.setdefault("df", d))
+    monkeypatch.setattr(pr, "DecisionClient", FakeClient)
+    monkeypatch.setattr(pr, "record_key_usage", lambda label, cl: {})
+    monkeypatch.setattr(pr, "readings", fake_readings)
+    monkeypatch.setattr(pr, "artifacts_dir", lambda layout=None: tmp_path)
+    out = pr.retry(["api"])
+    assert sent == ["e2", "e4"]  # the 503 and the transport error; not the 403 refusal, not the market row
+    got = written["df"]
+    assert list(got["event_id"]) == ["e1", "e2", "e3", "e4", "m1"]  # rows replaced in place
+    assert list(got["ok"]) == [True, True, False, True, False]
+    left = out["retry"][-1]
+    assert left["failed"] == 2 and left["statuses"] == {"403": 1, "market (status not recorded)": 1}

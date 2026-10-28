@@ -33,6 +33,7 @@ import numpy as np
 import pandas as pd
 
 from newsaction import io
+from newsaction.config import load_frozen
 from newsaction.paths import Layout, resolve_layout
 from newsaction.train import (
     DATASET_DIR,
@@ -364,14 +365,62 @@ def ensemble(frames: Sequence[pd.DataFrame]) -> pd.DataFrame:
     return out
 
 
-def ensemble_runs(cfg: TrainingConfig) -> dict[str, list[RunSpec]]:
-    """The seed runs of each reported model (the controls are not part of an ensemble)."""
+def seed_runs(cfg: TrainingConfig) -> dict[str, list[RunSpec]]:
+    """The seed runs of each model (the controls are not part of an ensemble)."""
     controls = {cfg.controls.shuffle_run, cfg.controls.repro_runs[1]}
     out: dict[str, list[RunSpec]] = {name: [] for name in MODEL_NAMES.values()}
     for r in cfg.kaggle.runs:
         if r.mode == "train" and r.name not in controls and not r.shuffle_labels and r.init is not None:
             out[MODEL_NAMES[r.init]].append(r)
     return out
+
+
+def frozen_runs(layout: Layout | None = None) -> dict[str, tuple[str, ...]] | None:
+    """The frozen instruments' runs, ``configs/frozen.yaml`` ``selection.trained_runs`` (NA-11 S2; PREREG §15
+    NA-11 row): {model: (run, ...)}; None before NA-11 writes them."""
+    sel = load_frozen(resolve_layout(layout).configs / "frozen.yaml").selection
+    if not isinstance(sel, Mapping) or not sel.get("trained_runs"):
+        return None
+    return {str(m): tuple(str(r) for r in runs) for m, runs in sel["trained_runs"].items()}
+
+
+def ensemble_runs(
+    cfg: TrainingConfig, pins: Mapping[str, Sequence[str]] | None = None
+) -> dict[str, list[RunSpec]]:
+    """The runs of each reported model: every seed run (PREREG §9.1) or, once NA-11 pins the frozen
+    instruments, exactly the pinned runs. A run added later to ``configs/training.yaml`` never joins a pinned
+    instrument (it is seed robustness, ``robustness_runs``)."""
+    seeds = seed_runs(cfg)
+    if pins is None:
+        return seeds
+    out: dict[str, list[RunSpec]] = {}
+    for model, runs in seeds.items():
+        pinned = tuple(pins.get(model, ()))
+        names = {r.name for r in runs}
+        missing = [p for p in pinned if p not in names]
+        if not pinned or missing:
+            raise RunImportError(
+                f"{model}: pinned runs {list(pinned)} are not planned seed runs ({sorted(names)})"
+            )
+        out[model] = [r for r in runs if r.name in pinned]
+    return out
+
+
+def robustness_runs(cfg: TrainingConfig, pins: Mapping[str, Sequence[str]]) -> dict[str, list[RunSpec]]:
+    """The seed runs outside the frozen pins (reported separately, never merged into an instrument)."""
+    return {m: [r for r in runs if r.name not in set(pins.get(m, ()))] for m, runs in seed_runs(cfg).items()}
+
+
+def read_instrument(model: str, split: str, layout: Layout | None = None) -> pd.DataFrame:
+    """A frozen instrument's prediction file (``ENSEMBLE_FILES``), refused unless its runs are the pin."""
+    pins = frozen_runs(layout)
+    if pins is None or model not in pins:
+        raise RunImportError(f"{model}: no frozen run pin in configs/frozen.yaml selection.trained_runs")
+    df = io.read_parquet(f"{PREDICTIONS_DIR}/{model}_{ENSEMBLE_FILES[split]}.parquet", layout=layout)
+    runs = set(df["runs"].astype(str).unique())
+    if runs != {",".join(pins[model])}:
+        raise RunImportError(f"{model} {split}: the file holds runs {sorted(runs)}, the pin is {pins[model]}")
+    return df
 
 
 def run(layout: Layout | None = None, cfg: TrainingConfig | None = None) -> dict[str, Any]:
@@ -401,8 +450,13 @@ def run(layout: Layout | None = None, cfg: TrainingConfig | None = None) -> dict
             "temperatures": {q: h["temperature"] for q, h in cal["heads"].items()},
         }
     keys = event_keys(cfg, lay)
-    for model, specs in ensemble_runs(cfg).items():
+    pins = frozen_runs(lay)
+    for model, specs in ensemble_runs(cfg, pins).items():
         have = [s.name for s in specs if s.name in frames]
+        if pins is not None and have != [s.name for s in specs]:
+            raise RunImportError(
+                f"{model}: pinned runs {[s.name for s in specs]} not all downloaded ({have})"
+            )
         if not have:
             continue
         mean = ensemble([frames[n] for n in have])
@@ -417,6 +471,24 @@ def run(layout: Layout | None = None, cfg: TrainingConfig | None = None) -> dict
                 layout=lay,
             )
         summary["models"][model] = {"runs": have}
+    if pins is not None:  # seed robustness: every downloaded seed run, never the frozen instrument's file
+        for model, specs in seed_runs(cfg).items():
+            have = [s.name for s in specs if s.name in frames]
+            if not set(have) - set(pins.get(model, ())):
+                continue
+            mean = ensemble([frames[n] for n in have])
+            for split, fname in ENSEMBLE_FILES.items():
+                part = common_schema(mean[mean["split"] == split], model, have, keys, cfg)
+                io.write_parquet(
+                    part,
+                    f"{PREDICTIONS_DIR}/{model}_seeds_{fname}.parquet",
+                    producer=PRODUCER,
+                    description=f"NA-11 seed robustness: {model} {len(have)}-seed ensemble "
+                    f"({', '.join(have)}) on {split}; reported separately, never the frozen instrument "
+                    "(PREREG §15 NA-11 row)",
+                    layout=lay,
+                )
+            summary["models"][f"{model}_seeds"] = {"runs": have}
     return summary
 
 

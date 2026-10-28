@@ -1,0 +1,74 @@
+[
+ {
+  "model": "liquid/d1-ultra",
+  "component": "a0",
+  "requests": 28918,
+  "ok": 28630,
+  "valid": 28630,
+  "cost": 1.857454788
+ },
+ {
+  "model": "liquid/d1-ultra",
+  "component": "a2",
+  "requests": 37601,
+  "ok": 37372,
+  "valid": 37372,
+  "cost": 2.48082282
+ },
+ {
+  "model": "liquid/d1-ultra",
+  "component": "b2",
+  "requests": 37601,
+  "ok": 37334,
+  "valid": 37334,
+  "cost": 2.076772278
+ },
+ {
+  "model": "liquid/d1-ultra",
+  "component": "b1",
+  "requests": 28918,
+  "ok": 28564,
+  "valid": 28564,
+  "cost": 1.5541987019999999
+ },
+ {
+  "model": "liquid/d1-ultra",
+  "component": "a0_2024h1",
+  "requests": 2793,
+  "ok": 2762,
+  "valid": 2762,
+  "cost": 0.10676311799999999
+ },
+ {
+  "model": "liquid/d1-ultra",
+  "component": "a2_2024h1",
+  "requests": 3887,
+  "ok": 3844,
+  "valid": 3844,
+  "cost": 0.154001106
+ },
+ {
+  "model": "respan/span-02",
+  "component": "a0",
+  "requests": 20012,
+  "ok": 20012,
+  "valid": 20012,
+  "cost": 0.57378844
+ },
+ {
+  "model": "nace-ai/drex-v2.0",
+  "component": "a0",
+  "requests": 20012,
+  "ok": 20000,
+  "valid": 20000,
+  "cost": 0.9116618400000001
+ },
+ {
+  "model": "liquid/d1-ultra",
+  "component": "market",
+  "requests": 273,
+  "ok": 271,
+  "valid": 271,
+  "cost": 0.010106712
+ }
+]

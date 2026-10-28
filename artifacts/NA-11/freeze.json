@@ -1,0 +1,51 @@
+{
+  "deviations_log": {
+    "bytes": 107453,
+    "sha256": "ca1ae543bd5b41c7ba78b2a3b0fb74682d1ff84edc5bb50cc5eccbd34bb6fa11"
+  },
+  "files": {
+    "configs/aliases.yaml": "9d42f07bed7bbb338e73517586d2453312732565c87551a6ac4ca11af7a143cd",
+    "configs/analysis.yaml": "43c152267c64d2f90377ed35d8032be4a0af15b43aecd59ef7e43ec92fb8277e",
+    "configs/availability.yaml": "4b31897d3cc7c23d946b014051db9cd7737e2882dc1ddbfd636822147502d7e1",
+    "configs/bars.yaml": "b5f74337a6f831f3824300560e3a24105815a6e418f2275a22950f20f2858ccd",
+    "configs/baselines.yaml": "9d6e592fe72b8abd0b2fd73dd37378a9ca188c827d9053da4a2ccb67f6f86eca",
+    "configs/codebook_v1.yaml": "9f23123cc4adb696f01a3de46b4da6a4206482c06cb7ee23a2440a6a02cfb8f1",
+    "configs/dm.yaml": "1f610176259bda628739542994bf2d7099c1b17afe1b3923e22474da99b77de0",
+    "configs/encoding.yaml": "3f26c6c5deecfb315640247b4dbbf1fab404b1dc43be108c3ad787a37477d5a2",
+    "configs/events.yaml": "396c21f63d6905b04e9733c70dd72822650e6ced0886f50c2ef5272bcf9a185d",
+    "configs/frozen.yaml": "f192aa9adb6989dd88ee4ef200d453cbe269f8ace86936af6a0217b0b11a1b52",
+    "configs/macro_calendar.yaml": "dde11820110670cdbf1a64c7498a85d991680bcca14060714b4982c3ff4184ad",
+    "configs/news.yaml": "6d2ec9dff8dba6f610042757cd77c7643f7699d5d5ad490cc4134394dd17a327",
+    "configs/patterns.yaml": "54549d7ca319dee68cfe781478659412ad2e472b57d6b3c21f17740973780e35",
+    "configs/production.yaml": "64b51c7593d22993658e6c41b8c5fb571440c0f9c0b966c0ca0b3ca5017c3912",
+    "configs/project.yaml": "8098fbc7c5deaac6ccb8ae408d99238e118f7681526eaf8b2bda4b33ed7bbecc",
+    "configs/questions_v1.yaml": "e602c6c0a354c7309756f929c0776ec8da0d4b2d29f8c3fb6c59199317a0c85a",
+    "configs/sources.yaml": "fde5b8457d297086022affb9c60df8ccea257f15a58d5630f8305883631ed1a2",
+    "configs/splits.yaml": "ffe37aa8928f808187ba4237c8c6a73f64018b8f81c58b00f934c6045c93c564",
+    "configs/states.yaml": "205de0f11706cf8e058dc375a268ea701218b021235df95af3a00527ea5cd521",
+    "configs/tournament.yaml": "f9fd9dc2791896c57d2f1852599d936c68d3d157663e3f7ca1d0a2117aefedcf",
+    "configs/training.yaml": "6708e52fd0f0f1a9cfccaed71a619da4581b4b1b28a0b93d556de3fd46fceea9",
+    "docs/PREREG.md#before-deviations-log": "735495d9e59879a83b57975e79803a9fcbd28fad7c0baacbe13e1b28221b91d7",
+    "src/newsaction/analysis/inference.py": "bcdd8151e53e6cf157c6e68d0594f357294d7ef60e5ee905da32d51304b6d21f",
+    "src/newsaction/analysis/metrics.py": "9c38cc43c1965d4bb31fc12167857b230ec395bda60838689d541432b314ebfb",
+    "src/newsaction/analysis/shapley.py": "0dc809aff5b82e3f5428da221b2af4fba84994f4e4f9c62ed4bd00eee020f73d",
+    "src/newsaction/analysis/spec.py": "087a29978b806a4b1db02c1a07ce8aa4a828d6da4091f76bd1b3c54846c3573b",
+    "src/newsaction/panel/reactions.py": "007c32fa6c76f83e2e64c62c9555b27fcf30ec2d5aeb5c51a41db6bbf4229c88",
+    "src/newsaction/panel/targets.py": "20541bf0daffe4e1788785764466f8d0cdda66154fd8cb3ef4263396d076a236"
+  },
+  "freeze_files": [
+    "docs/PREREG.md",
+    "configs/*.yaml",
+    "src/newsaction/panel/targets.py",
+    "src/newsaction/panel/reactions.py",
+    "src/newsaction/analysis/spec.py",
+    "src/newsaction/analysis/inference.py",
+    "src/newsaction/analysis/shapley.py",
+    "src/newsaction/analysis/metrics.py"
+  ],
+  "git_sha": "f8f3b4c345cf32bb63823d0689760144cdb6ce5f",
+  "hash": "523e7589d1bd551c715d03b2c285a4875a4770050f75712a585db7decae73a7c",
+  "note": "NA-11 S3: PREREG \u00a74.4 freeze after the val-B selection (primary instrument laya_fin, seed-13 pin), the analysis spec with H1b, the production plan and the canary baselines; before any 2026 state is built or sent",
+  "ts": "2026-10-28T10:38:58.453628+00:00",
+  "version": 1
+}

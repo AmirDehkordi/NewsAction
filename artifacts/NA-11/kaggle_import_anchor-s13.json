@@ -1,0 +1,10 @@
+{
+ "run": "anchor-s13",
+ "model": "anchor",
+ "test_callB": 65204,
+ "val_callB_d1": 29882,
+ "robustness_callA": 13360,
+ "probes": 1200,
+ "check_max_abs_dp": 0.0,
+ "check_rows": 500
+}

@@ -228,6 +228,9 @@ def test_real_repo_freeze_files_list() -> None:
         "src/newsaction/panel/targets.py",
         "src/newsaction/panel/reactions.py",
         "src/newsaction/analysis/spec.py",
+        "src/newsaction/analysis/inference.py",
+        "src/newsaction/analysis/shapley.py",
+        "src/newsaction/analysis/metrics.py",
     )
 
 

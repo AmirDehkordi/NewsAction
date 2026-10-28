@@ -977,15 +977,19 @@ def build_event_states(
     *,
     budget: Budget | None = None,
     keep: Mapping[str, Sequence[str]] | None = None,
+    allow_test: bool = False,
 ) -> tuple[pd.DataFrame, dict[str, list[str]]]:
     """States of ``events`` (rows of events_d0 / events_d2) under ``spec`` (validated first), and the article
     ids each state kept. ``budget`` fits each state's news list (``fit_news``); ``keep`` instead reuses the
     ids an earlier build kept, so the same event has the same news across encodings, masking and calls. An
-    event with no article text left after masking gets no state."""
+    event with no article text left after masking gets no state. ``allow_test`` admits test-period Call B
+    events; only NA-11's post-freeze build passes it, after checking the freeze
+    (``production.states_test``)."""
     validate_spec(spec)
     sfx = spec.window.lower()
     if spec.call == "B":
-        bad = events.loc[~events["split"].isin(B_SPLITS)]
+        allowed = (*B_SPLITS, "test") if allow_test else B_SPLITS
+        bad = events.loc[~events["split"].isin(allowed)]
         if len(bad):
             raise StatesError(
                 f"{spec.name}: Call B refuses {len(bad)} events outside {B_SPLITS} (no test-period Call B)"
@@ -1131,9 +1135,10 @@ def add_tokens(df: pd.DataFrame, tok: Any, qtok: Mapping[str, Mapping[str, int]]
     return df[list(OUTPUT_COLUMNS)]
 
 
-def stratified_sample(events: pd.DataFrame, n: int, strata: Sequence[str], seed: int) -> pd.DataFrame:
+def stratified_sample(events: pd.DataFrame, n: int, strata: Sequence[str], seed: int | str) -> pd.DataFrame:
     """Proportional allocation over ``strata`` (largest remainder, ties by stratum order), then the ``n_h``
-    events with the smallest u = sha256("{seed}:{event_id}") in each stratum."""
+    events with the smallest u = sha256("{seed}:{event_id}") in each stratum (``seed`` may carry a purpose,
+    as NA-11's "2026:ablation")."""
     if n > len(events):
         raise StatesError(f"cannot sample {n} of {len(events)} events")
     ev = events.copy()

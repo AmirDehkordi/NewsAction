@@ -1,0 +1,122 @@
+{
+ "canary": [
+  {
+   "model": "liquid/d1-ultra",
+   "phase": "end_s6",
+   "repeat_idx": 11,
+   "cells": 978,
+   "mean_abs_dp_train_a": 0.0212419750508352,
+   "mean_abs_dp_all": 0.020598214728946757,
+   "max_abs_dp_all": 0.15897792262268473,
+   "repeat_noise": 0.020308177271778964,
+   "rule": "mean_abs_dp_train_a > repeat_noise",
+   "stop": true,
+   "builds": "liquid/d1-ultra-20261015"
+  },
+  {
+   "model": "respan/span-02",
+   "phase": "end_s6",
+   "repeat_idx": 11,
+   "cells": 978,
+   "mean_abs_dp_train_a": 0.03989127270614285,
+   "mean_abs_dp_all": 0.021835129585705517,
+   "max_abs_dp_all": 0.49490165999999997,
+   "repeat_noise": 0.034379139614428574,
+   "rule": "mean_abs_dp_train_a > repeat_noise",
+   "stop": true,
+   "builds": "respan/span-02-20261015"
+  },
+  {
+   "model": "nace-ai/drex-v2.0",
+   "phase": "end_s6",
+   "repeat_idx": 11,
+   "cells": 978,
+   "mean_abs_dp_train_a": 0.0,
+   "mean_abs_dp_all": 0.0,
+   "max_abs_dp_all": 0.0,
+   "repeat_noise": 0.0,
+   "rule": "max_abs_dp >= 0.02",
+   "stop": false,
+   "builds": "nace-ai/drex-v2.0-20261009"
+  }
+ ],
+ "drift": [
+  {
+   "model": "liquid/d1-ultra",
+   "phase": "end_s6",
+   "repeat_idx": 3,
+   "drift_mean_abs_dp_vs_na06": 0.01938112185202021,
+   "drift_pairs": 100,
+   "repeat_noise": 0.020308177271778964,
+   "fires": false,
+   "builds_na06": "liquid/d1-ultra-20261015",
+   "builds_now": "liquid/d1-ultra-20261015"
+  },
+  {
+   "model": "respan/span-02",
+   "phase": "end_s6",
+   "repeat_idx": 3,
+   "drift_mean_abs_dp_vs_na06": 0.02495620417526666,
+   "drift_pairs": 100,
+   "repeat_noise": 0.034379139614428574,
+   "fires": false,
+   "builds_na06": "respan/span-02-20261015",
+   "builds_now": "respan/span-02-20261015"
+  },
+  {
+   "model": "nace-ai/drex-v2.0",
+   "phase": "end_s6",
+   "repeat_idx": 3,
+   "drift_mean_abs_dp_vs_na06": 0.0,
+   "drift_pairs": 100,
+   "repeat_noise": 0.0,
+   "fires": false,
+   "builds_na06": "nace-ai/drex-v2.0-20261009",
+   "builds_now": "nace-ai/drex-v2.0-20261009"
+  }
+ ],
+ "production_builds": {
+  "liquid/d1-ultra": [
+   "liquid/d1-ultra-20261015"
+  ],
+  "respan/span-02": [
+   "respan/span-02-20261015"
+  ],
+  "nace-ai/drex-v2.0": [
+   "nace-ai/drex-v2.0-20261009"
+  ]
+ },
+ "verdicts": [
+  {
+   "model": "liquid/d1-ultra",
+   "canary_fires": true,
+   "drift_fires": false,
+   "build_changed": false,
+   "builds": [
+    "liquid/d1-ultra-20261015"
+   ],
+   "verdict": "noise"
+  },
+  {
+   "model": "respan/span-02",
+   "canary_fires": true,
+   "drift_fires": false,
+   "build_changed": false,
+   "builds": [
+    "respan/span-02-20261015"
+   ],
+   "verdict": "noise"
+  },
+  {
+   "model": "nace-ai/drex-v2.0",
+   "canary_fires": false,
+   "drift_fires": false,
+   "build_changed": false,
+   "builds": [
+    "nace-ai/drex-v2.0-20261009"
+   ],
+   "verdict": "pass"
+  }
+ ],
+ "reconcile": 5.275779813018744e-13
+}
