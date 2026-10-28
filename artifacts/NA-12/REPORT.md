@@ -29,6 +29,13 @@ NA-09's validation predictions exactly.
   tracking error is no better than a naive 0.
 - **The highest test ICs** belong to two vendor-label baselines: tags-GBM +0.055 and vendor sentiment +0.047.
   The vendor labels were produced retrospectively (CLAUDE.md A6), so these two ICs may carry look-ahead (§10).
+- **Exploratory, requested after unblinding, no claim (§13).**
+  - *Earnings days.* Every signal's D0 IC is concentrated on earnings-day events (8% of test events). There it
+    held from validation to test: Laya-Fin +0.13 and d1-ultra +0.22 on test.
+  - *The val→test decline.* It is off earnings days and is common to every signal, the vendor baselines
+    included.
+  - *Months.* No signal shows a month effect (F test p ≥ 0.16), so the June–July dip of §10.5 is consistent
+    with chance.
 
 ## 1. Scope
 
@@ -41,6 +48,7 @@ NA-09's validation predictions exactly.
 | S3 tables | done | `analysis/tables.py`; `artifacts/NA-12/tables/` (20 tables × CSV + LaTeX, `keys.json`, `index.json`) |
 | S4 report | done | this file; `docs/decisions/NA-12.md`; `docs/DATA_CONTRACT.md` (NA-12 section, `analysis/contract.py`) |
 | Tests | done | `tests/test_unblind_lock.py`, `test_run_all_params.py`, `test_tables_keys.py` (the PRD's three), `test_price_only_d2.py` |
+| Exploratory: where the D0 signal lives (operator request after unblinding) | done | `analysis/exploratory.py`; `artifacts/NA-12/results/exploratory_d0_signal.json`; `tests/test_exploratory.py`; §13 |
 
 ## 2. Acceptance criteria
 
@@ -51,11 +59,11 @@ NA-09's validation predictions exactly.
 | AC3 inference | `tests/test_run_all_params.py`: the test run's configuration is `spec.load_config()` itself with PREREG's numbers; spies on `inference.ols_fe` (FE session × tier, clusters session and company, Driscoll–Kraay 5 lags), `metrics.Bootstrap.draw` (10,000 reps, block 5, seed 2026) and `metrics.holm` (H1, H1b, H2, H3, H4); BH q 0.10 for the secondary and heterogeneity families | PASS |
 | AC4 completeness | `python -m newsaction.analysis.tables`: 20 tables, 10,509 keys, `missing: []` against `tables.required()` (each primary and secondary test, all 8 cuts, every κ_h rung in three variants plus the plateau, every λ rung at D1 and D2 with and without clean windows, the half-lives, tracking ratios per rung, the cuts by tier, quantified flag and \|G\| bin, the A2.5, A3.2–A3.5 rows, the robustness items not run). `tests/test_tables_keys.py` checks every key against its CSV cell | PASS |
 | AC5 headline rule | `t1_primary` carries the anchor's estimate, CI and p next to Laya-Fin's in every row; §3 below states both for each hypothesis | PASS |
-| GAC1 | `make verify` exit 0 (§12) | PASS |
+| GAC1 | `make verify` exit 0 (§16) | PASS |
 | GAC2 | `git status --porcelain Data/` empty | PASS |
 | GAC3 | one "targets" sequence; `tests/test_blinding.py` passes (no 2026 literal or sealed-path use in `src/` outside `lock.py`) | PASS |
 | GAC4 | no API call: `ledgers/spend.jsonl`, `trials.jsonl`, `fmp_requests.jsonl` unchanged against main; NA-12 spend $0 | PASS |
-| GAC5 | `docs/DATA_CONTRACT.md` NA-12 section (73 files) with sha256 equal to `work/MANIFEST.json`; `python -m newsaction.io check` OK | PASS |
+| GAC5 | `docs/DATA_CONTRACT.md` NA-12 section (74 files, with §13's results file) with sha256 equal to `work/MANIFEST.json`; `python -m newsaction.io check` OK | PASS |
 
 ### 2.1 Mutations
 
@@ -361,6 +369,9 @@ The mean daily IC of N̂_W0 with z_cc is positive in most months of 2025 and ear
   but it is not a test of it.
 - **The June–July drop** is unexplained here and worth a data check (event counts and sources by month) before
   NA-13.
+  - *Month effects (§13.3, exploratory).* A one-way F test of the daily ICs on month finds none: test p 0.72
+    for Laya-Fin, 0.44 for d1-ultra and 0.16–0.71 for the others. One month's mean IC has an implied SE of about
+    0.03, so the June–July dip is within month-to-month noise.
 
 ## 11. Robustness (§11.6 and the operator rows (a)–(b); every variant raw and placebo-adjusted; `t16`)
 
@@ -414,7 +425,168 @@ in `t16` (uninformative).
   breaks the isotonic V's ties; the RG paths are also given signed. Both are descriptive, and every results JSON
   is unchanged.
 
-## 13. Deviations and corrections (all in PREREG §15)
+## 13. Exploratory: where the D0 signal lives (operator request after unblinding; no hypothesis, no claim)
+
+**How this section was made.**
+- **When.** The operator asked for it after the results above had been read. It adds no hypothesis and changes
+  no frozen file, definition or family. Every number is exploratory and outside every family.
+- **Code.** `src/newsaction/analysis/exploratory.py` writes `results/exploratory_d0_signal.json`
+  (byte-identical on a rerun). It calls the frozen `spec` functions: the sample outside the embargo, the daily
+  IC (≥ 5 names a session, IC 0 on a constant session), the Newey–West t with 5 lags, and the block-bootstrap
+  CIs in the JSON.
+- **Signals.** N̂_W0 of Laya-Fin, d1-ultra, span-02, drex-v2.0 and Laya zero-shot, each on its own D0 events, and
+  the vendor sentiment and tags-GBM baselines. The vendor labels are retrospective (§10.1, note ²). span-02 and
+  drex-v2.0 have no val-A reading.
+- **Cross-check.** The operator's assistant had computed several of these numbers independently. This code
+  reproduces every one: the earnings z_cc ICs, the test month-effect p (0.72 and 0.44) and the per-company SDs
+  (0.214 and 0.199 against a null of 0.197).
+
+### 13.1 Earnings-day events vs the rest
+
+The frame's `earnings` flag marks 482 val-A, 447 val-B and 1,128 test events, out of 8,376, 5,506 and 13,748.
+Sessions with at least 5 earnings events: 19, 21 and 56.
+
+Daily IC of the signal with z_cc. Columns: val-A / val-B / test; the t is for test.
+
+| Signal | Earnings days | Other events | Test difference, earnings − other (t) |
+|---|---|---|---|
+| Laya-Fin | +0.125 / +0.106 / +0.134 (t 3.2) | +0.048 / +0.049 / +0.013 (t 1.0) | +0.138 (2.8) |
+| d1-ultra | +0.304 / +0.237 / +0.223 (t 8.1) | +0.057 / +0.062 / +0.018 (t 1.4) | +0.223 (6.1) |
+| span-02 | — / +0.201 / +0.235 (t 8.1) | — / +0.066 / +0.019 (t 1.5) | +0.235 (6.2) |
+| drex-v2.0 | — / +0.240 / +0.241 (t 9.8) | — / +0.043 / +0.026 (t 2.2) | +0.223 (6.6) |
+| Laya zero-shot | +0.093 / +0.102 / +0.103 (t 3.7) | +0.025 / +0.009 / −0.003 (t −0.2) | +0.121 (3.6) |
+| vendor sentiment | +0.294 / +0.249 / +0.285 (t 9.5) | +0.039 / +0.058 / +0.022 (t 1.6) | +0.289 (7.9) |
+| tags-GBM | +0.277 / +0.255 / +0.304 (t 12.3) | +0.047 / +0.071 / +0.022 (t 1.7) | +0.294 (9.2) |
+
+On test, where the earnings-day signal sits (IC, t):
+
+| Signal | z_on: earnings / other | z_id: earnings / other |
+|---|---|---|
+| Laya-Fin | +0.069 (1.5) / +0.016 (1.1) | +0.091 (1.6) / +0.008 (0.7) |
+| d1-ultra | +0.238 (8.9) / +0.060 (4.5) | +0.034 (0.8) / −0.011 (−0.9) |
+| span-02 | +0.264 (9.8) / +0.058 (4.1) | +0.047 (1.1) / −0.010 (−0.8) |
+| drex-v2.0 | +0.241 (10.4) / +0.065 (5.3) | +0.057 (1.6) / −0.008 (−0.7) |
+| Laya zero-shot | +0.104 (4.4) / +0.033 (2.8) | −0.003 (−0.1) / −0.020 (−1.4) |
+| vendor sentiment | +0.327 (8.6) / +0.034 (2.4) | −0.004 (−0.1) / +0.005 (0.4) |
+| tags-GBM | +0.295 (6.9) / +0.037 (2.6) | +0.068 (1.8) / +0.006 (0.4) |
+
+- **Earnings days carry the signal, and it is stable there.** For every signal the earnings-day IC is 2–11 times
+  the IC on other events on validation and 9–14 times on test (Laya zero-shot's other-event test IC is about 0).
+  It did not fall from val-B to test: the changes are −0.014 to +0.049.
+- **The val→test decline is off earnings days, for every signal.** On the other events the IC fell from
+  0.04–0.07 on validation (Laya zero-shot 0.01–0.03) to −0.003…+0.026 on test, for the vendor baselines too. Laya-Fin's drop from +0.065
+  (val-B) to +0.020 (test, §10.1) is this pattern: its earnings-day IC held, and its other-event IC went from
+  +0.049 to +0.013.
+- **Laya-Fin's validation z_id signal was off earnings days.** It was +0.042 (t 3.2) on val-A and +0.033 (t 1.8)
+  on val-B, and +0.008 (t 0.7) on test. This is the signal H1b was added for (§4.2).
+- **The API models price earnings news at the open** (z_on +0.24–0.26, z_id not significant). Off earnings days
+  they keep a smaller open-gap IC (z_on about +0.06, t 4.1–5.3).
+- **Caveat.** Validation has only about 20 earnings sessions per split, so the validation earnings ICs have wide
+  CIs (in the JSON).
+
+### 13.2 Size tier
+
+Test daily IC (t); validation in the JSON:
+
+| Signal | Top-100: z_cc / z_on | Mid (101–250): z_cc / z_on | Rest (251–500): z_cc / z_on |
+|---|---|---|---|
+| Laya-Fin | +0.037 (1.7) / +0.014 (0.6) | −0.001 (−0.0) / −0.006 (−0.2) | +0.027 (1.5) / +0.027 (1.4) |
+| d1-ultra | +0.015 (0.6) / +0.015 (0.6) | +0.033 (2.2) / +0.082 (4.0) | +0.060 (3.7) / +0.096 (4.6) |
+| span-02 | +0.033 (1.3) / +0.029 (1.1) | +0.018 (1.2) / +0.086 (3.7) | +0.058 (3.4) / +0.091 (4.3) |
+| drex-v2.0 | +0.031 (1.2) / +0.038 (1.6) | +0.036 (2.1) / +0.085 (4.2) | +0.062 (3.5) / +0.084 (4.0) |
+| Laya zero-shot | +0.027 (1.2) / +0.029 (1.5) | −0.025 (−1.0) / +0.036 (2.0) | +0.010 (0.6) / +0.042 (2.2) |
+| vendor sentiment | +0.053 (2.1) / +0.037 (1.3) | +0.029 (1.5) / +0.046 (2.2) | +0.058 (2.9) / +0.070 (3.8) |
+| tags-GBM | +0.041 (1.7) / +0.047 (1.8) | +0.053 (3.0) / +0.068 (3.2) | +0.062 (3.0) / +0.075 (4.4) |
+
+- **API models.** On test, their open-gap signal sits in the Mid and Rest tiers (z_on +0.08 to +0.10, t
+  3.7–4.6) and is weak in the Top-100 (t ≤ 1.6). On val-B it was present in the Top-100 too (z_on +0.125 to
+  +0.141, t 3.3–3.9).
+- **Laya-Fin.** No tier stands out on test (the largest is +0.037, t 1.7, in the Top-100). On validation, every
+  tier was positive.
+- **z_id** is about 0 in every tier for every signal on test (|t| ≤ 1.7).
+
+### 13.3 Month effects
+
+One-way F test of the daily ICs (with z_cc) on calendar month. Degrees of freedom: (2, 56) on val-A and val-B,
+(6, 133) on test. The implied SE of one month's mean IC is √(MS_within ÷ mean days a month) (iid), or the
+long-run variance of the daily ICs over the mean days a month (Newey–West).
+
+| Signal | F test p: val-A / val-B / test | Implied monthly SE, test: iid / NW | SD of the 7 test monthly means | June / July 2026 IC |
+|---|---|---|---|---|
+| Laya-Fin | 0.71 / 0.25 / 0.72 | 0.037 / 0.031 | 0.029 | −0.023 / −0.006 |
+| d1-ultra | 0.25 / 0.40 / 0.44 | 0.030 / 0.032 | 0.030 | +0.003 / +0.008 |
+| span-02 | — / 0.60 / 0.24 | 0.033 / 0.035 | 0.037 | −0.001 / −0.007 |
+| drex-v2.0 | — / 0.38 / 0.20 | 0.028 / 0.032 | 0.034 | +0.007 / +0.019 |
+| Laya zero-shot | 0.30 / 0.71 / 0.16 | 0.033 / 0.038 | 0.040 | −0.055 / −0.021 |
+| vendor sentiment | 0.81 / 0.81 / 0.56 | 0.034 / 0.037 | 0.030 | +0.025 / −0.001 |
+| tags-GBM | 0.77 / 0.79 / 0.71 | 0.034 / 0.037 | 0.026 | +0.060 / +0.021 |
+
+- **No signal shows a month effect** on any split (every p ≥ 0.16).
+- **The monthly means scatter as noise would.** On test, the SD of the seven monthly means (0.026–0.040) matches
+  the implied SE of one month's mean (0.028–0.038). By chance alone, a month's mean IC can sit ±0.06 (2 SE)
+  from the period's mean.
+- **June–July 2026 (§10.5).** Laya-Fin's June (−0.023) is 1.2–1.4 implied SEs below its test mean (+0.020), and
+  d1-ultra's (+0.003 against +0.039) 1.1–1.2. tags-GBM did not dip in June (+0.060).
+
+### 13.4 Per-company rank correlations (test)
+
+Setup:
+- For each company with ≥ 15 test events: the Spearman correlation of the signal with z_cc over its events.
+  That covers 427 companies and 13,026 events for every signal.
+- The null shuffles the signal within each company: 200 draws, seed 2026, the same draws for every signal.
+- p = (1 + the number of null SDs ≥ the observed SD) ÷ 201.
+
+| Signal | Mean ρ | SD of ρ | Null SD: mean [2.5%, 97.5%] | p |
+|---|---|---|---|---|
+| Laya-Fin | +0.016 | 0.214 | 0.197 [0.186, 0.212] | 0.015 |
+| d1-ultra | +0.042 | 0.199 | 0.197 [0.183, 0.213] | 0.38 |
+| span-02 | +0.040 | 0.204 | 0.197 [0.183, 0.211] | 0.15 |
+| drex-v2.0 | +0.050 | 0.201 | 0.196 [0.184, 0.208] | 0.25 |
+| Laya zero-shot | +0.009 | 0.189 | 0.197 [0.184, 0.208] | 0.88 |
+| vendor sentiment | +0.030 | 0.189 | 0.197 [0.183, 0.211] | 0.86 |
+| tags-GBM | +0.057 | 0.211 | 0.197 [0.182, 0.209] | 0.015 |
+
+- **Laya-Fin and tags-GBM.** Their per-company correlations spread more than a within-company shuffle produces;
+  each observed SD lies above the null's 97.5th percentile.
+  - For Laya-Fin the excess implies a between-company SD of about √(0.214² − 0.197²) ≈ 0.08 around a mean of
+    +0.016: its reading tracks z_cc for some companies and runs against it for others.
+  - The test cannot tell company-specific skill from company-specific noise in the reading.
+  - Seven signals were tested, with no correction.
+- **The API models, Laya zero-shot and vendor sentiment.** Their spread is what chance gives (p 0.15–0.88), so
+  their signal is spread evenly across companies.
+
+### 13.5 Market state
+
+Days are split into terciles over each split's sessions outside the embargo (test: 47, 46 and 47 sessions).
+- **|SPY| close-to-close.** On test, below 0.31% and above 0.79%.
+- **Cross-sectional SD of z_cc** over covered member-days. On test, 0.81–1.28 for the low tercile and 1.51–2.94
+  for the high one.
+
+Test daily IC with z_cc (t is for high − low):
+
+| Signal | SD of z_cc: low / mid / high | High − low (t) | \|SPY\|: high − low (t) |
+|---|---|---|---|
+| Laya-Fin | +0.011 / +0.029 / +0.020 | +0.008 (0.3) | +0.011 (0.4) |
+| d1-ultra | +0.012 / +0.036 / +0.070 | +0.059 (2.7) | +0.012 (0.5) |
+| span-02 | +0.015 / +0.036 / +0.070 | +0.055 (2.2) | +0.004 (0.2) |
+| drex-v2.0 | +0.018 / +0.041 / +0.073 | +0.055 (2.5) | +0.021 (0.9) |
+| Laya zero-shot | +0.007 / +0.009 / −0.000 | −0.008 (−0.3) | +0.024 (0.8) |
+| vendor sentiment | +0.036 / +0.045 / +0.059 | +0.023 (0.8) | +0.004 (0.2) |
+| tags-GBM | +0.031 / +0.042 / +0.092 | +0.061 (2.2) | +0.012 (0.4) |
+
+- **Dispersion, on test.** The API models' and tags-GBM's IC rises with the day's cross-sectional dispersion of
+  z_cc: +0.07–0.09 on the most dispersed third of days against +0.01–0.03 on the least (t 2.2–2.7). Laya-Fin,
+  Laya zero-shot and sentiment show no such gradient.
+- **Dispersion, on validation.** No signal has a gradient with |t| > 2 (the largest is tags-GBM on val-A, −0.058,
+  t −1.9). So the test gradient is not stable across splits.
+- **|SPY|.** There is no gradient on test (|t| ≤ 0.9).
+  - On val-B, the API models, Laya zero-shot and both vendor baselines had a higher IC on high-|SPY| days (+0.05
+    to +0.08, t 1.7–3.0).
+  - On val-A they did not, and sentiment reversed (−0.057, t −2.8).
+- **Overlap with §13.1.** The dispersion terciles may overlap the earnings calendar. This section does not
+  separate the two.
+
+## 14. Deviations and corrections (in PREREG §15 unless noted)
 
 1. **Before unblinding** (NA-12 row). The operationalization of NA-12's calls of the frozen spec:
    - the unblinding routes and the rehearsal;
@@ -435,8 +607,11 @@ in `t16` (uninformative).
    No pre-registered number changed, and every results JSON is byte-identical before and after.
 3. **Within the frozen plan, reported here.** The anchor is reported as uninformative, not null (operator item 5).
    span-02 carries its footnote. H4 states its R² reference (operator item 6).
+4. **Exploratory section after unblinding (§13; operator request).** New code and one new results file only. No
+   frozen file, definition, hypothesis or family changed; every other results JSON is untouched. No PREREG
+   row (owner decision 4).
 
-## 14. Spend, look-ahead, STOPs, owner decisions
+## 15. Spend, look-ahead, STOPs, owner decisions
 
 - **Spend.** NA-12 $0. No API call, no Kaggle run, no FMP request (the spend, trials and FMP ledgers are
   unchanged). Cumulative spend stays at $15.73.
@@ -456,30 +631,40 @@ in `t16` (uninformative).
      and the LLM.*
   2. **June–July 2026 IC collapse** across all models. *Recommendation:* a descriptive data check (events, sources
      and coverage by month) before NA-13. It needs no new hypothesis and no outcome-driven change.
+     *Update after §13.3:* no signal shows a month effect (F test p ≥ 0.16), and the dip is within about 1.2
+     implied monthly SEs. The check is now optional.
   3. **Anchor robustness runs** after 2026-10-31 (your §15 row). They decide whether the Laya-Fin–anchor contrast
      reflects training. *Recommendation: run them as planned;* they do not affect any verdict above.
+  4. **The §13 exploratory section.** It was requested after unblinding, and the REPORT labels it so.
+     *Recommendation:* add a one-line PREREG §15 "after unblinding, exploratory" row, so the paper trail dates
+     it. Any NA-14 use goes in an exploratory section as post hoc, with no test.
 
-## 15. Files and `make verify`
+## 16. Files and `make verify`
 
 **Code (new).** `src/newsaction/analysis/`:
 - `unblind.py`, `slot_path.py`, `price_only_d2.py`;
 - `run_all.py`, `figdata.py`;
-- `tables.py`, `contract.py`.
+- `tables.py`, `contract.py`;
+- `exploratory.py` (§13).
 
-**Code (changed).** `analysis/frames.py`: the test targets, the S7 readings under the pin, the price-only test
-reading, member-days from given rows.
+**Code (changed).**
+- `analysis/frames.py`: the test targets, the S7 readings under the pin, the price-only test reading,
+  member-days from given rows.
+- `analysis/contract.py`: §13's results file has its own contract entry.
 
-**Tests (new).** `test_unblind_lock.py`, `test_run_all_params.py`, `test_tables_keys.py`, `test_price_only_d2.py`.
+**Tests (new).** `test_unblind_lock.py`, `test_run_all_params.py`, `test_tables_keys.py`, `test_price_only_d2.py`,
+`test_exploratory.py` (6 tests: the unblinding precondition, the embargo, the earnings and tier splits, the month
+F test, the seeded within-company shuffle, the terciles).
 
 **Docs.**
 - `docs/PREREG.md` (two §15 rows);
-- `docs/DATA_CONTRACT.md` (NA-12 section, 73 files);
+- `docs/DATA_CONTRACT.md` (NA-12 section, 74 files);
 - `docs/decisions/NA-12.md`;
 - this report.
 
 **Artifacts** (`artifacts/NA-12/`).
 - `unblind.json`, `unblind_rehearsal.json`;
-- `results/*.json` (13);
+- `results/*.json` (14, with §13's `exploratory_d0_signal.json`);
 - `figure_data/*.csv` (7);
 - `tables/` (20 × CSV + LaTeX, `keys.json`, `index.json`).
 
@@ -489,14 +674,16 @@ reading, member-days from given rows.
 
 **Ledgers.** `ledgers/test_access.jsonl` (+13 lines).
 
-`make verify`, run after the last change (no other NewsAction pytest running; 83% memory free), exit 0:
+`make verify`, run after the last code change (§13 included; no other NewsAction pytest running), exit 0:
 
 ```
 ruff check src tests scripts       All checks passed!
-ruff format --check                255 files already formatted
-mypy --strict src/                 Success: no issues found in 136 source files
-pytest -q -m "not network"         1900 passed, 3 skipped, 2 xfailed in 223.67s
-manifest                           266 artifacts, 10 inputs checked (size+mtime): OK
-ledgers                            OK (test_access.jsonl 26 lines)
-peak RSS                           10.5 GB
+ruff format --check                257 files already formatted
+mypy --strict src/                 Success: no issues found in 137 source files
+pytest -q -m "not network"         1906 passed, 3 skipped, 2 xfailed in 213.19s
+manifest                           267 artifacts, 10 inputs checked (size+mtime): OK
+ledgers                            OK (test_access.jsonl 26 lines, unchanged by §13)
+peak RSS                           9.4 GB
 ```
+
+Before §13 the same run gave 1,900 passed and 266 artifacts (peak 10.5 GB).

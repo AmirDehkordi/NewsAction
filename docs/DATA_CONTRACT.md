@@ -1887,6 +1887,15 @@ sha256 on a rerun (labels and export were run twice: 8 of 8 files identical).
 - **Availability:** public (val-B); written before unblinding
 - **sha256:** `448ecd8c7e3cc3d5e68c2c182e14c892c2921a253d37b8d908df4d7c8402447b`
 
+### `artifacts/NA-12/results/exploratory_d0_signal.json`
+- **Producer:** `newsaction.analysis.exploratory.run` (operator request after unblinding)
+- **Inputs:** the D0 analysis frames (`run_all.build_ctx`), NA-09's `work/baselines/{sentiment,tags_gbm}.parquet`, covered member-days (`frames.member_days`), `configs/analysis.yaml` (frozen daily IC, Newey–West lags, bootstrap)
+- **Schema:** `earnings` and `tier` (`spec.ic_targets` per group; earnings − rest daily difference), `monthly` (month means, F test, implied monthly SE), `company` (per-company Spearman SD and its shuffle null), `market_state` (tercile cut-offs; daily IC by tercile, high − low)
+- **Key:** nested by analysis, signal and split
+- **Rows / coverage:** exploratory, outside every family (no hypothesis, no claim): where the D0 signal lives for Laya-Fin, d1-ultra, span-02, drex-v2.0, Laya zero-shot and the vendor sentiment and tags-GBM baselines on val-A, val-B and test outside the embargo
+- **Availability:** val-A and val-B public; test outcomes from the test period's outcomes, after unblinding (NA-12 S1)
+- **sha256:** `6e4da0e60ad37ff8871bc9945566895569d056b3be2c1c99c79b52a05312e446`
+
 ### `artifacts/NA-12/results/battery.json`
 - **Producer:** `newsaction.analysis.run_all.battery`
 - **Inputs:** the analysis frames (`analysis.frames`), `configs/analysis.yaml` (frozen)

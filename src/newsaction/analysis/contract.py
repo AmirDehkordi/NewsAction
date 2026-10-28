@@ -104,14 +104,32 @@ FIXED: Final = (
         "the val-B rehearsal of the unblinding's assembly (59 columns reproduced)",
         "public (val-B); written before unblinding",
     ),
+    Entry(
+        f"{ARTIFACTS}/results/exploratory_d0_signal.json",
+        "`newsaction.analysis.exploratory.run` (operator request after unblinding)",
+        "the D0 analysis frames (`run_all.build_ctx`), NA-09's "
+        "`work/baselines/{sentiment,tags_gbm}.parquet`, covered member-days (`frames.member_days`), "
+        "`configs/analysis.yaml` (frozen daily IC, Newey–West lags, bootstrap)",
+        "`earnings` and `tier` (`spec.ic_targets` per group; earnings − rest daily difference), "
+        "`monthly` (month means, F test, implied monthly SE), `company` (per-company Spearman SD and its "
+        "shuffle null), `market_state` (tercile cut-offs; daily IC by tercile, high − low)",
+        "nested by analysis, signal and split",
+        "exploratory, outside every family (no hypothesis, no claim): where the D0 signal lives for "
+        "Laya-Fin, d1-ultra, span-02, drex-v2.0, Laya zero-shot and the vendor sentiment and tags-GBM "
+        "baselines on val-A, val-B and test outside the embargo",
+        f"val-A and val-B public; test outcomes from {OUTCOMES}",
+    ),
 )
 
 
 def _dynamic(lay: Layout) -> list[Entry]:
-    """One entry per results JSON, figure CSV and table file on disk."""
+    """One entry per results JSON, figure CSV and table file on disk (other than the fixed entries)."""
     root = lay.root / ARTIFACTS
+    fixed = {e.path for e in FIXED}
     out = []
     for p in sorted((root / "results").glob("*.json")):
+        if f"{ARTIFACTS}/results/{p.name}" in fixed:
+            continue
         out.append(
             Entry(
                 f"{ARTIFACTS}/results/{p.name}",
