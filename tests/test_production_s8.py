@@ -209,3 +209,17 @@ def test_the_end_of_s6_canary_is_judged_by_the_recorded_rule() -> None:
     assert verdict(False, False, prod={"noisy-1", "noisy-2"}) == "stop"  # or in the production answers
     assert verdict(True, False, model="det") == "stop" and verdict(False, True, model="det") == "stop"
     assert verdict(False, False, model="det") == "pass"
+
+
+def test_importing_the_production_steps_never_loads_lightgbm() -> None:
+    """LightGBM and torch segfault in one process (NA-09): ``price_only_test`` loads it only to predict."""
+    import subprocess
+    import sys
+
+    code = (
+        "import sys; import newsaction.production.price_only_test, newsaction.production.summary;"
+        "assert 'lightgbm' not in sys.modules, 'lightgbm imported'"
+    )
+    r = subprocess.run([sys.executable, "-c", code], capture_output=True, text=True, check=False)
+    assert r.returncode == 0, r.stderr[-2000:]
+    assert "lightgbm" not in sys.modules

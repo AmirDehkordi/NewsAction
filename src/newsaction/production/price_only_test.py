@@ -13,8 +13,8 @@ category lists are part of the model strings).
 - **D2** is not produced here: its ``react_z_on`` (z_on,t) is not among the frozen reactions' columns
   (operator decision pending).
 
-Output: ``work/dm/production/price_only_test.parquet`` (NA-09's common schema). Run it in its own process
-(LightGBM, never next to torch).
+Output: ``work/dm/production/price_only_test.parquet`` (NA-09's common schema). Run it in its own process:
+LightGBM is imported only inside ``_model`` (it and torch segfault in one process, NA-09).
 """
 
 from __future__ import annotations
@@ -22,9 +22,8 @@ from __future__ import annotations
 import json
 import sys
 from collections.abc import Sequence
-from typing import Any, Final
+from typing import TYPE_CHECKING, Any, Final
 
-import lightgbm as lgb
 import numpy as np
 import numpy.typing as npt
 import pandas as pd
@@ -41,6 +40,9 @@ from newsaction.production import CHUNK, ProductionError
 from newsaction.production.plan import load_plan
 from newsaction.production.run import PRODUCTION_DIR
 from newsaction.states import CONTEXT_COMPANY
+
+if TYPE_CHECKING:
+    import lightgbm as lgb
 
 OUT: Final = f"{PRODUCTION_DIR}/price_only_test.parquet"
 NA09_PREDICTIONS: Final = "baselines/price_only.parquet"
@@ -86,6 +88,8 @@ def frame(splits: Sequence[str], layout: Layout | None = None) -> pd.DataFrame:
 
 
 def _model(target: str, layout: Layout | None = None) -> tuple[lgb.Booster, dict[str, Any]]:
+    import lightgbm as lgb  # never at import time: LightGBM and torch segfault in one process (NA-09)
+
     path = resolve_layout(layout).work / f"baselines/models/price_only_{target}.json"
     doc = json.loads(path.read_text(encoding="utf-8"))
     if list(doc["record"]["features"]) != list(D0_FEATURES):

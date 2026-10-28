@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import re
 import shutil
 from collections.abc import Callable
 from pathlib import Path
@@ -12,10 +13,18 @@ from newsaction.paths import ROOT, Layout
 
 
 def make_layout(root: Path) -> Layout:
-    """A throwaway repository: copies of PREREG and configs, empty ledgers, empty work/ and Data/."""
+    """A throwaway repository: copies of PREREG and configs, empty ledgers, empty work/ and Data/. Its
+    ``configs/frozen.yaml`` is back in the pre-freeze protocol state (``frozen_requested`` and ``frozen``
+    false, every section as copied), so the lock's tests can freeze it themselves after the real NA-11
+    freeze."""
     (root / "docs").mkdir(parents=True)
     shutil.copy(ROOT / "docs" / "PREREG.md", root / "docs" / "PREREG.md")
     shutil.copytree(ROOT / "configs", root / "configs")
+    frozen = root / "configs" / "frozen.yaml"
+    text = re.sub(
+        r"^frozen_requested:.*$", "frozen_requested: false", frozen.read_text(encoding="utf-8"), flags=re.M
+    )
+    frozen.write_text(re.sub(r"^frozen:.*$", "frozen: false", text, flags=re.M), encoding="utf-8")
     (root / "ledgers").mkdir()
     for name in LEDGER_FILES:
         (root / "ledgers" / name).touch()
