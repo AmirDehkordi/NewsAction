@@ -203,6 +203,7 @@ def latex_table(df: pd.DataFrame, n_trials: int) -> Table:
     ).str.replace("  ", " ")
     t["exit"] = t["exit"].str.replace("close_", "C_")
     t["capacity_musd"] = t["capacity_median_usd"] / 1e6
+    t["dsr_prob_net_10"] = t["dsr_prob_net_10"].map(lambda v: "<0.001" if v < 0.001 else f"{v:.3f}")
     frame = t[list(LATEX_COLS)].rename(columns=LATEX_COLS).reset_index(drop=True)
     notes = (
         f"Test split {sp.start} to {sp.end}; daily net returns of beta-hedged, equal-weight long-short",

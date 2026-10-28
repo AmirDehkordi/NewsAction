@@ -1,0 +1,62 @@
+{
+ "output": {
+  "path": "work/strategy/market_test.parquet",
+  "sha256": "a8dd253d72cbd0e811ce2be5adaa1e7f18b7c75332d636b8ac625fcdc5765580",
+  "rows": 73498
+ },
+ "sessions": [
+  "2026-01-02",
+  "2026-07-31"
+ ],
+ "n_sessions": 145,
+ "lock_reads": [
+  {
+   "ts": "2026-10-28T22:54:21.648574+00:00",
+   "name": "prices_raw_2026",
+   "purpose": "targets",
+   "caller": "src/newsaction/strategy/market.py:<genexpr>:189",
+   "allowed": true
+  },
+  {
+   "ts": "2026-10-28T22:54:21.695356+00:00",
+   "name": "total_return_check_2026",
+   "purpose": "targets",
+   "caller": "src/newsaction/strategy/market.py:<genexpr>:189",
+   "allowed": true
+  },
+  {
+   "ts": "2026-10-28T22:54:21.719353+00:00",
+   "name": "bars30_2026",
+   "purpose": "targets",
+   "caller": "src/newsaction/strategy/market.py:test_panel:190",
+   "allowed": true
+  }
+ ],
+ "consistency_gaps": {
+  "val_b_vs_public": {
+   "raw_open": 0.0,
+   "raw_close": 0.0,
+   "adj_close": 0.0,
+   "r_cc": 0.0,
+   "r_id": 0.0,
+   "r_spy_cc": 0.0,
+   "r_spy_id": 0.0,
+   "beta_m": 0.0,
+   "ar_cc": 0.0,
+   "adv20": 0.0,
+   "ma20": 0.0,
+   "ma50": 0.0,
+   "ma20_prev": 0.0,
+   "ma50_prev": 0.0,
+   "p10": 0.0,
+   "r_10c": 0.0,
+   "r_spy_10c": 0.0
+  },
+  "test_vs_targets_test": {
+   "r_cc": 0.0,
+   "r_spy_cc": 0.0,
+   "ar_cc": 0.0
+  }
+ },
+ "tolerance": 1e-12
+}

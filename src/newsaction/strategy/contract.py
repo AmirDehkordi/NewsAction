@@ -101,7 +101,8 @@ FIXED: Final = (
     Entry(
         f"work/{mk.TEST_OUT}",
         "`newsaction.strategy.market test` (once, `NA_UNBLIND=1`)",
-        '`lock.read_sealed(…, "targets")` of the blinded prices, total-return check and 30-minute bars '
+        "`newsaction.lock` (purpose targets) reads of the blinded prices, total-return check and 30-minute "
+        "bars "
         "(logged in `ledgers/test_access.jsonl`), assembled as `panel.build.test_returns_panel` and "
         "`bars.derive.test_intraday_panel` do",
         "as `market_public`",
