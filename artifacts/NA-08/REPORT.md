@@ -277,9 +277,8 @@ a program whose sha256 is not the committed `train_ddp.py`.
 
 ## 7. Deviations from PREREG
 
-Two rows were appended to the §15 Deviations log (NA-08, before the freeze). As in earlier chunks they are **in
-the working tree, not committed**, for the operator to commit on main. `tests/test_train_config.py` checks both
-rows, so commit them with the merge.
+Two rows were appended to the §15 Deviations log (NA-08, before the freeze). The operator committed them on the
+branch (`24978f6`), and they reached main with the merge. `tests/test_train_config.py` checks both rows.
 
 1. **§9.1 max length 1024 → 1,036** for the trained models. The head is the longest trained question in Laya's
    rendering (143 + 3 tokens), and at 1,024 five Call A D0 states would be cut. Operator decision 2026-10-26.
@@ -339,7 +338,7 @@ Open for the operator:
   - `pyproject.toml`: `laya.*` in mypy's missing-import overrides; the notebook directory excluded from mypy (its
     program runs on Kaggle's stack); the generated notebook excluded from `ruff format` (still linted);
   - `ledgers/trials.jsonl`: +4 NA-08 trials.
-- **Uncommitted.** `docs/PREREG.md` (§15, two NA-08 rows).
+- **Committed by the operator.** `docs/PREREG.md` (§15, two NA-08 rows; `24978f6`).
 - **Tests.** 6 files, 121 tests: `test_train_config` (9), `test_train_labels` (49), `test_train_export_schema`
   (19), `test_train_notebook` (13), `test_train_metrics` (8), `test_train_import` (23). `test_train_import`
   includes the tiny-model end-to-end runs (both inits, the shuffle control and the pilot, through every
