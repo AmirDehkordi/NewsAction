@@ -1360,3 +1360,59 @@ sha256 on a rerun (labels and export were run twice: 8 of 8 files identical).
 - **Rows / coverage:** one record
 - **Availability:** n/a (val-A metrics, model choice and spend; no val-B or test value)
 - **sha256:** `fbd0352853166b35025db104ad91404ce44d29abbb2678ad7c6066e707e83ce7`
+
+## NA-11 — final selection, freeze, production (`newsaction.analysis`, `newsaction.production`)
+
+### `work/analysis/state_articles_w2.parquet`
+- **Producer:** `newsaction.analysis.frames.write_state_articles_w2`
+- **Inputs:** `work/events/events_d2.parquet` (`news_w2`), `work/states/callA_d2_E3.parquet`, `work/states/articles_masked.parquet`, `work/news/articles_clean.parquet` (NA-04 exclusions)
+- **Schema:** `event_id`, `article_id`, `rank` (int64, 0 = the state's first news item)
+- **Key:** (`event_id`, `rank`) unique
+- **Rows / coverage:** every Call A D2 state's articles, rebuilt as NA-09 rebuilt the D0 ones and checked against each state's news block (274,944 rows)
+- **Availability:** D2 (`w2`); article ids only
+- **sha256:** `4910de4f168d07f0d6fe4c5cfc277de5212235b3adccab064667987725a45e35`
+
+### `work/dm/production/company_id_matched.parquet`
+- **Producer:** `newsaction.production.company_id.run`
+- **Inputs:** `work/dm/tournament/samples.parquet` (NA-06's 400 identification events), `work/states/callA_d0_E3.parquet`, `work/events/{events_d0,window_counts}.parquet`, `work/panel/{panel_public,companies}.parquet`, `cache/decisions.sqlite` (chunk NA-11)
+- **Schema:** `model`, `event_id`, `key`, `ok`, `valid`, `true_key`, `argmax_key`, `p_true`, `cost`, `correct`
+- **Key:** (`model`, `event_id`) unique
+- **Rows / coverage:** PREREG §15 NA-06 row option (iv): company identification with activity-matched distractors, six stage-2 API models and local Laya zero-shot × 400 val-A events (2,800 rows)
+- **Availability:** val-A D0 states (masked); a probe, no target
+- **sha256:** `124ef4866f682b690463fd17aedcd082ab569f108171551e32533c66d85953d9`
+
+### `artifacts/NA-11/final_selection.csv`
+- **Producer:** `newsaction.production.select_final`
+- **Inputs:** `work/kaggle/predictions/{laya_fin,anchor}_{val_a,val_b}.parquet` (the frozen runs), `work/baselines/laya_zeroshot.parquet`, `work/dm/encoding/confirm.parquet`, `work/panel/panel_public.parquet`
+- **Schema:** `model`, `role`, `runs`, `n_events`, `n_days`, `ic`, `nw_t`, `boot_se`, `ci_low`, `ci_high`, `p_one_sided`, `ic_j_y2`, `ic_j_y2_t`, `ic_j_y2_days`, `cost_per_1000`, `selected`, `rank`, `rule`
+- **Key:** `model` unique
+- **Rows / coverage:** PREREG §8.5 on val-B: three candidates (common events) and three screen-failing comparators (NA-07's val-B sample, information only); its sha256 is `configs/frozen.yaml` `selection.ic_table_sha`
+- **Availability:** val-B targets (`allow_val_b: true`); no test row
+- **sha256:** `31d0a918b4462ba3779dc78fbf7eee42caf46c75e389c16df2238cefd680f2fd`
+
+### `artifacts/NA-11/company_id_matched.csv`
+- **Producer:** `newsaction.production.company_id.run`
+- **Inputs:** `work/dm/production/company_id_matched.parquet`, `work/dm/tournament/probes.parquet`
+- **Schema:** `model`, `n`, `valid`, `accuracy`, `mean_p_true`, `cost`, `accuracy_na06_design`, `baseline_matched`, `baseline_na06_design`, `screen_threshold`
+- **Key:** `model` unique
+- **Rows / coverage:** accuracy per model beside NA-06's and the no-reading baselines of both designs
+- **Availability:** val-A; a probe
+- **sha256:** `1e9e0c22b9a1506872ffa683d0275b847d89d3219aa0f30dc9d8ccb3bd6da7ad`
+
+### `artifacts/NA-11/spec_smoke_val_b.json`
+- **Producer:** `newsaction.production.smoke_spec`
+- **Inputs:** the val-A / val-B analysis frames (`newsaction.analysis.frames`) of Laya-Fin, the anchor and Laya zero-shot; `configs/frozen.yaml` calibration
+- **Schema:** {split, primary, steps: {name: {result, seconds}}, plateau_check, live_format_states_val_b, seconds}
+- **Key:** one JSON object
+- **Rows / coverage:** PRD NA-11 AC2: the spec end to end on val-B (29 steps; the ridge protocol's splits shifted)
+- **Availability:** val-A / val-B targets; no test row
+- **sha256:** `6f78ea81363eb4814544a219b7d5b24b27e5fec98fc3ba866a3c0c1157269ce5`
+
+### `artifacts/NA-11/key_usage.json`
+- **Producer:** `newsaction.production.record_key_usage`
+- **Inputs:** OpenRouter GET /api/v1/key and /api/v1/credits; `ledgers/spend.jsonl`
+- **Schema:** list of {label, ts, usage, usage_daily, limit, limit_remaining, is_free_tier, total_credits, total_usage, remaining, ledger_chunk_usd}
+- **Key:** one entry per check, in time order
+- **Rows / coverage:** the key's usage before and after each NA-11 paid batch (operator preamble item 6)
+- **Availability:** account metadata; no data
+- **sha256:** `c5007f3d797ab979ed8e5c2167c2a7571668ca8628be91392b917b6e367a2835`

@@ -40,7 +40,14 @@ from newsaction.train import (
     load_training_config,
     training_questions,
 )
-from newsaction.train.import_preds import PREFIX, common_schema, ensemble_runs, event_keys, read_json
+from newsaction.train.import_preds import (
+    PREFIX,
+    common_schema,
+    ensemble_runs,
+    event_keys,
+    frozen_runs,
+    read_json,
+)
 from newsaction.train.kaggle_export import INFO_FILE, MANIFEST_FILE
 from newsaction.train.metrics import calibration, ic_summary, require_val_a, softmax
 
@@ -444,7 +451,9 @@ def card_text(model: str, ctx: Mapping[str, Any]) -> str:
 def card_context(model: str, cfg: TrainingConfig, layout: Layout | None) -> dict[str, Any]:
     lay = resolve_layout(layout)
     runs = [
-        s.name for s in ensemble_runs(cfg)[model] if (lay.work / RUNS_DIR / f"{s.name}.parquet").is_file()
+        s.name
+        for s in ensemble_runs(cfg, frozen_runs(lay))[model]
+        if (lay.work / RUNS_DIR / f"{s.name}.parquet").is_file()
     ]
     if not runs:
         raise FileNotFoundError(f"no imported run of {model}")

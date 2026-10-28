@@ -1,0 +1,103 @@
+# NA-11 S4–S9: the frozen production plan (PRD NA-11; PREREG §4.4, §8.4–8.5, §9.4, §10, §11.6, §13, A2.1,
+# A2.6, A3.1, A3.5). Read by newsaction.production.plan (ProductionPlan). Hashed into the NA-11 freeze with
+# every configs/*.yaml: after the freeze the plan changes only as a reported deviation (PRD NA-11 constraints).
+
+version: 1
+chunk: NA-11
+cap_usd: 18.0                     # PREREG §13 (configs/project.yaml budget.chunk_caps.NA-11)
+primary_instrument: laya_fin      # configs/frozen.yaml selection.primary_instrument (asserted equal)
+encoding: E3                      # configs/frozen.yaml encoding.chosen
+calls_per_event: 2                # configs/frozen.yaml anchoring: N̂ from Call A, J from Call B (PREREG §8.4)
+
+states:                           # work/ state files; the test Call B files are built in S4, after the freeze
+  A_D0: states/callA_d0_E3.parquet
+  A_D2: states/callA_d2_E3.parquet
+  B_D2: states/callB_d2_E3.parquet
+  B_D1: states/callB_d1_E3.parquet
+  B_D2_test: states/callB_d2_E3_test.parquet
+  B_D1_test: states/callB_d1_E3_test.parquet
+  market: states/market_E3.parquet
+
+api:                              # S6: the primary instrument is trained, so the best API comparator runs too
+  model: liquid/d1-ultra          # NA-07's leading model (highest stage-2 Call A IC); screen-failing, model-specific
+  groups_role: primary_api        # PREREG A2.1: core + extended on Call A, core + explain on Call B
+  components:
+    - {name: a0, states: [A_D0], call: A, splits: [val_a, val_b, test], groups: [core, extended]}
+    - {name: a2, states: [A_D2], call: A, splits: [val_a, val_b, test], groups: [core, extended]}   # A3.1
+    - {name: b2, states: [B_D2, B_D2_test], call: B, splits: [val_a, val_b, test], groups: [core, explain]}
+    - {name: b1, states: [B_D1, B_D1_test], call: B, splits: [val_a, val_b, test], groups: [core, explain]}
+    - {name: a0_2024h1, states: [A_D0], call: A, splits: [robustness], groups: [core]}   # §11.6 2024-H1
+    - {name: a2_2024h1, states: [A_D2], call: A, splits: [robustness], groups: [core]}
+  market:                         # A3.5 (optional, exploratory): one market state per session
+    splits: [val_a, val_b, test]
+    questions:
+      market_move:
+        type: score
+        instructions: "Once investors fully absorb the news in `news`, how will the S&P 500 perform today relative to its typical daily move?"
+        criteria:
+          - "very large fall (more than 3 typical daily moves)"
+          - "large fall (2–3 typical daily moves)"
+          - "moderate fall (1–2 typical daily moves)"
+          - "small fall (0.5–1 typical daily move)"
+          - "no meaningful move (less than 0.5 typical daily move)"
+          - "small rise (0.5–1 typical daily move)"
+          - "moderate rise (1–2 typical daily moves)"
+          - "large rise (2–3 typical daily moves)"
+          - "very large rise (more than 3 typical daily moves)"
+      market_reason:
+        type: choice
+        instructions: "What is the most likely main reason for the stock market's move today?"
+        criteria:
+          macro_data: "economic data releases (inflation, jobs, growth)"
+          central_bank: "central bank policy, rates or bond yields"
+          earnings: "corporate earnings and company news"
+          geopolitics_policy: "geopolitics, trade or government policy"
+          commodities_currency: "oil, commodities or the dollar"
+          sentiment_flows: "investor sentiment, positioning or technical flows"
+          no_identifiable_news: "no identifiable news"
+  cut_order: [drop_q10_q13_q15, no_extended_on_d1, sample_50pct]   # PREREG A2.6, applied only if over the cap
+
+comparators_core:                 # the other two screen-failing comparators: core battery, model comparison only
+  - {model: respan/span-02, name: a0, states: [A_D0], call: A, splits: [val_b, test], groups: [core]}
+  - {model: nace-ai/drex-v2.0, name: a0, states: [A_D0], call: A, splits: [val_b, test], groups: [core]}
+
+laya_zero_shot:                   # PREREG §10.5 test Call A (NA-09 ran every non-test state); local, about 2.2 h
+  model: local/laya-typed-decisions
+  components:
+    - {name: a0, states: [A_D0], call: A, splits: [test], groups: [core]}
+
+trained:                          # S7: inference only with the frozen runs (selection.trained_runs), private Kaggle
+  runs: {laya_fin: laya-s13, anchor: anchor-s13}
+  export:                         # masked, third-party OK, no labels (CLAUDE.md D16)
+    - {name: b2, states: B_D2_test, splits: [test], questions: [react, cont]}
+    - {name: b1, states: B_D1_test, splits: [test], questions: [react, cont]}
+    - {name: b1, states: B_D1, splits: [val_a, val_b], questions: [react, cont]}
+    - {name: a0, states: A_D0, splits: [robustness], questions: [react, mag]}
+    - {name: a2, states: A_D2, splits: [robustness], questions: [react, mag]}
+  max_gpu_hours: 3.0              # operator preamble: 6.62 h left until 2026-10-31; shown to the operator first
+
+ablations:                        # S8 (PREREG §11.6): the API comparator, core battery
+  model: liquid/d1-ultra
+  n: 12000                        # per sample
+  splits: [val_a, val_b, test]
+  strata: [split, tier, month]
+  seed: 2026                      # u = sha256("2026:ablation:<event_id>"), the smallest u per stratum
+  calls:
+    - {name: b2_no_news, base: B_D2, change: "drop the news block"}
+    - {name: b2_shuffled, base: B_D2, change: "the news block of another sampled event (a derangement: another company, the same split)"}
+    - {name: a0_unmasked, base: A_D0, change: "the unmasked twin (NA-04 builder, masked: false)", probe: unmasked_robustness}
+
+llm_baseline:                     # PREREG §10.7 test subsample (NA-09's rule and settings)
+  model: mistralai/mistral-nemo
+  split: test
+  n: 2000
+  strata: [tier, month]
+  seed: 2026
+  cap_usd: 1.0
+
+price_only: {test: [D0, D2]}      # NA-09's saved models, after the freeze (D0 needs z_vol(t−1), D2 the reactions)
+
+canary:                           # S5 and the end of S6 (configs/dm.yaml canary rule, NA-05 operator decision 3)
+  file: artifacts/NA-05/canary_v1.jsonl
+  baseline: artifacts/NA-05/canary_baseline.parquet
+  repeats_for_noise: 5            # models without an NA-05 repeat-noise measurement measure it first

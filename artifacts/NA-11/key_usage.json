@@ -1,0 +1,41 @@
+[
+  {
+    "label": "NA-11 start, before any paid call",
+    "ts": "2026-10-28T09:27:55.595781+00:00",
+    "usage": 4.909913768,
+    "usage_daily": 0,
+    "limit": 25,
+    "limit_remaining": 20.090086232,
+    "is_free_tier": false,
+    "total_credits": 25.0,
+    "total_usage": 4.909913768,
+    "remaining": 20.090086232,
+    "ledger_chunk_usd": 0.0
+  },
+  {
+    "label": "before option (iv) company-ID rerun",
+    "ts": "2026-10-28T09:30:40.752445+00:00",
+    "usage": 4.909913768,
+    "usage_daily": 0,
+    "limit": 25,
+    "limit_remaining": 20.090086232,
+    "is_free_tier": false,
+    "total_credits": 25.0,
+    "total_usage": 4.909913768,
+    "remaining": 20.090086232,
+    "ledger_chunk_usd": 0.0
+  },
+  {
+    "label": "after option (iv) company-ID rerun",
+    "ts": "2026-10-28T09:38:39.673669+00:00",
+    "usage": 4.986316602,
+    "usage_daily": 0.076402834,
+    "limit": 25,
+    "limit_remaining": 20.013683398,
+    "is_free_tier": false,
+    "total_credits": 25.0,
+    "total_usage": 4.986316602,
+    "remaining": 20.013683398,
+    "ledger_chunk_usd": 0.07640283399999998
+  }
+]

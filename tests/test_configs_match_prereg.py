@@ -16,6 +16,7 @@ import pytest
 import yaml
 
 from newsaction import calendar as cal
+from newsaction import lock
 from newsaction.config import (
     SPLIT_ORDER,
     BudgetConfig,
@@ -112,10 +113,18 @@ def test_fmp_cap_and_seed() -> None:
 
 def test_frozen_skeleton() -> None:
     f = load_frozen()
-    assert f.frozen_requested is False
-    assert f.frozen is False
-    for section in ("selection", "thresholds", "calibration"):
-        assert getattr(f, section) is None
+    # NA-11 S3 sets frozen_requested; lock.freeze() sets frozen together with its record (one-way)
+    assert f.frozen is lock.is_frozen()
+    if f.frozen:
+        assert f.frozen_requested is True
+    # NA-11 (PRD S2) owns ``selection``, ``thresholds`` and ``calibration`` (PREREG §8.5, §7, A1.3): all null
+    # before it, all filled after it
+    if f.selection is None:
+        assert f.thresholds is None and f.calibration is None
+    else:
+        assert {"primary_instrument", "candidates", "trained_runs", "ic_table_sha"} <= set(f.selection)
+        assert f.thresholds and f.calibration
+        assert f.selection["primary_instrument"] in f.selection["candidates"]
     # NA-07 (PRD S5) owns ``encoding:`` and ``anchoring:`` (PREREG §8.4); its report writes both together
     assert (f.encoding is None) is (f.anchoring is None)
     if f.encoding:
