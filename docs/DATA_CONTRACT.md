@@ -1797,6 +1797,15 @@ sha256 on a rerun (labels and export were run twice: 8 of 8 files identical).
 - **Availability:** the test period's outcomes, after unblinding (NA-12 S1); the only file 2026 outcomes are read from afterwards
 - **sha256:** `c6b7cf4d4c4c76ce19bd1dca752471671e5146d309ba497228ca00c7e805122e`
 
+### `work/analysis/price_only_d2_test.parquet`
+- **Producer:** `newsaction.analysis.price_only_d2.run`
+- **Inputs:** NA-09's `work/baselines/models/price_only_y2.json`; `work/states/callB_d2_E3_test.parquet`, `work/events/events_d2.parquet`, `work/states/context_company.parquet`, `work/panel/panel_public.parquet`, `work/analysis/targets_test.parquet` (G, z_on, z_vol of t)
+- **Schema:** NA-09's common prediction schema (call B, `y_hat`)
+- **Key:** `event_id` unique
+- **Rows / coverage:** the price-only baseline's D2 test predictions for every test Call B D2 state; the same code first reproduces NA-09's val-A and val-B D2 predictions exactly
+- **Availability:** D2 (after close(t)); built from the test period's outcomes, after unblinding (NA-12 S1)
+- **sha256:** `b94a93b9bdb646614261e145110b79bfa338f26e915cb1df84bb6f9485886034`
+
 ### `artifacts/NA-12/unblind.json`
 - **Producer:** `newsaction.analysis.unblind.run`
 - **Inputs:** the unblinding run
