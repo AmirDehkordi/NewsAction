@@ -170,3 +170,58 @@ def run(models: Sequence[str], *, send: bool, layout: Layout | None = None) -> d
     out["table"] = rows
     out["stop"] = bool(table["stop"].any())
     return out
+
+
+CHECK: Final = "canary_check.csv"
+
+
+def compare_now(
+    models: Sequence[str], repeat_idx: int, phase: str, layout: Layout | None = None
+) -> list[dict[str, Any]]:
+    """S5 / end of S6: the canary under ``repeat_idx`` (fresh keys) against the NA-11 baselines. The rule
+    (``configs/dm.yaml`` ``canary``): a deterministic model STOPs at max |Δp| >= 0.02 over every item; any
+    other
+    at a mean |Δp| above its repeat noise, both measured on the 20 train Call A items (where the noise is)."""
+    from newsaction.dm import dm_config
+
+    lay = resolve_layout(layout)
+    rule = dm_config(lay).canary
+    base = pd.read_parquet(artifacts_dir(lay) / BASELINE)
+    noise = pd.read_csv(artifacts_dir(lay) / DRIFT).set_index("model")["canary_noise_mean_abs_dp"]
+    its = items(lay)
+    ta = {it.canary_id for it in train_a(its)}
+    rows = []
+    with DecisionClient(CHUNK, layout=lay) as cl:
+        for m in models:
+            res = cl.decide([it.spec(m, repeat_idx=repeat_idx, tag=f"canary_{phase}") for it in its])
+            now = probability_rows(its, res)
+            b0 = base.loc[(base["model"] == m) & (base["repeat_idx"] == 0)]
+            on = ["canary_id", "question", "option"]
+            mm = b0[[*on, "p"]].merge(now[[*on, "p"]], on=on, suffixes=("_base", "_now"))
+            d = (mm["p_now"] - mm["p_base"]).abs()
+            d_ta = d[mm["canary_id"].isin(ta).to_numpy()]
+            det = m in rule.deterministic
+            stop = (
+                float(d.max()) >= rule.deterministic_max_abs_dp
+                if det
+                else float(d_ta.mean()) > float(noise[m])
+            )
+            rows.append(
+                {
+                    "model": m,
+                    "phase": phase,
+                    "repeat_idx": repeat_idx,
+                    "cells": len(mm),
+                    "mean_abs_dp_train_a": float(d_ta.mean()),
+                    "mean_abs_dp_all": float(d.mean()),
+                    "max_abs_dp_all": float(d.max()),
+                    "repeat_noise": float(noise[m]),
+                    "rule": "max_abs_dp >= 0.02" if det else "mean_abs_dp_train_a > repeat_noise",
+                    "stop": bool(stop),
+                    "builds": ",".join(sorted(set(now["model_build"].astype(str)))),
+                }
+            )
+    path = artifacts_dir(lay) / CHECK
+    prior = pd.read_csv(path) if path.is_file() else pd.DataFrame()
+    pd.concat([prior, pd.DataFrame(rows)], ignore_index=True).to_csv(path, index=False)
+    return rows

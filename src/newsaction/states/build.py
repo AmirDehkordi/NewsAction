@@ -977,15 +977,19 @@ def build_event_states(
     *,
     budget: Budget | None = None,
     keep: Mapping[str, Sequence[str]] | None = None,
+    allow_test: bool = False,
 ) -> tuple[pd.DataFrame, dict[str, list[str]]]:
     """States of ``events`` (rows of events_d0 / events_d2) under ``spec`` (validated first), and the article
     ids each state kept. ``budget`` fits each state's news list (``fit_news``); ``keep`` instead reuses the
     ids an earlier build kept, so the same event has the same news across encodings, masking and calls. An
-    event with no article text left after masking gets no state."""
+    event with no article text left after masking gets no state. ``allow_test`` admits test-period Call B
+    events; only NA-11's post-freeze build passes it, after checking the freeze
+    (``production.states_test``)."""
     validate_spec(spec)
     sfx = spec.window.lower()
     if spec.call == "B":
-        bad = events.loc[~events["split"].isin(B_SPLITS)]
+        allowed = (*B_SPLITS, "test") if allow_test else B_SPLITS
+        bad = events.loc[~events["split"].isin(allowed)]
         if len(bad):
             raise StatesError(
                 f"{spec.name}: Call B refuses {len(bad)} events outside {B_SPLITS} (no test-period Call B)"

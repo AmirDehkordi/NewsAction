@@ -57,6 +57,33 @@ ENTRIES: Final = (
         "val-A D0 states (masked); a probe, no target",
     ),
     Entry(
+        "work/states/callB_d2_E3_test.parquet",
+        "`newsaction.production.states_test` (S4, after the freeze)",
+        "`work/events/events_d2.parquet`, `work/analysis/state_articles_w2.parquet`, NA-04's inputs; the "
+        "test "
+        'reactions from `panel.reactions.build_reactions(..., "test", "D2")` through `newsaction.lock` '
+        "(purpose reactions, logged)",
+        "NA-04's state schema (`event_id`, `company_id`, `session`, `split`, `window`, `call`, `encoding`, "
+        "`masked`, `state_json`, `state_sha256`, `n_tokens_state`, `n_tokens_with_questions`, `n_articles`, "
+        "`third_party_ok_all`)",
+        "`event_id` unique",
+        "Call B on D2 for the 18,625 test D2 events with a Call A D2 state; each equals its Call A D2 twin "
+        "except `reaction_so_far` (asserted)",
+        "D2 (after close(s)); built only after the freeze (PREREG §4.4 step 5)",
+    ),
+    Entry(
+        "work/states/callB_d1_E3_test.parquet",
+        "`newsaction.production.states_test` (S4, after the freeze)",
+        "`work/events/events_d0.parquet`, NA-04's inputs; the test D1 reactions from "
+        '`panel.reactions.build_reactions(..., "test", "D1")` and `bars.derive.test_intraday_panel` on the '
+        "blinded bars and prices, all through `newsaction.lock` (purpose reactions, logged)",
+        "NA-04's state schema",
+        "`event_id` unique",
+        "Call B on D1 (W0 news + the reaction by 10:00) for the test D0 events with text (13,977); NA-10's "
+        "budget (the longest possible reaction block)",
+        "D1 (10:00 ET); built only after the freeze",
+    ),
+    Entry(
         "artifacts/NA-11/final_selection.csv",
         "`newsaction.production.select_final`",
         "`work/kaggle/predictions/{laya_fin,anchor}_{val_a,val_b}.parquet` (the frozen runs), "

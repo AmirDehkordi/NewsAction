@@ -4,6 +4,7 @@ and the evidence that the freeze precedes the first 2026 state and the first "re
 from __future__ import annotations
 
 import json
+import re
 import sqlite3
 
 import pytest
@@ -35,6 +36,17 @@ def _cache_row(lay: Layout, split: str, session: str, created: str = "2026-10-28
     )
     con.commit()
     con.close()
+
+
+@pytest.fixture
+def tmp_layout(tmp_layout: Layout) -> Layout:
+    """The throwaway repository, with configs/frozen.yaml back in its pre-freeze state."""
+    path = tmp_layout.configs / "frozen.yaml"
+    text = path.read_text(encoding="utf-8")
+    text = re.sub(r"^frozen_requested:.*$", "frozen_requested: false", text, flags=re.MULTILINE)
+    text = re.sub(r"^frozen:.*$", "frozen: false", text, flags=re.MULTILINE)
+    path.write_text(text, encoding="utf-8")
+    return tmp_layout
 
 
 def test_the_repository_is_ready(tmp_layout: Layout) -> None:

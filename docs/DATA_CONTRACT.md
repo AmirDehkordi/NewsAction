@@ -1381,6 +1381,24 @@ sha256 on a rerun (labels and export were run twice: 8 of 8 files identical).
 - **Availability:** val-A D0 states (masked); a probe, no target
 - **sha256:** `124ef4866f682b690463fd17aedcd082ab569f108171551e32533c66d85953d9`
 
+### `work/states/callB_d2_E3_test.parquet`
+- **Producer:** `newsaction.production.states_test` (S4, after the freeze)
+- **Inputs:** `work/events/events_d2.parquet`, `work/analysis/state_articles_w2.parquet`, NA-04's inputs; the test reactions from `panel.reactions.build_reactions(..., "test", "D2")` through `newsaction.lock` (purpose reactions, logged)
+- **Schema:** NA-04's state schema (`event_id`, `company_id`, `session`, `split`, `window`, `call`, `encoding`, `masked`, `state_json`, `state_sha256`, `n_tokens_state`, `n_tokens_with_questions`, `n_articles`, `third_party_ok_all`)
+- **Key:** `event_id` unique
+- **Rows / coverage:** Call B on D2 for the 18,625 test D2 events with a Call A D2 state; each equals its Call A D2 twin except `reaction_so_far` (asserted)
+- **Availability:** D2 (after close(s)); built only after the freeze (PREREG §4.4 step 5)
+- **sha256:** `3d171ae2d835a3410e99d1faac6ec56fb08e48b9ccea1344d4769f8091866054`
+
+### `work/states/callB_d1_E3_test.parquet`
+- **Producer:** `newsaction.production.states_test` (S4, after the freeze)
+- **Inputs:** `work/events/events_d0.parquet`, NA-04's inputs; the test D1 reactions from `panel.reactions.build_reactions(..., "test", "D1")` and `bars.derive.test_intraday_panel` on the blinded bars and prices, all through `newsaction.lock` (purpose reactions, logged)
+- **Schema:** NA-04's state schema
+- **Key:** `event_id` unique
+- **Rows / coverage:** Call B on D1 (W0 news + the reaction by 10:00) for the test D0 events with text (13,977); NA-10's budget (the longest possible reaction block)
+- **Availability:** D1 (10:00 ET); built only after the freeze
+- **sha256:** `c0c047b8511fff75b61295bc957e724f7d784132398b7ee744a1b5a52f622f77`
+
 ### `artifacts/NA-11/final_selection.csv`
 - **Producer:** `newsaction.production.select_final`
 - **Inputs:** `work/kaggle/predictions/{laya_fin,anchor}_{val_a,val_b}.parquet` (the frozen runs), `work/baselines/laya_zeroshot.parquet`, `work/dm/encoding/confirm.parquet`, `work/panel/panel_public.parquet`
@@ -1433,4 +1451,4 @@ sha256 on a rerun (labels and export were run twice: 8 of 8 files identical).
 - **Key:** one entry per check, in time order
 - **Rows / coverage:** the key's usage before and after each NA-11 paid batch (operator preamble item 6)
 - **Availability:** account metadata; no data
-- **sha256:** `07b34e4be36bf0da1ca08cd86e9df329f728bc5b5a30ef827597475470ce28a2`
+- **sha256:** `2e8a413eba455987557efc18350a69518cb2ec34cd5379db51bb0cb6b88fd1f3`

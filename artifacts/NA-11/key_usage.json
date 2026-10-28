@@ -63,5 +63,18 @@
     "total_usage": 5.018330676,
     "remaining": 19.981669324000002,
     "ledger_chunk_usd": 0.11596472800000018
+  },
+  {
+    "label": "before the S5 canary",
+    "ts": "2026-10-28T10:46:49.258302+00:00",
+    "usage": 5.025878496,
+    "usage_daily": 0.115964728,
+    "limit": 25,
+    "limit_remaining": 19.974121504,
+    "is_free_tier": false,
+    "total_credits": 25.0,
+    "total_usage": 5.025878496,
+    "remaining": 19.974121504,
+    "ledger_chunk_usd": 0.11596472800000018
   }
 ]
