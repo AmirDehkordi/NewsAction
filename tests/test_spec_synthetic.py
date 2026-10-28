@@ -56,6 +56,35 @@ def test_h1_null_rejects_at_about_the_nominal_rate() -> None:
     assert rejections <= 4
 
 
+def test_h1b_recovers_a_planted_z_id_effect() -> None:
+    rng = np.random.default_rng(1013)
+    df = panel()
+    n = len(df)
+    df["a0_n_hat"] = rng.normal(0, 1, n)
+    df["z_on"] = 0.4 * df["a0_n_hat"] + rng.normal(0, 1, n)
+    df["z_id"] = 0.15 * df["a0_n_hat"] + rng.normal(0, 1, n)  # part of the news is priced after the open
+    r = spec.h1b(df, "test", fast())
+    assert r["test"] == "H1b" and r["value"] > 0.08 and r["p"] < 0.01
+    both = spec.primary_d0(df, "test", fast())
+    assert set(both) == {"H1", "H1b"} and both["H1b"]["value"] == pytest.approx(r["value"])
+    assert both["H1"]["n_days"] == r["n_days"]  # the same sample and bootstrap draws as H1
+
+
+def test_h1b_null_rejects_at_about_the_nominal_rate() -> None:
+    """No z_id effect, 20 replications at the 5% level: P(>= 5 rejections) is 0.3% for a correct test."""
+    cfg = fast(500)
+    rejections = 0
+    for seed in range(20):
+        rng = np.random.default_rng(4000 + seed)
+        df = panel(seed=seed)
+        n = len(df)
+        df["a0_n_hat"] = rng.normal(0, 1, n)
+        df["z_on"] = 0.4 * df["a0_n_hat"] + rng.normal(0, 1, n)  # priced at the open only
+        df["z_id"] = rng.normal(0, 1, n)
+        rejections += spec.h1b(df, "test", cfg)["p"] < 0.05
+    assert rejections <= 4
+
+
 def _d2_frame(seed: int) -> pd.DataFrame:
     rng = np.random.default_rng(seed)
     df = panel(seed=seed)
@@ -232,7 +261,7 @@ def test_cut_indicator_rules() -> None:
 
 def test_headline_rule() -> None:
     cfg = spec.load_config()
-    prim = {t: {"estimate": 0.1, "p": 0.001} for t in ("H1", "H2", "H3", "H4")}
+    prim = {t: {"estimate": 0.1, "p": 0.001} for t in ("H1", "H1b", "H2", "H3", "H4")}
     adj = spec.primary_family({t: 0.001 for t in prim}, cfg)
     anchor = {
         "H1": {"estimate": 0.05, "p": 0.01},
@@ -240,9 +269,17 @@ def test_headline_rule() -> None:
         "H3": {"estimate": 0.05, "p": 0.2},
     }
     out = spec.headline(prim, anchor, adj, cfg)
-    assert out == {"H1": "general", "H2": "model-specific", "H3": "model-specific", "H4": "model-specific"}
-    adj_fail = spec.primary_family({"H1": 0.03, "H2": 0.04, "H3": 0.001, "H4": 0.2}, cfg)
-    assert spec.headline(prim, anchor, adj_fail, cfg)["H1"] == "not supported"  # Holm: 0.03·3 > 0.05
+    assert out == {
+        "H1": "general",
+        "H1b": "model-specific",
+        "H2": "model-specific",
+        "H3": "model-specific",
+        "H4": "model-specific",
+    }
+    adj_fail = spec.primary_family({"H1": 0.03, "H1b": 0.5, "H2": 0.04, "H3": 0.001, "H4": 0.2}, cfg)
+    assert set(adj_fail) == {"H1", "H1b", "H2", "H3", "H4"}  # Holm over five tests
+    assert adj_fail["H1"] == pytest.approx(0.12)  # 0.03 · 4 (the 2nd smallest of five)
+    assert spec.headline(prim, anchor, adj_fail, cfg)["H1"] == "not supported"
 
 
 def test_directional_h2_needs_both_signs() -> None:

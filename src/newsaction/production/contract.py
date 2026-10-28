@@ -93,6 +93,31 @@ ENTRIES: Final = (
         "val-A / val-B targets; no test row",
     ),
     Entry(
+        "artifacts/NA-11/canary_baseline_na11.parquet",
+        "`newsaction.production.canary_check.run`",
+        "`artifacts/NA-05/canary_v1.jsonl`; `cache/decisions.sqlite` (chunk NA-11)",
+        "`model`, `model_build`, `canary_id`, `question`, `option`, `p`, `renormalized`, `key`, `repeat_idx` "
+        "(NA-05's `canary_baseline.parquet` format)",
+        "(`model`, `canary_id`, `question`, `option`, `repeat_idx`) unique",
+        "canary baselines of d1-ultra, span-02 and drex-v2.0 (no NA-05 baseline): repeat 0 of all 50 items "
+        "and "
+        "repeats 1–4 of the 20 train Call A items",
+        "train and synthetic canary states; no target",
+    ),
+    Entry(
+        "artifacts/NA-11/canary_drift_na06.csv",
+        "`newsaction.production.canary_check.run`",
+        "`artifacts/NA-11/canary_baseline_na11.parquet`, `work/dm/tournament/stage2.parquet`, "
+        "`cache/decisions.sqlite` (NA-06 and NA-11 rows)",
+        "`model`, `canary_noise_mean_abs_dp`, `canary_noise_per_repeat`, `drift_mean_abs_dp_vs_na06`, "
+        "`drift_pairs`, `same_state_noise_mean_abs_dp`, `builds_na06`, `builds_now`, `stop`",
+        "`model` unique",
+        "repeat noise of the new baselines and the drift of 100 NA-06 stage-2 answers per model (operator "
+        "rule: "
+        "STOP if the drift exceeds the noise)",
+        "val-A states; no target",
+    ),
+    Entry(
         "artifacts/NA-11/key_usage.json",
         "`newsaction.production.record_key_usage`",
         "OpenRouter GET /api/v1/key and /api/v1/credits; `ledgers/spend.jsonl`",

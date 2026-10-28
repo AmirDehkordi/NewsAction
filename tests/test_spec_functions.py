@@ -257,6 +257,12 @@ def test_sigma60_rescale_and_robustness_variants() -> None:
         "timing_04:00_08:00",
         "timing_08:00_09:15",
     }
+    assert "w0_cutoff_08:00_approx" in names
+    assert (names["w0_cutoff_08:00_approx"]["latest_et"] < 480).all()
+    df["a0_n_hat"], df["z_on"], df["z_id"], df["z_cc"] = (rng.normal(0, 1, n) for _ in range(4))
+    rob = spec.robustness(df, "test", fast(200), sessions, "D0")
+    assert set(rob) == set(names)
+    assert all({"H1", "H1b", "ic"} <= set(r) for r in rob.values())  # every H1 re-run re-runs H1b
     d2_names = dict(spec.robustness_variants(df, spec.load_config(), sessions, "D2"))
     assert "without_price_move_text" not in d2_names and not any(k.startswith("timing_") for k in d2_names)
     no = names["non_overlapping"]

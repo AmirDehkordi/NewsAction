@@ -423,7 +423,12 @@ strategy:            # NA-11: PREREG §12 and A1.6 S-CONV (NA-13 implements)
         entry: open_t+1
         exits: [close_t+1, close_t+5, close_t+20]
     calendar_time: true
-  gating: {variant: secondary, percentile: 0.7, values: calibration.<model>.gates}
+  gating:
+    variant: secondary
+    percentile: 0.7
+    values: calibration.<model>.gates
+    points: [D0, D2]
+    d1: 'not run: no model has a val-A Call B D1 reading before production, so no frozen gate'
   costs_bp_per_side: [5, 10, 20]
   capacity_adv_share: 0.01
   deflated_sharpe_trials: ledgers/trials.jsonl

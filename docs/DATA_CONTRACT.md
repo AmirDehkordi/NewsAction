@@ -1406,7 +1406,25 @@ sha256 on a rerun (labels and export were run twice: 8 of 8 files identical).
 - **Key:** one JSON object
 - **Rows / coverage:** PRD NA-11 AC2: the spec end to end on val-B (29 steps; the ridge protocol's splits shifted)
 - **Availability:** val-A / val-B targets; no test row
-- **sha256:** `6f78ea81363eb4814544a219b7d5b24b27e5fec98fc3ba866a3c0c1157269ce5`
+- **sha256:** `110db5b0bda03f7e55903a03eef51694a840172150c6d193ea8a1ef423ceed2c`
+
+### `artifacts/NA-11/canary_baseline_na11.parquet`
+- **Producer:** `newsaction.production.canary_check.run`
+- **Inputs:** `artifacts/NA-05/canary_v1.jsonl`; `cache/decisions.sqlite` (chunk NA-11)
+- **Schema:** `model`, `model_build`, `canary_id`, `question`, `option`, `p`, `renormalized`, `key`, `repeat_idx` (NA-05's `canary_baseline.parquet` format)
+- **Key:** (`model`, `canary_id`, `question`, `option`, `repeat_idx`) unique
+- **Rows / coverage:** canary baselines of d1-ultra, span-02 and drex-v2.0 (no NA-05 baseline): repeat 0 of all 50 items and repeats 1–4 of the 20 train Call A items
+- **Availability:** train and synthetic canary states; no target
+- **sha256:** `d091b3d1140984fca3be9d724f786824dd5436d7cc049c090b03cdca1731ae75`
+
+### `artifacts/NA-11/canary_drift_na06.csv`
+- **Producer:** `newsaction.production.canary_check.run`
+- **Inputs:** `artifacts/NA-11/canary_baseline_na11.parquet`, `work/dm/tournament/stage2.parquet`, `cache/decisions.sqlite` (NA-06 and NA-11 rows)
+- **Schema:** `model`, `canary_noise_mean_abs_dp`, `canary_noise_per_repeat`, `drift_mean_abs_dp_vs_na06`, `drift_pairs`, `same_state_noise_mean_abs_dp`, `builds_na06`, `builds_now`, `stop`
+- **Key:** `model` unique
+- **Rows / coverage:** repeat noise of the new baselines and the drift of 100 NA-06 stage-2 answers per model (operator rule: STOP if the drift exceeds the noise)
+- **Availability:** val-A states; no target
+- **sha256:** `b6b9f058dd139b310c90f999ff49c291a5eecc6df27ac75ab3df90325b2f2cf4`
 
 ### `artifacts/NA-11/key_usage.json`
 - **Producer:** `newsaction.production.record_key_usage`
@@ -1415,4 +1433,4 @@ sha256 on a rerun (labels and export were run twice: 8 of 8 files identical).
 - **Key:** one entry per check, in time order
 - **Rows / coverage:** the key's usage before and after each NA-11 paid batch (operator preamble item 6)
 - **Availability:** account metadata; no data
-- **sha256:** `c5007f3d797ab979ed8e5c2167c2a7571668ca8628be91392b917b6e367a2835`
+- **sha256:** `07b34e4be36bf0da1ca08cd86e9df329f728bc5b5a30ef827597475470ce28a2`

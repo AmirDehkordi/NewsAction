@@ -74,7 +74,17 @@ trained:                          # S7: inference only with the frozen runs (sel
     - {name: b1, states: B_D1, splits: [val_a, val_b], questions: [react, cont]}
     - {name: a0, states: A_D0, splits: [robustness], questions: [react, mag]}
     - {name: a2, states: A_D2, splits: [robustness], questions: [react, mag]}
+    - {name: a0_flip_edit, states: probe_edits, splits: [val_a], questions: [react]}        # probes (below)
+    - {name: a0_shuffled, states: probe_shuffled, splits: [val_a], questions: [react]}
   max_gpu_hours: 3.0              # operator preamble: 6.62 h left until 2026-10-31; shown to the operator first
+
+probes:                           # disclosed val-A probes, not hypotheses (operator, 2026-10-28): reported next
+                                  # to the API models' §8.3 screens in NA-06's form; they change no selection
+  samples: dm/tournament/samples.parquet          # NA-06's probe events: unmasked_twin, shuffled, shuffle_donor
+  edits: dm/tournament/counterfactual.parquet     # NA-06's 200 edit pairs (edited states; originals in A_D0)
+  unmasked: states/samples/unmasked.parquet       # NA-04's 1,000 val-A unmasked twins: local models only
+  laya_zero_shot: [counterfactual_flip, masked_vs_unmasked, shuffled_news]   # local, core battery
+  trained: [counterfactual_flip, shuffled_news]   # in the S7 Kaggle export: masked states only (CLAUDE.md D16)
 
 ablations:                        # S8 (PREREG §11.6): the API comparator, core battery
   model: liquid/d1-ultra

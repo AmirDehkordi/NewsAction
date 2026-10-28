@@ -29,9 +29,12 @@ numbers. Nothing here reads a file, so nothing here can reach a blinded target; 
 **Sample** (``eval_sample``): the rows of the split outside the embargo (§4.2); purged targets are NaN
 (§4.1) and drop out of each analysis that needs them.
 
-**Primary (§1.1, Holm at 0.05 over H1–H4).**
+**Primary (§1.1 and H1b, Holm at 0.05 over H1, H1b, H2, H3, H4).**
 - **H1** (``h1``): D0 events. Daily IC(N̂_W0, z_on) − daily IC(N̂_W0, z_id) on the sessions with both; H1:
   mean > 0; stationary block bootstrap over sessions (centred one-sided p, ``metrics``).
+- **H1b** (``h1b``; PREREG §15 NA-11 row): D0 events. Mean daily IC(N̂_W0, z_id) > 0 (not fully priced at
+  the open), on H1's sample and bootstrap draws. ``primary_d0`` runs H1 and H1b together, and every
+  robustness re-run of H1 re-runs H1b (``robustness``).
 - **H2** (``h2``): y = a + b·N̂ + c·G + day × tier FE (``inference.ols_fe``), two-way clustered (session,
   company). D2 is primary (y = y2, G = z_cc,t, N̂ from Call A on W2 news since anchoring is present, §8.4);
   D1 (y1, G_D1, N̂_W0) and D0 (y0 = z_id, no G) are reported. H2's p is the intersection–union p
@@ -151,6 +154,11 @@ class H1Cfg(_Strict):
     signal: str
     gap: str
     after_open: str
+
+
+class H1bCfg(_Strict):
+    signal: str
+    target: str
 
 
 class PointCfg(_Strict):
@@ -282,6 +290,7 @@ class RobustnessCfg(_Strict):
     non_overlap_sessions: int
     sigma60: Sigma60Cfg
     timing_strata_et: tuple[str, str, str]
+    cutoff_approx_et: str
     price_move_text: str
     live_format: str
 
@@ -294,6 +303,7 @@ class AnalysisConfig(_Strict):
     inference: InferenceCfg
     multiple_testing: MultipleCfg
     h1: H1Cfg
+    h1b: H1bCfg
     h2: H2Cfg
     h3: H3Cfg
     h4: H4Cfg
@@ -559,6 +569,26 @@ def h1(frame_d0: pd.DataFrame, split: str, cfg: AnalysisConfig, signal: str | No
             f"{name}_ci_high": e.ci_high,
         }
     return out
+
+
+def h1b(frame_d0: pd.DataFrame, split: str, cfg: AnalysisConfig, signal: str | None = None) -> dict[str, Any]:
+    """H1b (PREREG §15 NA-11 row): not fully priced at the open. Mean daily IC(N̂_W0, z_id) > 0 on D0 events,
+    one-sided, on H1's sample and bootstrap draws."""
+    c = cfg.h1b
+    sig = signal or c.signal
+    s = _complete(eval_sample(frame_d0, split, cfg), [sig])
+    boot = bootstrap_for(s, cfg)
+    est = mx.daily_mean_estimate(
+        daily(s, sig, c.target, cfg), boot, cfg.metrics.nw_lags, cfg.bootstrap.ci, "greater", len(s)
+    )
+    return {"test": "H1b", "split": split, "signal": sig, "target": c.target, **est.as_dict()}
+
+
+def primary_d0(
+    frame_d0: pd.DataFrame, split: str, cfg: AnalysisConfig, signal: str | None = None
+) -> dict[str, dict[str, Any]]:
+    """H1 and H1b together: every analysis that re-runs H1 re-runs H1b (PREREG §15 NA-11 row)."""
+    return {"H1": h1(frame_d0, split, cfg, signal), "H1b": h1b(frame_d0, split, cfg, signal)}
 
 
 def ic_targets(
@@ -1608,6 +1638,23 @@ def robustness_variants(
     if "price_move_text" in frame.columns:
         yield "without_price_move_text", frame.loc[~frame["price_move_text"].fillna(False).astype(bool)]
     if "latest_et" in frame.columns:
+        h, m = (int(x) for x in cfg.robustness.cutoff_approx_et.split(":"))
+        early = frame["latest_et"].to_numpy(dtype=float) < h * 60 + m
+        yield f"w0_cutoff_{cfg.robustness.cutoff_approx_et}_approx", frame.loc[early]
         st = timing_stratum(frame["latest_et"].to_numpy(dtype=float), cfg)
         for name in sorted({x for x in st if x is not None}):
             yield f"timing_{name}", frame.loc[st == name]
+
+
+def robustness(
+    frame: pd.DataFrame, split: str, cfg: AnalysisConfig, sessions: Sequence[date], point: Point = "D0"
+) -> dict[str, dict[str, Any]]:
+    """Every ``robustness_variants`` frame re-run: at D0, H1 and H1b and the ICs of N̂ with z_cc, z_on and z_id
+    (the operator row's report for (a) and (b)); at D2, H2."""
+    out: dict[str, dict[str, Any]] = {}
+    for name, f in robustness_variants(frame, cfg, sessions, point):
+        if point == "D0":
+            out[name] = {**primary_d0(f, split, cfg), "ic": ic_targets(f, split, cfg)}
+        else:
+            out[name] = {"H2": h2(f, split, cfg, point)}
+    return out

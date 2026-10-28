@@ -14,6 +14,7 @@ from newsaction.ledger import TEST_ACCESS, AccessLedger
 from newsaction.paths import Layout
 from newsaction.production import ProductionError
 from newsaction.production import freeze as fz
+from newsaction.provenance import utc_now_iso
 
 
 def _set(lay: Layout, key: str, value: object) -> None:
@@ -23,14 +24,14 @@ def _set(lay: Layout, key: str, value: object) -> None:
     path.write_text(yaml.safe_dump(doc, sort_keys=False, allow_unicode=True), encoding="utf-8")
 
 
-def _cache_row(lay: Layout, split: str, session: str) -> None:
+def _cache_row(lay: Layout, split: str, session: str, created: str = "2026-10-28T10:00:00+00:00") -> None:
     path = lay.root / "cache" / "decisions.sqlite"
     path.parent.mkdir(exist_ok=True)
     con = sqlite3.connect(path)
     con.execute("CREATE TABLE IF NOT EXISTS responses (created_at TEXT, key TEXT, meta_json TEXT)")
     con.execute(
         "INSERT INTO responses VALUES (?, ?, ?)",
-        ("2026-10-28T10:00:00+00:00", "k1", json.dumps({"split": split, "session": session})),
+        (created, f"k-{split}-{session}", json.dumps({"split": split, "session": session})),
     )
     con.commit()
     con.close()
@@ -77,7 +78,7 @@ def test_freeze_flow_and_order_evidence(tmp_layout: Layout) -> None:
     ev = fz.evidence(tmp_layout)
     assert ev["order_ok"] and ev["first_reactions_access"] is None and ev["targets_entries"] == 0
     lock.sealed_path("prices_raw_2026", "reactions", layout=tmp_layout)  # after the freeze: allowed, logged
-    _cache_row(tmp_layout, "test", "2026-01-05")  # created later than the freeze (its ts is a later instant)
+    _cache_row(tmp_layout, "test", "2026-01-05", created=utc_now_iso())  # a 2026 state sent after the freeze
     ev = fz.evidence(tmp_layout)
     assert ev["first_reactions_access"] > ev["freeze_ts"] and ev["order_ok"]
     with pytest.raises(ProductionError, match="already frozen"):

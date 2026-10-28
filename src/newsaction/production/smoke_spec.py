@@ -74,8 +74,8 @@ def run(layout: Layout | None = None) -> dict[str, Any]:
         s = time.time()
         out["steps"][name] = {"result": _jsonable(fn()), "seconds": round(time.time() - s, 1)}
 
-    p, a = d0["laya_fin"], d0["anchor"]
-    step("h1", lambda: {m: spec.h1(d0[m], SPLIT, cfg) for m in ("laya_fin", "anchor")})
+    p = d0["laya_fin"]
+    step("h1_h1b", lambda: {m: spec.primary_d0(d0[m], SPLIT, cfg) for m in ("laya_fin", "anchor")})
     step("ic_targets", lambda: {m: spec.ic_targets(d0[m], SPLIT, cfg) for m in d0})
     step("h2_d2", lambda: {m: spec.h2(d2[m], SPLIT, cfg, "D2") for m in ("laya_fin", "anchor")})
     step("h2_d1", lambda: spec.h2(p, SPLIT, cfg, "D1"))
@@ -88,14 +88,12 @@ def run(layout: Layout | None = None) -> dict[str, Any]:
     }
     step("h3", lambda: spec.h3(d2["laya_fin"], cfg, trained_groups))
     step("h4", lambda: spec.h4(p, cfg, list(cfg.groups.h4_news_trained)))
-    prim = {
-        "H1": spec.directional(out["steps"]["h1"]["result"]["laya_fin"] | {"test": "H1"}),
-        "H2": spec.directional(spec.h2(d2["laya_fin"], SPLIT, cfg, "D2")),
-    }
-    anch = {
-        "H1": spec.directional(spec.h1(a, SPLIT, cfg)),
-        "H2": spec.directional(spec.h2(d2["anchor"], SPLIT, cfg)),
-    }
+    prim_d0 = out["steps"]["h1_h1b"]["result"]["laya_fin"]
+    anch_d0 = out["steps"]["h1_h1b"]["result"]["anchor"]
+    prim = {k: spec.directional(prim_d0[k] | {"test": k}) for k in ("H1", "H1b")}
+    prim["H2"] = spec.directional(spec.h2(d2["laya_fin"], SPLIT, cfg, "D2"))
+    anch = {k: spec.directional(anch_d0[k] | {"test": k}) for k in ("H1", "H1b")}
+    anch["H2"] = spec.directional(spec.h2(d2["anchor"], SPLIT, cfg))
     adj = spec.primary_family({k: v["p"] for k, v in prim.items()}, cfg)
     step("headline", lambda: {"adjusted": adj, "verdicts": spec.headline(prim, anch, adj, cfg)})
     step("heterogeneity", lambda: spec.heterogeneity(d2["laya_fin"], SPLIT, cfg))
@@ -142,20 +140,13 @@ def run(layout: Layout | None = None) -> dict[str, Any]:
     step("h5_ladder", lambda: spec.h5(dd, cfg, cfg.explanation.ladder_steps_trained))
     step("sector", lambda: spec.sector_ic(p, SPLIT, cfg))
     sessions = sorted(d2b["session"].unique())
-    step(
-        "robustness_h1",
-        lambda: {k: spec.h1(f, SPLIT, cfg) for k, f in spec.robustness_variants(p, cfg, sessions)},
-    )
-    step(
-        "robustness_h2",
-        lambda: {
-            k: spec.h2(f, SPLIT, cfg, "D2")
-            for k, f in spec.robustness_variants(d2["laya_fin"], cfg, sessions, "D2")
-        },
-    )
+    step("robustness_d0", lambda: spec.robustness(p, SPLIT, cfg, sessions, "D0"))
+    step("robustness_d2", lambda: spec.robustness(d2["laya_fin"], SPLIT, cfg, sessions, "D2"))
     means = spec.placebo_means(days, ["y2", "z_on", "z_id"])
     step("placebo_h2", lambda: spec.h2(spec.placebo_adjust(d2["laya_fin"], means, ["y2"]), SPLIT, cfg, "D2"))
-    step("placebo_h1", lambda: spec.h1(spec.placebo_adjust(p, means, ["z_on", "z_id"]), SPLIT, cfg))
+    step(
+        "placebo_h1_h1b", lambda: spec.primary_d0(spec.placebo_adjust(p, means, ["z_on", "z_id"]), SPLIT, cfg)
+    )
     step(
         "mechanism_vendor",
         lambda: spec.mechanism_cuts(

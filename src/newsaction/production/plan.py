@@ -62,6 +62,14 @@ class TrainedPlan(_Strict):
     max_gpu_hours: float = Field(gt=0)
 
 
+class ProbesPlan(_Strict):
+    samples: str
+    edits: str
+    unmasked: str
+    laya_zero_shot: tuple[Literal["counterfactual_flip", "masked_vs_unmasked", "shuffled_news"], ...]
+    trained: tuple[Literal["counterfactual_flip", "shuffled_news"], ...]
+
+
 class AblationCall(_Strict):
     name: str
     base: str
@@ -105,6 +113,7 @@ class ProductionPlan(_Strict):
     comparators_core: tuple[Component, ...]
     laya_zero_shot: LocalPlan
     trained: TrainedPlan
+    probes: ProbesPlan
     ablations: AblationPlan
     llm_baseline: LlmPlan
     price_only: dict[str, tuple[str, ...]]

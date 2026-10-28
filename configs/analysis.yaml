@@ -30,7 +30,7 @@ inference:                        # PREREG §11.3
   dk_lags: 5                      # Driscoll–Kraay robustness
 
 multiple_testing:
-  primary: {method: holm, alpha: 0.05, tests: [H1, H2, H3, H4]}          # §1.1
+  primary: {method: holm, alpha: 0.05, tests: [H1, H1b, H2, H3, H4]}     # §1.1 and H1b (PREREG §15 NA-11 row)
   secondary: {method: bh, q: 0.10}                                         # §1.2, A1.4, A3.4
   heterogeneity: {method: bh, q: 0.10}                                     # §1.2 cuts (operator row: one family)
 
@@ -38,6 +38,9 @@ h1:                               # §1.1 H1: D0 events, Call A on W0 news
   signal: a0_n_hat
   gap: z_on
   after_open: z_id
+h1b:                              # PREREG §15 NA-11 row (operator, before the freeze): not fully priced at the open
+  signal: a0_n_hat                # D0 events: mean daily IC(N̂_W0, z_id) > 0, one-sided, computed like H1
+  target: z_id
 h2:                               # §1.1 H2 (central): y = a + b·N̂ + c·G + day × tier FE
   primary_point: D2               # §1.1: D2 primary; D1 with the NA-10 bars; D0 is the tradeable y0 version
   points:
@@ -144,5 +147,6 @@ robustness:                       # §11.6 and the operator row (a)–(b); each 
   non_overlap_sessions: 5
   sigma60: {window: 60, min_obs: 40}
   timing_strata_et: ["04:00", "08:00", "09:15"]   # latest W0 article: before 04:00, 04:00–08:00, 08:00–09:15
+  cutoff_approx_et: "08:00"      # §11.6's 08:00 W0 cutoff, approximated: events whose latest W0 article is earlier
   price_move_text: '(?i)\b(?:shares|stock)\b[^.;:|]{0,40}?\b(?:rose|rise[sn]?|rising|jump\w*|surg\w*|soar\w*|climb\w*|gain\w*|rall(?:y|ied|ies|ying)|advanc\w*|fell|fall(?:s|ing|en)?|drop\w*|slid\w*|slip\w*|slump\w*|tumbl\w*|plung\w*|sank|sink\w*|declin\w*|(?:edg|tick|trad|mov|head|trend)\w*\s+(?:up|down|higher|lower)|(?:are|is|was|were)\s+(?:up|down|higher|lower))\b|\bpre-?\s?market\b|\bafter[- ]?hours\b|\btoday\b|stock market (?:today|news today|live)\b|\blive (?:updates?|coverage|blog)\b|\bmarkets news,|\blive markets\b'
   live_format: '(?i)stock market (?:today|news today|live)\b|\blive (?:updates?|coverage|blog)\b|\bmarkets news,|\blive markets\b|(?:nasdaq|dow jones|dow|s&p 500|s&p|wall street|markets?)\s+today\s*:'

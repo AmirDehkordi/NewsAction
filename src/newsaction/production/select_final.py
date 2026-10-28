@@ -333,6 +333,8 @@ def strategy_entry() -> dict[str, Any]:
             "variant": "secondary",
             "percentile": GATE_PERCENTILE,
             "values": "calibration.<model>.gates",
+            "points": ["D0", "D2"],
+            "d1": "not run: no model has a val-A Call B D1 reading before production, so no frozen gate",
         },
         "costs_bp_per_side": [5, 10, 20],
         "capacity_adv_share": 0.01,

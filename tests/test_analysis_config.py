@@ -23,10 +23,12 @@ def test_numbers_match_prereg() -> None:
     assert "Holm-corrected, family α = 0.05" in PREREG
     assert cfg.multiple_testing.primary.alpha == 0.05 and cfg.multiple_testing.primary.tests == (
         "H1",
+        "H1b",
         "H2",
         "H3",
         "H4",
     )
+    assert (cfg.h1b.signal, cfg.h1b.target) == ("a0_n_hat", "z_id")  # H1b: PREREG §15 NA-11 row
     assert "Benjamini–Hochberg, q = 0.10" in PREREG
     assert cfg.multiple_testing.secondary.q == cfg.multiple_testing.heterogeneity.q == 0.10
     assert "Driscoll–Kraay (5 lags)" in PREREG and cfg.inference.dk_lags == 5
