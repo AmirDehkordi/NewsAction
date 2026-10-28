@@ -198,8 +198,8 @@ def test_panel(layout: Layout | None = None) -> tuple[pd.DataFrame, dict[str, An
 
 
 def rehearse(layout: Layout | None = None) -> dict[str, Any]:
-    """The test build's route with empty blinded frames (nothing is read through the lock): its val-B rows must
-    equal the public build's."""
+    """The test build's route with empty blinded frames (nothing is read through the lock): its val-B rows
+    must equal the public build's."""
     from newsaction.bars import derive
 
     lay = resolve_layout(layout)
