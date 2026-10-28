@@ -84,6 +84,133 @@ ENTRIES: Final = (
         "D1 (10:00 ET); built only after the freeze",
     ),
     Entry(
+        "work/dm/production/local_laya_typed_decisions_probes.parquet",
+        '`newsaction.production.laya_local.run("probes")`',
+        "NA-06's probe builders (`tournament.run`: counterfactual edits, unmasked twins, shuffled news) on "
+        "`work/states/callA_d0_E3.parquet` and `work/states/samples/*.parquet`; `cache/decisions.sqlite`",
+        "`newsaction.production.run.readings` (NA-06's `derived_frame` columns: `key`, `model`, `event_id`, "
+        "`tag`, `repeat_idx`, `ok`, `valid`, `model_build`, `cost`, `latency_ms`, `n_hat`, `m`, `surprise`, "
+        "`tone`, confidences; plus `q1`, `conf3`, `source`, `split`, `probe`)",
+        "(`probe`, `event_id`) unique",
+        "the operator's disclosed val-A probes for Laya zero-shot: flip_edit 200, flip_orig 200, unmasked "
+        "1,000, masked_twin 1,000, shuffled 1,000 (3,400 rows)",
+        "val-A D0; run locally (the unmasked states never leave this machine); probes, not hypotheses",
+    ),
+    Entry(
+        "work/dm/production/local_laya_typed_decisions_test.parquet",
+        '`newsaction.production.laya_local.run("test")`',
+        "`work/states/callA_d0_E3.parquet` (test rows, after the freeze); `cache/decisions.sqlite`",
+        "`newsaction.production.run.readings` (NA-06's `derived_frame` columns: `key`, `model`, `event_id`, "
+        "`tag`, `repeat_idx`, `ok`, `valid`, `model_build`, `cost`, `latency_ms`, `n_hat`, `m`, `surprise`, "
+        "`tone`, confidences; plus `q1`, `conf3`, `source`, `split`)",
+        "`event_id` unique",
+        "Laya zero-shot's test Call A at D0, core battery (PREREG §10.5 comparator)",
+        "D0 (09:15 ET); local model, nothing sent to a third party",
+    ),
+    Entry(
+        "work/dm/production/liquid_d1_ultra_api_comparators_market.parquet",
+        '`newsaction.production.run.run(["api", "comparators", "market"])` (S6)',
+        "the state files of `configs/production.yaml` `states`; `cache/decisions.sqlite` (chunk NA-11)",
+        "`newsaction.production.run.readings` (NA-06's `derived_frame` columns: `key`, `model`, `event_id`, "
+        "`tag`, `repeat_idx`, `ok`, `valid`, `model_build`, `cost`, `latency_ms`, `n_hat`, `m`, `surprise`, "
+        "`tone`, confidences; plus `q1`, `conf3`, `source`, `split`, `component`; market rows: `n_hat`, "
+        "`label_market_reason`, "
+        "`plabel_market_reason`)",
+        "(`component`, `event_id`) unique",
+        "liquid/d1-ultra: the full plan: Call A D0/D2 (core + extended), Call B D2 (core) and D1 (core + "
+        "explain), the 2024-H1 A0/A2 core, the A3.5 market states",
+        "the readings' window (`source`: a0 = W0, a2 = W2, b2 = D2, b1 = D1, m = market); test rows sent "
+        "after the freeze",
+    ),
+    Entry(
+        "work/dm/production/respan_span_02_api_comparators_market.parquet",
+        '`newsaction.production.run.run(["api", "comparators", "market"])` (S6)',
+        "the state files of `configs/production.yaml` `states`; `cache/decisions.sqlite` (chunk NA-11)",
+        "`newsaction.production.run.readings` (NA-06's `derived_frame` columns: `key`, `model`, `event_id`, "
+        "`tag`, `repeat_idx`, `ok`, `valid`, `model_build`, `cost`, `latency_ms`, `n_hat`, `m`, `surprise`, "
+        "`tone`, confidences; plus `q1`, `conf3`, `source`, `split`, `component`; market rows: `n_hat`, "
+        "`label_market_reason`, "
+        "`plabel_market_reason`)",
+        "(`component`, `event_id`) unique",
+        "respan/span-02: core Call A D0 on val-B and test (comparator; screen-failing, model-specific)",
+        "the readings' window (`source`: a0 = W0, a2 = W2, b2 = D2, b1 = D1, m = market); test rows sent "
+        "after the freeze",
+    ),
+    Entry(
+        "work/dm/production/nace_ai_drex_v2_0_api_comparators_market.parquet",
+        '`newsaction.production.run.run(["api", "comparators", "market"])` (S6)',
+        "the state files of `configs/production.yaml` `states`; `cache/decisions.sqlite` (chunk NA-11)",
+        "`newsaction.production.run.readings` (NA-06's `derived_frame` columns: `key`, `model`, `event_id`, "
+        "`tag`, `repeat_idx`, `ok`, `valid`, `model_build`, `cost`, `latency_ms`, `n_hat`, `m`, `surprise`, "
+        "`tone`, confidences; plus `q1`, `conf3`, `source`, `split`, `component`; market rows: `n_hat`, "
+        "`label_market_reason`, "
+        "`plabel_market_reason`)",
+        "(`component`, `event_id`) unique",
+        "nace-ai/drex-v2.0: core Call A D0 on val-B and test (comparator; screen-failing, model-specific)",
+        "the readings' window (`source`: a0 = W0, a2 = W2, b2 = D2, b1 = D1, m = market); test rows sent "
+        "after the freeze",
+    ),
+    Entry(
+        "work/kaggle/dataset_na11/test_callB.parquet",
+        "`newsaction.production.kaggle_infer.export` (S7)",
+        "NA-04 / NA-11 state files of `configs/production.yaml` `trained.export`; `configs/training.yaml` "
+        "questions (Laya's input format)",
+        "NA-08's evaluation columns (`example_id`, `event_id`, `split`, `call`, `window`, `variant`, "
+        "`question_id`, `state_json`, `question_json`, `n_tokens_state`); no label column",
+        "`example_id` unique",
+        "test Call B at D2 (18,625 states) and D1 (13,977), questions react and cont",
+        "masked, third-party-OK states only (CLAUDE.md D15-D16); uploaded as the private Kaggle dataset "
+        "`amirdehkordi98/newsaction-na11-infer`",
+    ),
+    Entry(
+        "work/kaggle/dataset_na11/val_callB_d1.parquet",
+        "`newsaction.production.kaggle_infer.export` (S7)",
+        "NA-04 / NA-11 state files of `configs/production.yaml` `trained.export`; `configs/training.yaml` "
+        "questions (Laya's input format)",
+        "NA-08's evaluation columns (`example_id`, `event_id`, `split`, `call`, `window`, `variant`, "
+        "`question_id`, `state_json`, `question_json`, `n_tokens_state`); no label column",
+        "`example_id` unique",
+        "val-A and val-B Call B at D1 (14,941 states), react and cont",
+        "masked, third-party-OK states only (CLAUDE.md D15-D16); uploaded as the private Kaggle dataset "
+        "`amirdehkordi98/newsaction-na11-infer`",
+    ),
+    Entry(
+        "work/kaggle/dataset_na11/robustness_callA.parquet",
+        "`newsaction.production.kaggle_infer.export` (S7)",
+        "NA-04 / NA-11 state files of `configs/production.yaml` `trained.export`; `configs/training.yaml` "
+        "questions (Laya's input format)",
+        "NA-08's evaluation columns (`example_id`, `event_id`, `split`, `call`, `window`, `variant`, "
+        "`question_id`, `state_json`, `question_json`, `n_tokens_state`); no label column",
+        "`example_id` unique",
+        "Call A at D0 (2,793) and D2 (3,887) of the robustness split, react and mag",
+        "masked, third-party-OK states only (CLAUDE.md D15-D16); uploaded as the private Kaggle dataset "
+        "`amirdehkordi98/newsaction-na11-infer`",
+    ),
+    Entry(
+        "work/kaggle/dataset_na11/probes.parquet",
+        "`newsaction.production.kaggle_infer.export` (S7)",
+        "NA-04 / NA-11 state files of `configs/production.yaml` `trained.export`; `configs/training.yaml` "
+        "questions (Laya's input format)",
+        "NA-08's evaluation columns (`example_id`, `event_id`, `split`, `call`, `window`, `variant`, "
+        "`question_id`, `state_json`, `question_json`, `n_tokens_state`); no label column",
+        "`example_id` unique",
+        "NA-06's 200 counterfactual edits (flip_edit) and 1,000 shuffled-news states (shuffled), react",
+        "masked, third-party-OK states only (CLAUDE.md D15-D16); uploaded as the private Kaggle dataset "
+        "`amirdehkordi98/newsaction-na11-infer`",
+    ),
+    Entry(
+        "work/kaggle/dataset_na11/check_val_a.parquet",
+        "`newsaction.production.kaggle_infer.export` (S7)",
+        "NA-04 / NA-11 state files of `configs/production.yaml` `trained.export`; `configs/training.yaml` "
+        "questions (Laya's input format)",
+        "NA-08's evaluation columns (`example_id`, `event_id`, `split`, `call`, `window`, `variant`, "
+        "`question_id`, `state_json`, `question_json`, `n_tokens_state`); no label column",
+        "`example_id` unique",
+        "500 val-A D0 react examples of NA-08's export, re-predicted to check the checkpoint",
+        "masked, third-party-OK states only (CLAUDE.md D15-D16); uploaded as the private Kaggle dataset "
+        "`amirdehkordi98/newsaction-na11-infer`",
+    ),
+    Entry(
         "artifacts/NA-11/final_selection.csv",
         "`newsaction.production.select_final`",
         "`work/kaggle/predictions/{laya_fin,anchor}_{val_a,val_b}.parquet` (the frozen runs), "

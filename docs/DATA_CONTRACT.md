@@ -1399,6 +1399,60 @@ sha256 on a rerun (labels and export were run twice: 8 of 8 files identical).
 - **Availability:** D1 (10:00 ET); built only after the freeze
 - **sha256:** `c0c047b8511fff75b61295bc957e724f7d784132398b7ee744a1b5a52f622f77`
 
+### `work/dm/production/local_laya_typed_decisions_probes.parquet`
+- **Producer:** `newsaction.production.laya_local.run("probes")`
+- **Inputs:** NA-06's probe builders (`tournament.run`: counterfactual edits, unmasked twins, shuffled news) on `work/states/callA_d0_E3.parquet` and `work/states/samples/*.parquet`; `cache/decisions.sqlite`
+- **Schema:** `newsaction.production.run.readings` (NA-06's `derived_frame` columns: `key`, `model`, `event_id`, `tag`, `repeat_idx`, `ok`, `valid`, `model_build`, `cost`, `latency_ms`, `n_hat`, `m`, `surprise`, `tone`, confidences; plus `q1`, `conf3`, `source`, `split`, `probe`)
+- **Key:** (`probe`, `event_id`) unique
+- **Rows / coverage:** the operator's disclosed val-A probes for Laya zero-shot: flip_edit 200, flip_orig 200, unmasked 1,000, masked_twin 1,000, shuffled 1,000 (3,400 rows)
+- **Availability:** val-A D0; run locally (the unmasked states never leave this machine); probes, not hypotheses
+- **sha256:** `9b970744dc75c9249a73b2dddefe23ebfbf175836cbce7ecfb10fce618ab9d06`
+
+### `work/kaggle/dataset_na11/test_callB.parquet`
+- **Producer:** `newsaction.production.kaggle_infer.export` (S7)
+- **Inputs:** NA-04 / NA-11 state files of `configs/production.yaml` `trained.export`; `configs/training.yaml` questions (Laya's input format)
+- **Schema:** NA-08's evaluation columns (`example_id`, `event_id`, `split`, `call`, `window`, `variant`, `question_id`, `state_json`, `question_json`, `n_tokens_state`); no label column
+- **Key:** `example_id` unique
+- **Rows / coverage:** test Call B at D2 (18,625 states) and D1 (13,977), questions react and cont
+- **Availability:** masked, third-party-OK states only (CLAUDE.md D15-D16); uploaded as the private Kaggle dataset `amirdehkordi98/newsaction-na11-infer`
+- **sha256:** `4f530b780ccd77b90ef012f111ca2b1aaaf5ac96e5b863f12a77c2f6cb737157`
+
+### `work/kaggle/dataset_na11/val_callB_d1.parquet`
+- **Producer:** `newsaction.production.kaggle_infer.export` (S7)
+- **Inputs:** NA-04 / NA-11 state files of `configs/production.yaml` `trained.export`; `configs/training.yaml` questions (Laya's input format)
+- **Schema:** NA-08's evaluation columns (`example_id`, `event_id`, `split`, `call`, `window`, `variant`, `question_id`, `state_json`, `question_json`, `n_tokens_state`); no label column
+- **Key:** `example_id` unique
+- **Rows / coverage:** val-A and val-B Call B at D1 (14,941 states), react and cont
+- **Availability:** masked, third-party-OK states only (CLAUDE.md D15-D16); uploaded as the private Kaggle dataset `amirdehkordi98/newsaction-na11-infer`
+- **sha256:** `cab199f65b70d84431669c55624b57f4ac2474f7f6ddfdb6c01ef83fa914a5f0`
+
+### `work/kaggle/dataset_na11/robustness_callA.parquet`
+- **Producer:** `newsaction.production.kaggle_infer.export` (S7)
+- **Inputs:** NA-04 / NA-11 state files of `configs/production.yaml` `trained.export`; `configs/training.yaml` questions (Laya's input format)
+- **Schema:** NA-08's evaluation columns (`example_id`, `event_id`, `split`, `call`, `window`, `variant`, `question_id`, `state_json`, `question_json`, `n_tokens_state`); no label column
+- **Key:** `example_id` unique
+- **Rows / coverage:** Call A at D0 (2,793) and D2 (3,887) of the robustness split, react and mag
+- **Availability:** masked, third-party-OK states only (CLAUDE.md D15-D16); uploaded as the private Kaggle dataset `amirdehkordi98/newsaction-na11-infer`
+- **sha256:** `5d100f1ae17701e58b1ef4200b3e22b026775ddf33c08490c606086cbe1e3656`
+
+### `work/kaggle/dataset_na11/probes.parquet`
+- **Producer:** `newsaction.production.kaggle_infer.export` (S7)
+- **Inputs:** NA-04 / NA-11 state files of `configs/production.yaml` `trained.export`; `configs/training.yaml` questions (Laya's input format)
+- **Schema:** NA-08's evaluation columns (`example_id`, `event_id`, `split`, `call`, `window`, `variant`, `question_id`, `state_json`, `question_json`, `n_tokens_state`); no label column
+- **Key:** `example_id` unique
+- **Rows / coverage:** NA-06's 200 counterfactual edits (flip_edit) and 1,000 shuffled-news states (shuffled), react
+- **Availability:** masked, third-party-OK states only (CLAUDE.md D15-D16); uploaded as the private Kaggle dataset `amirdehkordi98/newsaction-na11-infer`
+- **sha256:** `28b853b283ce99fdfe114c9691b8e03ebdcce4c367ef696885743ca5cb67f4a5`
+
+### `work/kaggle/dataset_na11/check_val_a.parquet`
+- **Producer:** `newsaction.production.kaggle_infer.export` (S7)
+- **Inputs:** NA-04 / NA-11 state files of `configs/production.yaml` `trained.export`; `configs/training.yaml` questions (Laya's input format)
+- **Schema:** NA-08's evaluation columns (`example_id`, `event_id`, `split`, `call`, `window`, `variant`, `question_id`, `state_json`, `question_json`, `n_tokens_state`); no label column
+- **Key:** `example_id` unique
+- **Rows / coverage:** 500 val-A D0 react examples of NA-08's export, re-predicted to check the checkpoint
+- **Availability:** masked, third-party-OK states only (CLAUDE.md D15-D16); uploaded as the private Kaggle dataset `amirdehkordi98/newsaction-na11-infer`
+- **sha256:** `e14fed28384c312ce4a85ff6c316d497b2d724bce1fcc208cd6880aeb5c9d78a`
+
 ### `artifacts/NA-11/final_selection.csv`
 - **Producer:** `newsaction.production.select_final`
 - **Inputs:** `work/kaggle/predictions/{laya_fin,anchor}_{val_a,val_b}.parquet` (the frozen runs), `work/baselines/laya_zeroshot.parquet`, `work/dm/encoding/confirm.parquet`, `work/panel/panel_public.parquet`
@@ -1451,4 +1505,4 @@ sha256 on a rerun (labels and export were run twice: 8 of 8 files identical).
 - **Key:** one entry per check, in time order
 - **Rows / coverage:** the key's usage before and after each NA-11 paid batch (operator preamble item 6)
 - **Availability:** account metadata; no data
-- **sha256:** `2e8a413eba455987557efc18350a69518cb2ec34cd5379db51bb0cb6b88fd1f3`
+- **sha256:** `8819ceab6a21688290006a869f347eeb4daacc8607d6706b6cc0b082f0886397`
