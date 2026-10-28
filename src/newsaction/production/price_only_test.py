@@ -10,8 +10,9 @@ category lists are part of the model strings).
 - **Predictions**: N_hat (e5 booster), mag_hat = max(|z_cc| booster, 0), P_up / P_down from NA-09's val-A
   isotonic maps of N_hat. ``check`` first re-predicts NA-09's val-A and val-B rows from the same features
   and compares them with ``work/baselines/price_only.parquet``.
-- **D2** is not produced here: its ``react_z_on`` (z_on,t) is not among the frozen reactions' columns
-  (operator decision pending).
+- **D2** is not produced here (PREREG §15, the post-freeze NA-11 row on timing): its ``react_z_on`` is
+  z_on,t, also H1's outcome, which the frozen reaction builder does not output. NA-12 predicts it first
+  after unblinding, once its code reproduces NA-09's val-A and val-B D2 predictions exactly.
 
 Output: ``work/dm/production/price_only_test.parquet`` (NA-09's common schema). Run it in its own process:
 LightGBM is imported only inside ``_model`` (it and torch segfault in one process, NA-09).
