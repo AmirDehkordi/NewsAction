@@ -4,9 +4,11 @@
   t−5 to the close of t+20, anchored at close(t−1) = 0. The post-event points are ``spec.plateau_rungs``
   (the frozen helper, equal to ``targets.py``'s rungs) over k = 0 … 20, purged like every rung; a pre-event
   point is −ΣAR_cc from t−k+1 to t−1 over σ_cc,t (the price relative to close(t−1)).
-- **Figure 1** (``group_paths``): mean path per V decile (D0 events, V from W0 news) and per RG class (D2
-  events, PREREG §7 RG from Call A's W2 N̂ and G = z_cc,t), each with its mean V, plus the open, 10:00 and
-  day-t 30-minute points (``slot_path``) for the deciles.
+- **Figure 1** (``group_paths``): mean path per V decile (D0 events, V from W0 news; V is a step function of
+  N̂, so deciles rank by N̂, which orders events as V does and breaks V's ties) and per RG class (D2 events,
+  PREREG §7 RG from Call A's W2 N̂ and G = z_cc,t), each with its mean V, plus the open, 10:00 and day-t
+  30-minute points (``slot_path``) for the deciles. The RG classes are also given signed (``signed``:
+  sign(N̂)·CAR and sign(N̂)·V), so "Under" and "Over" read in the news' direction.
 - **Figure 2** (``drift_by_g``): mean sign(G)·y2 by |G| bin within terciles of news strength |V_W2|.
 - **Reliability bins** (``reliability``): ``metrics.ece``'s 15 equal-width bins of the top three-class
   probability: count, mean confidence, hit rate.
@@ -94,6 +96,15 @@ def group_paths(
                  "n_group": nv}
             )  # fmt: skip
     return rows
+
+
+def signed(frame: pd.DataFrame, by: str, columns: Sequence[str]) -> pd.DataFrame:
+    """``columns`` multiplied by sign(``by``): the path in the direction of the news."""
+    out = frame.copy()
+    s = np.sign(out[by].to_numpy(dtype=float))
+    for c in columns:
+        out[c] = out[c].to_numpy(dtype=float) * s
+    return out
 
 
 def deciles(x: pd.Series, q: int = 10) -> pd.Series:

@@ -1011,7 +1011,7 @@ def figures(ctx: Ctx) -> dict[str, Any]:
         d0 = spec.eval_sample(ctx.d0[key], ev, cfg).dropna(subset=["a0_v"])
         p0 = figdata.event_paths(ctx.daily, d0[["event_id", "session", "symbol_id", "split"]], ends, cfg)
         f0 = d0.merge(p0[["event_id", *figdata.PATH_COLUMNS]], on="event_id", how="left")
-        f0["v_decile"] = figdata.deciles(f0["a0_v"])
+        f0["v_decile"] = figdata.deciles(f0["a0_n_hat"])  # V = iso(N̂) is non-decreasing: N̂ breaks V's ties
         cols = [*figdata.PATH_COLUMNS, *[c for c in figdata.SLOT_POINTS if c in f0.columns]]
         fig1 += [{"model": key, **r} for r in figdata.group_paths(f0, "v_decile", "a0_v", cols, "v_decile")]
         d2 = spec.eval_sample(ctx.d2[key], ev, cfg).dropna(subset=["a2_n_hat", "g_d2"])
@@ -1019,10 +1019,10 @@ def figures(ctx: Ctx) -> dict[str, Any]:
         f2 = d2.merge(p2[["event_id", *figdata.PATH_COLUMNS]], on="event_id", how="left")
         rg = ctx.frozen.thresholds["rg"]  # PREREG §7 RG (configs/frozen.yaml thresholds.rg)
         f2["rg"] = spec.rg_class(f2["a2_n_hat"], f2["g_d2"], rg["min_abs_n_hat"], rg["band"])
-        fig1_rg += [
-            {"model": key, **r}
-            for r in figdata.group_paths(f2, "rg", "a2_v", list(figdata.PATH_COLUMNS), "rg_class")
-        ]
+        signed = figdata.signed(f2, "a2_n_hat", [*figdata.PATH_COLUMNS, "a2_v"])  # in the news' direction
+        for label, frame in (("rg_class", f2), ("rg_class_signed", signed)):
+            rows = figdata.group_paths(frame, "rg", "a2_v", list(figdata.PATH_COLUMNS), label)
+            fig1_rg += [{"model": key, **r} for r in rows]
         fig2 += [{"model": key, **r} for r in figdata.drift_by_g(f2, "g_d2", "y2", "a2_v", "drift_vs_g")]
     write_figure(ctx, "fig1_v_decile_paths", pd.DataFrame(fig1))
     write_figure(ctx, "fig1_rg_class_paths", pd.DataFrame(fig1_rg))

@@ -2020,7 +2020,7 @@ sha256 on a rerun (labels and export were run twice: 8 of 8 files identical).
 - **Key:** one row per plotted value
 - **Rows / coverage:** figure data `fig1_rg_class_paths`
 - **Availability:** test (Figure 4: val-A, val-B, test); outcomes from the test period's outcomes, after unblinding (NA-12 S1)
-- **sha256:** `f6a062eb5148614623ce964db9a0393a2c99f68e97a8e8e823b13f55f79d3db3`
+- **sha256:** `b221d493486798811dd3bb03db5966bc6caadf62ca534891a7ae53ab9d5f2a97`
 
 ### `artifacts/NA-12/figure_data/fig1_v_decile_paths.csv`
 - **Producer:** `newsaction.analysis.run_all` (`figures`, `monthly_ic`, `calibration`), `analysis.figdata`
@@ -2029,7 +2029,7 @@ sha256 on a rerun (labels and export were run twice: 8 of 8 files identical).
 - **Key:** one row per plotted value
 - **Rows / coverage:** figure data `fig1_v_decile_paths`
 - **Availability:** test (Figure 4: val-A, val-B, test); outcomes from the test period's outcomes, after unblinding (NA-12 S1)
-- **sha256:** `3a08b675a1c0e5a49e3e99b957d12fe4fea47d7471748d571c9ff19ab4fe032e`
+- **sha256:** `50fda57b88044198a82805aa8265e5fee8503e3d9752647dc5b2c7c4d1d9c07b`
 
 ### `artifacts/NA-12/figure_data/fig2_drift_vs_g.csv`
 - **Producer:** `newsaction.analysis.run_all` (`figures`, `monthly_ic`, `calibration`), `analysis.figdata`
