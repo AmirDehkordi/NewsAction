@@ -352,7 +352,7 @@ ENTRIES: Final = (
         "`newsaction.production.llm_test.run` (S8)",
         "`work/dm/production/llm_test.parquet`",
         "{model, requests, send, projected_usd, cap_usd, budget_left_usd, answered, valid, invalid, "
-        "spent_usd}",
+        "spent_usd_this_run, spent_usd (the ledger's total under the batch's tag)}",
         "one object",
         "the LLM baseline's test batch",
         "counts and cost only",

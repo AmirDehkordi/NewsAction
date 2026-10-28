@@ -28,6 +28,7 @@ from newsaction.baselines import schema as bs
 from newsaction.baselines.data import d0_events
 from newsaction.dm.canary import STATE_COLUMNS
 from newsaction.dm.client import ChatSpec, DecisionClient
+from newsaction.events import EVENTS_D0
 from newsaction.paths import Layout, resolve_layout
 from newsaction.production import CHUNK, ProductionError, artifacts_dir, record_key_usage
 from newsaction.production.plan import load_plan
@@ -72,6 +73,21 @@ def specs(layout: Layout | None = None) -> list[ChatSpec]:
     return [replace(s, tag=TAG) for s in nb.specs(rows, model, cfg, lay)]
 
 
+def ledger_spend(layout: Layout | None = None) -> float:
+    """NA-11's ledger spend under this batch's tag (every run of it, the cached reruns included)."""
+    total = 0.0
+    with (resolve_layout(layout).root / "ledgers" / "spend.jsonl").open(encoding="utf-8") as fh:
+        for line in fh:
+            r = json.loads(line)
+            if (
+                r.get("chunk") == CHUNK
+                and r.get("event") == "spend"
+                and (r.get("meta") or {}).get("tag") == TAG
+            ):
+                total += float(r["usd"])
+    return total
+
+
 def run(layout: Layout | None = None, *, send: bool = False) -> dict[str, Any]:
     """Dry run (always) and, with ``send``, the calls and the predictions."""
     lay = resolve_layout(layout)
@@ -114,8 +130,8 @@ def run(layout: Layout | None = None, *, send: bool = False) -> dict[str, Any]:
                 "extra": json.dumps(d["extra"], sort_keys=True),
             }
         )
-    smp = io.read_parquet(SAMPLE, columns=["event_id", "company_id"], layout=lay)
-    pred = bs.frame(pd.DataFrame(rows).merge(smp, on="event_id", how="left", validate="one_to_one"))
+    firms = io.read_parquet(EVENTS_D0, columns=["event_id", "company_id"], layout=lay)
+    pred = bs.frame(pd.DataFrame(rows).merge(firms, on="event_id", how="left", validate="one_to_one"))
     io.write_parquet(
         pred,
         OUT,
@@ -127,7 +143,8 @@ def run(layout: Layout | None = None, *, send: bool = False) -> dict[str, Any]:
         "answered": int(sum(r.ok for r in res)),
         "valid": len(pred),
         "invalid": problems,
-        "spent_usd": float(sum(r.row.cost for r in res if r.row is not None and not r.cached)),
+        "spent_usd_this_run": float(sum(r.row.cost for r in res if r.row is not None and not r.cached)),
+        "spent_usd": ledger_spend(lay),
     }
     (artifacts_dir(lay) / "llm_test.json").write_text(json.dumps(out, indent=1) + "\n", encoding="utf-8")
     return out
