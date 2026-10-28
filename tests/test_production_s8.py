@@ -223,3 +223,68 @@ def test_importing_the_production_steps_never_loads_lightgbm() -> None:
     r = subprocess.run([sys.executable, "-c", code], capture_output=True, text=True, check=False)
     assert r.returncode == 0, r.stderr[-2000:]
     assert "lightgbm" not in sys.modules
+
+
+@pytest.mark.parametrize(
+    ("status", "expected"),
+    [(None, True), (float("nan"), True), (429, True), (500, True), (503, True), (400, False), (403, False)],
+)
+def test_transient_outcomes_are_the_clients_retryable_ones(status: object, expected: bool) -> None:
+    from newsaction.production.run import transient
+
+    assert transient(status) is expected
+
+
+def test_the_retry_pass_resends_only_transient_failures(
+    monkeypatch: pytest.MonkeyPatch, tmp_path: Any
+) -> None:
+    from newsaction.production import run as pr
+
+    df = pd.DataFrame(
+        {
+            "event_id": ["e1", "e2", "e3", "e4", "m1"],
+            "component": ["a0", "a0", "a0", "a0", "market"],
+            "ok": [True, False, False, False, False],
+            "valid": [True, False, False, False, False],
+            "status": [None, 503, 403, None, None],
+            "source": ["a0", "a0", "a0", "a0", "m"],
+        }
+    )
+    written: dict[str, pd.DataFrame] = {}
+    specs = [SimpleNamespace(info=SimpleNamespace(event_id=e)) for e in ("e1", "e2", "e3", "e4")]
+    sent: list[str] = []
+
+    class FakeClient:
+        def __init__(self, *args: Any, **kwargs: Any) -> None:
+            pass
+
+        def __enter__(self) -> FakeClient:
+            return self
+
+        def __exit__(self, *exc: object) -> None:
+            return None
+
+        def decide(self, sp: list[Any], concurrency: int = 16) -> list[Any]:
+            sent.extend(s.info.event_id for s in sp)
+            return [SimpleNamespace(ok=True, spec=s) for s in sp]
+
+    def fake_readings(res: list[Any], src: str) -> pd.DataFrame:
+        ids = [r.spec.info.event_id for r in res]
+        return pd.DataFrame({"event_id": ids, "ok": True, "valid": True, "status": None, "source": src})
+
+    monkeypatch.setattr(pr, "load_plan", lambda: SimpleNamespace())
+    monkeypatch.setattr(pr, "jobs", lambda plan, w: [("M", "a0", object())] if w == "api" else [])
+    monkeypatch.setattr(pr, "specs_of", lambda plan, m, comp, lay: specs)
+    monkeypatch.setattr(pr.io, "read_parquet", lambda rel, layout=None: df.copy())
+    monkeypatch.setattr(pr.io, "write_parquet", lambda d, rel, **kw: written.setdefault("df", d))
+    monkeypatch.setattr(pr, "DecisionClient", FakeClient)
+    monkeypatch.setattr(pr, "record_key_usage", lambda label, cl: {})
+    monkeypatch.setattr(pr, "readings", fake_readings)
+    monkeypatch.setattr(pr, "artifacts_dir", lambda layout=None: tmp_path)
+    out = pr.retry(["api"])
+    assert sent == ["e2", "e4"]  # the 503 and the transport error; not the 403 refusal, not the market row
+    got = written["df"]
+    assert list(got["event_id"]) == ["e1", "e2", "e3", "e4", "m1"]  # rows replaced in place
+    assert list(got["ok"]) == [True, True, False, True, False]
+    left = out["retry"][-1]
+    assert left["failed"] == 2 and left["statuses"] == {"403": 1, "market (status not recorded)": 1}

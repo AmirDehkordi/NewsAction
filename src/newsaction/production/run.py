@@ -30,7 +30,7 @@ from newsaction.dm.parse import Q1_MIDPOINTS
 from newsaction.dm.runner import derived_frame, load_states, state_specs
 from newsaction.dm.schemas import DecisionRequest, questions_from
 from newsaction.paths import Layout, resolve_layout
-from newsaction.production import CHUNK, ProductionError, artifacts_dir
+from newsaction.production import CHUNK, ProductionError, artifacts_dir, record_key_usage
 from newsaction.production.plan import Component, ProductionPlan, load_plan
 
 PRODUCTION_DIR: Final = "dm/production"
@@ -108,6 +108,7 @@ def market_readings(results: Sequence[CallResult]) -> pd.DataFrame:
             "valid": bool(r.parsed is not None and r.parsed.valid),
             "source": "m",
             "cost": None if r.row is None else r.row.cost,
+            "status": r.status,
         }
         if r.parsed is not None:
             mv = r.parsed.answers.get("market_move")
@@ -207,6 +208,114 @@ def run(which: Sequence[str], layout: Layout | None = None, concurrency: int = C
     return {"components": summary}
 
 
+def transient(status: object) -> bool:
+    """``dm.client``'s retryable outcomes: a transport error (no HTTP status), 429 or 5xx."""
+    if status is None or bool(pd.isna(status)):  # type: ignore[call-overload]
+        return True
+    code = int(float(str(status)))  # a parquet column with gaps holds 503.0
+    return code == 429 or code >= 500
+
+
+def status_label(status: object) -> str:
+    """An HTTP status as an integer string; "transport" for a request that got none."""
+    if status is None or bool(pd.isna(status)):  # type: ignore[call-overload]
+        return "transport"
+    return str(int(float(str(status))))
+
+
+def _strings(df: pd.DataFrame) -> pd.DataFrame:
+    for c in df.columns:
+        if df[c].dtype == object and c != "q1":
+            df[c] = df[c].astype("string")
+    return df
+
+
+def retry(
+    which: Sequence[str], layout: Layout | None = None, concurrency: int = CONCURRENCY
+) -> dict[str, Any]:
+    """The operator's one retry pass after S6: re-send every request that failed with a transient outcome
+    (``transient``) and replace its row in place; refusals (any other HTTP status) and invalid answers stay as
+    they are. Market rows of the S6 run carry no status (``market_readings`` records it since), so a failed
+    market request is reported, not re-sent. Writes ``artifacts/NA-11/production_retry.json``."""
+    lay = resolve_layout(layout)
+    plan = load_plan()
+    tag = "_".join(which)
+    summary: list[dict[str, Any]] = []
+    with DecisionClient(CHUNK, layout=lay) as cl:
+        record_key_usage("before the S6 retry pass", cl)
+        models = dict.fromkeys(m for w in which for m, _, _ in jobs(plan, w))
+        for model in models:
+            rel = f"{PRODUCTION_DIR}/{slug(model)}_{tag}.parquet"
+            df = io.read_parquet(rel, layout=lay)
+            df["_order"] = np.arange(len(df))
+            failed = ~df["ok"].astype(bool)
+            status = df["status"] if "status" in df.columns else pd.Series(pd.NA, index=df.index)
+            api = df["component"] != "market"
+            redo = failed & api & status.map(transient).astype(bool)
+            order = {(c, e): o for c, e, o in zip(df["component"], df["event_id"], df["_order"], strict=True)}
+            want = set(zip(df.loc[redo, "component"], df.loc[redo, "event_id"], strict=True))
+            new_parts = []
+            for w in which:
+                for m, name, comp in jobs(plan, w):
+                    if m != model or comp is None:
+                        continue
+                    sp = [s for s in specs_of(plan, m, comp, lay) if (name, s.info.event_id) in want]
+                    if not sp:
+                        continue
+                    res = cl.decide(sp, concurrency=concurrency)
+                    new = readings(res, source_of(name)).assign(component=name)
+                    new["_order"] = [order[(name, e)] for e in new["event_id"]]
+                    new_parts.append(new)
+                    summary.append(
+                        {
+                            "model": model,
+                            "component": name,
+                            "retried": len(sp),
+                            "ok_now": int(sum(r.ok for r in res)),
+                            "valid_now": int(new["valid"].sum()),
+                            "statuses_before": {
+                                str(k): int(v)
+                                for k, v in df.loc[redo & (df["component"] == name), "status"]
+                                .map(status_label)
+                                .value_counts()
+                                .items()
+                            },
+                        }
+                    )
+                    print(json.dumps(summary[-1]), flush=True)
+            left = df.loc[failed & ~redo]
+            summary.append(
+                {
+                    "model": model,
+                    "component": "(not retried)",
+                    "failed": len(left),
+                    "statuses": {
+                        str(k): int(v)
+                        for k, v in status.loc[left.index]
+                        .map(status_label)
+                        .where(left["component"] != "market", "market (status not recorded)")
+                        .value_counts()
+                        .items()
+                    },
+                }
+            )
+            if new_parts:
+                out = pd.concat([df.loc[~redo], *new_parts], ignore_index=True)
+                out = _strings(out.sort_values("_order", kind="mergesort").drop(columns=["_order"]))
+                io.write_parquet(
+                    out.reset_index(drop=True),
+                    rel,
+                    producer=CHUNK,
+                    description=f"NA-11 S6: {model} readings ({', '.join(which)}) per event and source "
+                    "(configs/production.yaml), after the one retry pass of transient failures",
+                    layout=lay,
+                )
+        record_key_usage("after the S6 retry pass", cl)
+    path = artifacts_dir(lay) / "production_retry.json"
+    path.write_text(json.dumps(summary, indent=1) + "\n", encoding="utf-8")
+    return {"retry": summary}
+
+
 def main(argv: Sequence[str] | None = None) -> int:
     args = list(sys.argv[1:] if argv is None else argv)
     cmd, which = (args[0], args[1:]) if args else ("project", ["api", "comparators", "market"])
@@ -216,7 +325,12 @@ def main(argv: Sequence[str] | None = None) -> int:
     if cmd == "run":
         print(json.dumps(run(which), indent=1))
         return 0
-    raise SystemExit("usage: python -m newsaction.production.run project|run [api] [comparators] [market]")
+    if cmd == "retry":
+        print(json.dumps(retry(which or ["api", "comparators", "market"]), indent=1))
+        return 0
+    raise SystemExit(
+        "usage: python -m newsaction.production.run project|run|retry [api] [comparators] [market]"
+    )
 
 
 if __name__ == "__main__":
