@@ -1,0 +1,29 @@
+% t15_calibration: §11.2 calibration of Q1's three classes (ECE; log-loss and Brier skill vs val-A climatology); H7
+\begin{tabular}{llllllllllllll}
+\toprule
+key & model & target & ece & log\_loss & brier & log\_loss\_skill & brier\_skill & n & auc & temperature & ece\_before & ece\_after & source \\
+\midrule
+laya\_fin:e5 & laya\_fin & e5 & 0.057 & 1.097 & 0.667 & 7.51e-04 & -3.32e-04 & 13,139 & — & — & — & — & — \\
+laya\_fin:z\_cc & laya\_fin & z\_cc & 0.033 & 1.093 & 0.664 & 0.010 & 0.010 & 13,748 & — & — & — & — & — \\
+laya\_fin:auc & laya\_fin & |z\_cc| >= 1 & — & — & — & — & — & — & 0.603 & — & — & — & — \\
+laya\_fin:temperature & laya\_fin & e5 & — & — & — & — & — & — & — & 1.002 & 0.058 & 0.057 & NA-08 val-A temperature (the files' probabilities) vs T = 1 on the logits \\
+anchor:e5 & anchor & e5 & 0.048 & 1.096 & 0.666 & 0.002 & 0.001 & 13,139 & — & — & — & — & — \\
+anchor:z\_cc & anchor & z\_cc & 0.016 & 1.087 & 0.660 & 0.015 & 0.015 & 13,748 & — & — & — & — & — \\
+anchor:auc & anchor & |z\_cc| >= 1 & — & — & — & — & — & — & 0.576 & — & — & — & — \\
+anchor:temperature & anchor & e5 & — & — & — & — & — & — & — & 0.966 & 0.011 & 0.048 & NA-08 val-A temperature (the files' probabilities) vs T = 1 on the logits \\
+laya\_zs:e5 & laya\_zs & e5 & 0.176 & 1.270 & 0.739 & -0.156 & -0.110 & 13,139 & — & — & — & — & — \\
+laya\_zs:z\_cc & laya\_zs & z\_cc & 0.179 & 1.300 & 0.751 & -0.177 & -0.120 & 13,748 & — & — & — & — & — \\
+laya\_zs:auc & laya\_zs & |z\_cc| >= 1 & — & — & — & — & — & — & 0.523 & — & — & — & — \\
+laya\_zs:temperature & laya\_zs & e5 & — & — & — & — & — & — & — & 6.329 & 0.176 & 0.110 & one Q1 temperature fit on val-A (NA-08's rule), applied to the evaluation split \\
+d1\_ultra:e5 & d1\_ultra & e5 & 0.260 & 1.311 & 0.796 & -0.194 & -0.194 & 13,139 & — & — & — & — & — \\
+d1\_ultra:z\_cc & d1\_ultra & z\_cc & 0.249 & 1.287 & 0.781 & -0.166 & -0.165 & 13,748 & — & — & — & — & — \\
+d1\_ultra:auc & d1\_ultra & |z\_cc| >= 1 & — & — & — & — & — & — & 0.580 & — & — & — & — \\
+d1\_ultra:temperature & d1\_ultra & e5 & — & — & — & — & — & — & — & 1.945 & 0.260 & 0.155 & one Q1 temperature fit on val-A (NA-08's rule), applied to the evaluation split \\
+span\_02:e5 & span\_02 & e5 & 0.361 & 1.603 & 0.907 & -0.460 & -0.361 & 13,139 & — & — & — & — & — \\
+span\_02:z\_cc & span\_02 & z\_cc & 0.342 & 1.556 & 0.881 & -0.410 & -0.315 & 13,748 & — & — & — & — & — \\
+span\_02:auc & span\_02 & |z\_cc| >= 1 & — & — & — & — & — & — & 0.556 & — & — & — & — \\
+drex\_v2:e5 & drex\_v2 & e5 & 0.209 & 1.247 & 0.758 & -0.135 & -0.138 & 13,139 & — & — & — & — & — \\
+drex\_v2:z\_cc & drex\_v2 & z\_cc & 0.204 & 1.235 & 0.751 & -0.119 & -0.120 & 13,748 & — & — & — & — & — \\
+drex\_v2:auc & drex\_v2 & |z\_cc| >= 1 & — & — & — & — & — & — & 0.566 & — & — & — & — \\
+\bottomrule
+\end{tabular}

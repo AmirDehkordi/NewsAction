@@ -1,0 +1,38 @@
+% t1b_primary_by_model: H1–H4 for every decision model (the API models screen-failing and model-specific)
+% Holm within each model is descriptive; only Laya-Fin's Holm enters the headline rule.
+\begin{tabular}{lllllllllllllll}
+\toprule
+key & model & test & role & estimate & ci\_low & ci\_high & nw\_t & p & n\_days & n\_obs & available & p\_holm\_within\_model & footnote & reason \\
+\midrule
+laya\_fin:H1 & laya\_fin & H1 & primary instrument (laya-s13) & 0.005 & -0.035 & 0.041 & 0.232 & 0.409 & 138 & 13,748 & yes & 0.853 &  & — \\
+laya\_fin:H1b & laya\_fin & H1b & primary instrument (laya-s13) & 0.010 & -0.014 & 0.037 & 0.815 & 0.213 & 138 & 13,748 & yes & 0.853 &  & — \\
+laya\_fin:H2 & laya\_fin & H2 & primary instrument (laya-s13) & -0.044 & — & — & — & 0.616 & — & — & yes & 0.853 &  & — \\
+laya\_fin:H3 & laya\_fin & H3 & primary instrument (laya-s13) & 0.004 & -7.79e-04 & 0.008 & 1.524 & 0.054 & 135 & 17,044 & yes & 0.269 &  & — \\
+laya\_fin:H4 & laya\_fin & H4 & primary instrument (laya-s13) & 0.001 & -0.002 & 0.004 & — & 0.216 & 140 & 13,732 & yes & 0.853 &  & — \\
+anchor:H1 & anchor & H1 & clean anchor (anchor-s13) & 0.004 & -0.027 & 0.034 & 0.222 & 0.406 & 138 & 13,748 & yes & 1.000 &  & — \\
+anchor:H1b & anchor & H1b & clean anchor (anchor-s13) & 0.002 & -0.019 & 0.022 & 0.181 & 0.427 & 138 & 13,748 & yes & 1.000 &  & — \\
+anchor:H2 & anchor & H2 & clean anchor (anchor-s13) & 0.015 & — & — & — & 0.294 & — & — & yes & 1.000 &  & — \\
+anchor:H3 & anchor & H3 & clean anchor (anchor-s13) & 0.001 & 1.73e-04 & 0.002 & 2.098 & 0.017 & 135 & 17,044 & yes & 0.083 &  & — \\
+anchor:H4 & anchor & H4 & clean anchor (anchor-s13) & -4.47e-04 & -0.002 & 7.40e-04 & — & 0.773 & 140 & 13,732 & yes & 1.000 &  & — \\
+laya\_zs:H1 & laya\_zs & H1 & Laya zero-shot (PREREG §10.5) & 0.054 & 0.023 & 0.087 & 3.171 & 0.001 & 138 & 13,748 & yes & 0.004 &  & — \\
+laya\_zs:H1b & laya\_zs & H1b & Laya zero-shot (PREREG §10.5) & -0.017 & -0.044 & 0.009 & -1.251 & 0.900 & 138 & 13,748 & yes & 1.000 &  & — \\
+laya\_zs:H2 & laya\_zs & H2 & Laya zero-shot (PREREG §10.5) & — & — & — & — & — & — & — & no & — &  & no Call A W2 reading \\
+laya\_zs:H3 & laya\_zs & H3 & Laya zero-shot (PREREG §10.5) & — & — & — & — & — & — & — & no & — &  & no Call A W2 / Call B readings on the fit, λ and test splits \\
+laya\_zs:H4 & laya\_zs & H4 & Laya zero-shot (PREREG §10.5) & -0.001 & -0.002 & -1.60e-04 & — & 0.992 & 140 & 13,732 & yes & 1.000 &  & — \\
+d1\_ultra:H1 & d1\_ultra & H1 & best API comparator; screen-failing, model-specific & 0.075 & 0.040 & 0.109 & 4.133 & <0.001 & 138 & 13,748 & yes & <0.001 &  & — \\
+d1\_ultra:H1b & d1\_ultra & H1b & best API comparator; screen-failing, model-specific & -7.37e-04 & -0.021 & 0.020 & -0.068 & 0.531 & 138 & 13,748 & yes & 1.000 &  & — \\
+d1\_ultra:H2 & d1\_ultra & H2 & best API comparator; screen-failing, model-specific & -0.076 & — & — & — & 0.991 & — & — & yes & 1.000 &  & — \\
+d1\_ultra:H3 & d1\_ultra & H3 & best API comparator; screen-failing, model-specific & 6.90e-04 & -0.002 & 0.003 & 0.518 & 0.285 & 135 & 17,044 & yes & 1.000 &  & — \\
+d1\_ultra:H4 & d1\_ultra & H4 & best API comparator; screen-failing, model-specific & 4.17e-04 & -0.002 & 0.003 & — & 0.354 & 140 & 13,732 & yes & 1.000 &  & — \\
+span\_02:H1 & span\_02 & H1 & core comparator; screen-failing, model-specific & 0.075 & 0.039 & 0.110 & 4.049 & <0.001 & 138 & 13,748 & yes & <0.001 & S5 canary STOP, operator: proceed (PREREG §15, post-freeze NA-11 row) & — \\
+span\_02:H1b & span\_02 & H1b & core comparator; screen-failing, model-specific & -5.40e-04 & -0.022 & 0.020 & -0.048 & 0.521 & 138 & 13,748 & yes & 0.521 & S5 canary STOP, operator: proceed (PREREG §15, post-freeze NA-11 row) & — \\
+span\_02:H2 & span\_02 & H2 & core comparator; screen-failing, model-specific & — & — & — & — & — & — & — & no & — & S5 canary STOP, operator: proceed (PREREG §15, post-freeze NA-11 row) & no Call A W2 reading \\
+span\_02:H3 & span\_02 & H3 & core comparator; screen-failing, model-specific & — & — & — & — & — & — & — & no & — & S5 canary STOP, operator: proceed (PREREG §15, post-freeze NA-11 row) & no Call A W2 / Call B readings on the fit, λ and test splits \\
+span\_02:H4 & span\_02 & H4 & core comparator; screen-failing, model-specific & — & — & — & — & — & — & — & no & — & S5 canary STOP, operator: proceed (PREREG §15, post-freeze NA-11 row) & no D0 readings on the fit and λ splits (the ridge protocol needs val-A and val-B) \\
+drex\_v2:H1 & drex\_v2 & H1 & core comparator; screen-failing, model-specific & 0.075 & 0.044 & 0.106 & 4.657 & <0.001 & 138 & 13,748 & yes & <0.001 &  & — \\
+drex\_v2:H1b & drex\_v2 & H1b & core comparator; screen-failing, model-specific & 0.002 & -0.018 & 0.022 & 0.176 & 0.426 & 138 & 13,748 & yes & 0.426 &  & — \\
+drex\_v2:H2 & drex\_v2 & H2 & core comparator; screen-failing, model-specific & — & — & — & — & — & — & — & no & — &  & no Call A W2 reading \\
+drex\_v2:H3 & drex\_v2 & H3 & core comparator; screen-failing, model-specific & — & — & — & — & — & — & — & no & — &  & no Call A W2 / Call B readings on the fit, λ and test splits \\
+drex\_v2:H4 & drex\_v2 & H4 & core comparator; screen-failing, model-specific & — & — & — & — & — & — & — & no & — &  & no D0 readings on the fit and λ splits (the ridge protocol needs val-A and val-B) \\
+\bottomrule
+\end{tabular}

@@ -1806,6 +1806,69 @@ sha256 on a rerun (labels and export were run twice: 8 of 8 files identical).
 - **Availability:** D2 (after close(t)); built from the test period's outcomes, after unblinding (NA-12 S1)
 - **sha256:** `b94a93b9bdb646614261e145110b79bfa338f26e915cb1df84bb6f9485886034`
 
+### `work/analysis/h3_predictions.parquet`
+- **Producer:** `newsaction.analysis.run_all.shapley`
+- **Inputs:** the D2 analysis frames; `spec.ridge_protocol` per coalition (fit val-B, λ val-A)
+- **Schema:** `event_id`, `session`, `company_id`, `tier`, `y2`, `pred_<coalition>` (7), `model`
+- **Key:** (`model`, `event_id`) unique
+- **Rows / coverage:** H3's seven coalition predictions of y2 per test D2 event for Laya-Fin, the anchor and d1-ultra; `spec.shapley_tables` on them reproduces H3's tables (checked)
+- **Availability:** test predictions; y2 from the test period's outcomes, after unblinding (NA-12 S1)
+- **sha256:** `178119aadf649eb0c7870ed594c4eae1f1fecc99fb23aefb431522c1442318b4`
+
+### `work/analysis/frame_d0_laya_fin.parquet`
+- **Producer:** `newsaction.analysis.run_all.write_frames`
+- **Inputs:** `analysis.frames.base` (events, public targets, `targets_test`), the model's readings, the frozen V / Ñ maps
+- **Schema:** the spec's analysis-frame columns (`analysis.spec` docstring); list columns (Q1 probabilities) dropped
+- **Key:** `event_id` unique
+- **Rows / coverage:** the D0 analysis frame of laya_fin on val-A, val-B and test, for the verifier's recomputation (PRD NA-12 verification 3, 4b)
+- **Availability:** val rows public; test outcomes from the test period's outcomes, after unblinding (NA-12 S1)
+- **sha256:** `f290b7c87eececbb33070293f2ac95d7e3a7462676ed6326ed0a0e0b55adbe24`
+
+### `work/analysis/frame_d2_laya_fin.parquet`
+- **Producer:** `newsaction.analysis.run_all.write_frames`
+- **Inputs:** `analysis.frames.base` (events, public targets, `targets_test`), the model's readings, the frozen V / Ñ maps
+- **Schema:** the spec's analysis-frame columns (`analysis.spec` docstring); list columns (Q1 probabilities) dropped
+- **Key:** `event_id` unique
+- **Rows / coverage:** the D2 analysis frame of laya_fin on val-A, val-B and test, for the verifier's recomputation (PRD NA-12 verification 3, 4b)
+- **Availability:** val rows public; test outcomes from the test period's outcomes, after unblinding (NA-12 S1)
+- **sha256:** `ad80220b41dced9f67429ea7b7680e2f67e0c26ac273ee092ca597c59f92c11b`
+
+### `work/analysis/frame_d0_anchor.parquet`
+- **Producer:** `newsaction.analysis.run_all.write_frames`
+- **Inputs:** `analysis.frames.base` (events, public targets, `targets_test`), the model's readings, the frozen V / Ñ maps
+- **Schema:** the spec's analysis-frame columns (`analysis.spec` docstring); list columns (Q1 probabilities) dropped
+- **Key:** `event_id` unique
+- **Rows / coverage:** the D0 analysis frame of anchor on val-A, val-B and test, for the verifier's recomputation (PRD NA-12 verification 3, 4b)
+- **Availability:** val rows public; test outcomes from the test period's outcomes, after unblinding (NA-12 S1)
+- **sha256:** `2ac22b3a3ad27caff49cefe5947aaf78b06da60419796ced22ad5ef0505ffa2e`
+
+### `work/analysis/frame_d2_anchor.parquet`
+- **Producer:** `newsaction.analysis.run_all.write_frames`
+- **Inputs:** `analysis.frames.base` (events, public targets, `targets_test`), the model's readings, the frozen V / Ñ maps
+- **Schema:** the spec's analysis-frame columns (`analysis.spec` docstring); list columns (Q1 probabilities) dropped
+- **Key:** `event_id` unique
+- **Rows / coverage:** the D2 analysis frame of anchor on val-A, val-B and test, for the verifier's recomputation (PRD NA-12 verification 3, 4b)
+- **Availability:** val rows public; test outcomes from the test period's outcomes, after unblinding (NA-12 S1)
+- **sha256:** `5946721294d78ead8603664c3b927fe43e3fad5c851d567574f3b3b8369d0ab9`
+
+### `work/analysis/frame_d0_d1_ultra.parquet`
+- **Producer:** `newsaction.analysis.run_all.write_frames`
+- **Inputs:** `analysis.frames.base` (events, public targets, `targets_test`), the model's readings, the frozen V / Ñ maps
+- **Schema:** the spec's analysis-frame columns (`analysis.spec` docstring); list columns (Q1 probabilities) dropped
+- **Key:** `event_id` unique
+- **Rows / coverage:** the D0 analysis frame of d1_ultra on val-A, val-B and test, for the verifier's recomputation (PRD NA-12 verification 3, 4b)
+- **Availability:** val rows public; test outcomes from the test period's outcomes, after unblinding (NA-12 S1)
+- **sha256:** `11cbfbd5896ecfb807c4408eea18bff127af494ee7923557229e67be68cbf5b7`
+
+### `work/analysis/frame_d2_d1_ultra.parquet`
+- **Producer:** `newsaction.analysis.run_all.write_frames`
+- **Inputs:** `analysis.frames.base` (events, public targets, `targets_test`), the model's readings, the frozen V / Ñ maps
+- **Schema:** the spec's analysis-frame columns (`analysis.spec` docstring); list columns (Q1 probabilities) dropped
+- **Key:** `event_id` unique
+- **Rows / coverage:** the D2 analysis frame of d1_ultra on val-A, val-B and test, for the verifier's recomputation (PRD NA-12 verification 3, 4b)
+- **Availability:** val rows public; test outcomes from the test period's outcomes, after unblinding (NA-12 S1)
+- **sha256:** `977524c65410c63a344c75046aa0dfe1a8f963bca7fcb115020da66a8880b0fd`
+
 ### `artifacts/NA-12/unblind.json`
 - **Producer:** `newsaction.analysis.unblind.run`
 - **Inputs:** the unblinding run
@@ -1823,3 +1886,561 @@ sha256 on a rerun (labels and export were run twice: 8 of 8 files identical).
 - **Rows / coverage:** the val-B rehearsal of the unblinding's assembly (59 columns reproduced)
 - **Availability:** public (val-B); written before unblinding
 - **sha256:** `448ecd8c7e3cc3d5e68c2c182e14c892c2921a253d37b8d908df4d7c8402447b`
+
+### `artifacts/NA-12/results/battery.json`
+- **Producer:** `newsaction.analysis.run_all.battery`
+- **Inputs:** the analysis frames (`analysis.frames`), `configs/analysis.yaml` (frozen)
+- **Schema:** the frozen `spec` functions' result dicts (JSON; NaN as null, ±∞ as strings)
+- **Key:** nested by model and test
+- **Rows / coverage:** S2 section `battery` on the test split
+- **Availability:** test; outcomes from the test period's outcomes, after unblinding (NA-12 S1)
+- **sha256:** `d260a106afe6b2e4dd2b7b9e9cdf00facbccba41448ceb55bf065acaf5163bae`
+
+### `artifacts/NA-12/results/calibration.json`
+- **Producer:** `newsaction.analysis.run_all.calibration`
+- **Inputs:** the analysis frames (`analysis.frames`), `configs/analysis.yaml` (frozen)
+- **Schema:** the frozen `spec` functions' result dicts (JSON; NaN as null, ±∞ as strings)
+- **Key:** nested by model and test
+- **Rows / coverage:** S2 section `calibration` on the test split
+- **Availability:** test; outcomes from the test period's outcomes, after unblinding (NA-12 S1)
+- **sha256:** `18fda0ff63ee4b03a4f3f9adffde5c93fff22f04a6047fad642d246a6c34bce6`
+
+### `artifacts/NA-12/results/comparison.json`
+- **Producer:** `newsaction.analysis.run_all.comparison`
+- **Inputs:** the analysis frames (`analysis.frames`), `configs/analysis.yaml` (frozen)
+- **Schema:** the frozen `spec` functions' result dicts (JSON; NaN as null, ±∞ as strings)
+- **Key:** nested by model and test
+- **Rows / coverage:** S2 section `comparison` on the test split
+- **Availability:** test; outcomes from the test period's outcomes, after unblinding (NA-12 S1)
+- **sha256:** `2a2522b79be80575760625d82044e5cb182d39f3528c3b89a1692be615749ab8`
+
+### `artifacts/NA-12/results/convergence.json`
+- **Producer:** `newsaction.analysis.run_all.convergence`
+- **Inputs:** the analysis frames (`analysis.frames`), `configs/analysis.yaml` (frozen)
+- **Schema:** the frozen `spec` functions' result dicts (JSON; NaN as null, ±∞ as strings)
+- **Key:** nested by model and test
+- **Rows / coverage:** S2 section `convergence` on the test split
+- **Availability:** test; outcomes from the test period's outcomes, after unblinding (NA-12 S1)
+- **sha256:** `68445fd0e89a7e9683d68e36af58908cd2bf39aeafa008f11d15d8d11ac3e804`
+
+### `artifacts/NA-12/results/explanation.json`
+- **Producer:** `newsaction.analysis.run_all.explanation`
+- **Inputs:** the analysis frames (`analysis.frames`), `configs/analysis.yaml` (frozen)
+- **Schema:** the frozen `spec` functions' result dicts (JSON; NaN as null, ±∞ as strings)
+- **Key:** nested by model and test
+- **Rows / coverage:** S2 section `explanation` on the test split
+- **Availability:** test; outcomes from the test period's outcomes, after unblinding (NA-12 S1)
+- **sha256:** `adbc2161148f884d8e83ff286907c80070efbdb0703a49cf508f0d53dfa38a93`
+
+### `artifacts/NA-12/results/exploratory.json`
+- **Producer:** `newsaction.analysis.run_all.exploratory`
+- **Inputs:** the analysis frames (`analysis.frames`), `configs/analysis.yaml` (frozen)
+- **Schema:** the frozen `spec` functions' result dicts (JSON; NaN as null, ±∞ as strings)
+- **Key:** nested by model and test
+- **Rows / coverage:** S2 section `exploratory` on the test split
+- **Availability:** test; outcomes from the test period's outcomes, after unblinding (NA-12 S1)
+- **sha256:** `9fe02c991fe35afd469f3e12721d9a330343ecd95899a79d1b2958262c7c1fae`
+
+### `artifacts/NA-12/results/figures.json`
+- **Producer:** `newsaction.analysis.run_all.figures`
+- **Inputs:** the analysis frames (`analysis.frames`), `configs/analysis.yaml` (frozen)
+- **Schema:** the frozen `spec` functions' result dicts (JSON; NaN as null, ±∞ as strings)
+- **Key:** nested by model and test
+- **Rows / coverage:** S2 section `figures` on the test split
+- **Availability:** test; outcomes from the test period's outcomes, after unblinding (NA-12 S1)
+- **sha256:** `977ce98ea3f171af8d4884580144eee80178a27bd8f5e0b3630f97b997856fa4`
+
+### `artifacts/NA-12/results/heterogeneity.json`
+- **Producer:** `newsaction.analysis.run_all.heterogeneity`
+- **Inputs:** the analysis frames (`analysis.frames`), `configs/analysis.yaml` (frozen)
+- **Schema:** the frozen `spec` functions' result dicts (JSON; NaN as null, ±∞ as strings)
+- **Key:** nested by model and test
+- **Rows / coverage:** S2 section `heterogeneity` on the test split
+- **Availability:** test; outcomes from the test period's outcomes, after unblinding (NA-12 S1)
+- **sha256:** `c88192fb0f1517f0d778581b2368de72918fbdcb60591c61b3856cde1cf5e86d`
+
+### `artifacts/NA-12/results/monthly_ic.json`
+- **Producer:** `newsaction.analysis.run_all.monthly_ic`
+- **Inputs:** the analysis frames (`analysis.frames`), `configs/analysis.yaml` (frozen)
+- **Schema:** the frozen `spec` functions' result dicts (JSON; NaN as null, ±∞ as strings)
+- **Key:** nested by model and test
+- **Rows / coverage:** S2 section `monthly_ic` on the test split
+- **Availability:** test; outcomes from the test period's outcomes, after unblinding (NA-12 S1)
+- **sha256:** `f8685e6a9aa619d761654d93b8175c9dd07e8946536c05cd7e1ecb2440efb7e2`
+
+### `artifacts/NA-12/results/primary.json`
+- **Producer:** `newsaction.analysis.run_all.primary`
+- **Inputs:** the analysis frames (`analysis.frames`), `configs/analysis.yaml` (frozen)
+- **Schema:** the frozen `spec` functions' result dicts (JSON; NaN as null, ±∞ as strings)
+- **Key:** nested by model and test
+- **Rows / coverage:** S2 section `primary` on the test split
+- **Availability:** test; outcomes from the test period's outcomes, after unblinding (NA-12 S1)
+- **sha256:** `17e2243f698b339c37ac2c9297641b2bb7492cb3bcd974894ff202e8dceb477b`
+
+### `artifacts/NA-12/results/robustness.json`
+- **Producer:** `newsaction.analysis.run_all.robustness`
+- **Inputs:** the analysis frames (`analysis.frames`), `configs/analysis.yaml` (frozen)
+- **Schema:** the frozen `spec` functions' result dicts (JSON; NaN as null, ±∞ as strings)
+- **Key:** nested by model and test
+- **Rows / coverage:** S2 section `robustness` on the test split
+- **Availability:** test; outcomes from the test period's outcomes, after unblinding (NA-12 S1)
+- **sha256:** `c4b1af585386d610ac15d8b9be916c17a30212883692b8f24cd546f453fed710`
+
+### `artifacts/NA-12/results/secondary.json`
+- **Producer:** `newsaction.analysis.run_all.secondary`
+- **Inputs:** the analysis frames (`analysis.frames`), `configs/analysis.yaml` (frozen)
+- **Schema:** the frozen `spec` functions' result dicts (JSON; NaN as null, ±∞ as strings)
+- **Key:** nested by model and test
+- **Rows / coverage:** S2 section `secondary` on the test split
+- **Availability:** test; outcomes from the test period's outcomes, after unblinding (NA-12 S1)
+- **sha256:** `56a9983862e6b2065f9c5200fddb4bcf8e70dbd74a318f6c858eae3fc751dc35`
+
+### `artifacts/NA-12/results/shapley.json`
+- **Producer:** `newsaction.analysis.run_all.shapley`
+- **Inputs:** the analysis frames (`analysis.frames`), `configs/analysis.yaml` (frozen)
+- **Schema:** the frozen `spec` functions' result dicts (JSON; NaN as null, ±∞ as strings)
+- **Key:** nested by model and test
+- **Rows / coverage:** S2 section `shapley` on the test split
+- **Availability:** test; outcomes from the test period's outcomes, after unblinding (NA-12 S1)
+- **sha256:** `56ada3698d66f00ec4b3db03b4adb95dbd738c3af8bc66303cb4264325b62a8e`
+
+### `artifacts/NA-12/figure_data/appendix_reliability.csv`
+- **Producer:** `newsaction.analysis.run_all` (`figures`, `monthly_ic`, `calibration`), `analysis.figdata`
+- **Inputs:** the analysis frames and the S2 results
+- **Schema:** long CSV (the plotted values with their group, point, mean, se, n)
+- **Key:** one row per plotted value
+- **Rows / coverage:** figure data `appendix_reliability`
+- **Availability:** test (Figure 4: val-A, val-B, test); outcomes from the test period's outcomes, after unblinding (NA-12 S1)
+- **sha256:** `5ca5ee4708886246446110198f8822cb037dcec94a1e80673f2f2196b2168293`
+
+### `artifacts/NA-12/figure_data/fig1_rg_class_paths.csv`
+- **Producer:** `newsaction.analysis.run_all` (`figures`, `monthly_ic`, `calibration`), `analysis.figdata`
+- **Inputs:** the analysis frames and the S2 results
+- **Schema:** long CSV (the plotted values with their group, point, mean, se, n)
+- **Key:** one row per plotted value
+- **Rows / coverage:** figure data `fig1_rg_class_paths`
+- **Availability:** test (Figure 4: val-A, val-B, test); outcomes from the test period's outcomes, after unblinding (NA-12 S1)
+- **sha256:** `f6a062eb5148614623ce964db9a0393a2c99f68e97a8e8e823b13f55f79d3db3`
+
+### `artifacts/NA-12/figure_data/fig1_v_decile_paths.csv`
+- **Producer:** `newsaction.analysis.run_all` (`figures`, `monthly_ic`, `calibration`), `analysis.figdata`
+- **Inputs:** the analysis frames and the S2 results
+- **Schema:** long CSV (the plotted values with their group, point, mean, se, n)
+- **Key:** one row per plotted value
+- **Rows / coverage:** figure data `fig1_v_decile_paths`
+- **Availability:** test (Figure 4: val-A, val-B, test); outcomes from the test period's outcomes, after unblinding (NA-12 S1)
+- **sha256:** `3a08b675a1c0e5a49e3e99b957d12fe4fea47d7471748d571c9ff19ab4fe032e`
+
+### `artifacts/NA-12/figure_data/fig2_drift_vs_g.csv`
+- **Producer:** `newsaction.analysis.run_all` (`figures`, `monthly_ic`, `calibration`), `analysis.figdata`
+- **Inputs:** the analysis frames and the S2 results
+- **Schema:** long CSV (the plotted values with their group, point, mean, se, n)
+- **Key:** one row per plotted value
+- **Rows / coverage:** figure data `fig2_drift_vs_g`
+- **Availability:** test (Figure 4: val-A, val-B, test); outcomes from the test period's outcomes, after unblinding (NA-12 S1)
+- **sha256:** `77851140502935c1c5892e21bc58643a2f8679f4e02e9589c7348aed6b1e5808`
+
+### `artifacts/NA-12/figure_data/fig4_monthly_ic.csv`
+- **Producer:** `newsaction.analysis.run_all` (`figures`, `monthly_ic`, `calibration`), `analysis.figdata`
+- **Inputs:** the analysis frames and the S2 results
+- **Schema:** long CSV (the plotted values with their group, point, mean, se, n)
+- **Key:** one row per plotted value
+- **Rows / coverage:** figure data `fig4_monthly_ic`
+- **Availability:** test (Figure 4: val-A, val-B, test); outcomes from the test period's outcomes, after unblinding (NA-12 S1)
+- **sha256:** `b77094efc12a1049d5652db4085effbb7896db53f7d85e8859271f5999cd0ccd`
+
+### `artifacts/NA-12/figure_data/fig5_shapley_shares.csv`
+- **Producer:** `newsaction.analysis.run_all` (`figures`, `monthly_ic`, `calibration`), `analysis.figdata`
+- **Inputs:** the analysis frames and the S2 results
+- **Schema:** long CSV (the plotted values with their group, point, mean, se, n)
+- **Key:** one row per plotted value
+- **Rows / coverage:** figure data `fig5_shapley_shares`
+- **Availability:** test (Figure 4: val-A, val-B, test); outcomes from the test period's outcomes, after unblinding (NA-12 S1)
+- **sha256:** `5e31b18d8165b9d415946ea8ae22db1f4b101987f69800be2b53a3faa72af6e4`
+
+### `artifacts/NA-12/figure_data/fig8_explanation_ladder.csv`
+- **Producer:** `newsaction.analysis.run_all` (`figures`, `monthly_ic`, `calibration`), `analysis.figdata`
+- **Inputs:** the analysis frames and the S2 results
+- **Schema:** long CSV (the plotted values with their group, point, mean, se, n)
+- **Key:** one row per plotted value
+- **Rows / coverage:** figure data `fig8_explanation_ladder`
+- **Availability:** test (Figure 4: val-A, val-B, test); outcomes from the test period's outcomes, after unblinding (NA-12 S1)
+- **sha256:** `bc49efc5abe64340a8fff622214873729d0d78facefdd97f968e05de6ba843e7`
+
+### `artifacts/NA-12/tables/index.json`
+- **Producer:** `newsaction.analysis.tables.write`
+- **Inputs:** `artifacts/NA-12/results/*.json`
+- **Schema:** keys.json: "table/key/column" → value; index.json: tables, columns, notes
+- **Key:** one file
+- **Rows / coverage:** table file `index.json`
+- **Availability:** test; outcomes from the test period's outcomes, after unblinding (NA-12 S1)
+- **sha256:** `f231b1f5de4cf608a6ef9a9a6b41ac412b7cf13fe2d6ffad881288805b1abe76`
+
+### `artifacts/NA-12/tables/keys.json`
+- **Producer:** `newsaction.analysis.tables.write`
+- **Inputs:** `artifacts/NA-12/results/*.json`
+- **Schema:** keys.json: "table/key/column" → value; index.json: tables, columns, notes
+- **Key:** one file
+- **Rows / coverage:** table file `keys.json`
+- **Availability:** test; outcomes from the test period's outcomes, after unblinding (NA-12 S1)
+- **sha256:** `172fdf8abb85794f0897e82dd60f1a4bfcb53dce371382879f7d0292c97f81f9`
+
+### `artifacts/NA-12/tables/t10_explanation_ladder.csv`
+- **Producer:** `newsaction.analysis.tables.write`
+- **Inputs:** `artifacts/NA-12/results/*.json`
+- **Schema:** a `key` column (unique) and the table's columns
+- **Key:** `key`
+- **Rows / coverage:** table file `t10_explanation_ladder.csv`
+- **Availability:** test; outcomes from the test period's outcomes, after unblinding (NA-12 S1)
+- **sha256:** `d58de25f8b3bc8d38cd0722904e8afb121cb38be769cdcd268f44e1c80fe51e2`
+
+### `artifacts/NA-12/tables/t10_explanation_ladder.tex`
+- **Producer:** `newsaction.analysis.tables.write`
+- **Inputs:** `artifacts/NA-12/results/*.json`
+- **Schema:** booktabs tabular; title and notes as comments
+- **Key:** one file
+- **Rows / coverage:** table file `t10_explanation_ladder.tex`
+- **Availability:** test; outcomes from the test period's outcomes, after unblinding (NA-12 S1)
+- **sha256:** `4458a376672369506e473818a5eebfe999c82f48f703aef2235f6f361f72119c`
+
+### `artifacts/NA-12/tables/t11_explanation_share_theta.csv`
+- **Producer:** `newsaction.analysis.tables.write`
+- **Inputs:** `artifacts/NA-12/results/*.json`
+- **Schema:** a `key` column (unique) and the table's columns
+- **Key:** `key`
+- **Rows / coverage:** table file `t11_explanation_share_theta.csv`
+- **Availability:** test; outcomes from the test period's outcomes, after unblinding (NA-12 S1)
+- **sha256:** `4ad3c9e9feff9fcd6fc0657ee34cb92b6f1c383b27e07577936555506498978e`
+
+### `artifacts/NA-12/tables/t11_explanation_share_theta.tex`
+- **Producer:** `newsaction.analysis.tables.write`
+- **Inputs:** `artifacts/NA-12/results/*.json`
+- **Schema:** booktabs tabular; title and notes as comments
+- **Key:** one file
+- **Rows / coverage:** table file `t11_explanation_share_theta.tex`
+- **Availability:** test; outcomes from the test period's outcomes, after unblinding (NA-12 S1)
+- **sha256:** `1f56af7f88148fdde512c98eefe39ca2086e6e26a2b65f68e85a9d4c0f7e8d3a`
+
+### `artifacts/NA-12/tables/t12_question_battery.csv`
+- **Producer:** `newsaction.analysis.tables.write`
+- **Inputs:** `artifacts/NA-12/results/*.json`
+- **Schema:** a `key` column (unique) and the table's columns
+- **Key:** `key`
+- **Rows / coverage:** table file `t12_question_battery.csv`
+- **Availability:** test; outcomes from the test period's outcomes, after unblinding (NA-12 S1)
+- **sha256:** `5b29c92473bae8d038757d10f92c134adbac4618c1baad4a0efe86e29bd48fbc`
+
+### `artifacts/NA-12/tables/t12_question_battery.tex`
+- **Producer:** `newsaction.analysis.tables.write`
+- **Inputs:** `artifacts/NA-12/results/*.json`
+- **Schema:** booktabs tabular; title and notes as comments
+- **Key:** one file
+- **Rows / coverage:** table file `t12_question_battery.tex`
+- **Availability:** test; outcomes from the test period's outcomes, after unblinding (NA-12 S1)
+- **sha256:** `0ce3b335a0a6618f64624a54446bc69ed02ecf4f7c73a46ed7e37658ac01cda3`
+
+### `artifacts/NA-12/tables/t13_shapley.csv`
+- **Producer:** `newsaction.analysis.tables.write`
+- **Inputs:** `artifacts/NA-12/results/*.json`
+- **Schema:** a `key` column (unique) and the table's columns
+- **Key:** `key`
+- **Rows / coverage:** table file `t13_shapley.csv`
+- **Availability:** test; outcomes from the test period's outcomes, after unblinding (NA-12 S1)
+- **sha256:** `a4fec4309891b7241386a7ce95059e736c2d4b87e7aa58cf6a5ccb0b43bb2992`
+
+### `artifacts/NA-12/tables/t13_shapley.tex`
+- **Producer:** `newsaction.analysis.tables.write`
+- **Inputs:** `artifacts/NA-12/results/*.json`
+- **Schema:** booktabs tabular; title and notes as comments
+- **Key:** one file
+- **Rows / coverage:** table file `t13_shapley.tex`
+- **Availability:** test; outcomes from the test period's outcomes, after unblinding (NA-12 S1)
+- **sha256:** `2368ba77d18ec69a6a9a9862240935d9c1fc2bc54e41b92c2c546d9f8819f07a`
+
+### `artifacts/NA-12/tables/t14_model_comparison.csv`
+- **Producer:** `newsaction.analysis.tables.write`
+- **Inputs:** `artifacts/NA-12/results/*.json`
+- **Schema:** a `key` column (unique) and the table's columns
+- **Key:** `key`
+- **Rows / coverage:** table file `t14_model_comparison.csv`
+- **Availability:** test; outcomes from the test period's outcomes, after unblinding (NA-12 S1)
+- **sha256:** `1f09db3d94b5046e4ab761cd55bd32dccef063534d8ed4d2d0d2935adf63c0dd`
+
+### `artifacts/NA-12/tables/t14_model_comparison.tex`
+- **Producer:** `newsaction.analysis.tables.write`
+- **Inputs:** `artifacts/NA-12/results/*.json`
+- **Schema:** booktabs tabular; title and notes as comments
+- **Key:** one file
+- **Rows / coverage:** table file `t14_model_comparison.tex`
+- **Availability:** test; outcomes from the test period's outcomes, after unblinding (NA-12 S1)
+- **sha256:** `e690edec69b611bad96d7b1f2e61ff20f070c3a9930414983830154f6c5737af`
+
+### `artifacts/NA-12/tables/t15_calibration.csv`
+- **Producer:** `newsaction.analysis.tables.write`
+- **Inputs:** `artifacts/NA-12/results/*.json`
+- **Schema:** a `key` column (unique) and the table's columns
+- **Key:** `key`
+- **Rows / coverage:** table file `t15_calibration.csv`
+- **Availability:** test; outcomes from the test period's outcomes, after unblinding (NA-12 S1)
+- **sha256:** `c7fa83ab91049a6a328f397ebff93fe19fa9aa892b81ae08af04cebf55acefdc`
+
+### `artifacts/NA-12/tables/t15_calibration.tex`
+- **Producer:** `newsaction.analysis.tables.write`
+- **Inputs:** `artifacts/NA-12/results/*.json`
+- **Schema:** booktabs tabular; title and notes as comments
+- **Key:** one file
+- **Rows / coverage:** table file `t15_calibration.tex`
+- **Availability:** test; outcomes from the test period's outcomes, after unblinding (NA-12 S1)
+- **sha256:** `b952825eaa27cd1cede66a9d98ed876ea6f46586f49320759f3d0665be03680e`
+
+### `artifacts/NA-12/tables/t16_robustness.csv`
+- **Producer:** `newsaction.analysis.tables.write`
+- **Inputs:** `artifacts/NA-12/results/*.json`
+- **Schema:** a `key` column (unique) and the table's columns
+- **Key:** `key`
+- **Rows / coverage:** table file `t16_robustness.csv`
+- **Availability:** test; outcomes from the test period's outcomes, after unblinding (NA-12 S1)
+- **sha256:** `5f2017bd953fc130ea3fb542f57612ab4c2fd6a4d7192612b42c0e0853ca8485`
+
+### `artifacts/NA-12/tables/t16_robustness.tex`
+- **Producer:** `newsaction.analysis.tables.write`
+- **Inputs:** `artifacts/NA-12/results/*.json`
+- **Schema:** booktabs tabular; title and notes as comments
+- **Key:** one file
+- **Rows / coverage:** table file `t16_robustness.tex`
+- **Availability:** test; outcomes from the test period's outcomes, after unblinding (NA-12 S1)
+- **sha256:** `d1f6568d33029ddf32020cc7f93d77b0b2f8d1b1f8bb4ac537bd0b705a5c8da9`
+
+### `artifacts/NA-12/tables/t17_sector_exploratory.csv`
+- **Producer:** `newsaction.analysis.tables.write`
+- **Inputs:** `artifacts/NA-12/results/*.json`
+- **Schema:** a `key` column (unique) and the table's columns
+- **Key:** `key`
+- **Rows / coverage:** table file `t17_sector_exploratory.csv`
+- **Availability:** test; outcomes from the test period's outcomes, after unblinding (NA-12 S1)
+- **sha256:** `97dd083818aeb747ad3c16923b867b0ed6d0f0b616d0599ccc181c5b45c73d75`
+
+### `artifacts/NA-12/tables/t17_sector_exploratory.tex`
+- **Producer:** `newsaction.analysis.tables.write`
+- **Inputs:** `artifacts/NA-12/results/*.json`
+- **Schema:** booktabs tabular; title and notes as comments
+- **Key:** one file
+- **Rows / coverage:** table file `t17_sector_exploratory.tex`
+- **Availability:** test; outcomes from the test period's outcomes, after unblinding (NA-12 S1)
+- **sha256:** `9c75875f03220abf7e80c0f2a76707e7b80d0b3b14f1d2b8082a93031531c1ea`
+
+### `artifacts/NA-12/tables/t18_probes_val_a.csv`
+- **Producer:** `newsaction.analysis.tables.write`
+- **Inputs:** `artifacts/NA-12/results/*.json`
+- **Schema:** a `key` column (unique) and the table's columns
+- **Key:** `key`
+- **Rows / coverage:** table file `t18_probes_val_a.csv`
+- **Availability:** test; outcomes from the test period's outcomes, after unblinding (NA-12 S1)
+- **sha256:** `114b88a202d89e4916eecbfd12cb19c667f99c181e6d600addef7201484f4fd9`
+
+### `artifacts/NA-12/tables/t18_probes_val_a.tex`
+- **Producer:** `newsaction.analysis.tables.write`
+- **Inputs:** `artifacts/NA-12/results/*.json`
+- **Schema:** booktabs tabular; title and notes as comments
+- **Key:** one file
+- **Rows / coverage:** table file `t18_probes_val_a.tex`
+- **Availability:** test; outcomes from the test period's outcomes, after unblinding (NA-12 S1)
+- **sha256:** `2d3b2da837297e3a19c51c41edc649ae86188ef2490728cb051e9e39ed32b0ff`
+
+### `artifacts/NA-12/tables/t19_monthly_ic.csv`
+- **Producer:** `newsaction.analysis.tables.write`
+- **Inputs:** `artifacts/NA-12/results/*.json`
+- **Schema:** a `key` column (unique) and the table's columns
+- **Key:** `key`
+- **Rows / coverage:** table file `t19_monthly_ic.csv`
+- **Availability:** test; outcomes from the test period's outcomes, after unblinding (NA-12 S1)
+- **sha256:** `6ee63d6d4ac06908411d75fddb3170bcdb6855de2b44889db48d9264bb68046f`
+
+### `artifacts/NA-12/tables/t19_monthly_ic.tex`
+- **Producer:** `newsaction.analysis.tables.write`
+- **Inputs:** `artifacts/NA-12/results/*.json`
+- **Schema:** booktabs tabular; title and notes as comments
+- **Key:** one file
+- **Rows / coverage:** table file `t19_monthly_ic.tex`
+- **Availability:** test; outcomes from the test period's outcomes, after unblinding (NA-12 S1)
+- **sha256:** `87098f6d50799dd9834efe1af19273988834a2fbae24756ac1bfda87ac315ee2`
+
+### `artifacts/NA-12/tables/t1_primary.csv`
+- **Producer:** `newsaction.analysis.tables.write`
+- **Inputs:** `artifacts/NA-12/results/*.json`
+- **Schema:** a `key` column (unique) and the table's columns
+- **Key:** `key`
+- **Rows / coverage:** table file `t1_primary.csv`
+- **Availability:** test; outcomes from the test period's outcomes, after unblinding (NA-12 S1)
+- **sha256:** `a39e2f671ba9805c9381f28bb2db820fafc8aa83bde9192872f754ff342ae3c2`
+
+### `artifacts/NA-12/tables/t1_primary.tex`
+- **Producer:** `newsaction.analysis.tables.write`
+- **Inputs:** `artifacts/NA-12/results/*.json`
+- **Schema:** booktabs tabular; title and notes as comments
+- **Key:** one file
+- **Rows / coverage:** table file `t1_primary.tex`
+- **Availability:** test; outcomes from the test period's outcomes, after unblinding (NA-12 S1)
+- **sha256:** `2f3bb04d13c789f75a65de05493d643c9bbe01b43c8ee9bc7927d2eb6414a2dd`
+
+### `artifacts/NA-12/tables/t1b_primary_by_model.csv`
+- **Producer:** `newsaction.analysis.tables.write`
+- **Inputs:** `artifacts/NA-12/results/*.json`
+- **Schema:** a `key` column (unique) and the table's columns
+- **Key:** `key`
+- **Rows / coverage:** table file `t1b_primary_by_model.csv`
+- **Availability:** test; outcomes from the test period's outcomes, after unblinding (NA-12 S1)
+- **sha256:** `37cf7a2c0739482d26afc019866a3a57054d25a24ec97554eb7792fcc4c6d676`
+
+### `artifacts/NA-12/tables/t1b_primary_by_model.tex`
+- **Producer:** `newsaction.analysis.tables.write`
+- **Inputs:** `artifacts/NA-12/results/*.json`
+- **Schema:** booktabs tabular; title and notes as comments
+- **Key:** one file
+- **Rows / coverage:** table file `t1b_primary_by_model.tex`
+- **Availability:** test; outcomes from the test period's outcomes, after unblinding (NA-12 S1)
+- **sha256:** `925624c1ad4eafffb25b36513d486b3324c8201ba65b7ea64015996ccf9a8179`
+
+### `artifacts/NA-12/tables/t2_h2_over_under.csv`
+- **Producer:** `newsaction.analysis.tables.write`
+- **Inputs:** `artifacts/NA-12/results/*.json`
+- **Schema:** a `key` column (unique) and the table's columns
+- **Key:** `key`
+- **Rows / coverage:** table file `t2_h2_over_under.csv`
+- **Availability:** test; outcomes from the test period's outcomes, after unblinding (NA-12 S1)
+- **sha256:** `8bcb2c11f32a8574b4c70dbd21d211c31f5bf4884c731e4c99b6dafe0fe1306a`
+
+### `artifacts/NA-12/tables/t2_h2_over_under.tex`
+- **Producer:** `newsaction.analysis.tables.write`
+- **Inputs:** `artifacts/NA-12/results/*.json`
+- **Schema:** booktabs tabular; title and notes as comments
+- **Key:** one file
+- **Rows / coverage:** table file `t2_h2_over_under.tex`
+- **Availability:** test; outcomes from the test period's outcomes, after unblinding (NA-12 S1)
+- **sha256:** `08e9a6a7a034b159a5eb94f543f956f9e31d2d044d06bc1df23893371050f4ab`
+
+### `artifacts/NA-12/tables/t3_ic.csv`
+- **Producer:** `newsaction.analysis.tables.write`
+- **Inputs:** `artifacts/NA-12/results/*.json`
+- **Schema:** a `key` column (unique) and the table's columns
+- **Key:** `key`
+- **Rows / coverage:** table file `t3_ic.csv`
+- **Availability:** test; outcomes from the test period's outcomes, after unblinding (NA-12 S1)
+- **sha256:** `dae94be5f0635c9f7914619bc1bdb4541729ad29d2e6f2555b9a8ec4c544ef41`
+
+### `artifacts/NA-12/tables/t3_ic.tex`
+- **Producer:** `newsaction.analysis.tables.write`
+- **Inputs:** `artifacts/NA-12/results/*.json`
+- **Schema:** booktabs tabular; title and notes as comments
+- **Key:** one file
+- **Rows / coverage:** table file `t3_ic.tex`
+- **Availability:** test; outcomes from the test period's outcomes, after unblinding (NA-12 S1)
+- **sha256:** `cf62889f75006e2f611e425bcd5094738ba69767463c6f3ddb417acfa9d7a2e0`
+
+### `artifacts/NA-12/tables/t4_secondary.csv`
+- **Producer:** `newsaction.analysis.tables.write`
+- **Inputs:** `artifacts/NA-12/results/*.json`
+- **Schema:** a `key` column (unique) and the table's columns
+- **Key:** `key`
+- **Rows / coverage:** table file `t4_secondary.csv`
+- **Availability:** test; outcomes from the test period's outcomes, after unblinding (NA-12 S1)
+- **sha256:** `c474f9c40628f2da101a9c92ed41aec9b53012837fed16bc7a15c81f6f5b3067`
+
+### `artifacts/NA-12/tables/t4_secondary.tex`
+- **Producer:** `newsaction.analysis.tables.write`
+- **Inputs:** `artifacts/NA-12/results/*.json`
+- **Schema:** booktabs tabular; title and notes as comments
+- **Key:** one file
+- **Rows / coverage:** table file `t4_secondary.tex`
+- **Availability:** test; outcomes from the test period's outcomes, after unblinding (NA-12 S1)
+- **sha256:** `5d7c684611dd9b95536126a827df107c5326a3f9600bf24d67300d614760763d`
+
+### `artifacts/NA-12/tables/t5_heterogeneity.csv`
+- **Producer:** `newsaction.analysis.tables.write`
+- **Inputs:** `artifacts/NA-12/results/*.json`
+- **Schema:** a `key` column (unique) and the table's columns
+- **Key:** `key`
+- **Rows / coverage:** table file `t5_heterogeneity.csv`
+- **Availability:** test; outcomes from the test period's outcomes, after unblinding (NA-12 S1)
+- **sha256:** `126066b207041c66d4e0b83cee5d8fec1bd6165a705e6578243e60c9562ba178`
+
+### `artifacts/NA-12/tables/t5_heterogeneity.tex`
+- **Producer:** `newsaction.analysis.tables.write`
+- **Inputs:** `artifacts/NA-12/results/*.json`
+- **Schema:** booktabs tabular; title and notes as comments
+- **Key:** one file
+- **Rows / coverage:** table file `t5_heterogeneity.tex`
+- **Availability:** test; outcomes from the test period's outcomes, after unblinding (NA-12 S1)
+- **sha256:** `24c54d1a80b9ba88d0e3d84f7d2e2e1caf4865941d20d6f46e0bb007841bdd83`
+
+### `artifacts/NA-12/tables/t6_convergence_ladder.csv`
+- **Producer:** `newsaction.analysis.tables.write`
+- **Inputs:** `artifacts/NA-12/results/*.json`
+- **Schema:** a `key` column (unique) and the table's columns
+- **Key:** `key`
+- **Rows / coverage:** table file `t6_convergence_ladder.csv`
+- **Availability:** test; outcomes from the test period's outcomes, after unblinding (NA-12 S1)
+- **sha256:** `e2b1ff300300b610b187c12c5ea019d89e9fd13c69600306979245b296db7901`
+
+### `artifacts/NA-12/tables/t6_convergence_ladder.tex`
+- **Producer:** `newsaction.analysis.tables.write`
+- **Inputs:** `artifacts/NA-12/results/*.json`
+- **Schema:** booktabs tabular; title and notes as comments
+- **Key:** one file
+- **Rows / coverage:** table file `t6_convergence_ladder.tex`
+- **Availability:** test; outcomes from the test period's outcomes, after unblinding (NA-12 S1)
+- **sha256:** `a389df64fe52fe4dede235a94be983e624a19496030b546c2e786e7765e4cf3e`
+
+### `artifacts/NA-12/tables/t7_gap_closure.csv`
+- **Producer:** `newsaction.analysis.tables.write`
+- **Inputs:** `artifacts/NA-12/results/*.json`
+- **Schema:** a `key` column (unique) and the table's columns
+- **Key:** `key`
+- **Rows / coverage:** table file `t7_gap_closure.csv`
+- **Availability:** test; outcomes from the test period's outcomes, after unblinding (NA-12 S1)
+- **sha256:** `b5c8a3a0373b832028f817eb0e4d47f263367d6571e70c7e42deb75ef2da79f9`
+
+### `artifacts/NA-12/tables/t7_gap_closure.tex`
+- **Producer:** `newsaction.analysis.tables.write`
+- **Inputs:** `artifacts/NA-12/results/*.json`
+- **Schema:** booktabs tabular; title and notes as comments
+- **Key:** one file
+- **Rows / coverage:** table file `t7_gap_closure.tex`
+- **Availability:** test; outcomes from the test period's outcomes, after unblinding (NA-12 S1)
+- **sha256:** `161765245a094110de714d981f48b6f1129d5e43cc67d3856fbbdbdae0d6c4c0`
+
+### `artifacts/NA-12/tables/t8_tracking_error.csv`
+- **Producer:** `newsaction.analysis.tables.write`
+- **Inputs:** `artifacts/NA-12/results/*.json`
+- **Schema:** a `key` column (unique) and the table's columns
+- **Key:** `key`
+- **Rows / coverage:** table file `t8_tracking_error.csv`
+- **Availability:** test; outcomes from the test period's outcomes, after unblinding (NA-12 S1)
+- **sha256:** `43ea9867777802a24d0d7d1ca4331f39c99e210428b1242ceef463bae84ef80b`
+
+### `artifacts/NA-12/tables/t8_tracking_error.tex`
+- **Producer:** `newsaction.analysis.tables.write`
+- **Inputs:** `artifacts/NA-12/results/*.json`
+- **Schema:** booktabs tabular; title and notes as comments
+- **Key:** one file
+- **Rows / coverage:** table file `t8_tracking_error.tex`
+- **Availability:** test; outcomes from the test period's outcomes, after unblinding (NA-12 S1)
+- **sha256:** `eeb92483707d17cc511a7dde8f50bc20d97f6a160e76a4bef976ba2526b1ee3c`
+
+### `artifacts/NA-12/tables/t9_convergence_cuts.csv`
+- **Producer:** `newsaction.analysis.tables.write`
+- **Inputs:** `artifacts/NA-12/results/*.json`
+- **Schema:** a `key` column (unique) and the table's columns
+- **Key:** `key`
+- **Rows / coverage:** table file `t9_convergence_cuts.csv`
+- **Availability:** test; outcomes from the test period's outcomes, after unblinding (NA-12 S1)
+- **sha256:** `a46631d9c863242a08074aded174bc5758a17c9b16a56684075070067180c89b`
+
+### `artifacts/NA-12/tables/t9_convergence_cuts.tex`
+- **Producer:** `newsaction.analysis.tables.write`
+- **Inputs:** `artifacts/NA-12/results/*.json`
+- **Schema:** booktabs tabular; title and notes as comments
+- **Key:** one file
+- **Rows / coverage:** table file `t9_convergence_cuts.tex`
+- **Availability:** test; outcomes from the test period's outcomes, after unblinding (NA-12 S1)
+- **sha256:** `fb177a2e585e35a016aaf6d90fb76fa470001d41a83bebffc9e7d7742003632e`

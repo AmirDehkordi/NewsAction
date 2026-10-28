@@ -1,0 +1,36 @@
+% t11_explanation_share_theta: A3.3–A3.5 (d1-ultra, model-specific): explained share, θ, persistence by reason, the market
+\begin{tabular}{lllllllllll}
+\toprule
+key & item & value & events\_share & n & variance\_share & se & p & ci\_low & ci\_high & available \\
+\midrule
+share:all & share of Σz\_cc² on days judged explained (X >= 0.5) & 0.410 & 0.156 & 18,291 & — & — & — & — & — & — \\
+share:tier:mid & explained share, mid & 0.421 & — & — & — & — & — & — & — & — \\
+share:tier:rest & explained share, rest & 0.401 & — & — & — & — & — & — & — & — \\
+share:tier:top100 & explained share, top100 & 0.413 & — & — & — & — & — & — & — & — \\
+share:reason:analyst\_action & explained share, reason analyst\_action & 0.342 & — & 3,269 & 0.103 & — & — & — & — & — \\
+share:reason:capital\_returns\_financing & explained share, reason capital\_returns\_financing & 0.278 & — & 410 & 0.013 & — & — & — & — & — \\
+share:reason:deal\_ma\_partnership & explained share, reason deal\_ma\_partnership & 0.336 & — & 1,192 & 0.050 & — & — & — & — & — \\
+share:reason:earnings\_results & explained share, reason earnings\_results & 0.536 & — & 4,592 & 0.570 & — & — & — & — & — \\
+share:reason:guidance\_outlook & explained share, reason guidance\_outlook & 0.500 & — & 622 & 0.043 & — & — & — & — & — \\
+share:reason:legal\_regulatory & explained share, reason legal\_regulatory & 0.313 & — & 423 & 0.015 & — & — & — & — & — \\
+share:reason:management\_governance & explained share, reason management\_governance & 0.071 & — & 263 & 0.009 & — & — & — & — & — \\
+share:reason:market\_or\_sector\_move & explained share, reason market\_or\_sector\_move & 0.036 & — & 2,113 & 0.011 & — & — & — & — & — \\
+share:reason:no\_identifiable\_news & explained share, reason no\_identifiable\_news & 0.021 & — & 4,387 & 0.144 & — & — & — & — & — \\
+share:reason:product\_operations & explained share, reason product\_operations & 0.338 & — & 782 & 0.029 & — & — & — & — & — \\
+share:reason:sector\_or\_macro & explained share, reason sector\_or\_macro & 0.622 & — & 238 & 0.013 & — & — & — & — & — \\
+theta:d2 & θ at D2 (explanation → persistence) & -0.062 & — & 17,188 & — & 0.038 & 0.946 & — & — & — \\
+theta:d1 & θ at D1 (explanation → persistence) & -0.040 & — & 13,203 & — & 0.036 & 0.868 & — & — & — \\
+persistence:analyst\_action & mean sign(G)·y2, reason analyst\_action & 0.001 & — & 3,159 & — & — & 0.491 & -0.065 & 0.067 & — \\
+persistence:capital\_returns\_financing & mean sign(G)·y2, reason capital\_returns\_financing & -0.121 & — & 392 & — & — & 0.960 & -0.259 & 0.016 & — \\
+persistence:deal\_ma\_partnership & mean sign(G)·y2, reason deal\_ma\_partnership & -0.016 & — & 1,136 & — & — & 0.646 & -0.098 & 0.069 & — \\
+persistence:earnings\_results & mean sign(G)·y2, reason earnings\_results & -0.028 & — & 4,204 & — & — & 0.842 & -0.086 & 0.032 & — \\
+persistence:guidance\_outlook & mean sign(G)·y2, reason guidance\_outlook & -0.125 & — & 572 & — & — & 0.976 & -0.250 & -7.08e-04 & — \\
+persistence:legal\_regulatory & mean sign(G)·y2, reason legal\_regulatory & -0.125 & — & 408 & — & — & 0.956 & -0.267 & 0.025 & — \\
+persistence:management\_governance & mean sign(G)·y2, reason management\_governance & -0.083 & — & 254 & — & — & 0.877 & -0.223 & 0.059 & — \\
+persistence:market\_or\_sector\_move & mean sign(G)·y2, reason market\_or\_sector\_move & -0.002 & — & 1,986 & — & — & 0.540 & -0.083 & 0.076 & — \\
+persistence:no\_identifiable\_news & mean sign(G)·y2, reason no\_identifiable\_news & 0.023 & — & 4,091 & — & — & 0.260 & -0.048 & 0.091 & — \\
+persistence:product\_operations & mean sign(G)·y2, reason product\_operations & 0.058 & — & 758 & — & — & 0.168 & -0.055 & 0.177 & — \\
+persistence:sector\_or\_macro & mean sign(G)·y2, reason sector\_or\_macro & -0.173 & — & 228 & — & — & 0.945 & -0.390 & 0.040 & — \\
+market:r2 & A3.5 market replication, OOS R² of SPY's r\_cc (exploratory) & 0.021 & — & 144 & — & — & 0.309 & -0.066 & 0.107 & yes \\
+\bottomrule
+\end{tabular}

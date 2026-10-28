@@ -1,0 +1,56 @@
+% t7_gap_closure: A1 gap closure AR(τ→h)/σ = a + λ_h·U_τ + ψ_h·V (+ FE) at D2 and D1; half-life (first λ_h >= 0.5)
+% ψ carries its two-sided p (ψ_h* = 0, outside every family); a half-life of ∞ is beyond t+20.
+\begin{tabular}{llllllllllllllll}
+\toprule
+key & model & point & variant & rung & available & lambda & lambda\_se & lambda\_p & lambda\_p\_dk & psi & psi\_se & psi\_p\_two & nobs & ci\_low & ci\_high \\
+\midrule
+laya\_fin:D2:all:C\_t+1 & laya\_fin & D2 & all & C\_t+1 & yes & -0.007 & 0.012 & 0.728 & 0.781 & -0.002 & 0.041 & 0.962 & 17,695 & — & — \\
+laya\_fin:D2:all:C\_t+5 & laya\_fin & D2 & all & C\_t+5 & yes & 0.026 & 0.026 & 0.159 & 0.177 & -0.067 & 0.090 & 0.460 & 17,188 & — & — \\
+laya\_fin:D2:all:C\_t+20 & laya\_fin & D2 & all & C\_t+20 & yes & 0.050 & 0.051 & 0.164 & 0.172 & -0.243 & 0.193 & 0.209 & 14,985 & — & — \\
+laya\_fin:D2:clean:C\_t+1 & laya\_fin & D2 & clean & C\_t+1 & yes & 0.006 & 0.016 & 0.350 & 0.314 & 0.085 & 0.058 & 0.141 & 10,266 & — & — \\
+laya\_fin:D2:clean:C\_t+5 & laya\_fin & D2 & clean & C\_t+5 & yes & 0.004 & 0.063 & 0.473 & 0.470 & -0.201 & 0.289 & 0.487 & 2,877 & — & — \\
+laya\_fin:D2:clean:C\_t+20 & laya\_fin & D2 & clean & C\_t+20 & yes & 0.358 & 0.711 & 0.308 & 0.280 & 0.639 & 2.840 & 0.822 & 314 & — & — \\
+laya\_fin:D2:all:half\_life & laya\_fin & D2 & all & half-life (sessions) & yes & — & — & — & — & — & — & — & — & — & — \\
+laya\_fin:D1:all:C\_t & laya\_fin & D1 & all & C\_t & yes & -0.011 & 0.013 & 0.805 & 0.790 & 0.064 & 0.038 & 0.095 & 13,287 & — & — \\
+laya\_fin:D1:all:C\_t+1 & laya\_fin & D1 & all & C\_t+1 & yes & -0.024 & 0.020 & 0.885 & 0.924 & 0.137 & 0.071 & 0.058 & 13,287 & — & — \\
+laya\_fin:D1:all:C\_t+5 & laya\_fin & D1 & all & C\_t+5 & yes & -0.002 & 0.034 & 0.527 & 0.524 & 0.048 & 0.134 & 0.718 & 12,711 & — & — \\
+laya\_fin:D1:all:C\_t+20 & laya\_fin & D1 & all & C\_t+20 & yes & -0.013 & 0.062 & 0.585 & 0.573 & -0.003 & 0.243 & 0.989 & 11,087 & — & — \\
+laya\_fin:D1:clean:C\_t & laya\_fin & D1 & clean & C\_t & yes & -0.011 & 0.013 & 0.805 & 0.790 & 0.064 & 0.038 & 0.095 & 13,287 & — & — \\
+laya\_fin:D1:clean:C\_t+1 & laya\_fin & D1 & clean & C\_t+1 & yes & 0.022 & 0.030 & 0.232 & 0.210 & 0.189 & 0.109 & 0.084 & 7,554 & — & — \\
+laya\_fin:D1:clean:C\_t+5 & laya\_fin & D1 & clean & C\_t+5 & yes & -0.014 & 0.093 & 0.558 & 0.559 & 0.046 & 0.320 & 0.885 & 2,073 & — & — \\
+laya\_fin:D1:clean:C\_t+20 & laya\_fin & D1 & clean & C\_t+20 & yes & -0.225 & 1.025 & 0.587 & 0.620 & -0.191 & 4.204 & 0.964 & 203 & — & — \\
+laya\_fin:D1:all:half\_life & laya\_fin & D1 & all & half-life (sessions) & yes & — & — & — & — & — & — & — & — & — & — \\
+anchor:D2:all:C\_t+1 & anchor & D2 & all & C\_t+1 & yes & -0.007 & 0.012 & 0.730 & 0.786 & 0.049 & 0.062 & 0.428 & 17,695 & — & — \\
+anchor:D2:all:C\_t+5 & anchor & D2 & all & C\_t+5 & yes & 0.027 & 0.027 & 0.156 & 0.175 & -0.034 & 0.144 & 0.813 & 17,188 & — & — \\
+anchor:D2:all:C\_t+20 & anchor & D2 & all & C\_t+20 & yes & 0.052 & 0.051 & 0.158 & 0.166 & 0.157 & 0.222 & 0.481 & 14,985 & — & — \\
+anchor:D2:clean:C\_t+1 & anchor & D2 & clean & C\_t+1 & yes & 0.005 & 0.016 & 0.377 & 0.346 & 0.292 & 0.140 & 0.039 & 10,266 & — & — \\
+anchor:D2:clean:C\_t+5 & anchor & D2 & clean & C\_t+5 & yes & 0.002 & 0.063 & 0.485 & 0.484 & -0.621 & 0.467 & 0.186 & 2,877 & — & — \\
+anchor:D2:clean:C\_t+20 & anchor & D2 & clean & C\_t+20 & yes & 0.310 & 0.682 & 0.326 & 0.302 & 3.333 & 4.771 & 0.487 & 314 & — & — \\
+anchor:D2:all:half\_life & anchor & D2 & all & half-life (sessions) & yes & — & — & — & — & — & — & — & — & — & — \\
+anchor:D1:all:C\_t & anchor & D1 & all & C\_t & yes & -0.012 & 0.013 & 0.819 & 0.800 & 0.010 & 0.035 & 0.780 & 13,287 & — & — \\
+anchor:D1:all:C\_t+1 & anchor & D1 & all & C\_t+1 & yes & -0.025 & 0.020 & 0.899 & 0.934 & 0.039 & 0.056 & 0.486 & 13,287 & — & — \\
+anchor:D1:all:C\_t+5 & anchor & D1 & all & C\_t+5 & yes & -0.003 & 0.034 & 0.533 & 0.530 & -0.043 & 0.087 & 0.624 & 12,711 & — & — \\
+anchor:D1:all:C\_t+20 & anchor & D1 & all & C\_t+20 & yes & -0.013 & 0.062 & 0.582 & 0.571 & 0.053 & 0.143 & 0.711 & 11,087 & — & — \\
+anchor:D1:clean:C\_t & anchor & D1 & clean & C\_t & yes & -0.012 & 0.013 & 0.819 & 0.800 & 0.010 & 0.035 & 0.780 & 13,287 & — & — \\
+anchor:D1:clean:C\_t+1 & anchor & D1 & clean & C\_t+1 & yes & 0.020 & 0.030 & 0.255 & 0.241 & 0.280 & 0.109 & 0.011 & 7,554 & — & — \\
+anchor:D1:clean:C\_t+5 & anchor & D1 & clean & C\_t+5 & yes & -0.010 & 0.093 & 0.542 & 0.542 & 0.319 & 0.343 & 0.354 & 2,073 & — & — \\
+anchor:D1:clean:C\_t+20 & anchor & D1 & clean & C\_t+20 & yes & -0.302 & 0.949 & 0.625 & 0.669 & 9.321 & 11.238 & 0.410 & 203 & — & — \\
+anchor:D1:all:half\_life & anchor & D1 & all & half-life (sessions) & yes & — & — & — & — & — & — & — & — & — & — \\
+d1\_ultra:D2:all:C\_t+1 & d1\_ultra & D2 & all & C\_t+1 & yes & -0.009 & 0.012 & 0.773 & 0.838 & -0.041 & 0.040 & 0.306 & 17,695 & — & — \\
+d1\_ultra:D2:all:C\_t+5 & d1\_ultra & D2 & all & C\_t+5 & yes & 0.022 & 0.026 & 0.206 & 0.218 & -0.160 & 0.095 & 0.094 & 17,188 & — & — \\
+d1\_ultra:D2:all:C\_t+20 & d1\_ultra & D2 & all & C\_t+20 & yes & 0.049 & 0.051 & 0.170 & 0.175 & -0.134 & 0.166 & 0.423 & 14,985 & — & — \\
+d1\_ultra:D2:clean:C\_t+1 & d1\_ultra & D2 & clean & C\_t+1 & yes & 0.003 & 0.016 & 0.418 & 0.397 & -0.065 & 0.048 & 0.177 & 10,266 & — & — \\
+d1\_ultra:D2:clean:C\_t+5 & d1\_ultra & D2 & clean & C\_t+5 & yes & -0.003 & 0.063 & 0.521 & 0.523 & -0.416 & 0.175 & 0.019 & 2,877 & — & — \\
+d1\_ultra:D2:clean:C\_t+20 & d1\_ultra & D2 & clean & C\_t+20 & yes & 0.325 & 0.693 & 0.320 & 0.289 & -3.506 & 2.509 & 0.166 & 314 & — & — \\
+d1\_ultra:D2:all:half\_life & d1\_ultra & D2 & all & half-life (sessions) & yes & — & — & — & — & — & — & — & — & — & — \\
+d1\_ultra:D1:all:C\_t & d1\_ultra & D1 & all & C\_t & yes & -0.013 & 0.013 & 0.829 & 0.820 & -0.003 & 0.037 & 0.940 & 13,287 & — & — \\
+d1\_ultra:D1:all:C\_t+1 & d1\_ultra & D1 & all & C\_t+1 & yes & -0.028 & 0.020 & 0.921 & 0.959 & -0.051 & 0.051 & 0.316 & 13,287 & — & — \\
+d1\_ultra:D1:all:C\_t+5 & d1\_ultra & D1 & all & C\_t+5 & yes & -0.012 & 0.034 & 0.636 & 0.623 & -0.234 & 0.110 & 0.036 & 12,711 & — & — \\
+d1\_ultra:D1:all:C\_t+20 & d1\_ultra & D1 & all & C\_t+20 & yes & -0.020 & 0.062 & 0.624 & 0.608 & -0.183 & 0.204 & 0.372 & 11,087 & — & — \\
+d1\_ultra:D1:clean:C\_t & d1\_ultra & D1 & clean & C\_t & yes & -0.013 & 0.013 & 0.829 & 0.820 & -0.003 & 0.037 & 0.940 & 13,287 & — & — \\
+d1\_ultra:D1:clean:C\_t+1 & d1\_ultra & D1 & clean & C\_t+1 & yes & 0.014 & 0.030 & 0.317 & 0.302 & -0.182 & 0.067 & 0.008 & 7,554 & — & — \\
+d1\_ultra:D1:clean:C\_t+5 & d1\_ultra & D1 & clean & C\_t+5 & yes & -0.029 & 0.094 & 0.622 & 0.620 & -0.396 & 0.273 & 0.149 & 2,073 & — & — \\
+d1\_ultra:D1:clean:C\_t+20 & d1\_ultra & D1 & clean & C\_t+20 & yes & -0.232 & 1.008 & 0.591 & 0.630 & -1.009 & 2.292 & 0.661 & 203 & — & — \\
+d1\_ultra:D1:all:half\_life & d1\_ultra & D1 & all & half-life (sessions) & yes & — & — & — & — & — & — & — & — & — & — \\
+\bottomrule
+\end{tabular}

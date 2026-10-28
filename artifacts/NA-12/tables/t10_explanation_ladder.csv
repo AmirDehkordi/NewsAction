@@ -1,0 +1,95 @@
+key,model,cut,step,r2,n,r2_ci_low,r2_ci_high,r2_p,increment,increment_p,lambda
+roll_r2,all,all,market+sector,0.2525031895,68761,,,,,,
+laya_fin:all:ex_ante,laya_fin,all,ex_ante,0.001308096074,68761,-0.0002207664549,0.002827097967,0.04479552045,,,10000
+laya_fin:all:ex_post,laya_fin,all,ex_post,0.002460000057,68761,0.0003790900351,0.004505640696,0.009699030097,0.001151903983,0.0099990001,10000
+laya_fin:all:knowable,laya_fin,all,ex-ante ÷ ex-post (increment: ex-post − ex-ante),0.5317463593,,,,,0.001151903983,,
+laya_fin:event_days:ex_ante,laya_fin,event_days,ex_ante,0.00372784559,18291,-0.0008469969078,0.007784954557,0.03659634037,,,1000
+laya_fin:event_days:ex_post,laya_fin,event_days,ex_post,0.006345220955,18291,7.292032414e-05,0.01203563868,0.01469853015,0.002617375365,0.0404959504,1000
+laya_fin:event_days:knowable,laya_fin,event_days,ex-ante ÷ ex-post (increment: ex-post − ex-ante),0.5875044568,,,,,0.002617375365,,
+laya_fin:non_event_days:ex_ante,laya_fin,non_event_days,ex_ante,2.236583987e-05,50470,-0.0001233528184,0.0001717390069,0.3887611239,,,10000
+laya_fin:tier:top100:ex_ante,laya_fin,tier:top100,ex_ante,0.006046115085,14007,2.450527797e-05,0.01319218341,0.04469553045,,,1000
+laya_fin:tier:top100:ex_post,laya_fin,tier:top100,ex_post,0.005026028908,14007,0.001376308907,0.009129021972,0.009499050095,-0.001020086177,0.7368263174,10000
+laya_fin:tier:top100:knowable,laya_fin,tier:top100,ex-ante ÷ ex-post (increment: ex-post − ex-ante),1.202960666,,,,,-0.001020086177,,
+laya_fin:tier:mid:ex_ante,laya_fin,tier:mid,ex_ante,-0.0007024657154,20612,-0.002866460928,0.001444906271,0.7242275772,,,1000
+laya_fin:tier:mid:ex_post,laya_fin,tier:mid,ex_post,0.00183884081,20612,-0.001043783263,0.004405972823,0.0795920408,0.002541306525,0.007699230077,1000
+laya_fin:tier:mid:knowable,laya_fin,tier:mid,ex-ante ÷ ex-post (increment: ex-post − ex-ante),-0.3820155131,,,,,0.002541306525,,
+laya_fin:tier:rest:ex_ante,laya_fin,tier:rest,ex_ante,0.001013843729,34142,-0.001075964915,0.00290043267,0.1608839116,,,1000
+laya_fin:tier:rest:ex_post,laya_fin,tier:rest,ex_post,0.001783359553,34142,-0.001106212422,0.004640459861,0.1065893411,0.0007695158244,0.1733826617,1000
+laya_fin:tier:rest:knowable,laya_fin,tier:rest,ex-ante ÷ ex-post (increment: ex-post − ex-ante),0.5685021436,,,,,0.0007695158244,,
+anchor:all:ex_ante,anchor,all,ex_ante,0.000117065161,68761,-0.0001443425524,0.0003988164902,0.1897810219,,,10000
+anchor:all:ex_post,anchor,all,ex_post,0.0003285930737,68761,-0.0001305150984,0.0007591217793,0.07159284072,0.0002115279128,0.09449055094,10000
+anchor:all:knowable,anchor,all,ex-ante ÷ ex-post (increment: ex-post − ex-ante),0.3562618033,,,,,0.0002115279128,,
+anchor:event_days:ex_ante,anchor,event_days,ex_ante,0.0002714060352,18291,-0.0002532628257,0.0007751096518,0.1406859314,,,10000
+anchor:event_days:ex_post,anchor,event_days,ex_post,0.0006481364945,18291,-0.0004941378376,0.001679937202,0.1110888911,0.0003767304593,0.1400859914,10000
+anchor:event_days:knowable,anchor,event_days,ex-ante ÷ ex-post (increment: ex-post − ex-ante),0.4187482691,,,,,0.0003767304593,,
+anchor:non_event_days:ex_ante,anchor,non_event_days,ex_ante,2.236583987e-05,50470,-0.0001233528184,0.0001717390069,0.3887611239,,,10000
+anchor:tier:top100:ex_ante,anchor,tier:top100,ex_ante,-0.0005449578248,14007,-0.001319082717,0.0002508425232,0.9143085691,,,10000
+anchor:tier:top100:ex_post,anchor,tier:top100,ex_post,-0.0008387958756,14007,-0.001939421976,0.0002725910118,0.9338066193,-0.0002938380508,0.8803119688,10000
+anchor:tier:top100:knowable,anchor,tier:top100,ex-ante ÷ ex-post (increment: ex-post − ex-ante),0.6496906347,,,,,-0.0002938380508,,
+anchor:tier:mid:ex_ante,anchor,tier:mid,ex_ante,-0.001300130215,20612,-0.002238345399,-0.000360758911,0.99630037,,,1000
+anchor:tier:mid:ex_post,anchor,tier:mid,ex_post,-0.0007331542791,20612,-0.002103507656,0.0005089295244,0.8610138986,0.0005669759362,0.1545845415,1000
+anchor:tier:mid:knowable,anchor,tier:mid,ex-ante ÷ ex-post (increment: ex-post − ex-ante),1.773337826,,,,,0.0005669759362,,
+anchor:tier:rest:ex_ante,anchor,tier:rest,ex_ante,-4.617286185e-05,34142,-0.000683979531,0.0006086126888,0.5582441756,,,10000
+anchor:tier:rest:ex_post,anchor,tier:rest,ex_post,0.0002987266756,34142,-0.001395834918,0.001882765488,0.3664633537,0.0003448995374,0.3139686031,1000
+anchor:tier:rest:knowable,anchor,tier:rest,ex-ante ÷ ex-post (increment: ex-post − ex-ante),-0.1545655799,,,,,0.0003448995374,,
+d1_ultra:all:ex_ante,d1_ultra,all,ex_ante,0.002846765105,68761,-0.0004795074584,0.005876983185,0.03269673033,,,0.01
+d1_ultra:all:ex_post,d1_ultra,all,ex_post,0.0081845411,68761,0.003990479448,0.01204478058,9.9990001e-05,0.005337775995,9.9990001e-05,1000
+d1_ultra:all:explanation,d1_ultra,all,explanation,0.1575851482,68761,0.1270779398,0.185229459,9.9990001e-05,0.1494006071,9.9990001e-05,1000
+d1_ultra:all:knowable,d1_ultra,all,ex-ante ÷ ex-post (increment: ex-post − ex-ante),0.3478222017,,,,,0.005337775995,,
+d1_ultra:event_days:ex_ante,d1_ultra,event_days,ex_ante,0.007846599673,18291,0.001072194105,0.01309959309,0.00099990001,,,1000
+d1_ultra:event_days:ex_post,d1_ultra,event_days,ex_post,0.01921028022,18291,0.01098129062,0.02610836267,9.9990001e-05,0.01136368055,9.9990001e-05,1000
+d1_ultra:event_days:explanation,d1_ultra,event_days,explanation,0.375307704,18291,0.3564486062,0.3923538951,9.9990001e-05,0.3560974238,9.9990001e-05,100
+d1_ultra:event_days:knowable,d1_ultra,event_days,ex-ante ÷ ex-post (increment: ex-post − ex-ante),0.4084583662,,,,,0.01136368055,,
+d1_ultra:non_event_days:ex_ante,d1_ultra,non_event_days,ex_ante,2.236583987e-05,50470,-0.0001233528184,0.0001717390069,0.3887611239,,,10000
+d1_ultra:tier:top100:ex_ante,d1_ultra,tier:top100,ex_ante,0.005317381697,14007,-0.0001002033306,0.01068051943,0.02569743026,,,1000
+d1_ultra:tier:top100:ex_post,d1_ultra,tier:top100,ex_post,0.008837696639,14007,0.005517264483,0.01209574484,9.9990001e-05,0.003520314942,0.004799520048,10000
+d1_ultra:tier:top100:explanation,d1_ultra,tier:top100,explanation,0.1985071446,14007,0.1652932164,0.2313805617,9.9990001e-05,0.189669448,9.9990001e-05,100
+d1_ultra:tier:top100:knowable,d1_ultra,tier:top100,ex-ante ÷ ex-post (increment: ex-post − ex-ante),0.6016705386,,,,,0.003520314942,,
+d1_ultra:tier:mid:ex_ante,d1_ultra,tier:mid,ex_ante,0.001747542432,20612,-0.0005554353446,0.004017384619,0.06529347065,,,10000
+d1_ultra:tier:mid:ex_post,d1_ultra,tier:mid,ex_post,0.004732541472,20612,-0.000962429642,0.01023988688,0.04819518048,0.00298499904,0.06109389061,1000
+d1_ultra:tier:mid:explanation,d1_ultra,tier:mid,explanation,0.1563665737,20612,0.1215215695,0.1897908284,9.9990001e-05,0.1516340323,9.9990001e-05,1000
+d1_ultra:tier:mid:knowable,d1_ultra,tier:mid,ex-ante ÷ ex-post (increment: ex-post − ex-ante),0.3692608806,,,,,0.00298499904,,
+d1_ultra:tier:rest:ex_ante,d1_ultra,tier:rest,ex_ante,0.003245094952,34142,-4.554121431e-05,0.006327816803,0.0202979702,,,100
+d1_ultra:tier:rest:ex_post,d1_ultra,tier:rest,ex_post,0.006614735974,34142,0.002378465886,0.01047399241,0.000299970003,0.003369641022,0.001399860014,1000
+d1_ultra:tier:rest:explanation,d1_ultra,tier:rest,explanation,0.1400653951,34142,0.1087616355,0.1662251309,9.9990001e-05,0.1334506592,9.9990001e-05,1000
+d1_ultra:tier:rest:knowable,d1_ultra,tier:rest,ex-ante ÷ ex-post (increment: ex-post − ex-ante),0.4905857112,,,,,0.003369641022,,
+d1_ultra:event_type:analyst_action:ex_ante,d1_ultra,event_type:analyst_action,ex_ante,0.003073027577,3629,-0.00240728142,0.008722367408,0.1379862014,,,0.01
+d1_ultra:event_type:analyst_action:ex_post,d1_ultra,event_type:analyst_action,ex_post,0.01174031869,3629,0.004043995554,0.02077832017,0.006799320068,0.008667291115,0.000399960004,1000
+d1_ultra:event_type:analyst_action:explanation,d1_ultra,event_type:analyst_action,explanation,0.4335249614,3629,0.4047960418,0.4623837213,9.9990001e-05,0.4217846427,9.9990001e-05,100
+d1_ultra:event_type:analyst_action:knowable,d1_ultra,event_type:analyst_action,ex-ante ÷ ex-post (increment: ex-post − ex-ante),0.2617499284,,,,,0.008667291115,,
+d1_ultra:event_type:capital_returns_financing:ex_ante,d1_ultra,event_type:capital_returns_financing,ex_ante,-0.03396361648,643,-0.08559482492,0.009716086147,0.903009699,,,10
+d1_ultra:event_type:capital_returns_financing:ex_post,d1_ultra,event_type:capital_returns_financing,ex_post,-0.0374258017,643,-0.08865016878,0.004300681502,0.9277072293,-0.003462185228,0.6406359364,100
+d1_ultra:event_type:capital_returns_financing:explanation,d1_ultra,event_type:capital_returns_financing,explanation,0.316763879,643,0.2605352108,0.3675465099,9.9990001e-05,0.3541896807,9.9990001e-05,100
+d1_ultra:event_type:capital_returns_financing:knowable,d1_ultra,event_type:capital_returns_financing,ex-ante ÷ ex-post (increment: ex-post − ex-ante),0.9074920223,,,,,-0.003462185228,,
+d1_ultra:event_type:deal_ma_partnership:ex_ante,d1_ultra,event_type:deal_ma_partnership,ex_ante,-0.004854149926,1266,-0.0175430857,0.007963397933,0.7732226777,,,10
+d1_ultra:event_type:deal_ma_partnership:ex_post,d1_ultra,event_type:deal_ma_partnership,ex_post,0.01435486444,1266,0.0003686841605,0.02880490565,0.02589741026,0.01920901436,9.9990001e-05,100
+d1_ultra:event_type:deal_ma_partnership:explanation,d1_ultra,event_type:deal_ma_partnership,explanation,0.3803718878,1266,0.3413744229,0.424691478,9.9990001e-05,0.3660170234,9.9990001e-05,100
+d1_ultra:event_type:deal_ma_partnership:knowable,d1_ultra,event_type:deal_ma_partnership,ex-ante ÷ ex-post (increment: ex-post − ex-ante),-0.3381536584,,,,,0.01920901436,,
+d1_ultra:event_type:earnings_results:ex_ante,d1_ultra,event_type:earnings_results,ex_ante,0.01409016105,7028,0.004557187179,0.02164699911,0.000199980002,,,1000
+d1_ultra:event_type:earnings_results:ex_post,d1_ultra,event_type:earnings_results,ex_post,0.02645278118,7028,0.01215433757,0.03933468684,9.9990001e-05,0.01236262014,9.9990001e-05,1000
+d1_ultra:event_type:earnings_results:explanation,d1_ultra,event_type:earnings_results,explanation,0.4003345181,7028,0.3767904314,0.4212586076,9.9990001e-05,0.373881737,9.9990001e-05,100
+d1_ultra:event_type:earnings_results:knowable,d1_ultra,event_type:earnings_results,ex-ante ÷ ex-post (increment: ex-post − ex-ante),0.5326532946,,,,,0.01236262014,,
+d1_ultra:event_type:guidance_outlook:ex_ante,d1_ultra,event_type:guidance_outlook,ex_ante,-0.03525627113,506,-0.07155964389,-0.005907559157,0.9712028797,,,100
+d1_ultra:event_type:guidance_outlook:ex_post,d1_ultra,event_type:guidance_outlook,ex_post,-0.007345922651,506,-0.03072257701,0.01421724145,0.7172282772,0.02791034848,0.001499850015,1000
+d1_ultra:event_type:guidance_outlook:explanation,d1_ultra,event_type:guidance_outlook,explanation,-0.05176090462,506,-0.2231175138,0.03000010754,0.7702229777,-0.04441498197,0.7532246775,10000
+d1_ultra:event_type:guidance_outlook:knowable,d1_ultra,event_type:guidance_outlook,ex-ante ÷ ex-post (increment: ex-post − ex-ante),4.799434027,,,,,0.02791034848,,
+d1_ultra:event_type:legal_regulatory:ex_ante,d1_ultra,event_type:legal_regulatory,ex_ante,-0.01846155031,467,-0.06163668701,0.016516678,0.8065193481,,,1000
+d1_ultra:event_type:legal_regulatory:ex_post,d1_ultra,event_type:legal_regulatory,ex_post,-0.0147404065,467,-0.06069396133,0.02350214819,0.7323267673,0.003721143813,0.0802919708,1000
+d1_ultra:event_type:legal_regulatory:explanation,d1_ultra,event_type:legal_regulatory,explanation,-1.16053252,467,-4.678606389,0.4162701639,0.7692230777,-1.145792114,0.7656234377,10
+d1_ultra:event_type:legal_regulatory:knowable,d1_ultra,event_type:legal_regulatory,ex-ante ÷ ex-post (increment: ex-post − ex-ante),1.252445129,,,,,0.003721143813,,
+d1_ultra:event_type:management_governance:ex_ante,d1_ultra,event_type:management_governance,ex_ante,0.005585387297,319,-0.007580559138,0.01652264038,0.1643835616,,,100
+d1_ultra:event_type:management_governance:ex_post,d1_ultra,event_type:management_governance,ex_post,0.002189717162,319,-0.002014319248,0.006361686098,0.1528847115,-0.003395670135,0.7370262974,10000
+d1_ultra:event_type:management_governance:explanation,d1_ultra,event_type:management_governance,explanation,0.1697934842,319,0.09914070109,0.2491976399,9.9990001e-05,0.1676037671,9.9990001e-05,10
+d1_ultra:event_type:management_governance:knowable,d1_ultra,event_type:management_governance,ex-ante ÷ ex-post (increment: ex-post − ex-ante),2.550734585,,,,,-0.003395670135,,
+d1_ultra:event_type:other:ex_ante,d1_ultra,event_type:other,ex_ante,-0.004107293703,3010,-0.007927220276,-0.000426618607,0.9839016098,,,10000
+d1_ultra:event_type:other:ex_post,d1_ultra,event_type:other,ex_post,-0.004155748433,3010,-0.01161442946,0.003796432114,0.8561143886,-4.845473008e-05,0.498450155,100
+d1_ultra:event_type:other:explanation,d1_ultra,event_type:other,explanation,0.194260012,3010,0.1656823789,0.2298877777,9.9990001e-05,0.1984157605,9.9990001e-05,10
+d1_ultra:event_type:other:knowable,d1_ultra,event_type:other,ex-ante ÷ ex-post (increment: ex-post − ex-ante),0.988340312,,,,,-4.845473008e-05,,
+d1_ultra:event_type:product_operations:ex_ante,d1_ultra,event_type:product_operations,ex_ante,-0.003387646291,1072,-0.01013788386,0.003139595822,0.8432156784,,,10000
+d1_ultra:event_type:product_operations:ex_post,d1_ultra,event_type:product_operations,ex_post,-0.003107526613,1072,-0.009796891087,0.003356609992,0.8231176882,0.0002801196783,0.01339866013,10000
+d1_ultra:event_type:product_operations:explanation,d1_ultra,event_type:product_operations,explanation,0.3554721951,1072,0.3082023497,0.3955851538,9.9990001e-05,0.3585797217,9.9990001e-05,100
+d1_ultra:event_type:product_operations:knowable,d1_ultra,event_type:product_operations,ex-ante ÷ ex-post (increment: ex-post − ex-ante),1.090142326,,,,,0.0002801196783,,
+d1_ultra:event_type:sector_or_macro:ex_ante,d1_ultra,event_type:sector_or_macro,ex_ante,-0.00270431563,351,-0.008382512105,0.001838973645,0.8513148685,,,10000
+d1_ultra:event_type:sector_or_macro:ex_post,d1_ultra,event_type:sector_or_macro,ex_post,0.03073366857,351,-0.00863195924,0.05787424637,0.009199080092,0.0334379842,0.002599740026,1000
+d1_ultra:event_type:sector_or_macro:explanation,d1_ultra,event_type:sector_or_macro,explanation,0.3492103772,351,0.1448792986,0.5053999235,9.9990001e-05,0.3184767086,9.9990001e-05,100
+d1_ultra:event_type:sector_or_macro:knowable,d1_ultra,event_type:sector_or_macro,ex-ante ÷ ex-post (increment: ex-post − ex-ante),-0.08799195656,,,,,0.0334379842,,

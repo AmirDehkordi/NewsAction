@@ -1,0 +1,92 @@
+% t6_convergence_ladder: A1 convergence ladder: κ_h of CAR^lvl_h on V (D0 events, day × tier FE) and the shares κ_h / κ_h*
+% ladder_clean: each rung on its clean-window events; ladder_h10: h* = t+10; ladder_plateau: the mean CAR^lvl over t+16..t+20. The C_t+60 rung is exploratory.
+\begin{tabular}{lllllllllllllll}
+\toprule
+key & model & variant & rung & available & kappa & kappa\_se & kappa\_t & kappa\_p & kappa\_se\_dk & kappa\_p\_dk & share\_of\_h\_star & nobs & ci\_low & ci\_high \\
+\midrule
+laya\_fin:ladder:O\_t & laya\_fin & ladder & O\_t & yes & 0.241 & 0.070 & 3.446 & <0.001 & 0.069 & <0.001 & 0.929 & 13,439 & — & — \\
+laya\_fin:ladder:10:00 & laya\_fin & ladder & 10:00 & yes & 0.273 & 0.080 & 3.404 & <0.001 & 0.081 & <0.001 & 1.055 & 13,287 & — & — \\
+laya\_fin:ladder:C\_t & laya\_fin & ladder & C\_t & yes & 0.359 & 0.090 & 3.973 & <0.001 & 0.108 & <0.001 & 1.387 & 13,748 & — & — \\
+laya\_fin:ladder:C\_t+1 & laya\_fin & ladder & C\_t+1 & yes & 0.362 & 0.097 & 3.755 & <0.001 & 0.100 & <0.001 & 1.400 & 13,615 & — & — \\
+laya\_fin:ladder:C\_t+2 & laya\_fin & ladder & C\_t+2 & yes & 0.376 & 0.112 & 3.358 & <0.001 & 0.111 & <0.001 & 1.453 & 13,439 & — & — \\
+laya\_fin:ladder:C\_t+5 & laya\_fin & ladder & C\_t+5 & yes & 0.263 & 0.137 & 1.915 & 0.029 & 0.134 & 0.026 & 1.017 & 12,850 & — & — \\
+laya\_fin:ladder:C\_t+10 & laya\_fin & ladder & C\_t+10 & yes & 0.208 & 0.177 & 1.175 & 0.121 & 0.179 & 0.124 & 0.803 & 11,993 & — & — \\
+laya\_fin:ladder:C\_t+20 & laya\_fin & ladder & C\_t+20 & yes & 0.259 & 0.230 & 1.126 & 0.131 & 0.234 & 0.136 & 1.000 & 11,201 & — & — \\
+laya\_fin:ladder:increase & laya\_fin & ladder & O\_t → C\_t+20 & yes & 0.018 & — & — & 0.467 & — & — & — & — & -0.361 & 0.490 \\
+laya\_fin:ladder\_clean:O\_t & laya\_fin & ladder\_clean & O\_t & yes & 0.241 & 0.070 & 3.446 & <0.001 & 0.069 & <0.001 & -0.337 & 13,439 & — & — \\
+laya\_fin:ladder\_clean:10:00 & laya\_fin & ladder\_clean & 10:00 & yes & 0.273 & 0.080 & 3.404 & <0.001 & 0.081 & <0.001 & -0.382 & 13,287 & — & — \\
+laya\_fin:ladder\_clean:C\_t & laya\_fin & ladder\_clean & C\_t & yes & 0.359 & 0.090 & 3.973 & <0.001 & 0.108 & <0.001 & -0.502 & 13,748 & — & — \\
+laya\_fin:ladder\_clean:C\_t+1 & laya\_fin & ladder\_clean & C\_t+1 & yes & 0.325 & 0.166 & 1.956 & 0.026 & 0.162 & 0.024 & -0.455 & 7,705 & — & — \\
+laya\_fin:ladder\_clean:C\_t+2 & laya\_fin & ladder\_clean & C\_t+2 & yes & 0.538 & 0.279 & 1.926 & 0.028 & 0.289 & 0.033 & -0.752 & 5,130 & — & — \\
+laya\_fin:ladder\_clean:C\_t+5 & laya\_fin & ladder\_clean & C\_t+5 & yes & 0.114 & 0.346 & 0.330 & 0.371 & 0.382 & 0.383 & -0.160 & 2,091 & — & — \\
+laya\_fin:ladder\_clean:C\_t+10 & laya\_fin & ladder\_clean & C\_t+10 & yes & 0.338 & 1.005 & 0.336 & 0.369 & 0.924 & 0.358 & -0.473 & 853 & — & — \\
+laya\_fin:ladder\_clean:C\_t+20 & laya\_fin & ladder\_clean & C\_t+20 & yes & -0.715 & 4.653 & -0.154 & 0.561 & 5.147 & 0.555 & 1.000 & 205 & — & — \\
+laya\_fin:ladder\_clean:increase & laya\_fin & ladder\_clean & O\_t → C\_t+20 & yes & -0.955 & — & — & 0.550 & — & — & — & — & -15.232 & 3.291 \\
+laya\_fin:ladder\_h10:O\_t & laya\_fin & ladder\_h10 & O\_t & yes & 0.241 & 0.070 & 3.446 & <0.001 & 0.069 & <0.001 & 1.158 & 13,439 & — & — \\
+laya\_fin:ladder\_h10:10:00 & laya\_fin & ladder\_h10 & 10:00 & yes & 0.273 & 0.080 & 3.404 & <0.001 & 0.081 & <0.001 & 1.314 & 13,287 & — & — \\
+laya\_fin:ladder\_h10:C\_t & laya\_fin & ladder\_h10 & C\_t & yes & 0.359 & 0.090 & 3.973 & <0.001 & 0.108 & <0.001 & 1.728 & 13,748 & — & — \\
+laya\_fin:ladder\_h10:C\_t+1 & laya\_fin & ladder\_h10 & C\_t+1 & yes & 0.362 & 0.097 & 3.755 & <0.001 & 0.100 & <0.001 & 1.744 & 13,615 & — & — \\
+laya\_fin:ladder\_h10:C\_t+2 & laya\_fin & ladder\_h10 & C\_t+2 & yes & 0.376 & 0.112 & 3.358 & <0.001 & 0.111 & <0.001 & 1.810 & 13,439 & — & — \\
+laya\_fin:ladder\_h10:C\_t+5 & laya\_fin & ladder\_h10 & C\_t+5 & yes & 0.263 & 0.137 & 1.915 & 0.029 & 0.134 & 0.026 & 1.267 & 12,850 & — & — \\
+laya\_fin:ladder\_h10:C\_t+10 & laya\_fin & ladder\_h10 & C\_t+10 & yes & 0.208 & 0.177 & 1.175 & 0.121 & 0.179 & 0.124 & 1.000 & 11,993 & — & — \\
+laya\_fin:ladder\_h10:C\_t+20 & laya\_fin & ladder\_h10 & C\_t+20 & yes & 0.259 & 0.230 & 1.126 & 0.131 & 0.234 & 0.136 & 1.245 & 11,201 & — & — \\
+laya\_fin:ladder\_h10:increase & laya\_fin & ladder\_h10 & O\_t → C\_t+10 & yes & -0.033 & — & — & 0.581 & — & — & — & — & -0.408 & 0.294 \\
+laya\_fin:ladder\_plateau:plateau & laya\_fin & ladder\_plateau & plateau & yes & 0.273 & 0.218 & 1.253 & 0.106 & 0.223 & 0.112 & — & 11,201 & — & — \\
+anchor:ladder:O\_t & anchor & ladder & O\_t & yes & 0.083 & 0.075 & 1.101 & 0.136 & 0.080 & 0.150 & 1.039 & 13,439 & — & — \\
+anchor:ladder:10:00 & anchor & ladder & 10:00 & yes & -0.022 & 0.077 & -0.284 & 0.612 & 0.080 & 0.608 & -0.276 & 13,287 & — & — \\
+anchor:ladder:C\_t & anchor & ladder & C\_t & yes & -0.042 & 0.074 & -0.560 & 0.712 & 0.080 & 0.699 & -0.522 & 13,748 & — & — \\
+anchor:ladder:C\_t+1 & anchor & ladder & C\_t+1 & yes & -0.039 & 0.086 & -0.449 & 0.673 & 0.088 & 0.668 & -0.483 & 13,615 & — & — \\
+anchor:ladder:C\_t+2 & anchor & ladder & C\_t+2 & yes & -0.029 & 0.092 & -0.320 & 0.625 & 0.084 & 0.636 & -0.368 & 13,439 & — & — \\
+anchor:ladder:C\_t+5 & anchor & ladder & C\_t+5 & yes & -0.056 & 0.103 & -0.546 & 0.707 & 0.108 & 0.699 & -0.707 & 12,850 & — & — \\
+anchor:ladder:C\_t+10 & anchor & ladder & C\_t+10 & yes & -0.030 & 0.114 & -0.264 & 0.604 & 0.116 & 0.602 & -0.378 & 11,993 & — & — \\
+anchor:ladder:C\_t+20 & anchor & ladder & C\_t+20 & yes & 0.080 & 0.157 & 0.507 & 0.307 & 0.193 & 0.340 & 1.000 & 11,201 & — & — \\
+anchor:ladder:increase & anchor & ladder & O\_t → C\_t+20 & yes & -0.003 & — & — & 0.514 & — & — & — & — & -0.267 & 0.422 \\
+anchor:ladder\_clean:O\_t & anchor & ladder\_clean & O\_t & yes & 0.083 & 0.075 & 1.101 & 0.136 & 0.080 & 0.150 & 0.012 & 13,439 & — & — \\
+anchor:ladder\_clean:10:00 & anchor & ladder\_clean & 10:00 & yes & -0.022 & 0.077 & -0.284 & 0.612 & 0.080 & 0.608 & -0.003 & 13,287 & — & — \\
+anchor:ladder\_clean:C\_t & anchor & ladder\_clean & C\_t & yes & -0.042 & 0.074 & -0.560 & 0.712 & 0.080 & 0.699 & -0.006 & 13,748 & — & — \\
+anchor:ladder\_clean:C\_t+1 & anchor & ladder\_clean & C\_t+1 & yes & 0.316 & 0.179 & 1.770 & 0.039 & 0.171 & 0.033 & 0.045 & 7,705 & — & — \\
+anchor:ladder\_clean:C\_t+2 & anchor & ladder\_clean & C\_t+2 & yes & 0.806 & 0.167 & 4.835 & <0.001 & 0.185 & <0.001 & 0.114 & 5,130 & — & — \\
+anchor:ladder\_clean:C\_t+5 & anchor & ladder\_clean & C\_t+5 & yes & 0.567 & 0.298 & 1.899 & 0.030 & 0.275 & 0.021 & 0.080 & 2,091 & — & — \\
+anchor:ladder\_clean:C\_t+10 & anchor & ladder\_clean & C\_t+10 & yes & 0.234 & 1.573 & 0.149 & 0.441 & 1.359 & 0.432 & 0.033 & 853 & — & — \\
+anchor:ladder\_clean:C\_t+20 & anchor & ladder\_clean & C\_t+20 & yes & 7.068 & 13.111 & 0.539 & 0.296 & 14.003 & 0.308 & 1.000 & 205 & — & — \\
+anchor:ladder\_clean:increase & anchor & ladder\_clean & O\_t → C\_t+20 & yes & 6.985 & — & — & 0.212 & — & — & — & — & -14.074 & 25.876 \\
+anchor:ladder\_h10:O\_t & anchor & ladder\_h10 & O\_t & yes & 0.083 & 0.075 & 1.101 & 0.136 & 0.080 & 0.150 & -2.750 & 13,439 & — & — \\
+anchor:ladder\_h10:10:00 & anchor & ladder\_h10 & 10:00 & yes & -0.022 & 0.077 & -0.284 & 0.612 & 0.080 & 0.608 & 0.730 & 13,287 & — & — \\
+anchor:ladder\_h10:C\_t & anchor & ladder\_h10 & C\_t & yes & -0.042 & 0.074 & -0.560 & 0.712 & 0.080 & 0.699 & 1.382 & 13,748 & — & — \\
+anchor:ladder\_h10:C\_t+1 & anchor & ladder\_h10 & C\_t+1 & yes & -0.039 & 0.086 & -0.449 & 0.673 & 0.088 & 0.668 & 1.277 & 13,615 & — & — \\
+anchor:ladder\_h10:C\_t+2 & anchor & ladder\_h10 & C\_t+2 & yes & -0.029 & 0.092 & -0.320 & 0.625 & 0.084 & 0.636 & 0.973 & 13,439 & — & — \\
+anchor:ladder\_h10:C\_t+5 & anchor & ladder\_h10 & C\_t+5 & yes & -0.056 & 0.103 & -0.546 & 0.707 & 0.108 & 0.699 & 1.871 & 12,850 & — & — \\
+anchor:ladder\_h10:C\_t+10 & anchor & ladder\_h10 & C\_t+10 & yes & -0.030 & 0.114 & -0.264 & 0.604 & 0.116 & 0.602 & 1.000 & 11,993 & — & — \\
+anchor:ladder\_h10:C\_t+20 & anchor & ladder\_h10 & C\_t+20 & yes & 0.080 & 0.157 & 0.507 & 0.307 & 0.193 & 0.340 & -2.646 & 11,201 & — & — \\
+anchor:ladder\_h10:increase & anchor & ladder\_h10 & O\_t → C\_t+10 & yes & -0.113 & — & — & 0.838 & — & — & — & — & -0.352 & 0.177 \\
+anchor:ladder\_plateau:plateau & anchor & ladder\_plateau & plateau & yes & 0.077 & 0.149 & 0.520 & 0.302 & 0.171 & 0.326 & — & 11,201 & — & — \\
+d1\_ultra:ladder:O\_t & d1\_ultra & ladder & O\_t & yes & 0.545 & 0.079 & 6.925 & <0.001 & 0.067 & <0.001 & 1.495 & 13,439 & — & — \\
+d1\_ultra:ladder:10:00 & d1\_ultra & ladder & 10:00 & yes & 0.610 & 0.086 & 7.088 & <0.001 & 0.089 & <0.001 & 1.673 & 13,287 & — & — \\
+d1\_ultra:ladder:C\_t & d1\_ultra & ladder & C\_t & yes & 0.586 & 0.077 & 7.579 & <0.001 & 0.091 & <0.001 & 1.608 & 13,748 & — & — \\
+d1\_ultra:ladder:C\_t+1 & d1\_ultra & ladder & C\_t+1 & yes & 0.538 & 0.088 & 6.116 & <0.001 & 0.105 & <0.001 & 1.475 & 13,615 & — & — \\
+d1\_ultra:ladder:C\_t+2 & d1\_ultra & ladder & C\_t+2 & yes & 0.468 & 0.113 & 4.138 & <0.001 & 0.137 & <0.001 & 1.285 & 13,439 & — & — \\
+d1\_ultra:ladder:C\_t+5 & d1\_ultra & ladder & C\_t+5 & yes & 0.355 & 0.125 & 2.834 & 0.003 & 0.153 & 0.011 & 0.975 & 12,850 & — & — \\
+d1\_ultra:ladder:C\_t+10 & d1\_ultra & ladder & C\_t+10 & yes & 0.249 & 0.153 & 1.622 & 0.054 & 0.173 & 0.077 & 0.682 & 11,993 & — & — \\
+d1\_ultra:ladder:C\_t+20 & d1\_ultra & ladder & C\_t+20 & yes & 0.365 & 0.215 & 1.694 & 0.046 & 0.213 & 0.044 & 1.000 & 11,201 & — & — \\
+d1\_ultra:ladder:increase & d1\_ultra & ladder & O\_t → C\_t+20 & yes & -0.181 & — & — & 0.834 & — & — & — & — & -0.534 & 0.216 \\
+d1\_ultra:ladder\_clean:O\_t & d1\_ultra & ladder\_clean & O\_t & yes & 0.545 & 0.079 & 6.925 & <0.001 & 0.067 & <0.001 & -0.445 & 13,439 & — & — \\
+d1\_ultra:ladder\_clean:10:00 & d1\_ultra & ladder\_clean & 10:00 & yes & 0.610 & 0.086 & 7.088 & <0.001 & 0.089 & <0.001 & -0.498 & 13,287 & — & — \\
+d1\_ultra:ladder\_clean:C\_t & d1\_ultra & ladder\_clean & C\_t & yes & 0.586 & 0.077 & 7.579 & <0.001 & 0.091 & <0.001 & -0.478 & 13,748 & — & — \\
+d1\_ultra:ladder\_clean:C\_t+1 & d1\_ultra & ladder\_clean & C\_t+1 & yes & 0.175 & 0.094 & 1.868 & 0.032 & 0.114 & 0.064 & -0.143 & 7,705 & — & — \\
+d1\_ultra:ladder\_clean:C\_t+2 & d1\_ultra & ladder\_clean & C\_t+2 & yes & 0.164 & 0.123 & 1.329 & 0.093 & 0.146 & 0.131 & -0.134 & 5,130 & — & — \\
+d1\_ultra:ladder\_clean:C\_t+5 & d1\_ultra & ladder\_clean & C\_t+5 & yes & -0.107 & 0.280 & -0.384 & 0.649 & 0.296 & 0.641 & 0.088 & 2,091 & — & — \\
+d1\_ultra:ladder\_clean:C\_t+10 & d1\_ultra & ladder\_clean & C\_t+10 & yes & 0.360 & 0.751 & 0.479 & 0.317 & 0.733 & 0.312 & -0.294 & 853 & — & — \\
+d1\_ultra:ladder\_clean:C\_t+20 & d1\_ultra & ladder\_clean & C\_t+20 & yes & -1.225 & 2.251 & -0.544 & 0.706 & 2.368 & 0.697 & 1.000 & 205 & — & — \\
+d1\_ultra:ladder\_clean:increase & d1\_ultra & ladder\_clean & O\_t → C\_t+20 & yes & -1.770 & — & — & 0.875 & — & — & — & — & -4.912 & 1.160 \\
+d1\_ultra:ladder\_h10:O\_t & d1\_ultra & ladder\_h10 & O\_t & yes & 0.545 & 0.079 & 6.925 & <0.001 & 0.067 & <0.001 & 2.192 & 13,439 & — & — \\
+d1\_ultra:ladder\_h10:10:00 & d1\_ultra & ladder\_h10 & 10:00 & yes & 0.610 & 0.086 & 7.088 & <0.001 & 0.089 & <0.001 & 2.453 & 13,287 & — & — \\
+d1\_ultra:ladder\_h10:C\_t & d1\_ultra & ladder\_h10 & C\_t & yes & 0.586 & 0.077 & 7.579 & <0.001 & 0.091 & <0.001 & 2.357 & 13,748 & — & — \\
+d1\_ultra:ladder\_h10:C\_t+1 & d1\_ultra & ladder\_h10 & C\_t+1 & yes & 0.538 & 0.088 & 6.116 & <0.001 & 0.105 & <0.001 & 2.163 & 13,615 & — & — \\
+d1\_ultra:ladder\_h10:C\_t+2 & d1\_ultra & ladder\_h10 & C\_t+2 & yes & 0.468 & 0.113 & 4.138 & <0.001 & 0.137 & <0.001 & 1.884 & 13,439 & — & — \\
+d1\_ultra:ladder\_h10:C\_t+5 & d1\_ultra & ladder\_h10 & C\_t+5 & yes & 0.355 & 0.125 & 2.834 & 0.003 & 0.153 & 0.011 & 1.429 & 12,850 & — & — \\
+d1\_ultra:ladder\_h10:C\_t+10 & d1\_ultra & ladder\_h10 & C\_t+10 & yes & 0.249 & 0.153 & 1.622 & 0.054 & 0.173 & 0.077 & 1.000 & 11,993 & — & — \\
+d1\_ultra:ladder\_h10:C\_t+20 & d1\_ultra & ladder\_h10 & C\_t+20 & yes & 0.365 & 0.215 & 1.694 & 0.046 & 0.213 & 0.044 & 1.466 & 11,201 & — & — \\
+d1\_ultra:ladder\_h10:increase & d1\_ultra & ladder\_h10 & O\_t → C\_t+10 & yes & -0.296 & — & — & 0.983 & — & — & — & — & -0.571 & -0.012 \\
+d1\_ultra:ladder\_plateau:plateau & d1\_ultra & ladder\_plateau & plateau & yes & 0.367 & 0.206 & 1.783 & 0.039 & 0.213 & 0.043 & — & 11,201 & — & — \\
+\bottomrule
+\end{tabular}
