@@ -1,0 +1,93 @@
+[
+ {
+  "model": "liquid/d1-ultra",
+  "component": "a0",
+  "retried": 288,
+  "ok_now": 288,
+  "valid_now": 288,
+  "statuses_before": {
+   "429": 288
+  }
+ },
+ {
+  "model": "liquid/d1-ultra",
+  "component": "a2",
+  "retried": 229,
+  "ok_now": 229,
+  "valid_now": 229,
+  "statuses_before": {
+   "429": 229
+  }
+ },
+ {
+  "model": "liquid/d1-ultra",
+  "component": "b2",
+  "retried": 267,
+  "ok_now": 267,
+  "valid_now": 267,
+  "statuses_before": {
+   "429": 266,
+   "502": 1
+  }
+ },
+ {
+  "model": "liquid/d1-ultra",
+  "component": "b1",
+  "retried": 354,
+  "ok_now": 354,
+  "valid_now": 354,
+  "statuses_before": {
+   "429": 354
+  }
+ },
+ {
+  "model": "liquid/d1-ultra",
+  "component": "a0_2024h1",
+  "retried": 31,
+  "ok_now": 31,
+  "valid_now": 31,
+  "statuses_before": {
+   "429": 31
+  }
+ },
+ {
+  "model": "liquid/d1-ultra",
+  "component": "a2_2024h1",
+  "retried": 43,
+  "ok_now": 43,
+  "valid_now": 43,
+  "statuses_before": {
+   "429": 43
+  }
+ },
+ {
+  "model": "liquid/d1-ultra",
+  "component": "(not retried)",
+  "failed": 2,
+  "statuses": {
+   "market (status not recorded)": 2
+  }
+ },
+ {
+  "model": "respan/span-02",
+  "component": "(not retried)",
+  "failed": 0,
+  "statuses": {}
+ },
+ {
+  "model": "nace-ai/drex-v2.0",
+  "component": "a0",
+  "retried": 12,
+  "ok_now": 12,
+  "valid_now": 12,
+  "statuses_before": {
+   "429": 12
+  }
+ },
+ {
+  "model": "nace-ai/drex-v2.0",
+  "component": "(not retried)",
+  "failed": 0,
+  "statuses": {}
+ }
+]

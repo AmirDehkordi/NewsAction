@@ -2,3 +2,6 @@ model,phase,repeat_idx,cells,mean_abs_dp_train_a,mean_abs_dp_all,max_abs_dp_all,
 liquid/d1-ultra,s5_pre_production,10,978,0.017559533342602216,0.019072786548229803,0.17744477533010178,0.020308177271778964,mean_abs_dp_train_a > repeat_noise,False,liquid/d1-ultra-20261015
 respan/span-02,s5_pre_production,10,978,0.03659617310254762,0.023242882901247444,0.49739281399999996,0.034379139614428574,mean_abs_dp_train_a > repeat_noise,True,respan/span-02-20261015
 nace-ai/drex-v2.0,s5_pre_production,10,978,0.0,0.0,0.0,0.0,max_abs_dp >= 0.02,False,nace-ai/drex-v2.0-20261009
+liquid/d1-ultra,end_s6,11,978,0.0212419750508352,0.020598214728946757,0.15897792262268473,0.020308177271778964,mean_abs_dp_train_a > repeat_noise,True,liquid/d1-ultra-20261015
+respan/span-02,end_s6,11,978,0.03989127270614285,0.021835129585705517,0.49490165999999997,0.034379139614428574,mean_abs_dp_train_a > repeat_noise,True,respan/span-02-20261015
+nace-ai/drex-v2.0,end_s6,11,978,0.0,0.0,0.0,0.0,max_abs_dp >= 0.02,False,nace-ai/drex-v2.0-20261009

@@ -1,0 +1,4 @@
+model,phase,repeat_idx,drift_mean_abs_dp_vs_na06,drift_pairs,repeat_noise,fires,builds_na06,builds_now
+liquid/d1-ultra,end_s6,3,0.01938112185202021,100,0.020308177271778964,False,liquid/d1-ultra-20261015,liquid/d1-ultra-20261015
+respan/span-02,end_s6,3,0.02495620417526666,100,0.034379139614428574,False,respan/span-02-20261015,respan/span-02-20261015
+nace-ai/drex-v2.0,end_s6,3,0.0,100,0.0,False,nace-ai/drex-v2.0-20261009,nace-ai/drex-v2.0-20261009

@@ -1417,6 +1417,33 @@ sha256 on a rerun (labels and export were run twice: 8 of 8 files identical).
 - **Availability:** D0 (09:15 ET); local model, nothing sent to a third party
 - **sha256:** `df399845360d9e13078fd85d93ab26f63f9b70bfa6c80019a3a67f1fcc157e0a`
 
+### `work/dm/production/liquid_d1_ultra_api_comparators_market.parquet`
+- **Producer:** `newsaction.production.run.run(["api", "comparators", "market"])` (S6)
+- **Inputs:** the state files of `configs/production.yaml` `states`; `cache/decisions.sqlite` (chunk NA-11)
+- **Schema:** `newsaction.production.run.readings` (NA-06's `derived_frame` columns: `key`, `model`, `event_id`, `tag`, `repeat_idx`, `ok`, `valid`, `model_build`, `cost`, `latency_ms`, `n_hat`, `m`, `surprise`, `tone`, confidences; plus `q1`, `conf3`, `source`, `split`, `component`; market rows: `n_hat`, `label_market_reason`, `plabel_market_reason`)
+- **Key:** (`component`, `event_id`) unique
+- **Rows / coverage:** liquid/d1-ultra: the full plan: Call A D0/D2 (core + extended), Call B D2 (core) and D1 (core + explain), the 2024-H1 A0/A2 core, the A3.5 market states
+- **Availability:** the readings' window (`source`: a0 = W0, a2 = W2, b2 = D2, b1 = D1, m = market); test rows sent after the freeze
+- **sha256:** `d81a9194c6b1be67d09771d5230e58855aad573b361a8385124c49beb0b57aaa`
+
+### `work/dm/production/respan_span_02_api_comparators_market.parquet`
+- **Producer:** `newsaction.production.run.run(["api", "comparators", "market"])` (S6)
+- **Inputs:** the state files of `configs/production.yaml` `states`; `cache/decisions.sqlite` (chunk NA-11)
+- **Schema:** `newsaction.production.run.readings` (NA-06's `derived_frame` columns: `key`, `model`, `event_id`, `tag`, `repeat_idx`, `ok`, `valid`, `model_build`, `cost`, `latency_ms`, `n_hat`, `m`, `surprise`, `tone`, confidences; plus `q1`, `conf3`, `source`, `split`, `component`; market rows: `n_hat`, `label_market_reason`, `plabel_market_reason`)
+- **Key:** (`component`, `event_id`) unique
+- **Rows / coverage:** respan/span-02: core Call A D0 on val-B and test (comparator; screen-failing, model-specific)
+- **Availability:** the readings' window (`source`: a0 = W0, a2 = W2, b2 = D2, b1 = D1, m = market); test rows sent after the freeze
+- **sha256:** `05cbc981c70651ea9226140abbbb31714abe0d0dbe901fca24acc064753f6d48`
+
+### `work/dm/production/nace_ai_drex_v2_0_api_comparators_market.parquet`
+- **Producer:** `newsaction.production.run.run(["api", "comparators", "market"])` (S6)
+- **Inputs:** the state files of `configs/production.yaml` `states`; `cache/decisions.sqlite` (chunk NA-11)
+- **Schema:** `newsaction.production.run.readings` (NA-06's `derived_frame` columns: `key`, `model`, `event_id`, `tag`, `repeat_idx`, `ok`, `valid`, `model_build`, `cost`, `latency_ms`, `n_hat`, `m`, `surprise`, `tone`, confidences; plus `q1`, `conf3`, `source`, `split`, `component`; market rows: `n_hat`, `label_market_reason`, `plabel_market_reason`)
+- **Key:** (`component`, `event_id`) unique
+- **Rows / coverage:** nace-ai/drex-v2.0: core Call A D0 on val-B and test (comparator; screen-failing, model-specific)
+- **Availability:** the readings' window (`source`: a0 = W0, a2 = W2, b2 = D2, b1 = D1, m = market); test rows sent after the freeze
+- **sha256:** `853cf27d7c1c7804f17d8fff59cd77f431e5414cc313411cc5b18cb42e2b2469`
+
 ### `work/kaggle/dataset_na11/test_callB.parquet`
 - **Producer:** `newsaction.production.kaggle_infer.export` (S7)
 - **Inputs:** NA-04 / NA-11 state files of `configs/production.yaml` `trained.export`; `configs/training.yaml` questions (Laya's input format)
@@ -1525,6 +1552,15 @@ sha256 on a rerun (labels and export were run twice: 8 of 8 files identical).
 - **Availability:** D0 (09:15 ET); unmasked: sent only under the registered probe tag `unmasked_robustness` (PREREG §11.6), third-party-OK articles only
 - **sha256:** `1092922246b9adafb5a7e2084808c498aadb1d1e882a57db2d3948f3abf33c25`
 
+### `work/dm/production/liquid_d1_ultra_ablations.parquet`
+- **Producer:** `newsaction.production.ablations.run` (S8)
+- **Inputs:** `work/dm/production/ablation_sample.parquet`, the Call B D2 states, `work/states/samples/unmasked_robustness.parquet`; `cache/decisions.sqlite` (chunk NA-11)
+- **Schema:** `newsaction.production.run.readings` plus `ablation` (`b2_no_news`, `b2_shuffled`, `a0_unmasked`) and `donor`
+- **Key:** (`ablation`, `event_id`) unique
+- **Rows / coverage:** d1-ultra, core battery: 12,000 events per ablation (36,000 rows)
+- **Availability:** D2 (Call B) / D0 (Call A); probes, compared with the S6 readings of the same events
+- **sha256:** `0a53fae8615a3dc3c980793b673e85c4f8fe03b9ce04cc26031a28bef025b4f0`
+
 ### `work/dm/production/llm_sample_test.parquet`
 - **Producer:** `newsaction.production.llm_test.write_sample` (S8)
 - **Inputs:** `work/states/callA_d0_E3.parquet`, `work/events/events_d0.parquet` (NA-09's `d0_events`)
@@ -1533,6 +1569,15 @@ sha256 on a rerun (labels and export were run twice: 8 of 8 files identical).
 - **Rows / coverage:** 2,000 test D0 events outside the embargo, tier × month, seed 2026 (NA-09's val-B rule, PREREG §10.7)
 - **Availability:** D0 (09:15 ET), masked
 - **sha256:** `ae28772ca585086b1fb5a70fad93d7fc7546e9f75c848b1bc070e0d618ecf7bc`
+
+### `work/dm/production/llm_test.parquet`
+- **Producer:** `newsaction.production.llm_test.run` (S8)
+- **Inputs:** `work/dm/production/llm_sample_test.parquet`; NA-09's prompt and settings; `cache/decisions.sqlite`
+- **Schema:** NA-09's common prediction schema (`baselines.schema`)
+- **Key:** `event_id` unique
+- **Rows / coverage:** mistralai/mistral-nemo's valid answers on the 2,000 test events (invalid ones counted in `artifacts/NA-11/llm_test.json`)
+- **Availability:** D0 (09:15 ET)
+- **sha256:** `9930c454e27b2c52b68ec2743eafd498c1828dcd55fa6b0007b5f069b25b26fb`
 
 ### `work/dm/production/price_only_test.parquet`
 - **Producer:** `newsaction.production.price_only_test.run` (S8)
@@ -1543,6 +1588,105 @@ sha256 on a rerun (labels and export were run twice: 8 of 8 files identical).
 - **Availability:** D0 (09:15 ET): t−1 context, z_vol of the previous session
 - **sha256:** `613d555227462262d39ce7534582efd45c070259ed51732ae65dee61f188a145`
 
+### `artifacts/NA-11/ablation_runs.json`
+- **Producer:** `newsaction.production.ablations.run` (S8)
+- **Inputs:** `work/dm/production/liquid_d1_ultra_ablations.parquet`
+- **Schema:** list of {ablation, requests, ok, valid, cost}
+- **Key:** one entry per ablation
+- **Rows / coverage:** the S8 ablation batches
+- **Availability:** counts and cost only
+- **sha256:** `7ce01d0f5ed9a52d3cd1729f6d6333259485b050bfb81a7757db04b0a0e6ae2a`
+
+### `artifacts/NA-11/llm_test.json`
+- **Producer:** `newsaction.production.llm_test.run` (S8)
+- **Inputs:** `work/dm/production/llm_test.parquet`
+- **Schema:** {model, requests, send, projected_usd, cap_usd, budget_left_usd, answered, valid, invalid, spent_usd_this_run, spent_usd (the ledger's total under the batch's tag)}
+- **Key:** one object
+- **Rows / coverage:** the LLM baseline's test batch
+- **Availability:** counts and cost only
+- **sha256:** `33f6d8c61dc7ff00961f23698752e318ca157dd4f9a1549976125a7749e72964`
+
+### `artifacts/NA-11/freeze.json`
+- **Producer:** `newsaction.production.freeze` (S3) through `lock.freeze`
+- **Inputs:** the freeze files (`lock.FREEZE_FILES`): PREREG before its Deviations log, `configs/*.yaml`, `panel/{targets,reactions}.py`, `analysis/{spec,inference,shapley,metrics}.py`
+- **Schema:** {version, hash, files, freeze_files, deviations_log {bytes, sha256}, git_sha, ts, note}
+- **Key:** one object
+- **Rows / coverage:** the PREREG §4.4 freeze record (hash `523e7589…`; the freeze time is its `ts`)
+- **Availability:** written once, before any 2026 state was built or sent
+- **sha256:** `f5801cd802de0bee776cbe69e0d49c3904e812d7d3b1866ec2bc0903f714663e`
+
+### `artifacts/NA-11/canary_check.csv`
+- **Producer:** `newsaction.production.canary_check.compare_now` (S5, end of S6)
+- **Inputs:** `artifacts/NA-05/canary_v1.jsonl`, `artifacts/NA-11/canary_baseline_na11.parquet`; `cache/decisions.sqlite`
+- **Schema:** model, phase, repeat_idx, cells, mean_abs_dp_train_a, mean_abs_dp_all, max_abs_dp_all, repeat_noise, rule, stop, builds
+- **Key:** (model, phase) unique
+- **Rows / coverage:** the canary against the NA-11 baselines under the `configs/dm.yaml` rule: S5 (repeat 10) and the end of S6 (repeat 11)
+- **Availability:** train-period canary items; no test data
+- **sha256:** `eebb9c72756d82da900929a29207934a369b5c259b874d67bbf04d3dbef98062`
+
+### `artifacts/NA-11/canary_drift_check.csv`
+- **Producer:** `newsaction.production.canary_check.drift_now` (end of S6)
+- **Inputs:** 100 NA-06 stage-2 val-A Call A states per model; `cache/decisions.sqlite`
+- **Schema:** model, phase, repeat_idx, drift_mean_abs_dp_vs_na06, drift_pairs, repeat_noise, fires, builds_na06, builds_now
+- **Key:** (model, phase) unique
+- **Rows / coverage:** the pre-freeze drift check repeated once at the end of S6 (repeat 3)
+- **Availability:** val-A states; no test data
+- **sha256:** `3987b819818d1b1bceed28a1c2ac93c3699492a8d2565859bfc87cac7f791f16`
+
+### `artifacts/NA-11/canary_end_s6.json`
+- **Producer:** the end-of-S6 run of `canary_check.compare_now`, `drift_now` and `judge`
+- **Inputs:** `artifacts/NA-11/{canary_check.csv,canary_drift_check.csv,canary_drift_na06.csv}`, the S6 readings' model builds
+- **Schema:** {canary, drift, production_builds, verdicts, reconcile}
+- **Key:** one object
+- **Rows / coverage:** the end-of-S6 verdict per model under the post-freeze §15 rule
+- **Availability:** no test data
+- **sha256:** `525b71ff40f05018149cef6f41e6e668c2749bae0cfb9be02dbe585ac0bdb33a`
+
+### `artifacts/NA-11/production_runs_api_comparators_market.json`
+- **Producer:** `newsaction.production.run.run` (S6)
+- **Inputs:** `work/dm/production/*_api_comparators_market.parquet`
+- **Schema:** list of {model, component, requests, ok, valid, cost}
+- **Key:** one entry per component
+- **Rows / coverage:** the S6 batches before the retry pass
+- **Availability:** counts and cost only
+- **sha256:** `c3a020cc22d4ab4b8efb29faf3e97e98c7cb3ea215299d8311bb4650c7f185fb`
+
+### `artifacts/NA-11/production_retry.json`
+- **Producer:** `newsaction.production.run.retry` (S6, operator decision)
+- **Inputs:** `work/dm/production/*_api_comparators_market.parquet`
+- **Schema:** list of {model, component, retried, ok_now, valid_now, statuses_before} and per model {component: '(not retried)', failed, statuses}
+- **Key:** one entry per retried component, one per model for what was left
+- **Rows / coverage:** the one retry pass over S6's transient failures (429, 5xx, transport)
+- **Availability:** counts only
+- **sha256:** `e069281eac36b9903500da695537e895cd43821a0731e226d2f75a7a8d9f9bc8`
+
+### `artifacts/NA-11/production_summary.csv`
+- **Producer:** `newsaction.production.summary.run` (S9)
+- **Inputs:** every NA-11 reading file, NA-08's instrument files, the state files (eligible events)
+- **Schema:** model, source, split, eligible, rows, answered, valid, coverage, invalid_rate, latency_p50_ms, latency_p95_ms, cost_usd
+- **Key:** (model, source, split) unique
+- **Rows / coverage:** coverage, invalid rate, latency and cost per model, reading and split (AC3)
+- **Availability:** counts only; no outcome
+- **sha256:** `39d70b860badb73cdf4ebc39345cb47d7af0562489e7d8bdce888479515db531`
+
+### `artifacts/NA-11/production_spend.csv`
+- **Producer:** `newsaction.production.summary.spend` (S9)
+- **Inputs:** `ledgers/spend.jsonl` (chunk NA-11, spend records)
+- **Schema:** model, purpose, requests, usd
+- **Key:** (model, purpose) unique
+- **Rows / coverage:** NA-11's ledger spend per model and purpose (AC5)
+- **Availability:** spend only
+- **sha256:** `b268692da089e297836023cb61dc31fbc7404cc5cc5717abe347ffce72b23971`
+
+### `artifacts/NA-11/probes_val_a.csv`
+- **Producer:** `newsaction.production.probes.run`
+- **Inputs:** `artifacts/NA-06/leaderboard.csv`, `work/dm/production/local_laya_typed_decisions_probes.parquet`, `work/kaggle/predictions/{laya_fin,anchor}_probes.parquet`, NA-08's val-A predictions
+- **Schema:** model, kind, flip_rate, flip_pairs, ic_masked(_t), ic_unmasked(_t), unmasked_minus_masked(_t), ic_shuffled(_t), screen thresholds
+- **Key:** model unique
+- **Rows / coverage:** the operator's disclosed val-A probes beside NA-06's API screens (not hypotheses)
+- **Availability:** val-A only
+- **sha256:** `787ad832275982dfdc1206872d254c5409b1ea4039985fd1628743f71ed03aa1`
+
 ### `artifacts/NA-11/key_usage.json`
 - **Producer:** `newsaction.production.record_key_usage`
 - **Inputs:** OpenRouter GET /api/v1/key and /api/v1/credits; `ledgers/spend.jsonl`
@@ -1550,4 +1694,94 @@ sha256 on a rerun (labels and export were run twice: 8 of 8 files identical).
 - **Key:** one entry per check, in time order
 - **Rows / coverage:** the key's usage before and after each NA-11 paid batch (operator preamble item 6)
 - **Availability:** account metadata; no data
-- **sha256:** `9b81bec367fe82582f7a3b53c4bb5bbdd38bd408905dfeda411e13f6f98460a8`
+- **sha256:** `a824467a5b36a1e01549c089c5a53e2deb5863f7db582bf05cdb9398a716435b`
+
+### `work/kaggle/predictions/laya_fin_test_callB.parquet`
+- **Producer:** `newsaction.production.kaggle_infer.import_run` (S7)
+- **Inputs:** the Kaggle kernel `newsaction-na11-infer-laya-s13` (inference only, the frozen pin) on `work/kaggle/dataset_na11/test_callB.parquet`; its record and outputs verified
+- **Schema:** NA-08's instrument schema plus `variant`
+- **Key:** (`event_id`, `call`, `window`, `variant`, `question`) unique
+- **Rows / coverage:** laya_fin on test_callB
+- **Availability:** the states' decision points; predictions only
+- **sha256:** `64cf0dadbf501b37d0a924407db557ee3dc442b39c52bbf0dd5c029286d17a11`
+
+### `work/kaggle/predictions/laya_fin_val_callB_d1.parquet`
+- **Producer:** `newsaction.production.kaggle_infer.import_run` (S7)
+- **Inputs:** the Kaggle kernel `newsaction-na11-infer-laya-s13` (inference only, the frozen pin) on `work/kaggle/dataset_na11/val_callB_d1.parquet`; its record and outputs verified
+- **Schema:** NA-08's instrument schema plus `variant`
+- **Key:** (`event_id`, `call`, `window`, `variant`, `question`) unique
+- **Rows / coverage:** laya_fin on val_callB_d1
+- **Availability:** the states' decision points; predictions only
+- **sha256:** `c724b1557d5c80909a7d5badd0487d34bde1967a04cfcd95f8fa604fb1449cb5`
+
+### `work/kaggle/predictions/laya_fin_robustness_callA.parquet`
+- **Producer:** `newsaction.production.kaggle_infer.import_run` (S7)
+- **Inputs:** the Kaggle kernel `newsaction-na11-infer-laya-s13` (inference only, the frozen pin) on `work/kaggle/dataset_na11/robustness_callA.parquet`; its record and outputs verified
+- **Schema:** NA-08's instrument schema plus `variant`
+- **Key:** (`event_id`, `call`, `window`, `variant`, `question`) unique
+- **Rows / coverage:** laya_fin on robustness_callA
+- **Availability:** the states' decision points; predictions only
+- **sha256:** `029466c9604108bccfa6754b396e7d2079cd94f9dc09686a386170d267a25e1f`
+
+### `work/kaggle/predictions/laya_fin_probes.parquet`
+- **Producer:** `newsaction.production.kaggle_infer.import_run` (S7)
+- **Inputs:** the Kaggle kernel `newsaction-na11-infer-laya-s13` (inference only, the frozen pin) on `work/kaggle/dataset_na11/probes.parquet`; its record and outputs verified
+- **Schema:** NA-08's instrument schema plus `variant`
+- **Key:** (`event_id`, `call`, `window`, `variant`, `question`) unique
+- **Rows / coverage:** laya_fin on probes
+- **Availability:** the states' decision points; predictions only
+- **sha256:** `bc58ea501ca3e5cce2c8fb267cbcd6be6015cef2a23267c9394f14ef9cc3356b`
+
+### `work/kaggle/predictions/anchor_test_callB.parquet`
+- **Producer:** `newsaction.production.kaggle_infer.import_run` (S7)
+- **Inputs:** the Kaggle kernel `newsaction-na11-infer-anchor-s13` (inference only, the frozen pin) on `work/kaggle/dataset_na11/test_callB.parquet`; its record and outputs verified
+- **Schema:** NA-08's instrument schema plus `variant`
+- **Key:** (`event_id`, `call`, `window`, `variant`, `question`) unique
+- **Rows / coverage:** anchor on test_callB
+- **Availability:** the states' decision points; predictions only
+- **sha256:** `e214885469887ce927dfbae722b3ca187562a41384665bf43a50725c5642f8d9`
+
+### `work/kaggle/predictions/anchor_val_callB_d1.parquet`
+- **Producer:** `newsaction.production.kaggle_infer.import_run` (S7)
+- **Inputs:** the Kaggle kernel `newsaction-na11-infer-anchor-s13` (inference only, the frozen pin) on `work/kaggle/dataset_na11/val_callB_d1.parquet`; its record and outputs verified
+- **Schema:** NA-08's instrument schema plus `variant`
+- **Key:** (`event_id`, `call`, `window`, `variant`, `question`) unique
+- **Rows / coverage:** anchor on val_callB_d1
+- **Availability:** the states' decision points; predictions only
+- **sha256:** `9de67c2255c0a7ddb772566b57d3b9991d0268cb32544bba7673493c30a18fb3`
+
+### `work/kaggle/predictions/anchor_robustness_callA.parquet`
+- **Producer:** `newsaction.production.kaggle_infer.import_run` (S7)
+- **Inputs:** the Kaggle kernel `newsaction-na11-infer-anchor-s13` (inference only, the frozen pin) on `work/kaggle/dataset_na11/robustness_callA.parquet`; its record and outputs verified
+- **Schema:** NA-08's instrument schema plus `variant`
+- **Key:** (`event_id`, `call`, `window`, `variant`, `question`) unique
+- **Rows / coverage:** anchor on robustness_callA
+- **Availability:** the states' decision points; predictions only
+- **sha256:** `ebfab81e21d3a1f785e9af0d33035f65a1d1f71892996fd6f526e7c9ef5ad66e`
+
+### `work/kaggle/predictions/anchor_probes.parquet`
+- **Producer:** `newsaction.production.kaggle_infer.import_run` (S7)
+- **Inputs:** the Kaggle kernel `newsaction-na11-infer-anchor-s13` (inference only, the frozen pin) on `work/kaggle/dataset_na11/probes.parquet`; its record and outputs verified
+- **Schema:** NA-08's instrument schema plus `variant`
+- **Key:** (`event_id`, `call`, `window`, `variant`, `question`) unique
+- **Rows / coverage:** anchor on probes
+- **Availability:** the states' decision points; predictions only
+- **sha256:** `178d34650f9586487f1838ad96b82c7d3e58fbc28204fe5b9946eaabf8370567`
+
+### `artifacts/NA-11/kaggle_import_laya-s13.json`
+- **Producer:** `newsaction.production.kaggle_infer.import_run` (S7)
+- **Inputs:** the kernel `newsaction-na11-infer-laya-s13`'s outputs
+- **Schema:** {file: rows} per imported file
+- **Key:** one object
+- **Rows / coverage:** what the S7 import of laya-s13 wrote
+- **Availability:** counts only
+- **sha256:** `4ee4979c19c77091eaf4c3003fc069ec2f0acaa9f29eb5ed3759648127bf6e56`
+
+### `artifacts/NA-11/kaggle_import_anchor-s13.json`
+- **Producer:** `newsaction.production.kaggle_infer.import_run` (S7)
+- **Inputs:** the kernel `newsaction-na11-infer-anchor-s13`'s outputs
+- **Schema:** {file: rows} per imported file
+- **Key:** one object
+- **Rows / coverage:** what the S7 import of anchor-s13 wrote
+- **Availability:** counts only
+- **sha256:** `d429ed785674a6fba4404946e38a88d633edbeabacda2c121d45ff8ae7087738`

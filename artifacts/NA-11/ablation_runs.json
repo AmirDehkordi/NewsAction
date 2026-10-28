@@ -1,0 +1,23 @@
+[
+ {
+  "ablation": "b2_no_news",
+  "requests": 12000,
+  "ok": 11965,
+  "valid": 11965,
+  "cost": 0.392239344
+ },
+ {
+  "ablation": "b2_shuffled",
+  "requests": 12000,
+  "ok": 11882,
+  "valid": 11882,
+  "cost": 0.5418419999999999
+ },
+ {
+  "ablation": "a0_unmasked",
+  "requests": 12000,
+  "ok": 11943,
+  "valid": 11943,
+  "cost": 0.497843598
+ }
+]
