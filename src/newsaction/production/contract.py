@@ -31,7 +31,7 @@ class Entry:
     availability: str
 
 
-ENTRIES: Final = (
+_LISTED: Final = (
     Entry(
         "work/analysis/state_articles_w2.parquet",
         "`newsaction.analysis.frames.write_state_articles_w2`",
@@ -358,6 +358,97 @@ ENTRIES: Final = (
         "counts and cost only",
     ),
     Entry(
+        "artifacts/NA-11/freeze.json",
+        "`newsaction.production.freeze` (S3) through `lock.freeze`",
+        "the freeze files (`lock.FREEZE_FILES`): PREREG before its Deviations log, `configs/*.yaml`, "
+        "`panel/{targets,reactions}.py`, `analysis/{spec,inference,shapley,metrics}.py`",
+        "{version, hash, files, freeze_files, deviations_log {bytes, sha256}, git_sha, ts, note}",
+        "one object",
+        "the PREREG §4.4 freeze record (hash `523e7589…`, 2026-10-28T10:38:58Z)",
+        "written once, before any 2026 state was built or sent",
+    ),
+    Entry(
+        "artifacts/NA-11/canary_check.csv",
+        "`newsaction.production.canary_check.compare_now` (S5, end of S6)",
+        "`artifacts/NA-05/canary_v1.jsonl`, `artifacts/NA-11/canary_baseline_na11.parquet`; "
+        "`cache/decisions.sqlite`",
+        "model, phase, repeat_idx, cells, mean_abs_dp_train_a, mean_abs_dp_all, max_abs_dp_all, "
+        "repeat_noise, rule, stop, builds",
+        "(model, phase) unique",
+        "the canary against the NA-11 baselines under the `configs/dm.yaml` rule: S5 (repeat 10) and the end "
+        "of S6 (repeat 11)",
+        "train-period canary items; no test data",
+    ),
+    Entry(
+        "artifacts/NA-11/canary_drift_check.csv",
+        "`newsaction.production.canary_check.drift_now` (end of S6)",
+        "100 NA-06 stage-2 val-A Call A states per model; `cache/decisions.sqlite`",
+        "model, phase, repeat_idx, drift_mean_abs_dp_vs_na06, drift_pairs, repeat_noise, fires, builds_na06, "
+        "builds_now",
+        "(model, phase) unique",
+        "the pre-freeze drift check repeated once at the end of S6 (repeat 3)",
+        "val-A states; no test data",
+    ),
+    Entry(
+        "artifacts/NA-11/canary_end_s6.json",
+        "the end-of-S6 run of `canary_check.compare_now`, `drift_now` and `judge`",
+        "`artifacts/NA-11/{canary_check.csv,canary_drift_check.csv,canary_drift_na06.csv}`, the S6 readings' "
+        "model builds",
+        "{canary, drift, production_builds, verdicts, reconcile}",
+        "one object",
+        "the end-of-S6 verdict per model under the post-freeze §15 rule",
+        "no test data",
+    ),
+    Entry(
+        "artifacts/NA-11/production_runs_api_comparators_market.json",
+        "`newsaction.production.run.run` (S6)",
+        "`work/dm/production/*_api_comparators_market.parquet`",
+        "list of {model, component, requests, ok, valid, cost}",
+        "one entry per component",
+        "the S6 batches before the retry pass",
+        "counts and cost only",
+    ),
+    Entry(
+        "artifacts/NA-11/production_retry.json",
+        "`newsaction.production.run.retry` (S6, operator decision)",
+        "`work/dm/production/*_api_comparators_market.parquet`",
+        "list of {model, component, retried, ok_now, valid_now, statuses_before} and per model "
+        "{component: '(not retried)', failed, statuses}",
+        "one entry per retried component, one per model for what was left",
+        "the one retry pass over S6's transient failures (429, 5xx, transport)",
+        "counts only",
+    ),
+    Entry(
+        "artifacts/NA-11/production_summary.csv",
+        "`newsaction.production.summary.run` (S9)",
+        "every NA-11 reading file, NA-08's instrument files, the state files (eligible events)",
+        "model, source, split, eligible, rows, answered, valid, coverage, invalid_rate, latency_p50_ms, "
+        "latency_p95_ms, cost_usd",
+        "(model, source, split) unique",
+        "coverage, invalid rate, latency and cost per model, reading and split (AC3)",
+        "counts only; no outcome",
+    ),
+    Entry(
+        "artifacts/NA-11/production_spend.csv",
+        "`newsaction.production.summary.spend` (S9)",
+        "`ledgers/spend.jsonl` (chunk NA-11, spend records)",
+        "model, purpose, requests, usd",
+        "(model, purpose) unique",
+        "NA-11's ledger spend per model and purpose (AC5)",
+        "spend only",
+    ),
+    Entry(
+        "artifacts/NA-11/probes_val_a.csv",
+        "`newsaction.production.probes.run`",
+        "`artifacts/NA-06/leaderboard.csv`, `work/dm/production/local_laya_typed_decisions_probes.parquet`, "
+        "`work/kaggle/predictions/{laya_fin,anchor}_probes.parquet`, NA-08's val-A predictions",
+        "model, kind, flip_rate, flip_pairs, ic_masked(_t), ic_unmasked(_t), unmasked_minus_masked(_t), "
+        "ic_shuffled(_t), screen thresholds",
+        "model unique",
+        "the operator's disclosed val-A probes beside NA-06's API screens (not hypotheses)",
+        "val-A only",
+    ),
+    Entry(
         "artifacts/NA-11/key_usage.json",
         "`newsaction.production.record_key_usage`",
         "OpenRouter GET /api/v1/key and /api/v1/credits; `ledgers/spend.jsonl`",
@@ -367,6 +458,36 @@ ENTRIES: Final = (
         "the key's usage before and after each NA-11 paid batch (operator preamble item 6)",
         "account metadata; no data",
     ),
+)
+
+ENTRIES: Final = (
+    _LISTED
+    + tuple(
+        Entry(
+            f"work/kaggle/predictions/{model}_{name}.parquet",
+            "`newsaction.production.kaggle_infer.import_run` (S7)",
+            f"the Kaggle kernel `newsaction-na11-infer-{run}` (inference only, the frozen pin) on "
+            f"`work/kaggle/dataset_na11/{name}.parquet`; its record and outputs verified",
+            "NA-08's instrument schema plus `variant`",
+            "(`event_id`, `call`, `window`, `variant`, `question`) unique",
+            f"{model} on {name}",
+            "the states' decision points; predictions only",
+        )
+        for model, run in (("laya_fin", "laya-s13"), ("anchor", "anchor-s13"))
+        for name in ("test_callB", "val_callB_d1", "robustness_callA", "probes")
+    )
+    + tuple(
+        Entry(
+            f"artifacts/NA-11/kaggle_import_{run}.json",
+            "`newsaction.production.kaggle_infer.import_run` (S7)",
+            f"the kernel `newsaction-na11-infer-{run}`'s outputs",
+            "{file: rows} per imported file",
+            "one object",
+            f"what the S7 import of {run} wrote",
+            "counts only",
+        )
+        for run in ("laya-s13", "anchor-s13")
+    )
 )
 
 
