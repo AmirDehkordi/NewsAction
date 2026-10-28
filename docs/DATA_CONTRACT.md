@@ -1788,6 +1788,24 @@ sha256 on a rerun (labels and export were run twice: 8 of 8 files identical).
 
 ## NA-12 — unblinding and the pre-registered analyses (`newsaction.analysis`)
 
+### `work/analysis/targets_test.parquet`
+- **Producer:** `newsaction.analysis.unblind.run` (once, `NA_UNBLIND=1`)
+- **Inputs:** `panel.targets.build_targets` and `build_d1_targets` ("test"), `panel.reactions.build_reactions` (D2, D1) and `panel.build.test_returns_panel`, all on the blinded files through `newsaction.lock` (purposes targets and reactions, logged in `ledgers/test_access.jsonl`); `analysis.slot_path`
+- **Schema:** ids (`session`, `symbol_id`, `split`, `company_id`, `member`, `is_rep`, `sector`, `half_day`); same-day `r_cc`, `r_spy_cc`, `ar_*`, `sigma_*`, `z_cc`, `z_on`, `z_id`, `z_vol`; `targets.py`'s columns (`y0`, `y2`, `e5`, `e5_lvl`, `car_lvl_*`, `fwd_lvl_*`, `ar_o*`, `z_o*`, …); `g_d2`, `g_d2_lvl`; D1 `y1`, `fwd_lvl_10_*`, `g_d1`, `g_d1_lvl`, `car_lvl_10`; the 30-minute path `car_lvl_b0` … `car_lvl_b11`
+- **Key:** (`session`, `symbol_id`) unique
+- **Rows / coverage:** every test-period row of the test returns panel (members and the post-exit rows)
+- **Availability:** the test period's outcomes, after unblinding (NA-12 S1); the only file 2026 outcomes are read from afterwards
+- **sha256:** `c6b7cf4d4c4c76ce19bd1dca752471671e5146d309ba497228ca00c7e805122e`
+
+### `artifacts/NA-12/unblind.json`
+- **Producer:** `newsaction.analysis.unblind.run`
+- **Inputs:** the unblinding run
+- **Schema:** the freeze hash at unblinding, the run's "targets" ledger entries, the output's sha256, counts
+- **Key:** one record
+- **Rows / coverage:** the evidence of the one access sequence (AC1); counts only
+- **Availability:** after unblinding
+- **sha256:** `54cadb6d484b6e24b50e75428d2423a99507518c0c8dfaecc17fbc257a711e11`
+
 ### `artifacts/NA-12/unblind_rehearsal.json`
 - **Producer:** `newsaction.analysis.unblind.rehearse`
 - **Inputs:** `work/panel/panel_public.parquet`, `work/panel/intraday_public.parquet`, the public bars

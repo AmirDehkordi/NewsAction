@@ -1,0 +1,139 @@
+{
+ "freeze_hash": "523e7589d1bd551c715d03b2c285a4875a4770050f75712a585db7decae73a7c",
+ "targets_entries": [
+  {
+   "ts": "2026-10-28T19:18:32.616872+00:00",
+   "name": "prices_raw_2026",
+   "caller": "src/newsaction/panel/targets.py:<genexpr>:282",
+   "allowed": true
+  },
+  {
+   "ts": "2026-10-28T19:18:32.643888+00:00",
+   "name": "total_return_check_2026",
+   "caller": "src/newsaction/panel/targets.py:<genexpr>:282",
+   "allowed": true
+  },
+  {
+   "ts": "2026-10-28T19:18:45.871645+00:00",
+   "name": "bars30_2026",
+   "caller": "src/newsaction/panel/targets.py:build_d1_targets:255",
+   "allowed": true
+  },
+  {
+   "ts": "2026-10-28T19:18:45.934534+00:00",
+   "name": "prices_raw_2026",
+   "caller": "src/newsaction/panel/targets.py:<genexpr>:256",
+   "allowed": true
+  },
+  {
+   "ts": "2026-10-28T19:18:45.949356+00:00",
+   "name": "total_return_check_2026",
+   "caller": "src/newsaction/panel/targets.py:<genexpr>:256",
+   "allowed": true
+  },
+  {
+   "ts": "2026-10-28T19:19:17.001819+00:00",
+   "name": "prices_raw_2026",
+   "caller": "src/newsaction/analysis/unblind.py:<genexpr>:217",
+   "allowed": true
+  },
+  {
+   "ts": "2026-10-28T19:19:17.018760+00:00",
+   "name": "total_return_check_2026",
+   "caller": "src/newsaction/analysis/unblind.py:<genexpr>:217",
+   "allowed": true
+  },
+  {
+   "ts": "2026-10-28T19:19:17.035487+00:00",
+   "name": "bars30_2026",
+   "caller": "src/newsaction/analysis/unblind.py:run:218",
+   "allowed": true
+  }
+ ],
+ "output": {
+  "path": "work/analysis/targets_test.parquet",
+  "sha256": "c6b7cf4d4c4c76ce19bd1dca752471671e5146d309ba497228ca00c7e805122e"
+ },
+ "consistency_gaps": {
+  "y0_vs_z_id": 0.0,
+  "g_d2_vs_z_cc": 0.0,
+  "path_b0_vs_car_lvl_10": 0.0
+ },
+ "seconds": 105.3,
+ "rows": 73498,
+ "sessions": 145,
+ "first_session": "2026-01-02",
+ "last_session": "2026-07-31",
+ "symbols": 519,
+ "non_missing": {
+  "r_cc": 73462,
+  "r_spy_cc": 73498,
+  "ar_cc": 73265,
+  "ar_on": 72283,
+  "ar_id": 72283,
+  "sigma_cc": 73237,
+  "sigma_on": 73237,
+  "sigma_id": 73237,
+  "z_id": 72223,
+  "z_vol": 73388,
+  "z_cc": 73205,
+  "z_on": 72223,
+  "y0": 72223,
+  "ar_o0_c1": 72283,
+  "z_o0_c1": 72223,
+  "ar_o0_c5": 70768,
+  "z_o0_c5": 70709,
+  "ar_c0_o1": 71768,
+  "z_c0_o1": 71708,
+  "ar_o1_c1": 71768,
+  "z_o1_c1": 71708,
+  "fwd_lvl_o1_c1": 71707,
+  "ar_o1_c5": 70758,
+  "z_o1_c5": 70698,
+  "fwd_lvl_o1_c5": 70698,
+  "ar_o1_c20": 63183,
+  "z_o1_c20": 63138,
+  "fwd_lvl_o1_c20": 63138,
+  "y2": 70698,
+  "e5": 71217,
+  "car6_z": 70713,
+  "car_lvl_o0": 72223,
+  "car_lvl_c0": 73237,
+  "car_lvl_c1": 72732,
+  "car_lvl_c2": 72227,
+  "car_lvl_c5": 70713,
+  "car_lvl_c10": 68193,
+  "car_lvl_c20": 63153,
+  "car_lvl_c60": 42938,
+  "e5_lvl": 71217,
+  "delist_within_c20": 73498,
+  "g_d2": 73205,
+  "g_d2_lvl": 73205,
+  "y1": 70119,
+  "ar_10_c0": 70831,
+  "ar_10_c1": 70831,
+  "z_10_c1": 70119,
+  "ar_10_c5": 69363,
+  "z_10_c5": 68660,
+  "fwd_lvl_10_c0": 70771,
+  "fwd_lvl_10_c1": 70771,
+  "fwd_lvl_10_c5": 69304,
+  "fwd_lvl_10_c20": 61933,
+  "delist_within_c20_d1": 72972,
+  "g_d1": 70119,
+  "g_d1_lvl": 70771,
+  "car_lvl_10": 70771,
+  "car_lvl_b0": 70771,
+  "car_lvl_b1": 70771,
+  "car_lvl_b2": 70771,
+  "car_lvl_b3": 70771,
+  "car_lvl_b4": 70771,
+  "car_lvl_b5": 70771,
+  "car_lvl_b6": 70770,
+  "car_lvl_b7": 70770,
+  "car_lvl_b8": 70770,
+  "car_lvl_b9": 70770,
+  "car_lvl_b10": 70770,
+  "car_lvl_b11": 70770
+ }
+}
