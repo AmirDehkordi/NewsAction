@@ -1,0 +1,102 @@
+% t10_explanation_ladder: A3.2 explanation ladder: out-of-sample share of stock-specific daily variance (z_cc) by step
+% Ridge fit on val-B, λ on val-A, evaluated on test (§11.5); news features are 0 on days without an event.
+\begin{tabular}{llllllllllll}
+\toprule
+key & model & cut & step & r2 & n & r2\_ci\_low & r2\_ci\_high & r2\_p & increment & increment\_p & lambda \\
+\midrule
+roll\_r2 & all & all & market+sector & 0.253 & 68,761 & — & — & — & — & — & — \\
+laya\_fin:all:ex\_ante & laya\_fin & all & ex\_ante & 0.001 & 68,761 & -2.21e-04 & 0.003 & 0.045 & — & — & 10000.000 \\
+laya\_fin:all:ex\_post & laya\_fin & all & ex\_post & 0.002 & 68,761 & 3.79e-04 & 0.005 & 0.010 & 0.001 & 0.010 & 10000.000 \\
+laya\_fin:all:knowable & laya\_fin & all & ex-ante ÷ ex-post (increment: ex-post − ex-ante) & 0.532 & — & — & — & — & 0.001 & — & — \\
+laya\_fin:event\_days:ex\_ante & laya\_fin & event\_days & ex\_ante & 0.004 & 18,291 & -8.47e-04 & 0.008 & 0.037 & — & — & 1000.000 \\
+laya\_fin:event\_days:ex\_post & laya\_fin & event\_days & ex\_post & 0.006 & 18,291 & 7.29e-05 & 0.012 & 0.015 & 0.003 & 0.040 & 1000.000 \\
+laya\_fin:event\_days:knowable & laya\_fin & event\_days & ex-ante ÷ ex-post (increment: ex-post − ex-ante) & 0.588 & — & — & — & — & 0.003 & — & — \\
+laya\_fin:non\_event\_days:ex\_ante & laya\_fin & non\_event\_days & ex\_ante & 2.24e-05 & 50,470 & -1.23e-04 & 1.72e-04 & 0.389 & — & — & 10000.000 \\
+laya\_fin:tier:top100:ex\_ante & laya\_fin & tier:top100 & ex\_ante & 0.006 & 14,007 & 2.45e-05 & 0.013 & 0.045 & — & — & 1000.000 \\
+laya\_fin:tier:top100:ex\_post & laya\_fin & tier:top100 & ex\_post & 0.005 & 14,007 & 0.001 & 0.009 & 0.009 & -0.001 & 0.737 & 10000.000 \\
+laya\_fin:tier:top100:knowable & laya\_fin & tier:top100 & ex-ante ÷ ex-post (increment: ex-post − ex-ante) & 1.203 & — & — & — & — & -0.001 & — & — \\
+laya\_fin:tier:mid:ex\_ante & laya\_fin & tier:mid & ex\_ante & -7.02e-04 & 20,612 & -0.003 & 0.001 & 0.724 & — & — & 1000.000 \\
+laya\_fin:tier:mid:ex\_post & laya\_fin & tier:mid & ex\_post & 0.002 & 20,612 & -0.001 & 0.004 & 0.080 & 0.003 & 0.008 & 1000.000 \\
+laya\_fin:tier:mid:knowable & laya\_fin & tier:mid & ex-ante ÷ ex-post (increment: ex-post − ex-ante) & -0.382 & — & — & — & — & 0.003 & — & — \\
+laya\_fin:tier:rest:ex\_ante & laya\_fin & tier:rest & ex\_ante & 0.001 & 34,142 & -0.001 & 0.003 & 0.161 & — & — & 1000.000 \\
+laya\_fin:tier:rest:ex\_post & laya\_fin & tier:rest & ex\_post & 0.002 & 34,142 & -0.001 & 0.005 & 0.107 & 7.70e-04 & 0.173 & 1000.000 \\
+laya\_fin:tier:rest:knowable & laya\_fin & tier:rest & ex-ante ÷ ex-post (increment: ex-post − ex-ante) & 0.569 & — & — & — & — & 7.70e-04 & — & — \\
+anchor:all:ex\_ante & anchor & all & ex\_ante & 1.17e-04 & 68,761 & -1.44e-04 & 3.99e-04 & 0.190 & — & — & 10000.000 \\
+anchor:all:ex\_post & anchor & all & ex\_post & 3.29e-04 & 68,761 & -1.31e-04 & 7.59e-04 & 0.072 & 2.12e-04 & 0.094 & 10000.000 \\
+anchor:all:knowable & anchor & all & ex-ante ÷ ex-post (increment: ex-post − ex-ante) & 0.356 & — & — & — & — & 2.12e-04 & — & — \\
+anchor:event\_days:ex\_ante & anchor & event\_days & ex\_ante & 2.71e-04 & 18,291 & -2.53e-04 & 7.75e-04 & 0.141 & — & — & 10000.000 \\
+anchor:event\_days:ex\_post & anchor & event\_days & ex\_post & 6.48e-04 & 18,291 & -4.94e-04 & 0.002 & 0.111 & 3.77e-04 & 0.140 & 10000.000 \\
+anchor:event\_days:knowable & anchor & event\_days & ex-ante ÷ ex-post (increment: ex-post − ex-ante) & 0.419 & — & — & — & — & 3.77e-04 & — & — \\
+anchor:non\_event\_days:ex\_ante & anchor & non\_event\_days & ex\_ante & 2.24e-05 & 50,470 & -1.23e-04 & 1.72e-04 & 0.389 & — & — & 10000.000 \\
+anchor:tier:top100:ex\_ante & anchor & tier:top100 & ex\_ante & -5.45e-04 & 14,007 & -0.001 & 2.51e-04 & 0.914 & — & — & 10000.000 \\
+anchor:tier:top100:ex\_post & anchor & tier:top100 & ex\_post & -8.39e-04 & 14,007 & -0.002 & 2.73e-04 & 0.934 & -2.94e-04 & 0.880 & 10000.000 \\
+anchor:tier:top100:knowable & anchor & tier:top100 & ex-ante ÷ ex-post (increment: ex-post − ex-ante) & 0.650 & — & — & — & — & -2.94e-04 & — & — \\
+anchor:tier:mid:ex\_ante & anchor & tier:mid & ex\_ante & -0.001 & 20,612 & -0.002 & -3.61e-04 & 0.996 & — & — & 1000.000 \\
+anchor:tier:mid:ex\_post & anchor & tier:mid & ex\_post & -7.33e-04 & 20,612 & -0.002 & 5.09e-04 & 0.861 & 5.67e-04 & 0.155 & 1000.000 \\
+anchor:tier:mid:knowable & anchor & tier:mid & ex-ante ÷ ex-post (increment: ex-post − ex-ante) & 1.773 & — & — & — & — & 5.67e-04 & — & — \\
+anchor:tier:rest:ex\_ante & anchor & tier:rest & ex\_ante & -4.62e-05 & 34,142 & -6.84e-04 & 6.09e-04 & 0.558 & — & — & 10000.000 \\
+anchor:tier:rest:ex\_post & anchor & tier:rest & ex\_post & 2.99e-04 & 34,142 & -0.001 & 0.002 & 0.366 & 3.45e-04 & 0.314 & 1000.000 \\
+anchor:tier:rest:knowable & anchor & tier:rest & ex-ante ÷ ex-post (increment: ex-post − ex-ante) & -0.155 & — & — & — & — & 3.45e-04 & — & — \\
+d1\_ultra:all:ex\_ante & d1\_ultra & all & ex\_ante & 0.003 & 68,761 & -4.80e-04 & 0.006 & 0.033 & — & — & 0.010 \\
+d1\_ultra:all:ex\_post & d1\_ultra & all & ex\_post & 0.008 & 68,761 & 0.004 & 0.012 & <0.001 & 0.005 & <0.001 & 1000.000 \\
+d1\_ultra:all:explanation & d1\_ultra & all & explanation & 0.158 & 68,761 & 0.127 & 0.185 & <0.001 & 0.149 & <0.001 & 1000.000 \\
+d1\_ultra:all:knowable & d1\_ultra & all & ex-ante ÷ ex-post (increment: ex-post − ex-ante) & 0.348 & — & — & — & — & 0.005 & — & — \\
+d1\_ultra:event\_days:ex\_ante & d1\_ultra & event\_days & ex\_ante & 0.008 & 18,291 & 0.001 & 0.013 & <0.001 & — & — & 1000.000 \\
+d1\_ultra:event\_days:ex\_post & d1\_ultra & event\_days & ex\_post & 0.019 & 18,291 & 0.011 & 0.026 & <0.001 & 0.011 & <0.001 & 1000.000 \\
+d1\_ultra:event\_days:explanation & d1\_ultra & event\_days & explanation & 0.375 & 18,291 & 0.356 & 0.392 & <0.001 & 0.356 & <0.001 & 100.000 \\
+d1\_ultra:event\_days:knowable & d1\_ultra & event\_days & ex-ante ÷ ex-post (increment: ex-post − ex-ante) & 0.408 & — & — & — & — & 0.011 & — & — \\
+d1\_ultra:non\_event\_days:ex\_ante & d1\_ultra & non\_event\_days & ex\_ante & 2.24e-05 & 50,470 & -1.23e-04 & 1.72e-04 & 0.389 & — & — & 10000.000 \\
+d1\_ultra:tier:top100:ex\_ante & d1\_ultra & tier:top100 & ex\_ante & 0.005 & 14,007 & -1.00e-04 & 0.011 & 0.026 & — & — & 1000.000 \\
+d1\_ultra:tier:top100:ex\_post & d1\_ultra & tier:top100 & ex\_post & 0.009 & 14,007 & 0.006 & 0.012 & <0.001 & 0.004 & 0.005 & 10000.000 \\
+d1\_ultra:tier:top100:explanation & d1\_ultra & tier:top100 & explanation & 0.199 & 14,007 & 0.165 & 0.231 & <0.001 & 0.190 & <0.001 & 100.000 \\
+d1\_ultra:tier:top100:knowable & d1\_ultra & tier:top100 & ex-ante ÷ ex-post (increment: ex-post − ex-ante) & 0.602 & — & — & — & — & 0.004 & — & — \\
+d1\_ultra:tier:mid:ex\_ante & d1\_ultra & tier:mid & ex\_ante & 0.002 & 20,612 & -5.55e-04 & 0.004 & 0.065 & — & — & 10000.000 \\
+d1\_ultra:tier:mid:ex\_post & d1\_ultra & tier:mid & ex\_post & 0.005 & 20,612 & -9.62e-04 & 0.010 & 0.048 & 0.003 & 0.061 & 1000.000 \\
+d1\_ultra:tier:mid:explanation & d1\_ultra & tier:mid & explanation & 0.156 & 20,612 & 0.122 & 0.190 & <0.001 & 0.152 & <0.001 & 1000.000 \\
+d1\_ultra:tier:mid:knowable & d1\_ultra & tier:mid & ex-ante ÷ ex-post (increment: ex-post − ex-ante) & 0.369 & — & — & — & — & 0.003 & — & — \\
+d1\_ultra:tier:rest:ex\_ante & d1\_ultra & tier:rest & ex\_ante & 0.003 & 34,142 & -4.55e-05 & 0.006 & 0.020 & — & — & 100.000 \\
+d1\_ultra:tier:rest:ex\_post & d1\_ultra & tier:rest & ex\_post & 0.007 & 34,142 & 0.002 & 0.010 & <0.001 & 0.003 & 0.001 & 1000.000 \\
+d1\_ultra:tier:rest:explanation & d1\_ultra & tier:rest & explanation & 0.140 & 34,142 & 0.109 & 0.166 & <0.001 & 0.133 & <0.001 & 1000.000 \\
+d1\_ultra:tier:rest:knowable & d1\_ultra & tier:rest & ex-ante ÷ ex-post (increment: ex-post − ex-ante) & 0.491 & — & — & — & — & 0.003 & — & — \\
+d1\_ultra:event\_type:analyst\_action:ex\_ante & d1\_ultra & event\_type:analyst\_action & ex\_ante & 0.003 & 3,629 & -0.002 & 0.009 & 0.138 & — & — & 0.010 \\
+d1\_ultra:event\_type:analyst\_action:ex\_post & d1\_ultra & event\_type:analyst\_action & ex\_post & 0.012 & 3,629 & 0.004 & 0.021 & 0.007 & 0.009 & <0.001 & 1000.000 \\
+d1\_ultra:event\_type:analyst\_action:explanation & d1\_ultra & event\_type:analyst\_action & explanation & 0.434 & 3,629 & 0.405 & 0.462 & <0.001 & 0.422 & <0.001 & 100.000 \\
+d1\_ultra:event\_type:analyst\_action:knowable & d1\_ultra & event\_type:analyst\_action & ex-ante ÷ ex-post (increment: ex-post − ex-ante) & 0.262 & — & — & — & — & 0.009 & — & — \\
+d1\_ultra:event\_type:capital\_returns\_financing:ex\_ante & d1\_ultra & event\_type:capital\_returns\_financing & ex\_ante & -0.034 & 643 & -0.086 & 0.010 & 0.903 & — & — & 10.000 \\
+d1\_ultra:event\_type:capital\_returns\_financing:ex\_post & d1\_ultra & event\_type:capital\_returns\_financing & ex\_post & -0.037 & 643 & -0.089 & 0.004 & 0.928 & -0.003 & 0.641 & 100.000 \\
+d1\_ultra:event\_type:capital\_returns\_financing:explanation & d1\_ultra & event\_type:capital\_returns\_financing & explanation & 0.317 & 643 & 0.261 & 0.368 & <0.001 & 0.354 & <0.001 & 100.000 \\
+d1\_ultra:event\_type:capital\_returns\_financing:knowable & d1\_ultra & event\_type:capital\_returns\_financing & ex-ante ÷ ex-post (increment: ex-post − ex-ante) & 0.907 & — & — & — & — & -0.003 & — & — \\
+d1\_ultra:event\_type:deal\_ma\_partnership:ex\_ante & d1\_ultra & event\_type:deal\_ma\_partnership & ex\_ante & -0.005 & 1,266 & -0.018 & 0.008 & 0.773 & — & — & 10.000 \\
+d1\_ultra:event\_type:deal\_ma\_partnership:ex\_post & d1\_ultra & event\_type:deal\_ma\_partnership & ex\_post & 0.014 & 1,266 & 3.69e-04 & 0.029 & 0.026 & 0.019 & <0.001 & 100.000 \\
+d1\_ultra:event\_type:deal\_ma\_partnership:explanation & d1\_ultra & event\_type:deal\_ma\_partnership & explanation & 0.380 & 1,266 & 0.341 & 0.425 & <0.001 & 0.366 & <0.001 & 100.000 \\
+d1\_ultra:event\_type:deal\_ma\_partnership:knowable & d1\_ultra & event\_type:deal\_ma\_partnership & ex-ante ÷ ex-post (increment: ex-post − ex-ante) & -0.338 & — & — & — & — & 0.019 & — & — \\
+d1\_ultra:event\_type:earnings\_results:ex\_ante & d1\_ultra & event\_type:earnings\_results & ex\_ante & 0.014 & 7,028 & 0.005 & 0.022 & <0.001 & — & — & 1000.000 \\
+d1\_ultra:event\_type:earnings\_results:ex\_post & d1\_ultra & event\_type:earnings\_results & ex\_post & 0.026 & 7,028 & 0.012 & 0.039 & <0.001 & 0.012 & <0.001 & 1000.000 \\
+d1\_ultra:event\_type:earnings\_results:explanation & d1\_ultra & event\_type:earnings\_results & explanation & 0.400 & 7,028 & 0.377 & 0.421 & <0.001 & 0.374 & <0.001 & 100.000 \\
+d1\_ultra:event\_type:earnings\_results:knowable & d1\_ultra & event\_type:earnings\_results & ex-ante ÷ ex-post (increment: ex-post − ex-ante) & 0.533 & — & — & — & — & 0.012 & — & — \\
+d1\_ultra:event\_type:guidance\_outlook:ex\_ante & d1\_ultra & event\_type:guidance\_outlook & ex\_ante & -0.035 & 506 & -0.072 & -0.006 & 0.971 & — & — & 100.000 \\
+d1\_ultra:event\_type:guidance\_outlook:ex\_post & d1\_ultra & event\_type:guidance\_outlook & ex\_post & -0.007 & 506 & -0.031 & 0.014 & 0.717 & 0.028 & 0.001 & 1000.000 \\
+d1\_ultra:event\_type:guidance\_outlook:explanation & d1\_ultra & event\_type:guidance\_outlook & explanation & -0.052 & 506 & -0.223 & 0.030 & 0.770 & -0.044 & 0.753 & 10000.000 \\
+d1\_ultra:event\_type:guidance\_outlook:knowable & d1\_ultra & event\_type:guidance\_outlook & ex-ante ÷ ex-post (increment: ex-post − ex-ante) & 4.799 & — & — & — & — & 0.028 & — & — \\
+d1\_ultra:event\_type:legal\_regulatory:ex\_ante & d1\_ultra & event\_type:legal\_regulatory & ex\_ante & -0.018 & 467 & -0.062 & 0.017 & 0.807 & — & — & 1000.000 \\
+d1\_ultra:event\_type:legal\_regulatory:ex\_post & d1\_ultra & event\_type:legal\_regulatory & ex\_post & -0.015 & 467 & -0.061 & 0.024 & 0.732 & 0.004 & 0.080 & 1000.000 \\
+d1\_ultra:event\_type:legal\_regulatory:explanation & d1\_ultra & event\_type:legal\_regulatory & explanation & -1.161 & 467 & -4.679 & 0.416 & 0.769 & -1.146 & 0.766 & 10.000 \\
+d1\_ultra:event\_type:legal\_regulatory:knowable & d1\_ultra & event\_type:legal\_regulatory & ex-ante ÷ ex-post (increment: ex-post − ex-ante) & 1.252 & — & — & — & — & 0.004 & — & — \\
+d1\_ultra:event\_type:management\_governance:ex\_ante & d1\_ultra & event\_type:management\_governance & ex\_ante & 0.006 & 319 & -0.008 & 0.017 & 0.164 & — & — & 100.000 \\
+d1\_ultra:event\_type:management\_governance:ex\_post & d1\_ultra & event\_type:management\_governance & ex\_post & 0.002 & 319 & -0.002 & 0.006 & 0.153 & -0.003 & 0.737 & 10000.000 \\
+d1\_ultra:event\_type:management\_governance:explanation & d1\_ultra & event\_type:management\_governance & explanation & 0.170 & 319 & 0.099 & 0.249 & <0.001 & 0.168 & <0.001 & 10.000 \\
+d1\_ultra:event\_type:management\_governance:knowable & d1\_ultra & event\_type:management\_governance & ex-ante ÷ ex-post (increment: ex-post − ex-ante) & 2.551 & — & — & — & — & -0.003 & — & — \\
+d1\_ultra:event\_type:other:ex\_ante & d1\_ultra & event\_type:other & ex\_ante & -0.004 & 3,010 & -0.008 & -4.27e-04 & 0.984 & — & — & 10000.000 \\
+d1\_ultra:event\_type:other:ex\_post & d1\_ultra & event\_type:other & ex\_post & -0.004 & 3,010 & -0.012 & 0.004 & 0.856 & -4.85e-05 & 0.498 & 100.000 \\
+d1\_ultra:event\_type:other:explanation & d1\_ultra & event\_type:other & explanation & 0.194 & 3,010 & 0.166 & 0.230 & <0.001 & 0.198 & <0.001 & 10.000 \\
+d1\_ultra:event\_type:other:knowable & d1\_ultra & event\_type:other & ex-ante ÷ ex-post (increment: ex-post − ex-ante) & 0.988 & — & — & — & — & -4.85e-05 & — & — \\
+d1\_ultra:event\_type:product\_operations:ex\_ante & d1\_ultra & event\_type:product\_operations & ex\_ante & -0.003 & 1,072 & -0.010 & 0.003 & 0.843 & — & — & 10000.000 \\
+d1\_ultra:event\_type:product\_operations:ex\_post & d1\_ultra & event\_type:product\_operations & ex\_post & -0.003 & 1,072 & -0.010 & 0.003 & 0.823 & 2.80e-04 & 0.013 & 10000.000 \\
+d1\_ultra:event\_type:product\_operations:explanation & d1\_ultra & event\_type:product\_operations & explanation & 0.355 & 1,072 & 0.308 & 0.396 & <0.001 & 0.359 & <0.001 & 100.000 \\
+d1\_ultra:event\_type:product\_operations:knowable & d1\_ultra & event\_type:product\_operations & ex-ante ÷ ex-post (increment: ex-post − ex-ante) & 1.090 & — & — & — & — & 2.80e-04 & — & — \\
+d1\_ultra:event\_type:sector\_or\_macro:ex\_ante & d1\_ultra & event\_type:sector\_or\_macro & ex\_ante & -0.003 & 351 & -0.008 & 0.002 & 0.851 & — & — & 10000.000 \\
+d1\_ultra:event\_type:sector\_or\_macro:ex\_post & d1\_ultra & event\_type:sector\_or\_macro & ex\_post & 0.031 & 351 & -0.009 & 0.058 & 0.009 & 0.033 & 0.003 & 1000.000 \\
+d1\_ultra:event\_type:sector\_or\_macro:explanation & d1\_ultra & event\_type:sector\_or\_macro & explanation & 0.349 & 351 & 0.145 & 0.505 & <0.001 & 0.318 & <0.001 & 100.000 \\
+d1\_ultra:event\_type:sector\_or\_macro:knowable & d1\_ultra & event\_type:sector\_or\_macro & ex-ante ÷ ex-post (increment: ex-post − ex-ante) & -0.088 & — & — & — & — & 0.033 & — & — \\
+\bottomrule
+\end{tabular}

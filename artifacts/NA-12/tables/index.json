@@ -1,0 +1,605 @@
+[
+ {
+  "name": "t1_primary",
+  "title": "Primary hypotheses (Holm over H1, H1b, H2, H3, H4; \u00a71.3 headline rule): Laya-Fin and the anchor",
+  "columns": [
+   "key",
+   "hypothesis",
+   "statement",
+   "primary_estimate",
+   "primary_ci_low",
+   "primary_ci_high",
+   "primary_p",
+   "primary_p_holm",
+   "anchor_estimate",
+   "anchor_ci_low",
+   "anchor_ci_high",
+   "anchor_p",
+   "verdict"
+  ],
+  "rows": 5,
+  "notes": [
+   "Estimates in each hypothesis' direction (H2: min(b, \u2212c)); p one-sided; the anchor's p is its own (\u00a71.3), not Holm-adjusted. H2's CI is in t2 (b and c separately).",
+   "The anchor's direction, H2 and continuation readings are uninformative (NA-11 REPORT \u00a77.1)."
+  ],
+  "files": [
+   "t1_primary.csv",
+   "t1_primary.tex"
+  ]
+ },
+ {
+  "name": "t1b_primary_by_model",
+  "title": "H1\u2013H4 for every decision model (the API models screen-failing and model-specific)",
+  "columns": [
+   "key",
+   "model",
+   "test",
+   "role",
+   "estimate",
+   "ci_low",
+   "ci_high",
+   "nw_t",
+   "p",
+   "n_days",
+   "n_obs",
+   "available",
+   "p_holm_within_model",
+   "footnote",
+   "reason"
+  ],
+  "rows": 30,
+  "notes": [
+   "Holm within each model is descriptive; only Laya-Fin's Holm enters the headline rule."
+  ],
+  "files": [
+   "t1b_primary_by_model.csv",
+   "t1b_primary_by_model.tex"
+  ]
+ },
+ {
+  "name": "t2_h2_over_under",
+  "title": "Over/under regression y = a + b\u00b7N\u0302 + c\u00b7G + day \u00d7 tier FE by decision point and within |G| bins",
+  "columns": [
+   "key",
+   "model",
+   "variant",
+   "available",
+   "b",
+   "b_se",
+   "b_t",
+   "b_p",
+   "b_se_dk",
+   "b_p_dk",
+   "c",
+   "c_se",
+   "c_t",
+   "c_p",
+   "c_se_dk",
+   "c_p_dk",
+   "p",
+   "p_dk",
+   "nobs",
+   "n_sessions",
+   "n_firms",
+   "df_t",
+   "r2_within",
+   "reason"
+  ],
+  "rows": 27,
+  "notes": [
+   "Two-way clustered (session, firm) SEs; Driscoll\u2013Kraay (5 lags) SEs and p in the _dk columns.",
+   "D2: y2, G = z_cc,t, N\u0302 from Call A on W2; D1: y1, G at 10:00, N\u0302_W0; D0: y0 = z_id, no G."
+  ],
+  "files": [
+   "t2_h2_over_under.csv",
+   "t2_h2_over_under.tex"
+  ]
+ },
+ {
+  "name": "t3_ic",
+  "title": "Daily IC of N\u0302_W0 with z_cc, z_on and z_id, and quintile spreads (\u00a711.1)",
+  "columns": [
+   "key",
+   "model",
+   "target",
+   "ic",
+   "ic_t",
+   "ic_ci_low",
+   "ic_ci_high",
+   "n_days",
+   "n_obs",
+   "qspread",
+   "qspread_t",
+   "qspread_p"
+  ],
+  "rows": 18,
+  "notes": [],
+  "files": [
+   "t3_ic.csv",
+   "t3_ic.tex"
+  ]
+ },
+ {
+  "name": "t4_secondary",
+  "title": "Secondary hypotheses (BH, q = 0.10, within each instrument; pooled sensitivity family)",
+  "columns": [
+   "key",
+   "model",
+   "test",
+   "available",
+   "estimate",
+   "p",
+   "in_family",
+   "q",
+   "q_pooled",
+   "reason",
+   "ci_low",
+   "ci_high",
+   "se",
+   "nobs"
+  ],
+  "rows": 24,
+  "notes": [
+   "H6 and A3.4 need tone and the explanation answer (Q16), which the trained models do not give.",
+   "The pooled family adds d1-ultra's H6 and A3.4 to Laya-Fin's six (PREREG \u00a715 NA-12 row)."
+  ],
+  "files": [
+   "t4_secondary.csv",
+   "t4_secondary.tex"
+  ]
+ },
+ {
+  "name": "t5_heterogeneity",
+  "title": "Heterogeneity cuts on H2 at D2: Wald test of N\u0302\u00b71[cut] and G\u00b71[cut], BH over each model's eight cuts",
+  "columns": [
+   "key",
+   "model",
+   "cut",
+   "n_in",
+   "n_out",
+   "wald_f",
+   "wald_q",
+   "p",
+   "b_diff",
+   "b_diff_se",
+   "b_diff_t",
+   "b_diff_se_dk",
+   "b_diff_p_two",
+   "c_diff",
+   "c_diff_se",
+   "c_diff_t",
+   "c_diff_se_dk",
+   "c_diff_p_two",
+   "b_in",
+   "b_in_se",
+   "c_in",
+   "c_in_se",
+   "b_out",
+   "b_out_se",
+   "c_out",
+   "c_out_se",
+   "q"
+  ],
+  "rows": 24,
+  "notes": [
+   "Laya-Fin's eight cuts are the family; the anchor's and d1-ultra's are reported."
+  ],
+  "files": [
+   "t5_heterogeneity.csv",
+   "t5_heterogeneity.tex"
+  ]
+ },
+ {
+  "name": "t6_convergence_ladder",
+  "title": "A1 convergence ladder: \u03ba_h of CAR^lvl_h on V (D0 events, day \u00d7 tier FE) and the shares \u03ba_h / \u03ba_h*",
+  "columns": [
+   "key",
+   "model",
+   "variant",
+   "rung",
+   "available",
+   "kappa",
+   "kappa_se",
+   "kappa_t",
+   "kappa_p",
+   "kappa_se_dk",
+   "kappa_p_dk",
+   "share_of_h_star",
+   "nobs",
+   "ci_low",
+   "ci_high"
+  ],
+  "rows": 84,
+  "notes": [
+   "ladder_clean: each rung on its clean-window events; ladder_h10: h* = t+10; ladder_plateau: the mean CAR^lvl over t+16..t+20. The C_t+60 rung is exploratory."
+  ],
+  "files": [
+   "t6_convergence_ladder.csv",
+   "t6_convergence_ladder.tex"
+  ]
+ },
+ {
+  "name": "t7_gap_closure",
+  "title": "A1 gap closure AR(\u03c4\u2192h)/\u03c3 = a + \u03bb_h\u00b7U_\u03c4 + \u03c8_h\u00b7V (+ FE) at D2 and D1; half-life (first \u03bb_h >= 0.5)",
+  "columns": [
+   "key",
+   "model",
+   "point",
+   "variant",
+   "rung",
+   "available",
+   "lambda",
+   "lambda_se",
+   "lambda_p",
+   "lambda_p_dk",
+   "psi",
+   "psi_se",
+   "psi_p_two",
+   "nobs",
+   "ci_low",
+   "ci_high"
+  ],
+  "rows": 48,
+  "notes": [
+   "\u03c8 carries its two-sided p (\u03c8_h* = 0, outside every family); a half-life of \u221e is beyond t+20."
+  ],
+  "files": [
+   "t7_gap_closure.csv",
+   "t7_gap_closure.tex"
+  ]
+ },
+ {
+  "name": "t8_tracking_error",
+  "title": "A1 tracking error RMSE(CAR^lvl_h \u2212 V) relative to the naive 0 and to the price-only V",
+  "columns": [
+   "key",
+   "model",
+   "rung",
+   "rmse",
+   "nobs",
+   "naive_ratio",
+   "naive_ci_low",
+   "naive_ci_high",
+   "naive_p",
+   "price_only_ratio",
+   "price_only_ci_low",
+   "price_only_ci_high",
+   "price_only_p"
+  ],
+  "rows": 24,
+  "notes": [],
+  "files": [
+   "t8_tracking_error.csv",
+   "t8_tracking_error.tex"
+  ]
+ },
+ {
+  "name": "t9_convergence_cuts",
+  "title": "A1 by tier, quantified vs story (vendor; d1-ultra's own label) and |G| bin",
+  "columns": [
+   "key",
+   "model",
+   "cut",
+   "level",
+   "kappa_t20",
+   "kappa_t20_p",
+   "nobs_d0",
+   "kappa_ct",
+   "kappa_ct_p",
+   "lambda_t5",
+   "lambda_t5_p",
+   "psi_t5",
+   "half_life",
+   "nobs_gap",
+   "tracking_naive_t20",
+   "tracking_naive_t20_p"
+  ],
+  "rows": 35,
+  "notes": [
+   "|G| bins apply to gap closure only (the D0 ladder has no G); PREREG \u00a715 NA-12 row."
+  ],
+  "files": [
+   "t9_convergence_cuts.csv",
+   "t9_convergence_cuts.tex"
+  ]
+ },
+ {
+  "name": "t10_explanation_ladder",
+  "title": "A3.2 explanation ladder: out-of-sample share of stock-specific daily variance (z_cc) by step",
+  "columns": [
+   "key",
+   "model",
+   "cut",
+   "step",
+   "r2",
+   "n",
+   "r2_ci_low",
+   "r2_ci_high",
+   "r2_p",
+   "increment",
+   "increment_p",
+   "lambda"
+  ],
+  "rows": 94,
+  "notes": [
+   "Ridge fit on val-B, \u03bb on val-A, evaluated on test (\u00a711.5); news features are 0 on days without an event."
+  ],
+  "files": [
+   "t10_explanation_ladder.csv",
+   "t10_explanation_ladder.tex"
+  ]
+ },
+ {
+  "name": "t11_explanation_share_theta",
+  "title": "A3.3\u2013A3.5 (d1-ultra, model-specific): explained share, \u03b8, persistence by reason, the market",
+  "columns": [
+   "key",
+   "item",
+   "value",
+   "events_share",
+   "n",
+   "variance_share",
+   "se",
+   "p",
+   "ci_low",
+   "ci_high",
+   "available"
+  ],
+  "rows": 29,
+  "notes": [],
+  "files": [
+   "t11_explanation_share_theta.csv",
+   "t11_explanation_share_theta.tex"
+  ]
+ },
+ {
+  "name": "t12_question_battery",
+  "title": "A2.5: mechanism cuts (own labels and vendor tags), horizon validity, H4 width, reading validity",
+  "columns": [
+   "key",
+   "model",
+   "analysis",
+   "label",
+   "level",
+   "b",
+   "b_p",
+   "c",
+   "c_p",
+   "nobs",
+   "available",
+   "kappa_t20",
+   "kappa_t20_p",
+   "rho",
+   "ci_low",
+   "ci_high",
+   "p",
+   "delta_r2",
+   "agreement"
+  ],
+  "rows": 130,
+  "notes": [],
+  "files": [
+   "t12_question_battery.csv",
+   "t12_question_battery.tex"
+  ]
+ },
+ {
+  "name": "t13_shapley",
+  "title": "\u00a711.5 Shapley decomposition of the test OOS R\u00b2 and mean daily IC over {R, N, J}, pooled and by tier",
+  "columns": [
+   "key",
+   "model",
+   "tier",
+   "metric",
+   "group",
+   "shapley",
+   "share",
+   "n"
+  ],
+  "rows": 96,
+  "notes": [],
+  "files": [
+   "t13_shapley.csv",
+   "t13_shapley.tex"
+  ]
+ },
+ {
+  "name": "t14_model_comparison",
+  "title": "Model comparison: daily IC of N\u0302_W0 with z_cc (val-B, test, common test events), cost, latency",
+  "columns": [
+   "key",
+   "model",
+   "name",
+   "role",
+   "ic_val_b",
+   "ic_val_b_t",
+   "ic_val_b_n",
+   "ic_test",
+   "ic_test_t",
+   "ic_test_n",
+   "ic_common",
+   "ic_common_t",
+   "ic_common_n",
+   "cost_per_1000",
+   "latency_p50_ms",
+   "latency_p95_ms",
+   "coverage",
+   "footnote"
+  ],
+  "rows": 14,
+  "notes": [
+   "The API models are screen-failing and model-specific (\u00a715 NA-06 row). span-02: the S5 canary fired a STOP and the operator chose to proceed (PREREG \u00a715, post-freeze NA-11 row).",
+   "Costs per 1,000 decisions include answers paid by earlier chunks; the price-only D2 row is IC with y2."
+  ],
+  "files": [
+   "t14_model_comparison.csv",
+   "t14_model_comparison.tex"
+  ]
+ },
+ {
+  "name": "t15_calibration",
+  "title": "\u00a711.2 calibration of Q1's three classes (ECE; log-loss and Brier skill vs val-A climatology); H7",
+  "columns": [
+   "key",
+   "model",
+   "target",
+   "ece",
+   "log_loss",
+   "brier",
+   "log_loss_skill",
+   "brier_skill",
+   "n",
+   "auc",
+   "temperature",
+   "ece_before",
+   "ece_after",
+   "source"
+  ],
+  "rows": 22,
+  "notes": [],
+  "files": [
+   "t15_calibration.csv",
+   "t15_calibration.tex"
+  ]
+ },
+ {
+  "name": "t16_robustness",
+  "title": "\u00a711.6 and operator rows (a)\u2013(b): every robustness variant, raw and placebo-adjusted",
+  "columns": [
+   "key",
+   "model",
+   "point",
+   "variant",
+   "adjustment",
+   "H1",
+   "H1_t",
+   "H1_p",
+   "n",
+   "H1b",
+   "H1b_t",
+   "H1b_p",
+   "ic_z_cc",
+   "ic_z_cc_t",
+   "ic_z_on",
+   "ic_z_on_t",
+   "ic_z_id",
+   "ic_z_id_t",
+   "b",
+   "b_p",
+   "c",
+   "c_p",
+   "H2_p",
+   "nobs",
+   "ic_y2",
+   "ic_y2_t",
+   "note"
+  ],
+  "rows": 127,
+  "notes": [
+   "At D0 each variant re-runs H1, H1b and the ICs; at D2, H2 (\u00a715 NA-11 row (xii))."
+  ],
+  "files": [
+   "t16_robustness.csv",
+   "t16_robustness.tex"
+  ]
+ },
+ {
+  "name": "t17_sector_exploratory",
+  "title": "Exploratory (outside every family, no claim): IC of N\u0302_W0 by GICS sector and leave-one-sector-out",
+  "columns": [
+   "key",
+   "model",
+   "kind",
+   "sector",
+   "ic_z_cc",
+   "ic_z_cc_t",
+   "ic_z_cc_ci_low",
+   "ic_z_cc_ci_high",
+   "ic_z_cc_n",
+   "ic_z_on",
+   "ic_z_on_t",
+   "ic_z_on_ci_low",
+   "ic_z_on_ci_high",
+   "ic_z_on_n",
+   "ic_z_id",
+   "ic_z_id_t",
+   "ic_z_id_ci_low",
+   "ic_z_id_ci_high",
+   "ic_z_id_n"
+  ],
+  "rows": 66,
+  "notes": [],
+  "files": [
+   "t17_sector_exploratory.csv",
+   "t17_sector_exploratory.tex"
+  ]
+ },
+ {
+  "name": "t18_probes_val_a",
+  "title": "Disclosed val-A probes (NA-11; not hypotheses), next to the model comparison",
+  "columns": [
+   "key",
+   "model",
+   "flip_rate",
+   "flip_pairs",
+   "flip_screen",
+   "edit_mean_shift",
+   "flip_rate_all_pairs",
+   "flip_pairs_valid",
+   "right_way",
+   "edit_shift_t",
+   "n_hat_sd_val_a",
+   "shift_sd",
+   "ic_masked",
+   "ic_masked_t",
+   "ic_unmasked",
+   "ic_unmasked_t",
+   "unmasked_minus_masked",
+   "unmasked_minus_masked_t",
+   "masked_screen",
+   "ic_shuffled",
+   "ic_shuffled_t",
+   "shuffled_screen_t",
+   "ic_real_same_events",
+   "ic_real_same_events_t",
+   "real_minus_shuffled",
+   "real_minus_shuffled_t",
+   "real_shuffled_events",
+   "kind",
+   "screen_company_identification",
+   "screen_counterfactual_flip",
+   "screen_masked_vs_unmasked",
+   "screen_shuffled_news",
+   "screen_all"
+  ],
+  "rows": 9,
+  "notes": [],
+  "files": [
+   "t18_probes_val_a.csv",
+   "t18_probes_val_a.tex"
+  ]
+ },
+ {
+  "name": "t19_monthly_ic",
+  "title": "Monthly mean daily IC of N\u0302_W0 with z_cc (val-A, val-B, test)",
+  "columns": [
+   "key",
+   "model",
+   "split",
+   "month",
+   "ic",
+   "n_days"
+  ],
+  "rows": 72,
+  "notes": [
+   "anchor: 2024-12 (answerdotai/ModernBERT-large Dec-2024 checkpoint (PREREG \u00a79.2))",
+   "d1_ultra: 2026-10-15 (NA-05 catalog created)",
+   "span_02: 2026-10-16 (NA-05 catalog created)",
+   "drex_v2: 2026-10-12 (NA-05 catalog created)"
+  ],
+  "files": [
+   "t19_monthly_ic.csv",
+   "t19_monthly_ic.tex"
+  ]
+ }
+]

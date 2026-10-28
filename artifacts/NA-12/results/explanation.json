@@ -1,0 +1,2652 @@
+{
+ "split": "test",
+ "roll_r2": {
+  "step": "market+sector",
+  "r2": 0.25250318947789097,
+  "n": 68761
+ },
+ "models": {
+  "laya_fin": {
+   "ladder": {
+    "split": "test",
+    "target": "z_cc",
+    "steps": {
+     "ex_ante": {
+      "value": 0.0013080960738505673,
+      "nw_t": null,
+      "boot_se": 0.0007778194181910593,
+      "ci_low": -0.0002207664548781343,
+      "ci_high": 0.002827097967133487,
+      "p": 0.044795520447955206,
+      "alternative": "greater",
+      "n_days": 140,
+      "n_obs": 68761,
+      "lambda": 10000.0,
+      "features": [
+       "has_d0",
+       "a0_n_hat",
+       "a0_abs_n_hat",
+       "a0_mag_mean"
+      ]
+     },
+     "ex_post": {
+      "value": 0.0024600000565137845,
+      "nw_t": null,
+      "boot_se": 0.0010608493947763008,
+      "ci_low": 0.00037909003505919427,
+      "ci_high": 0.004505640696338317,
+      "p": 0.0096990300969903,
+      "alternative": "greater",
+      "n_days": 140,
+      "n_obs": 68761,
+      "lambda": 10000.0,
+      "features": [
+       "has_d0",
+       "a0_n_hat",
+       "a0_abs_n_hat",
+       "a0_mag_mean",
+       "has_d2",
+       "a2_n_hat",
+       "a2_abs_n_hat",
+       "a2_mag_mean"
+      ],
+      "increment": {
+       "value": 0.0011519039826632172,
+       "nw_t": null,
+       "boot_se": 0.0004856116036780403,
+       "ci_low": 0.00022549105005417654,
+       "ci_high": 0.0021353760517713516,
+       "p": 0.009999000099990002,
+       "alternative": "greater",
+       "n_days": 140,
+       "n_obs": 68761
+      }
+     }
+    },
+    "knowable_before_open": 0.5317463592681171,
+    "arrived_during_day": 0.0011519039826632172
+   },
+   "by_tier": {
+    "top100": {
+     "split": "test",
+     "target": "z_cc",
+     "steps": {
+      "ex_ante": {
+       "value": 0.006046115084505273,
+       "nw_t": null,
+       "boot_se": 0.0033581419728138063,
+       "ci_low": 2.450527796558283e-05,
+       "ci_high": 0.013192183408822965,
+       "p": 0.0446955304469553,
+       "alternative": "greater",
+       "n_days": 140,
+       "n_obs": 14007,
+       "lambda": 1000.0,
+       "features": [
+        "has_d0",
+        "a0_n_hat",
+        "a0_abs_n_hat",
+        "a0_mag_mean"
+       ]
+      },
+      "ex_post": {
+       "value": 0.0050260289076331545,
+       "nw_t": null,
+       "boot_se": 0.0019838704152284835,
+       "ci_low": 0.0013763089066062156,
+       "ci_high": 0.009129021972178906,
+       "p": 0.009499050094990502,
+       "alternative": "greater",
+       "n_days": 140,
+       "n_obs": 14007,
+       "lambda": 10000.0,
+       "features": [
+        "has_d0",
+        "a0_n_hat",
+        "a0_abs_n_hat",
+        "a0_mag_mean",
+        "has_d2",
+        "a2_n_hat",
+        "a2_abs_n_hat",
+        "a2_mag_mean"
+       ],
+       "increment": {
+        "value": -0.0010200861768721176,
+        "nw_t": null,
+        "boot_se": 0.001782177315638791,
+        "ci_low": -0.004785487355695695,
+        "ci_high": 0.0022056878975739254,
+        "p": 0.7368263173682632,
+        "alternative": "greater",
+        "n_days": 140,
+        "n_obs": 14007
+       }
+      }
+     },
+     "knowable_before_open": 1.2029606664861971,
+     "arrived_during_day": -0.0010200861768721184
+    },
+    "mid": {
+     "split": "test",
+     "target": "z_cc",
+     "steps": {
+      "ex_ante": {
+       "value": -0.0007024657154289133,
+       "nw_t": null,
+       "boot_se": 0.0011071362334701866,
+       "ci_low": -0.0028664609280729305,
+       "ci_high": 0.0014449062707712573,
+       "p": 0.7242275772422758,
+       "alternative": "greater",
+       "n_days": 140,
+       "n_obs": 20612,
+       "lambda": 1000.0,
+       "features": [
+        "has_d0",
+        "a0_n_hat",
+        "a0_abs_n_hat",
+        "a0_mag_mean"
+       ]
+      },
+      "ex_post": {
+       "value": 0.001838840809653493,
+       "nw_t": null,
+       "boot_se": 0.0013776927458600207,
+       "ci_low": -0.0010437832628028372,
+       "ci_high": 0.00440597282305054,
+       "p": 0.0795920407959204,
+       "alternative": "greater",
+       "n_days": 140,
+       "n_obs": 20612,
+       "lambda": 1000.0,
+       "features": [
+        "has_d0",
+        "a0_n_hat",
+        "a0_abs_n_hat",
+        "a0_mag_mean",
+        "has_d2",
+        "a2_n_hat",
+        "a2_abs_n_hat",
+        "a2_mag_mean"
+       ],
+       "increment": {
+        "value": 0.002541306525082406,
+        "nw_t": null,
+        "boot_se": 0.0009756274653354894,
+        "ci_low": 0.0006938262585167994,
+        "ci_high": 0.0045197999849615235,
+        "p": 0.007699230076992301,
+        "alternative": "greater",
+        "n_days": 140,
+        "n_obs": 20612
+       }
+      }
+     },
+     "knowable_before_open": -0.38201551311083004,
+     "arrived_during_day": 0.002541306525082406
+    },
+    "rest": {
+     "split": "test",
+     "target": "z_cc",
+     "steps": {
+      "ex_ante": {
+       "value": 0.0010138437287447787,
+       "nw_t": null,
+       "boot_se": 0.00102023304058719,
+       "ci_low": -0.00107596491465744,
+       "ci_high": 0.0029004326703865315,
+       "p": 0.1608839116088391,
+       "alternative": "greater",
+       "n_days": 140,
+       "n_obs": 34142,
+       "lambda": 1000.0,
+       "features": [
+        "has_d0",
+        "a0_n_hat",
+        "a0_abs_n_hat",
+        "a0_mag_mean"
+       ]
+      },
+      "ex_post": {
+       "value": 0.0017833595531160581,
+       "nw_t": null,
+       "boot_se": 0.001450798033610152,
+       "ci_low": -0.0011062124219100703,
+       "ci_high": 0.004640459860510744,
+       "p": 0.1065893410658934,
+       "alternative": "greater",
+       "n_days": 140,
+       "n_obs": 34142,
+       "lambda": 1000.0,
+       "features": [
+        "has_d0",
+        "a0_n_hat",
+        "a0_abs_n_hat",
+        "a0_mag_mean",
+        "has_d2",
+        "a2_n_hat",
+        "a2_abs_n_hat",
+        "a2_mag_mean"
+       ],
+       "increment": {
+        "value": 0.0007695158243712796,
+        "nw_t": null,
+        "boot_se": 0.0008519065557994647,
+        "ci_low": -0.0008700932275014639,
+        "ci_high": 0.0024934381778853425,
+        "p": 0.1733826617338266,
+        "alternative": "greater",
+        "n_days": 140,
+        "n_obs": 34142
+       }
+      }
+     },
+     "knowable_before_open": 0.5685021435936981,
+     "arrived_during_day": 0.0007695158243712795
+    }
+   },
+   "event_days": {
+    "split": "test",
+    "target": "z_cc",
+    "steps": {
+     "ex_ante": {
+      "value": 0.003727845590008502,
+      "nw_t": null,
+      "boot_se": 0.0022009847677170887,
+      "ci_low": -0.0008469969078061618,
+      "ci_high": 0.007784954556834762,
+      "p": 0.0365963403659634,
+      "alternative": "greater",
+      "n_days": 140,
+      "n_obs": 18291,
+      "lambda": 1000.0,
+      "features": [
+       "has_d0",
+       "a0_n_hat",
+       "a0_abs_n_hat",
+       "a0_mag_mean"
+      ]
+     },
+     "ex_post": {
+      "value": 0.006345220954778947,
+      "nw_t": null,
+      "boot_se": 0.0030270248316770915,
+      "ci_low": 7.292032414232962e-05,
+      "ci_high": 0.012035638675228543,
+      "p": 0.014698530146985302,
+      "alternative": "greater",
+      "n_days": 140,
+      "n_obs": 18291,
+      "lambda": 1000.0,
+      "features": [
+       "has_d0",
+       "a0_n_hat",
+       "a0_abs_n_hat",
+       "a0_mag_mean",
+       "has_d2",
+       "a2_n_hat",
+       "a2_abs_n_hat",
+       "a2_mag_mean"
+      ],
+      "increment": {
+       "value": 0.0026173753647704447,
+       "nw_t": null,
+       "boot_se": 0.001464564221222354,
+       "ci_low": -0.00017693501126594838,
+       "ci_high": 0.005554680331861037,
+       "p": 0.040495950404959506,
+       "alternative": "greater",
+       "n_days": 140,
+       "n_obs": 18291
+      }
+     }
+    },
+    "knowable_before_open": 0.5875044567519512,
+    "arrived_during_day": 0.002617375364770445
+   },
+   "non_event_days": {
+    "split": "test",
+    "target": "z_cc",
+    "steps": {
+     "ex_ante": {
+      "value": 2.236583986638099e-05,
+      "nw_t": null,
+      "boot_se": 7.533144747094642e-05,
+      "ci_low": -0.0001233528183730857,
+      "ci_high": 0.00017173900691520877,
+      "p": 0.38876112388761125,
+      "alternative": "greater",
+      "n_days": 140,
+      "n_obs": 50470,
+      "lambda": 10000.0,
+      "features": [
+       "has_d0",
+       "a0_n_hat",
+       "a0_abs_n_hat",
+       "a0_mag_mean"
+      ]
+     }
+    }
+   }
+  },
+  "anchor": {
+   "ladder": {
+    "split": "test",
+    "target": "z_cc",
+    "steps": {
+     "ex_ante": {
+      "value": 0.00011706516099332939,
+      "nw_t": null,
+      "boot_se": 0.00013798318976547487,
+      "ci_low": -0.00014434255235405835,
+      "ci_high": 0.0003988164901783881,
+      "p": 0.1897810218978102,
+      "alternative": "greater",
+      "n_days": 140,
+      "n_obs": 68761,
+      "lambda": 10000.0,
+      "features": [
+       "has_d0",
+       "a0_n_hat",
+       "a0_abs_n_hat",
+       "a0_mag_mean"
+      ]
+     },
+     "ex_post": {
+      "value": 0.00032859307374386173,
+      "nw_t": null,
+      "boot_se": 0.00022958257306271006,
+      "ci_low": -0.00013051509838214924,
+      "ci_high": 0.0007591217793198272,
+      "p": 0.0715928407159284,
+      "alternative": "greater",
+      "n_days": 140,
+      "n_obs": 68761,
+      "lambda": 10000.0,
+      "features": [
+       "has_d0",
+       "a0_n_hat",
+       "a0_abs_n_hat",
+       "a0_mag_mean",
+       "has_d2",
+       "a2_n_hat",
+       "a2_abs_n_hat",
+       "a2_mag_mean"
+      ],
+      "increment": {
+       "value": 0.00021152791275053234,
+       "nw_t": null,
+       "boot_se": 0.0001637702309437043,
+       "ci_low": -0.0001111078057956537,
+       "ci_high": 0.0005247950743562986,
+       "p": 0.09449055094490551,
+       "alternative": "greater",
+       "n_days": 140,
+       "n_obs": 68761
+      }
+     }
+    },
+    "knowable_before_open": 0.35626180326789747,
+    "arrived_during_day": 0.00021152791275053234
+   },
+   "by_tier": {
+    "top100": {
+     "split": "test",
+     "target": "z_cc",
+     "steps": {
+      "ex_ante": {
+       "value": -0.0005449578247825646,
+       "nw_t": null,
+       "boot_se": 0.0003983625689454772,
+       "ci_low": -0.0013190827174129512,
+       "ci_high": 0.00025084252316465844,
+       "p": 0.9143085691430857,
+       "alternative": "greater",
+       "n_days": 140,
+       "n_obs": 14007,
+       "lambda": 10000.0,
+       "features": [
+        "has_d0",
+        "a0_n_hat",
+        "a0_abs_n_hat",
+        "a0_mag_mean"
+       ]
+      },
+      "ex_post": {
+       "value": -0.0008387958756309402,
+       "nw_t": null,
+       "boot_se": 0.0005614178741492742,
+       "ci_low": -0.0019394219759069297,
+       "ci_high": 0.00027259101179610314,
+       "p": 0.9338066193380662,
+       "alternative": "greater",
+       "n_days": 140,
+       "n_obs": 14007,
+       "lambda": 10000.0,
+       "features": [
+        "has_d0",
+        "a0_n_hat",
+        "a0_abs_n_hat",
+        "a0_mag_mean",
+        "has_d2",
+        "a2_n_hat",
+        "a2_abs_n_hat",
+        "a2_mag_mean"
+       ],
+       "increment": {
+        "value": -0.0002938380508483755,
+        "nw_t": null,
+        "boot_se": 0.0002463241116922491,
+        "ci_low": -0.0007724573249883998,
+        "ci_high": 0.00018562603740351102,
+        "p": 0.8803119688031197,
+        "alternative": "greater",
+        "n_days": 140,
+        "n_obs": 14007
+       }
+      }
+     },
+     "knowable_before_open": 0.6496906346524995,
+     "arrived_during_day": -0.0002938380508483756
+    },
+    "mid": {
+     "split": "test",
+     "target": "z_cc",
+     "steps": {
+      "ex_ante": {
+       "value": -0.0013001302152840237,
+       "nw_t": null,
+       "boot_se": 0.00047900923363512093,
+       "ci_low": -0.0022383453992575113,
+       "ci_high": -0.00036075891098360477,
+       "p": 0.9963003699630038,
+       "alternative": "greater",
+       "n_days": 140,
+       "n_obs": 20612,
+       "lambda": 1000.0,
+       "features": [
+        "has_d0",
+        "a0_n_hat",
+        "a0_abs_n_hat",
+        "a0_mag_mean"
+       ]
+      },
+      "ex_post": {
+       "value": -0.0007331542791271185,
+       "nw_t": null,
+       "boot_se": 0.0006769664390170034,
+       "ci_low": -0.0021035076562970515,
+       "ci_high": 0.0005089295243917479,
+       "p": 0.861013898610139,
+       "alternative": "greater",
+       "n_days": 140,
+       "n_obs": 20612,
+       "lambda": 1000.0,
+       "features": [
+        "has_d0",
+        "a0_n_hat",
+        "a0_abs_n_hat",
+        "a0_mag_mean",
+        "has_d2",
+        "a2_n_hat",
+        "a2_abs_n_hat",
+        "a2_mag_mean"
+       ],
+       "increment": {
+        "value": 0.0005669759361569051,
+        "nw_t": null,
+        "boot_se": 0.0005647223216269814,
+        "ci_low": -0.0005394010340367238,
+        "ci_high": 0.0016926035265938633,
+        "p": 0.15458454154584542,
+        "alternative": "greater",
+        "n_days": 140,
+        "n_obs": 20612
+       }
+      }
+     },
+     "knowable_before_open": 1.7733378257464956,
+     "arrived_during_day": 0.0005669759361569052
+    },
+    "rest": {
+     "split": "test",
+     "target": "z_cc",
+     "steps": {
+      "ex_ante": {
+       "value": -4.6172861847259654e-05,
+       "nw_t": null,
+       "boot_se": 0.00032875299065350934,
+       "ci_low": -0.0006839795309948553,
+       "ci_high": 0.0006086126887644899,
+       "p": 0.5582441755824418,
+       "alternative": "greater",
+       "n_days": 140,
+       "n_obs": 34142,
+       "lambda": 10000.0,
+       "features": [
+        "has_d0",
+        "a0_n_hat",
+        "a0_abs_n_hat",
+        "a0_mag_mean"
+       ]
+      },
+      "ex_post": {
+       "value": 0.00029872667559592065,
+       "nw_t": null,
+       "boot_se": 0.000839849195960581,
+       "ci_low": -0.0013958349183412601,
+       "ci_high": 0.0018827654882145669,
+       "p": 0.36646335366463356,
+       "alternative": "greater",
+       "n_days": 140,
+       "n_obs": 34142,
+       "lambda": 1000.0,
+       "features": [
+        "has_d0",
+        "a0_n_hat",
+        "a0_abs_n_hat",
+        "a0_mag_mean",
+        "has_d2",
+        "a2_n_hat",
+        "a2_abs_n_hat",
+        "a2_mag_mean"
+       ],
+       "increment": {
+        "value": 0.0003448995374431803,
+        "nw_t": null,
+        "boot_se": 0.0006930071755874572,
+        "ci_low": -0.0010664557483717131,
+        "ci_high": 0.0016396500576829937,
+        "p": 0.31396860313968605,
+        "alternative": "greater",
+        "n_days": 140,
+        "n_obs": 34142
+       }
+      }
+     },
+     "knowable_before_open": -0.1545655799072876,
+     "arrived_during_day": 0.0003448995374431803
+    }
+   },
+   "event_days": {
+    "split": "test",
+    "target": "z_cc",
+    "steps": {
+     "ex_ante": {
+      "value": 0.00027140603517586496,
+      "nw_t": null,
+      "boot_se": 0.000262406187606374,
+      "ci_low": -0.0002532628257126727,
+      "ci_high": 0.0007751096517896346,
+      "p": 0.1406859314068593,
+      "alternative": "greater",
+      "n_days": 140,
+      "n_obs": 18291,
+      "lambda": 10000.0,
+      "features": [
+       "has_d0",
+       "a0_n_hat",
+       "a0_abs_n_hat",
+       "a0_mag_mean"
+      ]
+     },
+     "ex_post": {
+      "value": 0.0006481364944765866,
+      "nw_t": null,
+      "boot_se": 0.0005554330160086714,
+      "ci_low": -0.0004941378375594626,
+      "ci_high": 0.0016799372017769075,
+      "p": 0.1110888911108889,
+      "alternative": "greater",
+      "n_days": 140,
+      "n_obs": 18291,
+      "lambda": 10000.0,
+      "features": [
+       "has_d0",
+       "a0_n_hat",
+       "a0_abs_n_hat",
+       "a0_mag_mean",
+       "has_d2",
+       "a2_n_hat",
+       "a2_abs_n_hat",
+       "a2_mag_mean"
+      ],
+      "increment": {
+       "value": 0.0003767304593007217,
+       "nw_t": null,
+       "boot_se": 0.0003625126269752139,
+       "ci_low": -0.0003875437750050562,
+       "ci_high": 0.0010543311496090163,
+       "p": 0.14008599140085992,
+       "alternative": "greater",
+       "n_days": 140,
+       "n_obs": 18291
+      }
+     }
+    },
+    "knowable_before_open": 0.41874826905873186,
+    "arrived_during_day": 0.0003767304593007217
+   },
+   "non_event_days": {
+    "split": "test",
+    "target": "z_cc",
+    "steps": {
+     "ex_ante": {
+      "value": 2.236583986638099e-05,
+      "nw_t": null,
+      "boot_se": 7.533144747094642e-05,
+      "ci_low": -0.0001233528183730857,
+      "ci_high": 0.00017173900691520877,
+      "p": 0.38876112388761125,
+      "alternative": "greater",
+      "n_days": 140,
+      "n_obs": 50470,
+      "lambda": 10000.0,
+      "features": [
+       "has_d0",
+       "a0_n_hat",
+       "a0_abs_n_hat",
+       "a0_mag_mean"
+      ]
+     }
+    }
+   }
+  },
+  "d1_ultra": {
+   "ladder": {
+    "split": "test",
+    "target": "z_cc",
+    "steps": {
+     "ex_ante": {
+      "value": 0.002846765104939172,
+      "nw_t": null,
+      "boot_se": 0.0016342660329067933,
+      "ci_low": -0.00047950745835969514,
+      "ci_high": 0.005876983184778359,
+      "p": 0.0326967303269673,
+      "alternative": "greater",
+      "n_days": 140,
+      "n_obs": 68761,
+      "lambda": 0.01,
+      "features": [
+       "has_d0",
+       "a0_n_hat",
+       "a0_abs_n_hat",
+       "a0_m",
+       "a0_surprise",
+       "a0_tone"
+      ]
+     },
+     "ex_post": {
+      "value": 0.008184541099928508,
+      "nw_t": null,
+      "boot_se": 0.0020600649937669874,
+      "ci_low": 0.003990479447592241,
+      "ci_high": 0.012044780575694242,
+      "p": 9.999000099990002e-05,
+      "alternative": "greater",
+      "n_days": 140,
+      "n_obs": 68761,
+      "lambda": 1000.0,
+      "features": [
+       "has_d0",
+       "a0_n_hat",
+       "a0_abs_n_hat",
+       "a0_m",
+       "a0_surprise",
+       "a0_tone",
+       "has_d2",
+       "a2_n_hat",
+       "a2_abs_n_hat",
+       "a2_m",
+       "a2_surprise",
+       "a2_tone"
+      ],
+      "increment": {
+       "value": 0.005337775994989337,
+       "nw_t": null,
+       "boot_se": 0.0008894290362745228,
+       "ci_low": 0.0036184099091616795,
+       "ci_high": 0.007087164753371075,
+       "p": 9.999000099990002e-05,
+       "alternative": "greater",
+       "n_days": 140,
+       "n_obs": 68761
+      }
+     },
+     "explanation": {
+      "value": 0.1575851481795541,
+      "nw_t": null,
+      "boot_se": 0.014980739308352519,
+      "ci_low": 0.12707793978672827,
+      "ci_high": 0.18522945903336047,
+      "p": 9.999000099990002e-05,
+      "alternative": "greater",
+      "n_days": 140,
+      "n_obs": 68761,
+      "lambda": 1000.0,
+      "features": [
+       "has_d0",
+       "a0_n_hat",
+       "a0_abs_n_hat",
+       "a0_m",
+       "a0_surprise",
+       "a0_tone",
+       "has_d2",
+       "a2_n_hat",
+       "a2_abs_n_hat",
+       "a2_m",
+       "a2_surprise",
+       "a2_tone",
+       "b2_x",
+       "b2_x_n_hat",
+       "reason__analyst_action__n_hat",
+       "reason__capital_returns_financing__n_hat",
+       "reason__deal_ma_partnership__n_hat",
+       "reason__earnings_results__n_hat",
+       "reason__guidance_outlook__n_hat",
+       "reason__legal_regulatory__n_hat",
+       "reason__management_governance__n_hat",
+       "reason__market_or_sector_move__n_hat",
+       "reason__no_identifiable_news__n_hat",
+       "reason__product_operations__n_hat",
+       "reason__sector_or_macro__n_hat"
+      ],
+      "increment": {
+       "value": 0.14940060707962563,
+       "nw_t": null,
+       "boot_se": 0.01362627394296784,
+       "ci_low": 0.12152596387378053,
+       "ci_high": 0.17492495703420338,
+       "p": 9.999000099990002e-05,
+       "alternative": "greater",
+       "n_days": 140,
+       "n_obs": 68761
+      }
+     }
+    },
+    "knowable_before_open": 0.34782220165820155,
+    "arrived_during_day": 0.005337775994989336
+   },
+   "by_tier": {
+    "top100": {
+     "split": "test",
+     "target": "z_cc",
+     "steps": {
+      "ex_ante": {
+       "value": 0.005317381696519643,
+       "nw_t": null,
+       "boot_se": 0.0027461614556178265,
+       "ci_low": -0.00010020333056687078,
+       "ci_high": 0.010680519428263112,
+       "p": 0.025697430256974303,
+       "alternative": "greater",
+       "n_days": 140,
+       "n_obs": 14007,
+       "lambda": 1000.0,
+       "features": [
+        "has_d0",
+        "a0_n_hat",
+        "a0_abs_n_hat",
+        "a0_m",
+        "a0_surprise",
+        "a0_tone"
+       ]
+      },
+      "ex_post": {
+       "value": 0.008837696638730106,
+       "nw_t": null,
+       "boot_se": 0.001688573253645918,
+       "ci_low": 0.005517264482810502,
+       "ci_high": 0.012095744835655094,
+       "p": 9.999000099990002e-05,
+       "alternative": "greater",
+       "n_days": 140,
+       "n_obs": 14007,
+       "lambda": 10000.0,
+       "features": [
+        "has_d0",
+        "a0_n_hat",
+        "a0_abs_n_hat",
+        "a0_m",
+        "a0_surprise",
+        "a0_tone",
+        "has_d2",
+        "a2_n_hat",
+        "a2_abs_n_hat",
+        "a2_m",
+        "a2_surprise",
+        "a2_tone"
+       ],
+       "increment": {
+        "value": 0.0035203149422104625,
+        "nw_t": null,
+        "boot_se": 0.0013615479927532453,
+        "ci_low": 0.0009211601100077544,
+        "ci_high": 0.006266386995705546,
+        "p": 0.0047995200479952005,
+        "alternative": "greater",
+        "n_days": 140,
+        "n_obs": 14007
+       }
+      },
+      "explanation": {
+       "value": 0.1985071446446681,
+       "nw_t": null,
+       "boot_se": 0.016749519763131566,
+       "ci_low": 0.16529321638850314,
+       "ci_high": 0.2313805616913816,
+       "p": 9.999000099990002e-05,
+       "alternative": "greater",
+       "n_days": 140,
+       "n_obs": 14007,
+       "lambda": 100.0,
+       "features": [
+        "has_d0",
+        "a0_n_hat",
+        "a0_abs_n_hat",
+        "a0_m",
+        "a0_surprise",
+        "a0_tone",
+        "has_d2",
+        "a2_n_hat",
+        "a2_abs_n_hat",
+        "a2_m",
+        "a2_surprise",
+        "a2_tone",
+        "b2_x",
+        "b2_x_n_hat",
+        "reason__analyst_action__n_hat",
+        "reason__capital_returns_financing__n_hat",
+        "reason__deal_ma_partnership__n_hat",
+        "reason__earnings_results__n_hat",
+        "reason__guidance_outlook__n_hat",
+        "reason__legal_regulatory__n_hat",
+        "reason__management_governance__n_hat",
+        "reason__market_or_sector_move__n_hat",
+        "reason__no_identifiable_news__n_hat",
+        "reason__product_operations__n_hat",
+        "reason__sector_or_macro__n_hat"
+       ],
+       "increment": {
+        "value": 0.18966944800593796,
+        "nw_t": null,
+        "boot_se": 0.015688456335306078,
+        "ci_low": 0.15853055130979338,
+        "ci_high": 0.22019594967509715,
+        "p": 9.999000099990002e-05,
+        "alternative": "greater",
+        "n_days": 140,
+        "n_obs": 14007
+       }
+      }
+     },
+     "knowable_before_open": 0.601670538589985,
+     "arrived_during_day": 0.0035203149422104634
+    },
+    "mid": {
+     "split": "test",
+     "target": "z_cc",
+     "steps": {
+      "ex_ante": {
+       "value": 0.0017475424315193213,
+       "nw_t": null,
+       "boot_se": 0.0011744490637101569,
+       "ci_low": -0.0005554353446131196,
+       "ci_high": 0.00401738461898862,
+       "p": 0.06529347065293471,
+       "alternative": "greater",
+       "n_days": 140,
+       "n_obs": 20612,
+       "lambda": 10000.0,
+       "features": [
+        "has_d0",
+        "a0_n_hat",
+        "a0_abs_n_hat",
+        "a0_m",
+        "a0_surprise",
+        "a0_tone"
+       ]
+      },
+      "ex_post": {
+       "value": 0.004732541472007334,
+       "nw_t": null,
+       "boot_se": 0.002852632905152778,
+       "ci_low": -0.0009624296420222726,
+       "ci_high": 0.01023988687623269,
+       "p": 0.0481951804819518,
+       "alternative": "greater",
+       "n_days": 140,
+       "n_obs": 20612,
+       "lambda": 1000.0,
+       "features": [
+        "has_d0",
+        "a0_n_hat",
+        "a0_abs_n_hat",
+        "a0_m",
+        "a0_surprise",
+        "a0_tone",
+        "has_d2",
+        "a2_n_hat",
+        "a2_abs_n_hat",
+        "a2_m",
+        "a2_surprise",
+        "a2_tone"
+       ],
+       "increment": {
+        "value": 0.0029849990404880126,
+        "nw_t": null,
+        "boot_se": 0.0019829733739427763,
+        "ci_low": -0.0009630220623083016,
+        "ci_high": 0.006803611704038372,
+        "p": 0.06109389061093891,
+        "alternative": "greater",
+        "n_days": 140,
+        "n_obs": 20612
+       }
+      },
+      "explanation": {
+       "value": 0.15636657372257684,
+       "nw_t": null,
+       "boot_se": 0.017490584530127397,
+       "ci_low": 0.12152156947778298,
+       "ci_high": 0.18979082837503913,
+       "p": 9.999000099990002e-05,
+       "alternative": "greater",
+       "n_days": 140,
+       "n_obs": 20612,
+       "lambda": 1000.0,
+       "features": [
+        "has_d0",
+        "a0_n_hat",
+        "a0_abs_n_hat",
+        "a0_m",
+        "a0_surprise",
+        "a0_tone",
+        "has_d2",
+        "a2_n_hat",
+        "a2_abs_n_hat",
+        "a2_m",
+        "a2_surprise",
+        "a2_tone",
+        "b2_x",
+        "b2_x_n_hat",
+        "reason__analyst_action__n_hat",
+        "reason__capital_returns_financing__n_hat",
+        "reason__deal_ma_partnership__n_hat",
+        "reason__earnings_results__n_hat",
+        "reason__guidance_outlook__n_hat",
+        "reason__legal_regulatory__n_hat",
+        "reason__management_governance__n_hat",
+        "reason__market_or_sector_move__n_hat",
+        "reason__no_identifiable_news__n_hat",
+        "reason__product_operations__n_hat",
+        "reason__sector_or_macro__n_hat"
+       ],
+       "increment": {
+        "value": 0.1516340322505695,
+        "nw_t": null,
+        "boot_se": 0.015510254626478549,
+        "ci_low": 0.12089811003723899,
+        "ci_high": 0.18158483240846526,
+        "p": 9.999000099990002e-05,
+        "alternative": "greater",
+        "n_days": 140,
+        "n_obs": 20612
+       }
+      }
+     },
+     "knowable_before_open": 0.3692608806189904,
+     "arrived_during_day": 0.0029849990404880126
+    },
+    "rest": {
+     "split": "test",
+     "target": "z_cc",
+     "steps": {
+      "ex_ante": {
+       "value": 0.0032450949521240753,
+       "nw_t": null,
+       "boot_se": 0.0016331951430369697,
+       "ci_low": -4.554121431025392e-05,
+       "ci_high": 0.0063278168033490696,
+       "p": 0.0202979702029797,
+       "alternative": "greater",
+       "n_days": 140,
+       "n_obs": 34142,
+       "lambda": 100.0,
+       "features": [
+        "has_d0",
+        "a0_n_hat",
+        "a0_abs_n_hat",
+        "a0_m",
+        "a0_surprise",
+        "a0_tone"
+       ]
+      },
+      "ex_post": {
+       "value": 0.0066147359737335825,
+       "nw_t": null,
+       "boot_se": 0.00207065680830666,
+       "ci_low": 0.002378465885615269,
+       "ci_high": 0.010473992408336349,
+       "p": 0.00029997000299970003,
+       "alternative": "greater",
+       "n_days": 140,
+       "n_obs": 34142,
+       "lambda": 1000.0,
+       "features": [
+        "has_d0",
+        "a0_n_hat",
+        "a0_abs_n_hat",
+        "a0_m",
+        "a0_surprise",
+        "a0_tone",
+        "has_d2",
+        "a2_n_hat",
+        "a2_abs_n_hat",
+        "a2_m",
+        "a2_surprise",
+        "a2_tone"
+       ],
+       "increment": {
+        "value": 0.0033696410216095076,
+        "nw_t": null,
+        "boot_se": 0.0011783669566428658,
+        "ci_low": 0.0011146199722969672,
+        "ci_high": 0.0057286439672974265,
+        "p": 0.0013998600139986002,
+        "alternative": "greater",
+        "n_days": 140,
+        "n_obs": 34142
+       }
+      },
+      "explanation": {
+       "value": 0.140065395140287,
+       "nw_t": null,
+       "boot_se": 0.014754834902522114,
+       "ci_low": 0.10876163546745182,
+       "ci_high": 0.16622513087944968,
+       "p": 9.999000099990002e-05,
+       "alternative": "greater",
+       "n_days": 140,
+       "n_obs": 34142,
+       "lambda": 1000.0,
+       "features": [
+        "has_d0",
+        "a0_n_hat",
+        "a0_abs_n_hat",
+        "a0_m",
+        "a0_surprise",
+        "a0_tone",
+        "has_d2",
+        "a2_n_hat",
+        "a2_abs_n_hat",
+        "a2_m",
+        "a2_surprise",
+        "a2_tone",
+        "b2_x",
+        "b2_x_n_hat",
+        "reason__analyst_action__n_hat",
+        "reason__capital_returns_financing__n_hat",
+        "reason__deal_ma_partnership__n_hat",
+        "reason__earnings_results__n_hat",
+        "reason__guidance_outlook__n_hat",
+        "reason__legal_regulatory__n_hat",
+        "reason__management_governance__n_hat",
+        "reason__market_or_sector_move__n_hat",
+        "reason__no_identifiable_news__n_hat",
+        "reason__product_operations__n_hat",
+        "reason__sector_or_macro__n_hat"
+       ],
+       "increment": {
+        "value": 0.13345065916655344,
+        "nw_t": null,
+        "boot_se": 0.013746902950034862,
+        "ci_low": 0.10468245248531767,
+        "ci_high": 0.1583606785764213,
+        "p": 9.999000099990002e-05,
+        "alternative": "greater",
+        "n_days": 140,
+        "n_obs": 34142
+       }
+      }
+     },
+     "knowable_before_open": 0.4905857112075228,
+     "arrived_during_day": 0.003369641021609507
+    }
+   },
+   "event_days": {
+    "split": "test",
+    "target": "z_cc",
+    "steps": {
+     "ex_ante": {
+      "value": 0.007846599673266175,
+      "nw_t": null,
+      "boot_se": 0.003078707876716424,
+      "ci_low": 0.0010721941053018049,
+      "ci_high": 0.013099593085726221,
+      "p": 0.000999900009999,
+      "alternative": "greater",
+      "n_days": 140,
+      "n_obs": 18291,
+      "lambda": 1000.0,
+      "features": [
+       "has_d0",
+       "a0_n_hat",
+       "a0_abs_n_hat",
+       "a0_m",
+       "a0_surprise",
+       "a0_tone"
+      ]
+     },
+     "ex_post": {
+      "value": 0.019210280221093348,
+      "nw_t": null,
+      "boot_se": 0.003839622546037999,
+      "ci_low": 0.010981290624818145,
+      "ci_high": 0.026108362671961465,
+      "p": 9.999000099990002e-05,
+      "alternative": "greater",
+      "n_days": 140,
+      "n_obs": 18291,
+      "lambda": 1000.0,
+      "features": [
+       "has_d0",
+       "a0_n_hat",
+       "a0_abs_n_hat",
+       "a0_m",
+       "a0_surprise",
+       "a0_tone",
+       "has_d2",
+       "a2_n_hat",
+       "a2_abs_n_hat",
+       "a2_m",
+       "a2_surprise",
+       "a2_tone"
+      ],
+      "increment": {
+       "value": 0.011363680547827174,
+       "nw_t": null,
+       "boot_se": 0.0018626856645540615,
+       "ci_low": 0.007925319627767491,
+       "ci_high": 0.01521184592214194,
+       "p": 9.999000099990002e-05,
+       "alternative": "greater",
+       "n_days": 140,
+       "n_obs": 18291
+      }
+     },
+     "explanation": {
+      "value": 0.3753077040274293,
+      "nw_t": null,
+      "boot_se": 0.009167829671728748,
+      "ci_low": 0.35644860621516,
+      "ci_high": 0.39235389512727076,
+      "p": 9.999000099990002e-05,
+      "alternative": "greater",
+      "n_days": 140,
+      "n_obs": 18291,
+      "lambda": 100.0,
+      "features": [
+       "has_d0",
+       "a0_n_hat",
+       "a0_abs_n_hat",
+       "a0_m",
+       "a0_surprise",
+       "a0_tone",
+       "has_d2",
+       "a2_n_hat",
+       "a2_abs_n_hat",
+       "a2_m",
+       "a2_surprise",
+       "a2_tone",
+       "b2_x",
+       "b2_x_n_hat",
+       "reason__analyst_action__n_hat",
+       "reason__capital_returns_financing__n_hat",
+       "reason__deal_ma_partnership__n_hat",
+       "reason__earnings_results__n_hat",
+       "reason__guidance_outlook__n_hat",
+       "reason__legal_regulatory__n_hat",
+       "reason__management_governance__n_hat",
+       "reason__market_or_sector_move__n_hat",
+       "reason__no_identifiable_news__n_hat",
+       "reason__product_operations__n_hat",
+       "reason__sector_or_macro__n_hat"
+      ],
+      "increment": {
+       "value": 0.356097423806336,
+       "nw_t": null,
+       "boot_se": 0.007634900871449758,
+       "ci_low": 0.3409247242738125,
+       "ci_high": 0.370818938651563,
+       "p": 9.999000099990002e-05,
+       "alternative": "greater",
+       "n_days": 140,
+       "n_obs": 18291
+      }
+     }
+    },
+    "knowable_before_open": 0.4084583661955342,
+    "arrived_during_day": 0.011363680547827174
+   },
+   "non_event_days": {
+    "split": "test",
+    "target": "z_cc",
+    "steps": {
+     "ex_ante": {
+      "value": 2.236583986638099e-05,
+      "nw_t": null,
+      "boot_se": 7.533144747094642e-05,
+      "ci_low": -0.0001233528183730857,
+      "ci_high": 0.00017173900691520877,
+      "p": 0.38876112388761125,
+      "alternative": "greater",
+      "n_days": 140,
+      "n_obs": 50470,
+      "lambda": 10000.0,
+      "features": [
+       "has_d0",
+       "a0_n_hat",
+       "a0_abs_n_hat",
+       "a0_m",
+       "a0_surprise",
+       "a0_tone"
+      ]
+     }
+    }
+   },
+   "by_event_type": {
+    "analyst_action": {
+     "split": "test",
+     "target": "z_cc",
+     "steps": {
+      "ex_ante": {
+       "value": 0.003073027576876799,
+       "nw_t": null,
+       "boot_se": 0.002838787721495438,
+       "ci_low": -0.0024072814203463543,
+       "ci_high": 0.008722367407975311,
+       "p": 0.137986201379862,
+       "alternative": "greater",
+       "n_days": 140,
+       "n_obs": 3629,
+       "lambda": 0.01,
+       "features": [
+        "has_d0",
+        "a0_n_hat",
+        "a0_abs_n_hat",
+        "a0_m",
+        "a0_surprise",
+        "a0_tone"
+       ]
+      },
+      "ex_post": {
+       "value": 0.011740318692283508,
+       "nw_t": null,
+       "boot_se": 0.00427255160875752,
+       "ci_low": 0.0040439955544612684,
+       "ci_high": 0.020778320167567615,
+       "p": 0.006799320067993201,
+       "alternative": "greater",
+       "n_days": 140,
+       "n_obs": 3629,
+       "lambda": 1000.0,
+       "features": [
+        "has_d0",
+        "a0_n_hat",
+        "a0_abs_n_hat",
+        "a0_m",
+        "a0_surprise",
+        "a0_tone",
+        "has_d2",
+        "a2_n_hat",
+        "a2_abs_n_hat",
+        "a2_m",
+        "a2_surprise",
+        "a2_tone"
+       ],
+       "increment": {
+        "value": 0.008667291115406707,
+        "nw_t": null,
+        "boot_se": 0.002536988061532626,
+        "ci_low": 0.003912238577885707,
+        "ci_high": 0.013872207183565195,
+        "p": 0.00039996000399960006,
+        "alternative": "greater",
+        "n_days": 140,
+        "n_obs": 3629
+       }
+      },
+      "explanation": {
+       "value": 0.43352496143538377,
+       "nw_t": null,
+       "boot_se": 0.014589975069657483,
+       "ci_low": 0.4047960417926979,
+       "ci_high": 0.46238372129974925,
+       "p": 9.999000099990002e-05,
+       "alternative": "greater",
+       "n_days": 140,
+       "n_obs": 3629,
+       "lambda": 100.0,
+       "features": [
+        "has_d0",
+        "a0_n_hat",
+        "a0_abs_n_hat",
+        "a0_m",
+        "a0_surprise",
+        "a0_tone",
+        "has_d2",
+        "a2_n_hat",
+        "a2_abs_n_hat",
+        "a2_m",
+        "a2_surprise",
+        "a2_tone",
+        "b2_x",
+        "b2_x_n_hat",
+        "reason__analyst_action__n_hat",
+        "reason__capital_returns_financing__n_hat",
+        "reason__deal_ma_partnership__n_hat",
+        "reason__earnings_results__n_hat",
+        "reason__guidance_outlook__n_hat",
+        "reason__legal_regulatory__n_hat",
+        "reason__management_governance__n_hat",
+        "reason__market_or_sector_move__n_hat",
+        "reason__no_identifiable_news__n_hat",
+        "reason__product_operations__n_hat",
+        "reason__sector_or_macro__n_hat"
+       ],
+       "increment": {
+        "value": 0.4217846427431001,
+        "nw_t": null,
+        "boot_se": 0.015092007293238355,
+        "ci_low": 0.39228054392465356,
+        "ci_high": 0.45154380591757404,
+        "p": 9.999000099990002e-05,
+        "alternative": "greater",
+        "n_days": 140,
+        "n_obs": 3629
+       }
+      }
+     },
+     "knowable_before_open": 0.26174992838112565,
+     "arrived_during_day": 0.008667291115406709
+    },
+    "capital_returns_financing": {
+     "split": "test",
+     "target": "z_cc",
+     "steps": {
+      "ex_ante": {
+       "value": -0.033963616476237905,
+       "nw_t": null,
+       "boot_se": 0.02461358132474809,
+       "ci_low": -0.08559482491613528,
+       "ci_high": 0.009716086146964089,
+       "p": 0.903009699030097,
+       "alternative": "greater",
+       "n_days": 130,
+       "n_obs": 643,
+       "lambda": 10.0,
+       "features": [
+        "has_d0",
+        "a0_n_hat",
+        "a0_abs_n_hat",
+        "a0_m",
+        "a0_surprise",
+        "a0_tone"
+       ]
+      },
+      "ex_post": {
+       "value": -0.037425801703877604,
+       "nw_t": null,
+       "boot_se": 0.023997298862434433,
+       "ci_low": -0.08865016878432636,
+       "ci_high": 0.004300681501677809,
+       "p": 0.9277072292770723,
+       "alternative": "greater",
+       "n_days": 130,
+       "n_obs": 643,
+       "lambda": 100.0,
+       "features": [
+        "has_d0",
+        "a0_n_hat",
+        "a0_abs_n_hat",
+        "a0_m",
+        "a0_surprise",
+        "a0_tone",
+        "has_d2",
+        "a2_n_hat",
+        "a2_abs_n_hat",
+        "a2_m",
+        "a2_surprise",
+        "a2_tone"
+       ],
+       "increment": {
+        "value": -0.0034621852276397096,
+        "nw_t": null,
+        "boot_se": 0.00902806053348925,
+        "ci_low": -0.021115515506844575,
+        "ci_high": 0.014160734796258977,
+        "p": 0.6406359364063594,
+        "alternative": "greater",
+        "n_days": 130,
+        "n_obs": 643
+       }
+      },
+      "explanation": {
+       "value": 0.31676387895782976,
+       "nw_t": null,
+       "boot_se": 0.02745515421956764,
+       "ci_low": 0.26053521077992053,
+       "ci_high": 0.36754650986115717,
+       "p": 9.999000099990002e-05,
+       "alternative": "greater",
+       "n_days": 130,
+       "n_obs": 643,
+       "lambda": 100.0,
+       "features": [
+        "has_d0",
+        "a0_n_hat",
+        "a0_abs_n_hat",
+        "a0_m",
+        "a0_surprise",
+        "a0_tone",
+        "has_d2",
+        "a2_n_hat",
+        "a2_abs_n_hat",
+        "a2_m",
+        "a2_surprise",
+        "a2_tone",
+        "b2_x",
+        "b2_x_n_hat",
+        "reason__analyst_action__n_hat",
+        "reason__capital_returns_financing__n_hat",
+        "reason__deal_ma_partnership__n_hat",
+        "reason__earnings_results__n_hat",
+        "reason__guidance_outlook__n_hat",
+        "reason__legal_regulatory__n_hat",
+        "reason__management_governance__n_hat",
+        "reason__market_or_sector_move__n_hat",
+        "reason__no_identifiable_news__n_hat",
+        "reason__product_operations__n_hat",
+        "reason__sector_or_macro__n_hat"
+       ],
+       "increment": {
+        "value": 0.35418968066170736,
+        "nw_t": null,
+        "boot_se": 0.02851764901480826,
+        "ci_low": 0.29822913913842203,
+        "ci_high": 0.40977511826585267,
+        "p": 9.999000099990002e-05,
+        "alternative": "greater",
+        "n_days": 130,
+        "n_obs": 643
+       }
+      }
+     },
+     "knowable_before_open": 0.9074920223477541,
+     "arrived_during_day": -0.0034621852276396983
+    },
+    "deal_ma_partnership": {
+     "split": "test",
+     "target": "z_cc",
+     "steps": {
+      "ex_ante": {
+       "value": -0.00485414992618367,
+       "nw_t": null,
+       "boot_se": 0.006476134428454548,
+       "ci_low": -0.017543085698024628,
+       "ci_high": 0.007963397932550626,
+       "p": 0.7732226777322267,
+       "alternative": "greater",
+       "n_days": 140,
+       "n_obs": 1266,
+       "lambda": 10.0,
+       "features": [
+        "has_d0",
+        "a0_n_hat",
+        "a0_abs_n_hat",
+        "a0_m",
+        "a0_surprise",
+        "a0_tone"
+       ]
+      },
+      "ex_post": {
+       "value": 0.014354864438097244,
+       "nw_t": null,
+       "boot_se": 0.007279155701911965,
+       "ci_low": 0.0003686841605295597,
+       "ci_high": 0.028804905648974023,
+       "p": 0.025897410258974102,
+       "alternative": "greater",
+       "n_days": 140,
+       "n_obs": 1266,
+       "lambda": 100.0,
+       "features": [
+        "has_d0",
+        "a0_n_hat",
+        "a0_abs_n_hat",
+        "a0_m",
+        "a0_surprise",
+        "a0_tone",
+        "has_d2",
+        "a2_n_hat",
+        "a2_abs_n_hat",
+        "a2_m",
+        "a2_surprise",
+        "a2_tone"
+       ],
+       "increment": {
+        "value": 0.019209014364280914,
+        "nw_t": null,
+        "boot_se": 0.0047346911572602925,
+        "ci_low": 0.00986025748253931,
+        "ci_high": 0.02832842836904307,
+        "p": 9.999000099990002e-05,
+        "alternative": "greater",
+        "n_days": 140,
+        "n_obs": 1266
+       }
+      },
+      "explanation": {
+       "value": 0.380371887838332,
+       "nw_t": null,
+       "boot_se": 0.021358623394311892,
+       "ci_low": 0.34137442288689646,
+       "ci_high": 0.42469147803626933,
+       "p": 9.999000099990002e-05,
+       "alternative": "greater",
+       "n_days": 140,
+       "n_obs": 1266,
+       "lambda": 100.0,
+       "features": [
+        "has_d0",
+        "a0_n_hat",
+        "a0_abs_n_hat",
+        "a0_m",
+        "a0_surprise",
+        "a0_tone",
+        "has_d2",
+        "a2_n_hat",
+        "a2_abs_n_hat",
+        "a2_m",
+        "a2_surprise",
+        "a2_tone",
+        "b2_x",
+        "b2_x_n_hat",
+        "reason__analyst_action__n_hat",
+        "reason__capital_returns_financing__n_hat",
+        "reason__deal_ma_partnership__n_hat",
+        "reason__earnings_results__n_hat",
+        "reason__guidance_outlook__n_hat",
+        "reason__legal_regulatory__n_hat",
+        "reason__management_governance__n_hat",
+        "reason__market_or_sector_move__n_hat",
+        "reason__no_identifiable_news__n_hat",
+        "reason__product_operations__n_hat",
+        "reason__sector_or_macro__n_hat"
+       ],
+       "increment": {
+        "value": 0.3660170234002348,
+        "nw_t": null,
+        "boot_se": 0.01831886443309195,
+        "ci_low": 0.3326035714831511,
+        "ci_high": 0.40426869146242744,
+        "p": 9.999000099990002e-05,
+        "alternative": "greater",
+        "n_days": 140,
+        "n_obs": 1266
+       }
+      }
+     },
+     "knowable_before_open": -0.33815365844214784,
+     "arrived_during_day": 0.019209014364280914
+    },
+    "earnings_results": {
+     "split": "test",
+     "target": "z_cc",
+     "steps": {
+      "ex_ante": {
+       "value": 0.0140901610486504,
+       "nw_t": null,
+       "boot_se": 0.004368447547076178,
+       "ci_low": 0.004557187179059656,
+       "ci_high": 0.021646999108279108,
+       "p": 0.00019998000199980003,
+       "alternative": "greater",
+       "n_days": 140,
+       "n_obs": 7028,
+       "lambda": 1000.0,
+       "features": [
+        "has_d0",
+        "a0_n_hat",
+        "a0_abs_n_hat",
+        "a0_m",
+        "a0_surprise",
+        "a0_tone"
+       ]
+      },
+      "ex_post": {
+       "value": 0.02645278118457099,
+       "nw_t": null,
+       "boot_se": 0.00678654546232712,
+       "ci_low": 0.012154337565439852,
+       "ci_high": 0.03933468684020511,
+       "p": 9.999000099990002e-05,
+       "alternative": "greater",
+       "n_days": 140,
+       "n_obs": 7028,
+       "lambda": 1000.0,
+       "features": [
+        "has_d0",
+        "a0_n_hat",
+        "a0_abs_n_hat",
+        "a0_m",
+        "a0_surprise",
+        "a0_tone",
+        "has_d2",
+        "a2_n_hat",
+        "a2_abs_n_hat",
+        "a2_m",
+        "a2_surprise",
+        "a2_tone"
+       ],
+       "increment": {
+        "value": 0.012362620135920592,
+        "nw_t": null,
+        "boot_se": 0.003235515820959996,
+        "ci_low": 0.006267961535222875,
+        "ci_high": 0.01908243969047571,
+        "p": 9.999000099990002e-05,
+        "alternative": "greater",
+        "n_days": 140,
+        "n_obs": 7028
+       }
+      },
+      "explanation": {
+       "value": 0.40033451814277604,
+       "nw_t": null,
+       "boot_se": 0.011271360261043981,
+       "ci_low": 0.3767904314159594,
+       "ci_high": 0.4212586076176149,
+       "p": 9.999000099990002e-05,
+       "alternative": "greater",
+       "n_days": 140,
+       "n_obs": 7028,
+       "lambda": 100.0,
+       "features": [
+        "has_d0",
+        "a0_n_hat",
+        "a0_abs_n_hat",
+        "a0_m",
+        "a0_surprise",
+        "a0_tone",
+        "has_d2",
+        "a2_n_hat",
+        "a2_abs_n_hat",
+        "a2_m",
+        "a2_surprise",
+        "a2_tone",
+        "b2_x",
+        "b2_x_n_hat",
+        "reason__analyst_action__n_hat",
+        "reason__capital_returns_financing__n_hat",
+        "reason__deal_ma_partnership__n_hat",
+        "reason__earnings_results__n_hat",
+        "reason__guidance_outlook__n_hat",
+        "reason__legal_regulatory__n_hat",
+        "reason__management_governance__n_hat",
+        "reason__market_or_sector_move__n_hat",
+        "reason__no_identifiable_news__n_hat",
+        "reason__product_operations__n_hat",
+        "reason__sector_or_macro__n_hat"
+       ],
+       "increment": {
+        "value": 0.37388173695820504,
+        "nw_t": null,
+        "boot_se": 0.008817606609140001,
+        "ci_low": 0.35644948824771217,
+        "ci_high": 0.39136803586610236,
+        "p": 9.999000099990002e-05,
+        "alternative": "greater",
+        "n_days": 140,
+        "n_obs": 7028
+       }
+      }
+     },
+     "knowable_before_open": 0.5326532945756461,
+     "arrived_during_day": 0.012362620135920589
+    },
+    "guidance_outlook": {
+     "split": "test",
+     "target": "z_cc",
+     "steps": {
+      "ex_ante": {
+       "value": -0.03525627112992853,
+       "nw_t": null,
+       "boot_se": 0.016745426084152727,
+       "ci_low": -0.07155964389103092,
+       "ci_high": -0.005907559157261167,
+       "p": 0.9712028797120288,
+       "alternative": "greater",
+       "n_days": 130,
+       "n_obs": 506,
+       "lambda": 100.0,
+       "features": [
+        "has_d0",
+        "a0_n_hat",
+        "a0_abs_n_hat",
+        "a0_m",
+        "a0_surprise",
+        "a0_tone"
+       ]
+      },
+      "ex_post": {
+       "value": -0.007345922650525501,
+       "nw_t": null,
+       "boot_se": 0.011437215933125081,
+       "ci_low": -0.030722577007050323,
+       "ci_high": 0.014217241448930027,
+       "p": 0.7172282771722828,
+       "alternative": "greater",
+       "n_days": 130,
+       "n_obs": 506,
+       "lambda": 1000.0,
+       "features": [
+        "has_d0",
+        "a0_n_hat",
+        "a0_abs_n_hat",
+        "a0_m",
+        "a0_surprise",
+        "a0_tone",
+        "has_d2",
+        "a2_n_hat",
+        "a2_abs_n_hat",
+        "a2_m",
+        "a2_surprise",
+        "a2_tone"
+       ],
+       "increment": {
+        "value": 0.02791034847940303,
+        "nw_t": null,
+        "boot_se": 0.007781576123887903,
+        "ci_low": 0.014663465657610071,
+        "ci_high": 0.04535674513093885,
+        "p": 0.0014998500149985001,
+        "alternative": "greater",
+        "n_days": 130,
+        "n_obs": 506
+       }
+      },
+      "explanation": {
+       "value": -0.05176090461850469,
+       "nw_t": null,
+       "boot_se": 0.07086038248460703,
+       "ci_low": -0.22311751378754638,
+       "ci_high": 0.03000010754496714,
+       "p": 0.7702229777022298,
+       "alternative": "greater",
+       "n_days": 130,
+       "n_obs": 506,
+       "lambda": 10000.0,
+       "features": [
+        "has_d0",
+        "a0_n_hat",
+        "a0_abs_n_hat",
+        "a0_m",
+        "a0_surprise",
+        "a0_tone",
+        "has_d2",
+        "a2_n_hat",
+        "a2_abs_n_hat",
+        "a2_m",
+        "a2_surprise",
+        "a2_tone",
+        "b2_x",
+        "b2_x_n_hat",
+        "reason__analyst_action__n_hat",
+        "reason__capital_returns_financing__n_hat",
+        "reason__deal_ma_partnership__n_hat",
+        "reason__earnings_results__n_hat",
+        "reason__guidance_outlook__n_hat",
+        "reason__legal_regulatory__n_hat",
+        "reason__management_governance__n_hat",
+        "reason__market_or_sector_move__n_hat",
+        "reason__no_identifiable_news__n_hat",
+        "reason__product_operations__n_hat",
+        "reason__sector_or_macro__n_hat"
+       ],
+       "increment": {
+        "value": -0.0444149819679792,
+        "nw_t": null,
+        "boot_se": 0.06814401343832249,
+        "ci_low": -0.20723979929563086,
+        "ci_high": 0.04097113480877115,
+        "p": 0.7532246775322468,
+        "alternative": "greater",
+        "n_days": 130,
+        "n_obs": 506
+       }
+      }
+     },
+     "knowable_before_open": 4.79943402717512,
+     "arrived_during_day": 0.027910348479403033
+    },
+    "legal_regulatory": {
+     "split": "test",
+     "target": "z_cc",
+     "steps": {
+      "ex_ante": {
+       "value": -0.018461550312608366,
+       "nw_t": null,
+       "boot_se": 0.020004293103692585,
+       "ci_low": -0.061636687006110774,
+       "ci_high": 0.016516678000582718,
+       "p": 0.8065193480651934,
+       "alternative": "greater",
+       "n_days": 135,
+       "n_obs": 467,
+       "lambda": 1000.0,
+       "features": [
+        "has_d0",
+        "a0_n_hat",
+        "a0_abs_n_hat",
+        "a0_m",
+        "a0_surprise",
+        "a0_tone"
+       ]
+      },
+      "ex_post": {
+       "value": -0.014740406499549753,
+       "nw_t": null,
+       "boot_se": 0.02162656690816751,
+       "ci_low": -0.060693961325065465,
+       "ci_high": 0.023502148189816212,
+       "p": 0.7323267673232676,
+       "alternative": "greater",
+       "n_days": 135,
+       "n_obs": 467,
+       "lambda": 1000.0,
+       "features": [
+        "has_d0",
+        "a0_n_hat",
+        "a0_abs_n_hat",
+        "a0_m",
+        "a0_surprise",
+        "a0_tone",
+        "has_d2",
+        "a2_n_hat",
+        "a2_abs_n_hat",
+        "a2_m",
+        "a2_surprise",
+        "a2_tone"
+       ],
+       "increment": {
+        "value": 0.003721143813058609,
+        "nw_t": null,
+        "boot_se": 0.0028076376667839323,
+        "ci_low": -0.001977040692155403,
+        "ci_high": 0.008951695039458753,
+        "p": 0.08029197080291971,
+        "alternative": "greater",
+        "n_days": 135,
+        "n_obs": 467
+       }
+      },
+      "explanation": {
+       "value": -1.1605325202045234,
+       "nw_t": null,
+       "boot_se": 1.4869041530820126,
+       "ci_low": -4.678606388635391,
+       "ci_high": 0.41627016390671284,
+       "p": 0.7692230776922308,
+       "alternative": "greater",
+       "n_days": 135,
+       "n_obs": 467,
+       "lambda": 10.0,
+       "features": [
+        "has_d0",
+        "a0_n_hat",
+        "a0_abs_n_hat",
+        "a0_m",
+        "a0_surprise",
+        "a0_tone",
+        "has_d2",
+        "a2_n_hat",
+        "a2_abs_n_hat",
+        "a2_m",
+        "a2_surprise",
+        "a2_tone",
+        "b2_x",
+        "b2_x_n_hat",
+        "reason__analyst_action__n_hat",
+        "reason__capital_returns_financing__n_hat",
+        "reason__deal_ma_partnership__n_hat",
+        "reason__earnings_results__n_hat",
+        "reason__guidance_outlook__n_hat",
+        "reason__legal_regulatory__n_hat",
+        "reason__management_governance__n_hat",
+        "reason__market_or_sector_move__n_hat",
+        "reason__no_identifiable_news__n_hat",
+        "reason__product_operations__n_hat",
+        "reason__sector_or_macro__n_hat"
+       ],
+       "increment": {
+        "value": -1.1457921137049736,
+        "nw_t": null,
+        "boot_se": 1.4840856240721656,
+        "ci_low": -4.649644180025391,
+        "ci_high": 0.4168267588449246,
+        "p": 0.7656234376562344,
+        "alternative": "greater",
+        "n_days": 135,
+        "n_obs": 467
+       }
+      }
+     },
+     "knowable_before_open": 1.2524451285093308,
+     "arrived_during_day": 0.003721143813058613
+    },
+    "management_governance": {
+     "split": "test",
+     "target": "z_cc",
+     "steps": {
+      "ex_ante": {
+       "value": 0.00558538729739393,
+       "nw_t": null,
+       "boot_se": 0.00613684815355717,
+       "ci_low": -0.007580559137547313,
+       "ci_high": 0.01652264037796885,
+       "p": 0.1643835616438356,
+       "alternative": "greater",
+       "n_days": 120,
+       "n_obs": 319,
+       "lambda": 100.0,
+       "features": [
+        "has_d0",
+        "a0_n_hat",
+        "a0_abs_n_hat",
+        "a0_m",
+        "a0_surprise",
+        "a0_tone"
+       ]
+      },
+      "ex_post": {
+       "value": 0.0021897171621079107,
+       "nw_t": null,
+       "boot_se": 0.0021458074939396344,
+       "ci_low": -0.002014319248133537,
+       "ci_high": 0.006361686097759269,
+       "p": 0.1528847115288471,
+       "alternative": "greater",
+       "n_days": 120,
+       "n_obs": 319,
+       "lambda": 10000.0,
+       "features": [
+        "has_d0",
+        "a0_n_hat",
+        "a0_abs_n_hat",
+        "a0_m",
+        "a0_surprise",
+        "a0_tone",
+        "has_d2",
+        "a2_n_hat",
+        "a2_abs_n_hat",
+        "a2_m",
+        "a2_surprise",
+        "a2_tone"
+       ],
+       "increment": {
+        "value": -0.00339567013528602,
+        "nw_t": null,
+        "boot_se": 0.0058634596169853835,
+        "ci_low": -0.0140561903613915,
+        "ci_high": 0.009144591762029922,
+        "p": 0.7370262973702629,
+        "alternative": "greater",
+        "n_days": 120,
+        "n_obs": 319
+       }
+      },
+      "explanation": {
+       "value": 0.1697934842477017,
+       "nw_t": null,
+       "boot_se": 0.037882849876813986,
+       "ci_low": 0.0991407010903322,
+       "ci_high": 0.24919763987390403,
+       "p": 9.999000099990002e-05,
+       "alternative": "greater",
+       "n_days": 120,
+       "n_obs": 319,
+       "lambda": 10.0,
+       "features": [
+        "has_d0",
+        "a0_n_hat",
+        "a0_abs_n_hat",
+        "a0_m",
+        "a0_surprise",
+        "a0_tone",
+        "has_d2",
+        "a2_n_hat",
+        "a2_abs_n_hat",
+        "a2_m",
+        "a2_surprise",
+        "a2_tone",
+        "b2_x",
+        "b2_x_n_hat",
+        "reason__analyst_action__n_hat",
+        "reason__capital_returns_financing__n_hat",
+        "reason__deal_ma_partnership__n_hat",
+        "reason__earnings_results__n_hat",
+        "reason__guidance_outlook__n_hat",
+        "reason__legal_regulatory__n_hat",
+        "reason__management_governance__n_hat",
+        "reason__market_or_sector_move__n_hat",
+        "reason__no_identifiable_news__n_hat",
+        "reason__product_operations__n_hat",
+        "reason__sector_or_macro__n_hat"
+       ],
+       "increment": {
+        "value": 0.16760376708559374,
+        "nw_t": null,
+        "boot_se": 0.03721614179342874,
+        "ci_low": 0.09850157927629624,
+        "ci_high": 0.2454466793656015,
+        "p": 9.999000099990002e-05,
+        "alternative": "greater",
+        "n_days": 120,
+        "n_obs": 319
+       }
+      }
+     },
+     "knowable_before_open": 2.55073458529101,
+     "arrived_during_day": -0.003395670135286019
+    },
+    "other": {
+     "split": "test",
+     "target": "z_cc",
+     "steps": {
+      "ex_ante": {
+       "value": -0.0041072937030340075,
+       "nw_t": null,
+       "boot_se": 0.001900005264291732,
+       "ci_low": -0.007927220276070918,
+       "ci_high": -0.0004266186069625175,
+       "p": 0.9839016098390161,
+       "alternative": "greater",
+       "n_days": 140,
+       "n_obs": 3010,
+       "lambda": 10000.0,
+       "features": [
+        "has_d0",
+        "a0_n_hat",
+        "a0_abs_n_hat",
+        "a0_m",
+        "a0_surprise",
+        "a0_tone"
+       ]
+      },
+      "ex_post": {
+       "value": -0.0041557484331126585,
+       "nw_t": null,
+       "boot_se": 0.003911906063827788,
+       "ci_low": -0.011614429464105333,
+       "ci_high": 0.0037964321144148857,
+       "p": 0.8561143885611439,
+       "alternative": "greater",
+       "n_days": 140,
+       "n_obs": 3010,
+       "lambda": 100.0,
+       "features": [
+        "has_d0",
+        "a0_n_hat",
+        "a0_abs_n_hat",
+        "a0_m",
+        "a0_surprise",
+        "a0_tone",
+        "has_d2",
+        "a2_n_hat",
+        "a2_abs_n_hat",
+        "a2_m",
+        "a2_surprise",
+        "a2_tone"
+       ],
+       "increment": {
+        "value": -4.845473007865044e-05,
+        "nw_t": null,
+        "boot_se": 0.0037340877518750606,
+        "ci_low": -0.0069529794477801825,
+        "ci_high": 0.0076010463778835,
+        "p": 0.49845015498450157,
+        "alternative": "greater",
+        "n_days": 140,
+        "n_obs": 3010
+       }
+      },
+      "explanation": {
+       "value": 0.19426001204501475,
+       "nw_t": null,
+       "boot_se": 0.016477934821671918,
+       "ci_low": 0.1656823788603876,
+       "ci_high": 0.22988777771441632,
+       "p": 9.999000099990002e-05,
+       "alternative": "greater",
+       "n_days": 140,
+       "n_obs": 3010,
+       "lambda": 10.0,
+       "features": [
+        "has_d0",
+        "a0_n_hat",
+        "a0_abs_n_hat",
+        "a0_m",
+        "a0_surprise",
+        "a0_tone",
+        "has_d2",
+        "a2_n_hat",
+        "a2_abs_n_hat",
+        "a2_m",
+        "a2_surprise",
+        "a2_tone",
+        "b2_x",
+        "b2_x_n_hat",
+        "reason__analyst_action__n_hat",
+        "reason__capital_returns_financing__n_hat",
+        "reason__deal_ma_partnership__n_hat",
+        "reason__earnings_results__n_hat",
+        "reason__guidance_outlook__n_hat",
+        "reason__legal_regulatory__n_hat",
+        "reason__management_governance__n_hat",
+        "reason__market_or_sector_move__n_hat",
+        "reason__no_identifiable_news__n_hat",
+        "reason__product_operations__n_hat",
+        "reason__sector_or_macro__n_hat"
+       ],
+       "increment": {
+        "value": 0.19841576047812745,
+        "nw_t": null,
+        "boot_se": 0.01624908049251638,
+        "ci_low": 0.170203773980369,
+        "ci_high": 0.23294127308901477,
+        "p": 9.999000099990002e-05,
+        "alternative": "greater",
+        "n_days": 140,
+        "n_obs": 3010
+       }
+      }
+     },
+     "knowable_before_open": 0.9883403120139401,
+     "arrived_during_day": -4.845473007865104e-05
+    },
+    "product_operations": {
+     "split": "test",
+     "target": "z_cc",
+     "steps": {
+      "ex_ante": {
+       "value": -0.0033876462912108382,
+       "nw_t": null,
+       "boot_se": 0.003361744450612346,
+       "ci_low": -0.010137883857141023,
+       "ci_high": 0.003139595822253284,
+       "p": 0.8432156784321568,
+       "alternative": "greater",
+       "n_days": 140,
+       "n_obs": 1072,
+       "lambda": 10000.0,
+       "features": [
+        "has_d0",
+        "a0_n_hat",
+        "a0_abs_n_hat",
+        "a0_m",
+        "a0_surprise",
+        "a0_tone"
+       ]
+      },
+      "ex_post": {
+       "value": -0.0031075266129499727,
+       "nw_t": null,
+       "boot_se": 0.0033469542154153857,
+       "ci_low": -0.009796891087328008,
+       "ci_high": 0.003356609992351485,
+       "p": 0.8231176882311769,
+       "alternative": "greater",
+       "n_days": 140,
+       "n_obs": 1072,
+       "lambda": 10000.0,
+       "features": [
+        "has_d0",
+        "a0_n_hat",
+        "a0_abs_n_hat",
+        "a0_m",
+        "a0_surprise",
+        "a0_tone",
+        "has_d2",
+        "a2_n_hat",
+        "a2_abs_n_hat",
+        "a2_m",
+        "a2_surprise",
+        "a2_tone"
+       ],
+       "increment": {
+        "value": 0.0002801196782608654,
+        "nw_t": null,
+        "boot_se": 0.00013393485115301585,
+        "ci_low": 1.001535268875275e-05,
+        "ci_high": 0.0005291415897985018,
+        "p": 0.013398660133986601,
+        "alternative": "greater",
+        "n_days": 140,
+        "n_obs": 1072
+       }
+      },
+      "explanation": {
+       "value": 0.35547219509217837,
+       "nw_t": null,
+       "boot_se": 0.02225477930049129,
+       "ci_low": 0.3082023496795636,
+       "ci_high": 0.39558515376748565,
+       "p": 9.999000099990002e-05,
+       "alternative": "greater",
+       "n_days": 140,
+       "n_obs": 1072,
+       "lambda": 100.0,
+       "features": [
+        "has_d0",
+        "a0_n_hat",
+        "a0_abs_n_hat",
+        "a0_m",
+        "a0_surprise",
+        "a0_tone",
+        "has_d2",
+        "a2_n_hat",
+        "a2_abs_n_hat",
+        "a2_m",
+        "a2_surprise",
+        "a2_tone",
+        "b2_x",
+        "b2_x_n_hat",
+        "reason__analyst_action__n_hat",
+        "reason__capital_returns_financing__n_hat",
+        "reason__deal_ma_partnership__n_hat",
+        "reason__earnings_results__n_hat",
+        "reason__guidance_outlook__n_hat",
+        "reason__legal_regulatory__n_hat",
+        "reason__management_governance__n_hat",
+        "reason__market_or_sector_move__n_hat",
+        "reason__no_identifiable_news__n_hat",
+        "reason__product_operations__n_hat",
+        "reason__sector_or_macro__n_hat"
+       ],
+       "increment": {
+        "value": 0.35857972170512836,
+        "nw_t": null,
+        "boot_se": 0.022865655398218145,
+        "ci_low": 0.3108039320895814,
+        "ci_high": 0.39997757854743093,
+        "p": 9.999000099990002e-05,
+        "alternative": "greater",
+        "n_days": 140,
+        "n_obs": 1072
+       }
+      }
+     },
+     "knowable_before_open": 1.090142326406321,
+     "arrived_during_day": 0.00028011967826086556
+    },
+    "sector_or_macro": {
+     "split": "test",
+     "target": "z_cc",
+     "steps": {
+      "ex_ante": {
+       "value": -0.002704315629596839,
+       "nw_t": null,
+       "boot_se": 0.002532249816439851,
+       "ci_low": -0.008382512105367917,
+       "ci_high": 0.0018389736451593641,
+       "p": 0.8513148685131486,
+       "alternative": "greater",
+       "n_days": 122,
+       "n_obs": 351,
+       "lambda": 10000.0,
+       "features": [
+        "has_d0",
+        "a0_n_hat",
+        "a0_abs_n_hat",
+        "a0_m",
+        "a0_surprise",
+        "a0_tone"
+       ]
+      },
+      "ex_post": {
+       "value": 0.030733668569697094,
+       "nw_t": null,
+       "boot_se": 0.018524985098022466,
+       "ci_low": -0.008631959240201097,
+       "ci_high": 0.05787424636549358,
+       "p": 0.0091990800919908,
+       "alternative": "greater",
+       "n_days": 122,
+       "n_obs": 351,
+       "lambda": 1000.0,
+       "features": [
+        "has_d0",
+        "a0_n_hat",
+        "a0_abs_n_hat",
+        "a0_m",
+        "a0_surprise",
+        "a0_tone",
+        "has_d2",
+        "a2_n_hat",
+        "a2_abs_n_hat",
+        "a2_m",
+        "a2_surprise",
+        "a2_tone"
+       ],
+       "increment": {
+        "value": 0.033437984199293926,
+        "nw_t": null,
+        "boot_se": 0.017521882788076523,
+        "ci_low": -0.00278585340180302,
+        "ci_high": 0.059151769915806986,
+        "p": 0.0025997400259974,
+        "alternative": "greater",
+        "n_days": 122,
+        "n_obs": 351
+       }
+      },
+      "explanation": {
+       "value": 0.3492103772060893,
+       "nw_t": null,
+       "boot_se": 0.10173237086967074,
+       "ci_low": 0.14487929864631605,
+       "ci_high": 0.5053999234544757,
+       "p": 9.999000099990002e-05,
+       "alternative": "greater",
+       "n_days": 122,
+       "n_obs": 351,
+       "lambda": 100.0,
+       "features": [
+        "has_d0",
+        "a0_n_hat",
+        "a0_abs_n_hat",
+        "a0_m",
+        "a0_surprise",
+        "a0_tone",
+        "has_d2",
+        "a2_n_hat",
+        "a2_abs_n_hat",
+        "a2_m",
+        "a2_surprise",
+        "a2_tone",
+        "b2_x",
+        "b2_x_n_hat",
+        "reason__analyst_action__n_hat",
+        "reason__capital_returns_financing__n_hat",
+        "reason__deal_ma_partnership__n_hat",
+        "reason__earnings_results__n_hat",
+        "reason__guidance_outlook__n_hat",
+        "reason__legal_regulatory__n_hat",
+        "reason__management_governance__n_hat",
+        "reason__market_or_sector_move__n_hat",
+        "reason__no_identifiable_news__n_hat",
+        "reason__product_operations__n_hat",
+        "reason__sector_or_macro__n_hat"
+       ],
+       "increment": {
+        "value": 0.318476708636392,
+        "nw_t": null,
+        "boot_se": 0.08637381061092135,
+        "ci_low": 0.13806213263002787,
+        "ci_high": 0.44999160190854576,
+        "p": 9.999000099990002e-05,
+        "alternative": "greater",
+        "n_days": 122,
+        "n_obs": 351
+       }
+      }
+     },
+     "knowable_before_open": -0.08799195655618058,
+     "arrived_during_day": 0.03343798419929393
+    }
+   }
+  }
+ },
+ "explained_share": {
+  "split": "test",
+  "n": 18291,
+  "share_explained": 0.409565253785015,
+  "share_events_explained": 0.15597835000820076,
+  "by_tier": {
+   "mid": 0.4213759913708067,
+   "rest": 0.4005825320240626,
+   "top100": 0.41320768864473806
+  },
+  "by_reason": {
+   "analyst_action": {
+    "share_of_variance": 0.10295999122802628,
+    "n": 3269,
+    "share_explained": 0.3422307238567778
+   },
+   "capital_returns_financing": {
+    "share_of_variance": 0.012929195685384568,
+    "n": 410,
+    "share_explained": 0.27806616997876965
+   },
+   "deal_ma_partnership": {
+    "share_of_variance": 0.05048738920927688,
+    "n": 1192,
+    "share_explained": 0.33637167529343437
+   },
+   "earnings_results": {
+    "share_of_variance": 0.5699680454583977,
+    "n": 4592,
+    "share_explained": 0.5358662552657204
+   },
+   "guidance_outlook": {
+    "share_of_variance": 0.04280024141658875,
+    "n": 622,
+    "share_explained": 0.49993788739652406
+   },
+   "legal_regulatory": {
+    "share_of_variance": 0.01481087209424717,
+    "n": 423,
+    "share_explained": 0.312508968735105
+   },
+   "management_governance": {
+    "share_of_variance": 0.00905089725960533,
+    "n": 263,
+    "share_explained": 0.07117728260289262
+   },
+   "market_or_sector_move": {
+    "share_of_variance": 0.01077665074259266,
+    "n": 2113,
+    "share_explained": 0.03589937726405237
+   },
+   "no_identifiable_news": {
+    "share_of_variance": 0.14351853571511541,
+    "n": 4387,
+    "share_explained": 0.021124332393436394
+   },
+   "product_operations": {
+    "share_of_variance": 0.02933178710852891,
+    "n": 782,
+    "share_explained": 0.33818192789082224
+   },
+   "sector_or_macro": {
+    "share_of_variance": 0.013366394082236253,
+    "n": 238,
+    "share_explained": 0.6221977389931986
+   }
+  }
+ },
+ "theta_d2": {
+  "test": "A3.4",
+  "split": "test",
+  "point": "D2",
+  "nobs": 17188,
+  "theta": -0.06187046300656636,
+  "theta_se": 0.03818331670939221,
+  "theta_t": -1.6203532940172185,
+  "theta_se_dk": 0.03836326721772199,
+  "theta_p_two": 0.10750736009323575,
+  "theta_p": 0.9462463199533822,
+  "theta_p_dk": 0.9454245345966278,
+  "estimate": -0.06187046300656636,
+  "p": 0.9462463199533822
+ },
+ "theta_d1": {
+  "test": "A3.4",
+  "split": "test",
+  "point": "D1",
+  "nobs": 13203,
+  "theta": -0.0398652013377738,
+  "theta_se": 0.035523406386576264,
+  "theta_t": -1.1222234969233758,
+  "theta_se_dk": 0.037748509189277676,
+  "theta_p_two": 0.2637303934875464,
+  "theta_p": 0.8681348032562268,
+  "theta_p_dk": 0.8536033146100444,
+  "estimate": -0.0398652013377738,
+  "p": 0.8681348032562268
+ },
+ "persistence_by_reason": {
+  "analyst_action": {
+   "value": 0.0014620854583268417,
+   "nw_t": null,
+   "boot_se": 0.03356468936714831,
+   "ci_low": -0.06542897990230782,
+   "ci_high": 0.0666264297269782,
+   "p": 0.4911508849115088,
+   "alternative": "greater",
+   "n_days": 135,
+   "n_obs": 3159
+  },
+  "capital_returns_financing": {
+   "value": -0.12107890705107285,
+   "nw_t": null,
+   "boot_se": 0.06909619880853887,
+   "ci_low": -0.25875208471098404,
+   "ci_high": 0.01626876246052279,
+   "p": 0.9596040395960403,
+   "alternative": "greater",
+   "n_days": 121,
+   "n_obs": 392
+  },
+  "deal_ma_partnership": {
+   "value": -0.01610685360770921,
+   "nw_t": null,
+   "boot_se": 0.04283868154883549,
+   "ci_low": -0.097656724659534,
+   "ci_high": 0.06885143534394307,
+   "p": 0.6458354164583542,
+   "alternative": "greater",
+   "n_days": 135,
+   "n_obs": 1136
+  },
+  "earnings_results": {
+   "value": -0.028488133151131828,
+   "nw_t": null,
+   "boot_se": 0.02968919636279755,
+   "ci_low": -0.0861253363856411,
+   "ci_high": 0.031546332482920436,
+   "p": 0.8423157684231577,
+   "alternative": "greater",
+   "n_days": 135,
+   "n_obs": 4204
+  },
+  "guidance_outlook": {
+   "value": -0.1250660081631344,
+   "nw_t": null,
+   "boot_se": 0.06408199269259247,
+   "ci_low": -0.249657206753632,
+   "ci_high": -0.0007080506803888748,
+   "p": 0.9755024497550245,
+   "alternative": "greater",
+   "n_days": 124,
+   "n_obs": 572
+  },
+  "legal_regulatory": {
+   "value": -0.1250528480155123,
+   "nw_t": null,
+   "boot_se": 0.07417488992112393,
+   "ci_low": -0.266768651389566,
+   "ci_high": 0.02492817380474753,
+   "p": 0.956004399560044,
+   "alternative": "greater",
+   "n_days": 129,
+   "n_obs": 408
+  },
+  "management_governance": {
+   "value": -0.08282566559786586,
+   "nw_t": null,
+   "boot_se": 0.0714764948143035,
+   "ci_low": -0.2225628187892811,
+   "ci_high": 0.058566411560303976,
+   "p": 0.8774122587741225,
+   "alternative": "greater",
+   "n_days": 107,
+   "n_obs": 254
+  },
+  "market_or_sector_move": {
+   "value": -0.0022058150795836967,
+   "nw_t": null,
+   "boot_se": 0.04051729923087021,
+   "ci_low": -0.08345955719238475,
+   "ci_high": 0.07599814395928603,
+   "p": 0.5404459554044595,
+   "alternative": "greater",
+   "n_days": 104,
+   "n_obs": 1986
+  },
+  "no_identifiable_news": {
+   "value": 0.022511091855687372,
+   "nw_t": null,
+   "boot_se": 0.03580831927880402,
+   "ci_low": -0.04760047690478868,
+   "ci_high": 0.09140027945029716,
+   "p": 0.25977402259774024,
+   "alternative": "greater",
+   "n_days": 135,
+   "n_obs": 4091
+  },
+  "product_operations": {
+   "value": 0.05778824671785625,
+   "nw_t": null,
+   "boot_se": 0.059361664164724263,
+   "ci_low": -0.05510644540163461,
+   "ci_high": 0.17705720439845427,
+   "p": 0.16848315168483152,
+   "alternative": "greater",
+   "n_days": 134,
+   "n_obs": 758
+  },
+  "sector_or_macro": {
+   "value": -0.17313379171150692,
+   "nw_t": null,
+   "boot_se": 0.1100650923624922,
+   "ci_low": -0.3902886889528592,
+   "ci_high": 0.03982956216974234,
+   "p": 0.9452054794520548,
+   "alternative": "greater",
+   "n_days": 103,
+   "n_obs": 228
+  }
+ },
+ "market_replication": {
+  "available": true,
+  "beta": [
+   0.0004155325803224536,
+   0.002544109548000575
+  ],
+  "n_fit": 127,
+  "r2_value": 0.021445704412421954,
+  "r2_nw_t": null,
+  "r2_boot_se": 0.043819324156584856,
+  "r2_ci_low": -0.06572958181489452,
+  "r2_ci_high": 0.10691136846848713,
+  "r2_p": 0.3087691230876912,
+  "r2_alternative": "greater",
+  "r2_n_days": 144,
+  "r2_n_obs": 144,
+  "exploratory": true
+ }
+}

@@ -1,0 +1,23 @@
+key,model,target,ece,log_loss,brier,log_loss_skill,brier_skill,n,auc,temperature,ece_before,ece_after,source
+laya_fin:e5,laya_fin,e5,0.05689196378,1.097495599,0.6666893727,0.0007509431318,-0.0003317079113,13139,,,,,
+laya_fin:z_cc,laya_fin,z_cc,0.03265030506,1.093469427,0.6636016221,0.009513664866,0.01004856686,13748,,,,,
+laya_fin:auc,laya_fin,|z_cc| >= 1,,,,,,,0.6026053717,,,,
+laya_fin:temperature,laya_fin,e5,,,,,,,,1.001949005,0.05785117474,0.05689196378,NA-08 val-A temperature (the files' probabilities) vs T = 1 on the logits
+anchor:e5,anchor,e5,0.04755803515,1.096379543,0.6656510016,0.001767091118,0.001226312362,13139,,,,,
+anchor:z_cc,anchor,z_cc,0.0162567628,1.086896005,0.6602099299,0.01546800101,0.01510824486,13748,,,,,
+anchor:auc,anchor,|z_cc| >= 1,,,,,,,0.5758113541,,,,
+anchor:temperature,anchor,e5,,,,,,,,0.9656785104,0.01101214416,0.04755803515,NA-08 val-A temperature (the files' probabilities) vs T = 1 on the logits
+laya_zs:e5,laya_zs,e5,0.1764261889,1.27006452,0.7394523162,-0.156369806,-0.1095086088,13139,,,,,
+laya_zs:z_cc,laya_zs,z_cc,0.178924004,1.299515532,0.7510177483,-0.1771269908,-0.1203575632,13748,,,,,
+laya_zs:auc,laya_zs,|z_cc| >= 1,,,,,,,0.5225375577,,,,
+laya_zs:temperature,laya_zs,e5,,,,,,,,6.329398091,0.1764261889,0.1100940548,"one Q1 temperature fit on val-A (NA-08's rule), applied to the evaluation split"
+d1_ultra:e5,d1_ultra,e5,0.26024796,1.311353151,0.7960345121,-0.1939623265,-0.1944071642,13139,,,,,
+d1_ultra:z_cc,d1_ultra,z_cc,0.2487669909,1.28690634,0.7806346705,-0.1657053347,-0.1645396652,13748,,,,,
+d1_ultra:auc,d1_ultra,|z_cc| >= 1,,,,,,,0.5798392367,,,,
+d1_ultra:temperature,d1_ultra,e5,,,,,,,,1.945408425,0.26024796,0.1546530776,"one Q1 temperature fit on val-A (NA-08's rule), applied to the evaluation split"
+span_02:e5,span_02,e5,0.3606198743,1.603292524,0.906826105,-0.4597676231,-0.3606440173,13139,,,,,
+span_02:z_cc,span_02,z_cc,0.3417111073,1.556395305,0.8812916068,-0.4098137939,-0.3146982468,13748,,,,,
+span_02:auc,span_02,|z_cc| >= 1,,,,,,,0.556293822,,,,
+drex_v2:e5,drex_v2,e5,0.2093858501,1.246552787,0.7581642587,-0.1349628166,-0.1375848766,13139,,,,,
+drex_v2:z_cc,drex_v2,z_cc,0.2039583474,1.235050382,0.750966559,-0.1187331772,-0.1202811997,13748,,,,,
+drex_v2:auc,drex_v2,|z_cc| >= 1,,,,,,,0.5657651338,,,,

@@ -1,0 +1,15 @@
+key,model,name,role,ic_val_b,ic_val_b_t,ic_val_b_n,ic_test,ic_test_t,ic_test_n,ic_common,ic_common_t,ic_common_n,cost_per_1000,latency_p50_ms,latency_p95_ms,coverage,footnote
+laya_fin,laya_fin,laya_fin,primary instrument (laya-s13),0.06470129638,3.642338311,5506,0.01985968629,1.671214851,13748,0.01985968629,1.671214851,13748,0,,,1,
+anchor,anchor,anchor,clean anchor (anchor-s13),-0.01986295007,-1.516748889,5506,0.007694702376,0.8261636571,13748,0.007694702376,0.8261636571,13748,0,,,1,
+laya_zs,laya_zs,local/laya-typed-decisions,Laya zero-shot (PREREG §10.5),0.02949231578,1.93782331,5506,0.005298015325,0.36880336,13748,0.005298015325,0.36880336,13748,0,535.794,757.8221162,1,
+d1_ultra,d1_ultra,liquid/d1-ultra,"best API comparator; screen-failing, model-specific",0.0965322487,5.376959889,5506,0.03920841265,3.229150908,13748,0.03920841265,3.229150908,13748,0.06348905044,287.912417,427.3717584,1,
+span_02,span_02,respan/span-02,"core comparator; screen-failing, model-specific",0.09863546298,5.829231044,5506,0.04066938669,3.098129631,13748,0.04066938669,3.098129631,13748,0.02837343564,2261.996833,2458.837524,1,"S5 canary STOP, operator: proceed (PREREG §15, post-freeze NA-11 row)"
+drex_v2,drex_v2,nace-ai/drex-v2.0,"core comparator; screen-failing, model-specific",0.07527053977,4.099181076,5506,0.04419969971,3.695759348,13748,0.04419969971,3.695759348,13748,0.04515383988,679.966041,1115.332617,1,
+baseline:sentiment,sentiment,,baseline (PREREG §10),0.08698635302,4.389363868,5506,0.04697390177,3.363612578,13748,,,,,,,,
+baseline:embed_ridge,embed_ridge,,baseline (PREREG §10),0.002168511871,0.1027856364,5506,0.004092180128,0.4468680973,13748,,,,,,,,
+baseline:tags_gbm,tags_gbm,,baseline (PREREG §10),0.1082394567,6.025344476,5506,0.05481502887,3.91311524,13748,,,,,,,,
+baseline:llm,llm,,baseline (PREREG §10),0.05219221183,1.92829565,1978,0.0005467355379,0.01809322889,1977,,,,,,,,
+baseline:price_only,price_only,,baseline (PREREG §10),0.00387161373,0.3312466621,5506,-0.002572657005,-0.2632754251,13748,,,,,,,,
+llm_subsample:laya_fin,laya_fin,,the LLM baseline's test subsample,,,,-0.01168149516,-0.3708979495,1977,,,,,,,,
+llm_subsample:llm,llm,,the LLM baseline's test subsample,,,,0.0005467355379,0.01809322889,1977,,,,,,,,
+baseline:price_only_d2,"price_only (D2, y2)",,baseline (PREREG §10.4),,,,0.0119283012,1.176543525,17188,,,,,,,,
