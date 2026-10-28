@@ -67,6 +67,7 @@ TIERS_MONTHLY: Final = "panel/tiers_monthly.parquet"
 OUT_DAILY: Final = "strategy/books_{split}.parquet"
 OUT_POSITIONS: Final = "strategy/positions_{split}.parquet"
 OUT_PLACEBO: Final = "strategy/placebo_{split}.parquet"
+OUT_PLACEBO_PATHS: Final = "strategy/placebo_paths_{split}.parquet"
 ENTRY_TEXT: Final = {"open_t": "open_t", "10:00 bar close": "bar10_t", "open_t+1": "open_t+1"}
 D0_COLS: Final = ("a0_n_hat", "a0_n_tilde", "a0_v", "b1_j", "g_d1", "g_d1_lvl")
 D2_COLS: Final = ("a2_n_hat", "a2_v", "b2_j", "g_d2", "g_d2_lvl")
@@ -292,8 +293,15 @@ def percentile(value: float, null: np.ndarray) -> float:
 
 @dataclass
 class Placebo:
-    gross: np.ndarray
+    gross: np.ndarray  # annualized Sharpe per seed
     net: dict[str, np.ndarray]
+    mean_gross: np.ndarray  # annualized mean return per seed (supplementary, descriptive)
+    mean_net: dict[str, np.ndarray]
+    path: np.ndarray  # (3, T): the 5th, 50th and 95th percentile of the cumulative net path at 10 bp
+
+
+PATH_BP: Final = 10.0
+PATH_QUANTILES: Final = (0.05, 0.5, 0.95)
 
 
 def placebo(u: pf.Universe, seeds: int) -> Placebo:
@@ -307,9 +315,14 @@ def placebo(u: pf.Universe, seeds: int) -> Placebo:
         side = pf.sides(cohort, g, score, None, np.zeros(len(ev)))
         w[i] = pf.weights(side, cohort, u.n_cohorts)
     d = pf.evaluate(u, w)
+    nets = {f"{int(bp)}": cs.net(d.gross, d.turnover, bp) for bp in cs.LEVELS_BP}
+    cum = np.cumprod(1.0 + cs.net(d.gross, d.turnover, PATH_BP), axis=1) - 1.0
     return Placebo(
         pf.sharpe_rows(d.gross),
-        {f"{int(bp)}": pf.sharpe_rows(cs.net(d.gross, d.turnover, bp)) for bp in cs.LEVELS_BP},
+        {k: pf.sharpe_rows(v) for k, v in nets.items()},
+        d.gross.mean(axis=1) * pf.ANNUAL,
+        {k: v.mean(axis=1) * pf.ANNUAL for k, v in nets.items()},
+        np.quantile(cum, PATH_QUANTILES, axis=0),
     )
 
 
@@ -367,6 +380,9 @@ def run_split(split: str, layout: Layout | None = None, *, seeds: int = PLACEBO_
         tb = pf.aligned(u, ev, "tiebreak").to_numpy(dtype=float) if rule.signal == "n_tilde" else None
         side = pf.select(u, score, tb)
         cohort = ue["cohort"].to_numpy(dtype=np.int64)
+        finite = np.isfinite(score)
+        group = np.full(len(ue), None, dtype=object)
+        group[finite] = pf.groups(cohort[finite], ue["tier"].to_numpy(dtype=object)[finite])
         w = pf.weights(side, cohort, u.n_cohorts)
         rec: dict[str, Any] = {"rule": rule.key, **asdict(rule), "split": split, "universe": key, **u.counts}
         rec["uninformative"] = rule.model in UNINFORMATIVE
@@ -389,6 +405,8 @@ def run_split(split: str, layout: Layout | None = None, *, seeds: int = PLACEBO_
             rec[f"placebo_pct_net_{tag}"] = percentile(s[f"sharpe_net_{tag}"], pl.net[tag])
             rec[f"placebo_median_net_{tag}"] = float(np.median(pl.net[tag]))
             rec[f"placebo_p95_net_{tag}"] = float(np.quantile(pl.net[tag], 0.95))
+            rec[f"placebo_pct_mean_net_{tag}"] = percentile(s[f"ann_return_net_{tag}"], pl.mean_net[tag])
+        rec["placebo_pct_mean_gross"] = percentile(s["ann_return_gross"], pl.mean_gross)
         traded = np.unique(cohort[side != 0])
         rec["n_cohorts_traded"] = len(traded)
         rec["mean_names_per_side"] = float(rec["n_positions"] / 2 / len(traded))
@@ -444,6 +462,7 @@ def run_split(split: str, layout: Layout | None = None, *, seeds: int = PLACEBO_
         p["side"] = side[on].astype(np.int64)
         p["weight"] = w[on]
         p["score"] = score[on]
+        p["group"] = group[on].astype(str)
         pos_rows.append(p)
 
     daily = pd.concat(daily_rows, ignore_index=True)
@@ -462,9 +481,25 @@ def run_split(split: str, layout: Layout | None = None, *, seeds: int = PLACEBO_
                     "seed": pf.SEED + 1 + i,
                     "sharpe_gross": float(pl.gross[i]),
                     **{f"sharpe_net_{k}": float(v[i]) for k, v in pl.net.items()},
+                    "ann_return_gross": float(pl.mean_gross[i]),
+                    **{f"ann_return_net_{k}": float(v[i]) for k, v in pl.mean_net.items()},
                 }
             )
     place = pd.DataFrame(pl_rows)
+    path_rows = [
+        pd.DataFrame(
+            {
+                "universe": key,
+                "session": universes[key].sessions,
+                **{
+                    f"cum_net_{int(PATH_BP)}_q{int(q * 100):02d}": pl.path[j]
+                    for j, q in enumerate(PATH_QUANTILES)
+                },
+            }
+        )
+        for key, pl in placebos.items()
+    ]
+    paths = pd.concat(path_rows, ignore_index=True)
     desc = f"NA-13: {split} strategy books"
     io.write_parquet(
         daily,
@@ -490,6 +525,14 @@ def run_split(split: str, layout: Layout | None = None, *, seeds: int = PLACEBO_
         "universe and seed",
         layout=lay,
     )
+    io.write_parquet(
+        paths,
+        OUT_PLACEBO_PATHS.format(split=split),
+        producer=CHUNK,
+        description=f"{desc}: the placebo's 5th / 50th / 95th percentile cumulative net path at 10 bp per "
+        "universe and session (Figure 7's band)",
+        layout=lay,
+    )
     out = {
         "split": split,
         "seconds": round(time.time() - t0, 1),
@@ -500,6 +543,72 @@ def run_split(split: str, layout: Layout | None = None, *, seeds: int = PLACEBO_
     }
     write_json(lay, f"books_{split}.json", out)
     return out
+
+
+# --- the trials ledger (CLAUDE.md B10; PRD NA-13 S3) --------------------------------------------------------
+
+
+TRIAL_KIND: Final = "strategy"
+TRIAL_METRIC: Final = "sharpe_net_10"
+
+
+def trial_rows(layout: Layout | None = None) -> list[dict[str, Any]]:
+    """One row per (rule, split) book with a position, then the exploratory add-on's variants."""
+    from newsaction.strategy import ma_cross
+
+    lay = resolve_layout(layout)
+    rows: list[dict[str, Any]] = []
+    for split in SPLITS:
+        doc = json.loads((lay.root / RESULTS / f"books_{split}.json").read_text(encoding="utf-8"))
+        for b in doc["books"]:
+            if not b.get("n_positions"):
+                continue
+            params = {k: b[k] for k in ("family", "point", "signal", "exit", "model", "gated")}
+            rows.append(
+                {
+                    "name": b["rule"],
+                    "split": split,
+                    "metric": TRIAL_METRIC,
+                    "value": b[TRIAL_METRIC],
+                    "params": {**params, "universe": b["universe"]},
+                }
+            )
+    ma = json.loads((lay.root / RESULTS / ma_cross.RESULT).read_text(encoding="utf-8"))
+    return rows + ma_cross.trial_rows(ma)
+
+
+def log_trials(layout: Layout | None = None) -> dict[str, int]:
+    """Append the NA-13 rows (kind "strategy"); a row already logged with the same value is skipped, a row
+    logged with another value is an error (the run is deterministic)."""
+    from newsaction.ledger import TRIALS, TrialLedger, TrialRecord, params_hash
+
+    lay = resolve_layout(layout)
+    led = TrialLedger(lay.ledgers / TRIALS)
+    have = {(r["name"], r["split"]): r for r in led.records() if r["chunk"] == CHUNK}
+    added = skipped = 0
+    for r in trial_rows(lay):
+        value = clean(r["value"])
+        old = have.get((r["name"], r["split"]))
+        if old is not None:
+            if old["value"] != value and not (
+                old["value"] is not None and value is not None and abs(old["value"] - value) <= 1e-12
+            ):
+                raise RunError(f"{r['name']} ({r['split']}) is logged with {old['value']}, now {value}")
+            skipped += 1
+            continue
+        led.log(
+            TrialRecord(
+                chunk=CHUNK,
+                kind=TRIAL_KIND,
+                name=r["name"],
+                params_hash=params_hash(clean(r["params"])),
+                split=r["split"],
+                metric=r["metric"],
+                value=value,
+            )
+        )
+        added += 1
+    return {"added": added, "skipped": skipped, "ledger_rows": len(led.records())}
 
 
 def clean(x: Any) -> Any:
@@ -532,7 +641,10 @@ def main(argv: Sequence[str] | None = None) -> int:
         out = run_split(cmd)
         print(json.dumps({k: v for k, v in out.items() if k != "books"}, indent=1))
         return 0
-    print(f"unknown command {cmd!r}; expected one of {SPLITS}", file=sys.stderr)
+    if cmd == "trials":
+        print(json.dumps(log_trials(), indent=1))
+        return 0
+    print(f"unknown command {cmd!r}; expected one of {SPLITS} or trials", file=sys.stderr)
     return 2
 
 

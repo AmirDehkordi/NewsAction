@@ -148,3 +148,40 @@ def test_ac6_rebuild_one_day_of_s_conv_d2_ranks() -> None:
         rtol=0,
         atol=1e-12,
     )
+
+
+def test_signal_definitions() -> None:
+    """S-CONV's U = V − G^lvl; J and RG signed by the move and the news (PREREG §7, §15 NA-13 row (iv))."""
+    d2 = pd.DataFrame(
+        {
+            "a2_v": [0.4, -0.2, 0.1],
+            "g_d2_lvl": [1.0, -0.5, 0.2],
+            "g_d2": [2.0, -1.0, 0.4],
+            "b2_j": [0.3, 0.3, -0.1],
+            "a2_n_hat": [0.6, -0.7, 0.2],
+        }
+    )
+    s = run._signals(d2.copy(), "D2", 0.5)
+    np.testing.assert_allclose(s["u"], [-0.6, 0.3, -0.1])
+    np.testing.assert_allclose(s["j"], [0.3, -0.3, -0.1])
+    np.testing.assert_allclose(s["rg"].to_numpy()[:2], [0.6 - 2.0, -0.7 + 1.0])
+    assert np.isnan(s["rg"].iloc[2])
+    np.testing.assert_allclose(s["gap"], [-1.0, 0.5, -0.2])
+    d1 = pd.DataFrame(
+        {
+            "a0_v": [0.4, -0.2],
+            "g_d1_lvl": [0.1, 0.3],
+            "g_d1": [-0.2, 0.6],
+            "b1_j": [0.5, 0.5],
+            "a0_n_hat": [-0.9, 0.1],
+            "a0_n_tilde": [-0.3, 0.05],
+        }
+    )
+    s1 = run._signals(d1.copy(), "D1", 0.5)
+    np.testing.assert_allclose(s1["u"], [0.3, -0.5])
+    np.testing.assert_allclose(s1["j"], [-0.5, 0.5])
+    assert s1["rg"].iloc[0] == pytest.approx(-0.9 + 0.2) and np.isnan(s1["rg"].iloc[1])
+    np.testing.assert_allclose(s1["gap"], [-0.1, -0.3])
+    s0 = run._signals(d1.copy(), "D0", 0.5)
+    np.testing.assert_allclose(s0["n_tilde"], [-0.3, 0.05])
+    np.testing.assert_allclose(s0["tiebreak"], [-0.9, 0.1])
