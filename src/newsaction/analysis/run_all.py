@@ -43,6 +43,7 @@ import pandas as pd
 
 from newsaction import calendar, io
 from newsaction.analysis import figdata, frames, slot_path, spec
+from newsaction.analysis import metrics as mx
 from newsaction.analysis.unblind import ARTIFACTS, CHUNK
 from newsaction.config import load_frozen, load_splits
 from newsaction.paths import Layout, resolve_layout
@@ -343,6 +344,22 @@ def _with(frame: pd.DataFrame, mask: pd.Series) -> pd.DataFrame:
     return frame.loc[mask.fillna(False).astype(bool).to_numpy()]
 
 
+def quintiles(
+    frame: pd.DataFrame, split: str, cfg: spec.AnalysisConfig, signal: str = "a0_n_hat"
+) -> dict[str, Any]:
+    """§11.1 quintile spreads (``metrics.quintile_spread``): the mean daily top-minus-bottom quintile of each
+    target by the signal, with the NW t and the day bootstrap of the spec's other daily means."""
+    s = spec.eval_sample(frame, split, cfg).dropna(subset=[signal])
+    boot = spec.bootstrap_for(s, cfg)
+    out: dict[str, Any] = {}
+    for target in ("z_cc", "z_on", "z_id"):
+        d = s.dropna(subset=[target])
+        q = mx.quintile_spread(d, signal, target, cfg.sample.min_names_per_day, cfg.metrics.quintiles)
+        e = mx.daily_mean_estimate(q, boot, cfg.metrics.nw_lags, cfg.bootstrap.ci, "greater", len(d))
+        out[target] = e.as_dict()
+    return out
+
+
 # --- S2 sections --------------------------------------------------------------------------------------------
 
 
@@ -375,6 +392,9 @@ def primary(ctx: Ctx) -> dict[str, Any]:
         r["H2_D1"] = spec.h2(d0, ev, cfg, "D1") if a0 and answers(d0, ["g_d1", "y1"], [ev]) else na("no D1 G")
         r["H2_D0"] = spec.h2(d0, ev, cfg, "D0") if a0 else na("no Call A D0 reading")
         r["H2_by_abs_g"] = spec.h2_by_abs_g(d2, ev, cfg, "D2") if a2 else na("no Call A W2 reading")
+        if a0:  # §11.1's metrics of N̂_W0: daily IC and quintile spread with z_cc, z_on and z_id
+            r["ic"] = spec.ic_targets(d0, ev, cfg)
+            r["quintiles"] = quintiles(d0, ev, cfg)
         r["holm_within_model"] = spec.primary_family({t: p_of(r[t]) for t in TESTS}, cfg)
         out["models"][m.key] = r
     prim = out["models"][PRIMARY]
@@ -559,6 +579,16 @@ def secondary(ctx: Ctx) -> dict[str, Any]:
     }
     ctx.cache["secondary"] = out
     return out
+
+
+def exploratory(ctx: Ctx) -> dict[str, Any]:
+    """Operator row (before NA-11): the IC of N̂_W0 by GICS sector and leave-one-sector-out, exploratory and
+    outside every family (no claim)."""
+    return {
+        "split": ctx.split,
+        "exploratory": True,
+        "sector": {k: spec.sector_ic(ctx.d0[k], ctx.split, ctx.cfg) for k in FOCUS},
+    }
 
 
 def heterogeneity(ctx: Ctx) -> dict[str, Any]:
@@ -1031,6 +1061,7 @@ SECTIONS: Final[dict[str, Callable[[Ctx], dict[str, Any]]]] = {
     "monthly_ic": monthly_ic,
     "calibration": calibration,
     "robustness": robustness,
+    "exploratory": exploratory,
     "comparison": comparison,
     "figures": figures,
 }

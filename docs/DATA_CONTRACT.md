@@ -1785,3 +1785,14 @@ sha256 on a rerun (labels and export were run twice: 8 of 8 files identical).
 - **Rows / coverage:** what the S7 import of anchor-s13 wrote
 - **Availability:** counts only
 - **sha256:** `d429ed785674a6fba4404946e38a88d633edbeabacda2c121d45ff8ae7087738`
+
+## NA-12 — unblinding and the pre-registered analyses (`newsaction.analysis`)
+
+### `artifacts/NA-12/unblind_rehearsal.json`
+- **Producer:** `newsaction.analysis.unblind.rehearse`
+- **Inputs:** `work/panel/panel_public.parquet`, `work/panel/intraday_public.parquet`, the public bars
+- **Schema:** the consistency gaps, the largest difference against the public panels, counts
+- **Key:** one record
+- **Rows / coverage:** the val-B rehearsal of the unblinding's assembly (59 columns reproduced)
+- **Availability:** public (val-B); written before unblinding
+- **sha256:** `448ecd8c7e3cc3d5e68c2c182e14c892c2921a253d37b8d908df4d7c8402447b`
