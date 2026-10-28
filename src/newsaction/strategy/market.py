@@ -1,6 +1,7 @@
 """NA-13: the daily returns the strategies trade on (PREREG §5.1–5.3, §12; operator preamble NA-13, item 3).
 
     uv run python -m newsaction.strategy.market public          # val-A and val-B; nothing blinded
+    uv run python -m newsaction.strategy.market rehearse        # the test route, empty blinded frames
     NA_UNBLIND=1 uv run python -m newsaction.strategy.market test   # once: three reads through the lock
 
 One long panel per (session, symbol_id) from NA-01's own grid (``panel.build.assemble``), so every return is
@@ -34,7 +35,7 @@ from typing import Any, Final
 import numpy as np
 import pandas as pd
 
-from newsaction import calendar, io, lock
+from newsaction import io, lock
 from newsaction.config import load_splits
 from newsaction.panel import build, targets
 from newsaction.paths import Layout, resolve_layout
@@ -182,13 +183,56 @@ def compare(new: pd.DataFrame, ref: pd.DataFrame, cols: Sequence[str]) -> dict[s
 
 
 def test_panel(layout: Layout | None = None) -> tuple[pd.DataFrame, dict[str, Any]]:
-    """(val-B and test rows assembled with the blinded files, the consistency gaps)."""
-    from newsaction.bars import derive
-
+    """(test rows assembled with the blinded files, the consistency gaps)."""
     lay = resolve_layout(layout)
     lock.require_unblind(lay)  # STOP on a freeze-hash mismatch (operator preamble NA-13, item 3)
     prices, total = (lock.read_sealed(n, "targets", layout=lay) for n in targets.blinded_price_files())
     bars = lock.read_sealed(targets.blinded_bars_file(), "targets", layout=lay)
+    out = assemble_with(prices, total, bars, lay)
+    gaps = {"val_b_vs_public": val_b_gaps(out, lay)}
+    tt = io.read_parquet(TARGETS_TEST, columns=[*KEYS, *SAME_AS_TARGETS], layout=lay)
+    test = out.loc[out["split"] == "test"].reset_index(drop=True)
+    gaps["test_vs_targets_test"] = compare(test, tt, list(SAME_AS_TARGETS))
+    _refuse(gaps)
+    return test, gaps
+
+
+def rehearse(layout: Layout | None = None) -> dict[str, Any]:
+    """The test build's route with empty blinded frames (nothing is read through the lock): its val-B rows must
+    equal the public build's."""
+    from newsaction.bars import derive
+
+    lay = resolve_layout(layout)
+    inp = build.load_inputs(lay)
+    empty_bars = pd.DataFrame({c: pd.Series(dtype=object) for c in derive.BAR_READ})
+    empty_px = inp.prices_raw.iloc[0:0]
+    empty_tot = inp.total.iloc[0:0]
+    del inp
+    out = assemble_with(empty_px, empty_tot, empty_bars, lay)
+    gaps = {"val_b_vs_public": val_b_gaps(out, lay)}
+    _refuse(gaps)
+    return {"rows_val_b": int((out["split"] == "val_b").sum()), "consistency_gaps": gaps}
+
+
+def _refuse(gaps: dict[str, dict[str, float]]) -> None:
+    bad = {f"{k}:{c}": v for k, g in gaps.items() for c, v in g.items() if not v <= TOL}
+    if bad:
+        raise MarketError(f"the test build differs from the public build or targets_test: {bad}")
+
+
+def val_b_gaps(out: pd.DataFrame, layout: Layout) -> dict[str, float]:
+    vb = load_splits().splits["val_b"]
+    pub = io.read_parquet(PUBLIC_OUT, layout=layout)
+    pub = pub.loc[[vb.start <= d <= vb.end for d in pub["session"]]]
+    new_vb = out.loc[[vb.start <= d <= vb.end for d in out["session"]]]
+    return compare(new_vb, pub, [c for c in COLUMNS if c not in (*KEYS, *IDS)])
+
+
+def assemble_with(prices: pd.DataFrame, total: pd.DataFrame, bars: pd.DataFrame, lay: Layout) -> pd.DataFrame:
+    """val-B and test rows of the grid with ``prices`` / ``total`` / ``bars`` added (``panel.build.
+    test_returns_panel`` and ``bars.derive.test_intraday_panel``'s route)."""
+    from newsaction.bars import derive
+
     inp = build.load_inputs(lay)
     inp = replace(
         inp,
@@ -201,20 +245,7 @@ def test_panel(layout: Layout | None = None) -> tuple[pd.DataFrame, dict[str, An
     daily = long_rows(asm, start, end)
     del asm, inp
     intraday = derive.test_intraday_panel(bars, prices, total, layout=lay)
-    out = with_intraday(daily, intraday)
-    del intraday
-    vb = load_splits().splits["val_b"]
-    pub = io.read_parquet(PUBLIC_OUT, layout=lay)
-    pub = pub.loc[[vb.start <= d <= vb.end for d in pub["session"]]]
-    new_vb = out.loc[[vb.start <= d <= vb.end for d in out["session"]]]
-    gaps = {"val_b_vs_public": compare(new_vb, pub, [c for c in COLUMNS if c not in (*KEYS, *IDS)])}
-    tt = io.read_parquet(TARGETS_TEST, columns=[*KEYS, *SAME_AS_TARGETS], layout=lay)
-    test = out.loc[out["split"] == "test"].reset_index(drop=True)
-    gaps["test_vs_targets_test"] = compare(test, tt, list(SAME_AS_TARGETS))
-    bad = {f"{k}:{c}": v for k, g in gaps.items() for c, v in g.items() if not v <= TOL}
-    if bad:
-        raise MarketError(f"the test build differs from the public build or targets_test: {bad}")
-    return test, gaps
+    return with_intraday(daily, intraday)
 
 
 def write_test(layout: Layout | None = None) -> dict[str, Any]:
@@ -254,23 +285,17 @@ def lock_entries(layout: Layout | None = None) -> list[dict[str, Any]]:
     return AccessLedger(lay.ledgers / TEST_ACCESS).entries()
 
 
-def entry_session(session: date, offset: int) -> date:
-    """The session ``offset`` sessions after ``session`` (``offset`` ≥ 0)."""
-    d = session
-    for _ in range(offset):
-        d = calendar.next_session(d)
-    return d
-
-
 def main(argv: Sequence[str] | None = None) -> int:
     args = list(sys.argv[1:] if argv is None else argv)
     cmd = args[0] if args else "public"
     if cmd == "public":
         print(json.dumps(write_public(), indent=1, default=str))
+    elif cmd == "rehearse":
+        print(json.dumps(rehearse(), indent=1, default=str))
     elif cmd == "test":
         print(json.dumps(write_test(), indent=1, default=str))
     else:
-        print(f"unknown command {cmd!r}; expected public or test", file=sys.stderr)
+        print(f"unknown command {cmd!r}; expected public, rehearse or test", file=sys.stderr)
         return 2
     return 0
 
