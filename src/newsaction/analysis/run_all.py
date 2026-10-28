@@ -771,7 +771,7 @@ def _temperature(ctx: Ctx, key: str) -> dict[str, Any]:
         logit_of = runs.loc[sel].drop_duplicates("event_id").set_index("event_id")["logits"]
         logits = np.stack(s["event_id"].map(logit_of).map(np.asarray).to_list())
         before = softmax(logits)
-        t = float("nan")
+        t = float(ctx.frozen.calibration[key]["temperatures_na08"]["react"])  # NA-08's val-A Q1 (react) T
         source = "NA-08 val-A temperature (the files' probabilities) vs T = 1 on the logits"
     else:
         r = ref.dropna(subset=["a0_q1"])

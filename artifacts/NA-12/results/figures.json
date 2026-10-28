@@ -1,0 +1,12 @@
+{
+ "split": "test",
+ "files": [
+  "appendix_reliability.csv",
+  "fig1_rg_class_paths.csv",
+  "fig1_v_decile_paths.csv",
+  "fig2_drift_vs_g.csv",
+  "fig4_monthly_ic.csv",
+  "fig5_shapley_shares.csv",
+  "fig8_explanation_ladder.csv"
+ ]
+}

@@ -268,10 +268,13 @@ def test_targets(layout: Layout | None = None) -> tuple[pd.DataFrame, pd.DataFra
         f["session"] = pd.to_datetime(f["session"]).dt.date
     if set(tt["split"]) != {"test"}:
         raise FrameError("targets_test holds a row outside the test split")
-    df = tt.merge(t1, on=["session", "symbol_id"], how="left", validate="one_to_one")
-    members = df.loc[df["member"].astype(bool)]
-    if bool(members["tier"].isna().any()):
-        raise FrameError("a test member row has no tier in panel_test_inputs")
+    df = tt.merge(t1, on=["session", "symbol_id"], how="left", validate="one_to_one", indicator=True)
+    absent = df["member"].astype(bool) & (df["_merge"] == "left_only")
+    if bool(absent.any()):
+        raise FrameError(f"{int(absent.sum())} test member rows are missing from panel_test_inputs")
+    # A member's tier may be missing, as in the public panel: NA-01 ranks no spin-off joiner before its first
+    # ranking month (tier_source joiner_threshold / no_data); such rows keep tier NaN.
+    df = df.drop(columns=["_merge"])
     return df[list(PANEL_COLUMNS)].copy(), df[list(INTRADAY_COLUMNS)].copy(), df.copy()
 
 
