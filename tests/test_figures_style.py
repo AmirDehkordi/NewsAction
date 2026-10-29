@@ -1,9 +1,9 @@
 """NA-14 S1, S2 and AC3: print style, fonts, palette and one input per figure (``figures.style``, ``render``).
 
-- each figure is drawn at one or two column widths with no text below 7 pt;
-- the palette is the dataviz skill's reference instance (light), entities keep one colour, and the computed
-  red
-  arm matches the blue arm's lightness;
+- each figure is drawn at the arXiv text width (6.5 in) or half of it (3.15 in), with no text below 7 pt, in
+  Computer Modern, and with no text that cmr10 cannot print as written (a raw underscore, a unicode symbol);
+- the palette is the dataviz skill's reference instance (light), entities keep one colour, and the ordinal
+  ramps are the validated blue steps and the orange slot's hue at blue's lightness;
 - a figure module reads no file, and drawing a figure reads only its CSV;
 - drawing from the committed CSV writes the committed PDF and PNG byte for byte.
 """
@@ -16,6 +16,7 @@ import shutil
 from pathlib import Path
 from typing import Any
 
+import matplotlib as mpl
 import matplotlib.pyplot as plt
 import pandas as pd
 import pytest
@@ -40,24 +41,42 @@ READERS = {
 
 
 @pytest.mark.parametrize("name", list(render.MODULES))
-def test_print_width_and_minimum_font(name: str) -> None:
+def test_print_width_font_and_text(name: str) -> None:
     with style.paper_style():
+        assert mpl.rcParams["font.serif"][0] == "cmr10" and mpl.rcParams["mathtext.fontset"] == "cm"
+        assert mpl.rcParams["axes.formatter.use_mathtext"]
         fig = render.module(name).plot(render.read(name))
         fig.canvas.draw()
         try:
-            assert round(float(fig.get_size_inches()[0]), 3) in style.WIDTHS
+            assert round(float(fig.get_size_inches()[0]), 3) in (3.15, 6.5)
             sizes = style.text_sizes(fig)
             assert sizes and min(sizes) >= style.MIN_FONT_PT
+            texts = [t.get_text() for t in style.texts(fig)]
+            assert all(style.plain_text_ok(t) for t in texts), [
+                t for t in texts if not style.plain_text_ok(t)
+            ]
+            families = {t.get_fontfamily()[0] for t in style.texts(fig)}
+            assert families <= {"serif", "cmr10", "cmti10"}, families
         finally:
             plt.close(fig)
 
 
+def test_plain_text_rule() -> None:
+    assert style.plain_text_ok(r"daily IC of $\hat N$ with $z_{cc}$ (val-B, 95%)")
+    assert style.plain_text_ok(r"tags-GBM$^{\dagger}$")
+    for bad in ("z_cc", "a < b", "−0.5", "tags-GBM†", "|G|", "odd $math"):
+        assert not style.plain_text_ok(bad), bad
+
+
 def test_palette_is_the_reference_instance() -> None:
     assert style.SLOTS == REFERENCE
-    assert style.COLOR["laya_fin"] == REFERENCE[0] and style.COLOR["d1_ultra"] == REFERENCE[1]
-    assert style.COLOR["gap_fade"] == style.COLOR["price_only"] == REFERENCE[2]
-    assert style.COLOR["anchor"] == style.MUTED
-    assert style.FONT == "DejaVu Sans" and style.MIN_FONT_PT == 7.0
+    assert style.color("laya_fin") == REFERENCE[0] and style.color("d1_ultra") == REFERENCE[1]
+    assert style.color("gap_fade") == style.color("price_only") == REFERENCE[2]
+    for context in ("anchor", "span_02", "drex_v2", "laya_zs", "sentiment", "tags_gbm"):
+        assert style.color(context) == style.CONTEXT
+    assert style.RAMP["laya_fin"] == ("#86b6ef", "#2a78d6", "#104281")
+    assert style.RAMP["d1_ultra"] == ("#ff8653", REFERENCE[1], "#a82800")
+    assert style.FONT == "cmr10" and style.MIN_FONT_PT == 7.0 and style.WIDTHS == (3.15, 6.5)
 
 
 def _calls(path: Path) -> set[str]:
@@ -76,7 +95,7 @@ def test_figure_modules_read_no_file() -> None:
         assert _calls(PKG / f"{m}.py") & READERS == set(), m
 
 
-@pytest.mark.parametrize("name", ["fig1_convergence", "fig7_strategies", "figA6_exploratory_d0"])
+@pytest.mark.parametrize("name", ["fig3_convergence", "fig6_strategies", "figA14_exploratory_d0"])
 def test_drawing_reads_only_its_csv(name: str, monkeypatch: pytest.MonkeyPatch) -> None:
     seen: list[str] = []
     real_csv, real_open = pd.read_csv, builtins.open
@@ -98,7 +117,7 @@ def test_drawing_reads_only_its_csv(name: str, monkeypatch: pytest.MonkeyPatch) 
     assert {Path(p).resolve() for p in seen} == {(ROOT / FIGURES / f"{name}.csv").resolve()}
 
 
-@pytest.mark.parametrize("name", ["fig6_filters", "figA4_ablations"])
+@pytest.mark.parametrize("name", ["fig1_validation_test", "figA2_filters"])
 def test_drawing_writes_the_committed_bytes(name: str, tmp_path: Path) -> None:
     (tmp_path / FIGURES).mkdir(parents=True)
     shutil.copyfile(ROOT / FIGURES / f"{name}.csv", tmp_path / FIGURES / f"{name}.csv")
@@ -106,12 +125,17 @@ def test_drawing_writes_the_committed_bytes(name: str, tmp_path: Path) -> None:
         assert path.read_bytes() == (ROOT / FIGURES / path.name).read_bytes(), path.name
 
 
-def test_check_refuses_small_text_and_odd_widths() -> None:
+def test_check_refuses_small_text_odd_widths_and_unprintable_text() -> None:
     with style.paper_style():
-        fig, axes = style.new(style.WIDTH_SINGLE, 2.0)
+        fig, axes = style.new(style.WIDTH_HALF, 2.0)
         axes[0][0].text(0.5, 0.5, "tiny", fontsize=6)
         with pytest.raises(ValueError, match="below"):
             render.check(fig, "toy")
         plt.close(fig)
+        fig, axes = style.new(style.WIDTH_HALF, 2.0)
+        axes[0][0].set_xlabel("ic_z_cc")
+        with pytest.raises(ValueError, match="cannot print"):
+            render.check(fig, "toy")
+        plt.close(fig)
     with pytest.raises(ValueError):
-        style.new(5.0, 2.0)
+        style.new(6.9, 2.0)

@@ -1,10 +1,11 @@
 """NA-14: draw one figure from its CSV (PRD NA-14 S2: "each reads ONLY its CSV"; AC3).
 
-    uv run python -m newsaction.figures.render [fig1_convergence ...]
+    uv run python -m newsaction.figures.render [fig1_validation_test ...]
 
 A figure module holds ``NAME`` and ``plot(df) -> Figure`` and reads no file. ``draw`` reads
-``artifacts/NA-14/figures/<NAME>.csv``, the only input of the figure, draws it in the paper style, refuses
-text below 7 pt or a width other than one or two columns, and writes the PDF and the PNG next to the CSV.
+``artifacts/NA-14/figures/<NAME>.csv``, the only input of the figure, draws it in the paper style and refuses
+it unless it is 6.5 or 3.15 in wide, no text is below 7 pt and every text prints in Computer Modern as
+written (notation as math, no raw underscore); then it writes the PDF and the PNG next to the CSV.
 """
 
 from __future__ import annotations
@@ -24,21 +25,28 @@ from newsaction.figures.sources import FIGURES
 from newsaction.paths import Layout, resolve_layout
 
 MODULES: Final = {
-    "fig1_convergence": "newsaction.figures.fig1_hero_car",
-    "fig2_drift_vs_move": "newsaction.figures.fig2_drift_vs_move",
-    "fig3_tournament": "newsaction.figures.fig3_tournament",
-    "fig4_monthly_ic": "newsaction.figures.fig4_monthly_ic",
-    "fig5_shapley": "newsaction.figures.fig5_shapley",
-    "fig6_filters": "newsaction.figures.fig6_filters",
-    "fig7_strategies": "newsaction.figures.fig7_strategies",
-    "fig8_explain_move": "newsaction.figures.fig8_explain_move",
-    "figA1_reliability": "newsaction.figures.appendix:reliability",
-    "figA2_encoding": "newsaction.figures.appendix:encoding",
-    "figA3_identifiability": "newsaction.figures.appendix:identifiability",
-    "figA4_ablations": "newsaction.figures.appendix:ablations",
+    "fig1_validation_test": "newsaction.figures.fig1_validation_test",
+    "fig2_priced_at_open": "newsaction.figures.fig2_priced_at_open",
+    "fig3_convergence": "newsaction.figures.fig3_convergence",
+    "fig4_over_under": "newsaction.figures.fig4_over_under",
+    "fig5_explaining_moves": "newsaction.figures.fig5_explaining_moves",
+    "fig6_strategies": "newsaction.figures.fig6_strategies",
+    "fig7_memorisation": "newsaction.figures.fig7_memorisation",
+    "figA1_tournament": "newsaction.figures.appendix:tournament",
+    "figA2_filters": "newsaction.figures.appendix:filters",
+    "figA3_encoding": "newsaction.figures.appendix:encoding",
+    "figA4_reliability": "newsaction.figures.appendix:reliability",
     "figA5_robustness": "newsaction.figures.appendix:robustness",
-    "figA6_exploratory_d0": "newsaction.figures.appendix:exploratory_d0",
-    "figA7_exploratory_ma_cross": "newsaction.figures.appendix:exploratory_ma_cross",
+    "figA6_monthly_ic": "newsaction.figures.appendix:monthly_ic",
+    "figA7_convergence_detail": "newsaction.figures.appendix:convergence_detail",
+    "figA8_drift_laya_fin": "newsaction.figures.appendix:drift_laya_fin",
+    "figA9_shapley": "newsaction.figures.appendix:shapley",
+    "figA10_ablations": "newsaction.figures.appendix:ablations",
+    "figA11_persistence": "newsaction.figures.appendix:persistence",
+    "figA12_strategy_paths": "newsaction.figures.appendix:strategy_paths",
+    "figA13_probes": "newsaction.figures.appendix:probes",
+    "figA14_exploratory_d0": "newsaction.figures.appendix:exploratory_d0",
+    "figA15_exploratory_ma_cross": "newsaction.figures.appendix:exploratory_ma_cross",
 }
 
 
@@ -90,10 +98,13 @@ def read(name: str, layout: Layout | None = None) -> pd.DataFrame:
 def check(fig: Figure, name: str) -> None:
     w = round(float(fig.get_size_inches()[0]), 3)
     if w not in style.WIDTHS:
-        raise ValueError(f"{name}: width {w} in is neither one nor two columns")
+        raise ValueError(f"{name}: width {w} in is neither the full ({style.WIDTH_FULL}) nor half text width")
     sizes = style.text_sizes(fig)
     if sizes and min(sizes) < style.MIN_FONT_PT:
         raise ValueError(f"{name}: text at {min(sizes)} pt is below {style.MIN_FONT_PT} pt")
+    bad = [t.get_text() for t in style.texts(fig) if not style.plain_text_ok(t.get_text())]
+    if bad:
+        raise ValueError(f"{name}: text that Computer Modern cannot print as written (use math): {bad[:3]}")
 
 
 def draw(name: str, layout: Layout | None = None) -> list[Path]:

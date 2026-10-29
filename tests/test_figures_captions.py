@@ -9,8 +9,9 @@
 - ``captions.md`` is the current rendering;
 - the operator's labels follow the data: a figure that plots the anchor says "near-constant outputs", one that
   plots a vendor-label baseline says "possibly look-ahead-contaminated upper bound", one that plots span-02
-  points
-  to its S5 STOP, and the exploratory figures say "Exploratory (post hoc)".
+  points to its S5 STOP, and the exploratory appendix figures (A6, A13, A14, A15) say "Exploratory" first;
+- the captions are LaTeX-ready: notation in math, no raw underscore, and they render through the preview's
+  text converter.
 """
 
 from __future__ import annotations
@@ -19,7 +20,7 @@ from typing import Any
 
 import pytest
 
-from newsaction.figures import captions, render
+from newsaction.figures import captions, latex, render
 from newsaction.figures import keys as kz
 from newsaction.paths import ROOT
 
@@ -39,16 +40,18 @@ def test_rendered_captions_are_current() -> None:
 
 
 def _one(caption: str) -> dict[str, dict[str, Any]]:
-    return {"fig1_convergence": {"section": 4, "title": "t", "caption": caption}}
+    return {"fig3_convergence": {"section": 4, "title": "t", "caption": caption}}
 
 
 def _own(bad: list[str]) -> list[str]:
-    return [b for b in bad if b.startswith("fig1_convergence:") and "caption" not in b.split(":", 1)[1][:12]]
+    return [b for b in bad if b.startswith("fig3_convergence:") and "caption" not in b.split(":", 1)[1][:12]]
 
 
 def test_check_reports_a_bare_number() -> None:
     bad = _own(captions.check(captions=_one("κ is 0.36 at the close.")))
-    assert bad == ["fig1_convergence: uncited number '0.36'"]
+    assert bad == ["fig3_convergence: uncited number '0.36'"]
+    bad = _own(captions.check(captions=_one(r"$\kappa_h$ is $0.36$ at the close.")))
+    assert bad == ["fig3_convergence: uncited number '0.36'"]
 
 
 def test_check_reports_an_unknown_key() -> None:
@@ -92,14 +95,27 @@ def test_labels_follow_the_data(name: str) -> None:
         assert "possibly look-ahead-contaminated upper bound" in cap
     if _plots(name, ("span_02", "span-02")):
         assert "S5" in cap
-    if name.startswith("figA6") or name.startswith("figA7"):
+    if name in ("figA6_monthly_ic", "figA13_probes", "figA14_exploratory_d0", "figA15_exploratory_ma_cross"):
         assert cap.startswith("Exploratory (post hoc)")
+        assert str(captions.load()[name]["section"]) == "appendix"
 
 
 def test_results_are_captioned_as_found() -> None:
     caps = {k: " ".join(str(v["caption"]).split()) for k, v in captions.load().items()}
-    assert "no small-move underreaction" in caps["fig2_drift_vs_move"]
-    assert "not reached within" in caps["fig1_convergence"] and "never catch" in caps["fig1_convergence"]
-    assert "negative net" in caps["fig7_strategies"] and "gap fade" in caps["fig7_strategies"]
-    assert "after the sample" in caps["fig4_monthly_ic"]
-    assert "Exploratory (post hoc)" in caps["figA3_identifiability"]
+    assert (
+        "no small-move underreaction" in caps["fig4_over_under"]
+        and "never catch up" in caps["fig4_over_under"]
+    )
+    assert "on $|V|$" in caps["fig4_over_under"]  # the terciles, NA-12's split (a presentation deviation)
+    assert "not reached within" in caps["fig3_convergence"]
+    assert "every one is negative" in caps["fig6_strategies"] and "the gap fade" in caps["fig6_strategies"]
+    assert "positive net" in caps["fig6_strategies"]  # owner decision 1: NA-13's result as found
+    assert "released after the sample" in caps["fig7_memorisation"]
+    assert "SE bands" in caps["fig3_convergence"] and "pooled over the tiers" in caps["fig4_over_under"]
+
+
+def test_captions_render_as_latex() -> None:
+    keys = kz.load(ROOT / "artifacts" / "NA-14" / "tables" / "keys.json")
+    for name, entry in captions.load().items():
+        text = latex.tex(kz.cite(" ".join(str(entry["caption"]).split()), keys))
+        assert "\\_" not in text and text.count("$") % 2 == 0, name

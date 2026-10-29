@@ -41,6 +41,7 @@ def test_fmt_equals_na12(column: str) -> None:
 
 def test_specs() -> None:
     assert kz.spec_format(0.9221, "pct0") == "92%" and kz.spec_format(0.9979, "pct1") == "99.8%"
+    assert kz.spec_format(0.00252, "pct2") == "0.25%"
     assert kz.spec_format(-1.98, "signed2") == "−1.98" and kz.spec_format(0.61, "signed2") == "+0.61"
     assert kz.spec_format(545.0, "int") == "545" and kz.spec_format(15858, "int") == "15,858"
     assert kz.spec_format(-0.0017481, "f4") == "−0.0017" and kz.spec_format(-0.04, "abs2") == "0.04"
@@ -68,3 +69,6 @@ def test_bare_digits() -> None:
     )
     assert kz.bare_digits(text) == ["0.36", "12", "93%"]
     assert kz.bare_digits("{{a/b/c}} and [[0.5]] and S-D0, Top-100, e5, R², MA20/MA50") == []
+    math = r"$y_2$, $t{+}20$, $C_{t-1}$, $R^2$, $z_{cc}$, $|G| \geq [[3]]$, $\kappa_h = [[1]]$"
+    assert kz.bare_digits(math) == []
+    assert kz.bare_digits(r"$\kappa_h = 1$ and $\pm 1.96$") == ["1", "1.96"]

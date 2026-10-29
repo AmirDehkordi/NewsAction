@@ -7,9 +7,9 @@
    books, the operator's input file, the captions, two configs and the ledgers) must have the sha256
    recorded in
    ``artifacts/NA-14/digests.json``; a changed input stops the run before anything is rebuilt.
-2. **Rebuild.** The tables (``tables``), the figure CSVs (``data``), every figure (``render``) and the
-   captions
-   (``captions``, which first checks every cited number against its table cell).
+2. **Rebuild.** The tables (``tables``), their LaTeX (``latex``), the figure CSVs (``data``), every figure
+   (``render``), the captions (``captions``, which first checks every cited number against its table cell) and
+   the LaTeX preview (``preview``; ``make paper-preview`` compiles it).
 3. **Outputs.** The sha256 of every CSV, LaTeX, JSON and Markdown output must equal the committed digest.
    The PDF
    and PNG digests are compared too but only reported: their bytes depend on the matplotlib and FreeType
@@ -33,7 +33,7 @@ from collections.abc import Iterable, Mapping, Sequence
 from pathlib import Path
 from typing import Any, Final
 
-from newsaction.figures import captions, data, render, tables
+from newsaction.figures import captions, data, guard, latex, preview, render, tables
 from newsaction.figures import sources as sc
 from newsaction.paths import Layout
 
@@ -63,12 +63,16 @@ def inputs() -> list[str]:
         tables.MONTHLY_JSON,
         tables.EXPLORATORY_JSON,
         tables.MA_CROSS_JSON,
+        tables.SMOKE_JSON,
+        tables.DEVIATIONS,
+        tables.PREREG,
         tables.NA08_REPORT,
         tables.NA11_REPORT,
         data.NA03_SUMMARY,
         captions.CAPTIONS,
         f"work/{tables.POSITIONS}",
         f"work/{tables.BOOKS}",
+        f"work/{tables.PLACEBO}",
         "configs/splits.yaml",
         "configs/project.yaml",
         *(f"ledgers/{name}" for name in LEDGERS),
@@ -91,7 +95,7 @@ def _na12_tables(root: Path) -> list[str]:
 def outputs(root: Path) -> list[str]:
     """Every file ``make paper`` writes (under artifacts/NA-14, except its inputs and the digests)."""
     base = root / sc.ARTIFACTS
-    skip = {captions.CAPTIONS, tables.OPERATOR, DIGESTS, REPORT}
+    skip = {captions.CAPTIONS, tables.OPERATOR, tables.DEVIATIONS, DIGESTS, REPORT, preview.PDF}
     files = [p for p in base.rglob("*") if p.is_file() and p.suffix in (*TEXT_SUFFIXES, *FIGURE_SUFFIXES)]
     return sorted(r for r in (p.relative_to(root).as_posix() for p in files) if r not in skip)
 
@@ -110,11 +114,18 @@ def _diff(want: Mapping[str, str], got: Mapping[str, str]) -> list[str]:
 def build(lay: Layout) -> dict[str, Any]:
     t0 = time.monotonic()
     tab = tables.write(lay)
+    tex = latex.write(lay)
     csvs = data.write(lay)
     figs = [p for name in render.MODULES for p in render.draw(name, lay)]
     cap = captions.write(lay)
+    bad = guard.violations(lay)
+    if bad:
+        raise ValueError(f"exploratory material in a main figure or table: {bad[:5]}")
+    pre = preview.write(lay)
     return {
         "tables": tab,
+        "latex": tex,
+        "preview": str(pre),
         "figure_csvs": len(csvs),
         "figure_files": len(figs),
         "captions": str(cap),

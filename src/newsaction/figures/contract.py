@@ -16,7 +16,7 @@ from pathlib import Path
 from typing import Final
 
 from newsaction import io
-from newsaction.figures import captions, data, paper, render, tables
+from newsaction.figures import captions, data, latex, paper, preview, render, tables
 from newsaction.figures import sources as sc
 from newsaction.paths import Layout, resolve_layout
 
@@ -83,18 +83,27 @@ def _table_entries(root: Path) -> list[Entry]:
                 f"{t['rows']} rows: {t['title']}",
             )
         )
-        if f"{t['name']}.tex" in t["files"]:
-            out.append(
-                Entry(
-                    f"{sc.TABLES}/{t['name']}.tex",
-                    "`newsaction.figures.tables`",
-                    f"`{sc.TABLES}/{t['name']}.csv`",
-                    "booktabs float or longtable; the operator's labels as notes",
-                    "one file",
-                    f"the LaTeX view of {t['name']}",
-                )
+    for t in json.loads((root / latex.INDEX).read_text(encoding="utf-8")):
+        out.append(
+            Entry(
+                f"{sc.TABLES}/{t['file']}",
+                "`newsaction.figures.latex`",
+                ", ".join(f"`{s}`" for s in t["sources"]) + " (the cells of `keys.json`)",
+                "LaTeX: booktabs, threeparttable(x) notes, siunitx S columns; a float or a longtable",
+                "one file",
+                f"{'main' if t['section'] == latex.MAIN else 'appendix'} table {t['label']} "
+                f"({len(t['cells'])} cited cells)",
             )
+        )
     out += [
+        Entry(
+            latex.INDEX,
+            "`newsaction.figures.latex`",
+            "the LaTeX tables",
+            "JSON list: name, label, section (main or appendix), file, sources, cells (every cited key)",
+            "one entry per LaTeX table",
+            "which cells each LaTeX table prints",
+        ),
         Entry(
             f"{sc.TABLES}/keys.json",
             "`newsaction.figures.tables`",
@@ -107,17 +116,10 @@ def _table_entries(root: Path) -> list[Entry]:
             f"{sc.TABLES}/index.json",
             "`newsaction.figures.tables`",
             "every NA-14 table",
-            "name, title, columns, rows, notes, sources, copy_of, files",
+            "name, title, section, exploratory, exploratory_rows, columns, rows, notes, sources, copy_of, "
+            "files",
             "one file",
             "the table index",
-        ),
-        Entry(
-            f"{sc.TABLES}/paper_tables.tex",
-            "`newsaction.figures.tables`",
-            "the `.tex` tables",
-            "a LaTeX document that inputs every table",
-            "one file",
-            "compiles every table at once (checked with tectonic in NA-14)",
         ),
     ]
     return out
@@ -132,6 +134,26 @@ def _fixed() -> list[Entry]:
             "YAML: `laya_release` {date, name, source}",
             "one file",
             "facts no earlier artifact records (Laya's release date)",
+        ),
+        Entry(
+            tables.DEVIATIONS,
+            "NA-14 (author; the operator's revision pass)",
+            f"`{tables.PREREG}` §15",
+            "YAML: rows → {row, date, chunk, change, reason}",
+            "one entry per row of PREREG §15",
+            "the one-line summaries of the deviations (t34 checks each against its row)",
+        ),
+        Entry(
+            preview.PREVIEW,
+            "`newsaction.figures.preview` (make paper)",
+            "the figures, the LaTeX tables and `captions.yaml`",
+            "LaTeX article (11 pt, US letter, 1-inch margins): every main figure and table in outline "
+            "order, then "
+            "the appendix",
+            "one file",
+            "the paper preview; `make paper-preview` compiles it with tectonic (the PDF's digest is "
+            "reported, "
+            "not registered)",
         ),
         Entry(
             captions.CAPTIONS,
@@ -176,9 +198,15 @@ def write(layout: Layout | None = None) -> list[str]:
     on_disk = {
         p.relative_to(lay.root).as_posix() for p in (lay.root / sc.ARTIFACTS).rglob("*") if p.is_file()
     }
-    listed = {e.path for e in entries} | {paper.REPORT}  # the REPORT is documentation, as in NA-12 and NA-13
+    # The REPORT is documentation, as in NA-12 and NA-13; the compiled preview depends on tectonic's bundle,
+    # so its digest is reported in the REPORT, not registered.
+    listed = {e.path for e in entries} | {paper.REPORT, preview.PDF}
     if on_disk - listed:
         raise ValueError(f"NA-14 files without a contract entry: {sorted(on_disk - listed)[:5]}")
+    keep = {e.path for e in entries}
+    with io._manifest_txn(lay) as m:  # drop the entries of NA-14 files that no longer exist (renamed figures)
+        for rel in [r for r in m["artifacts"] if r.startswith(f"{sc.ARTIFACTS}/") and r not in keep]:
+            del m["artifacts"][rel]
     blocks = []
     for e in entries:
         io.register_artifact(e.path, producer=sc.CHUNK, description=e.rows, layout=lay)

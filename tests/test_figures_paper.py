@@ -1,11 +1,10 @@
 """NA-14 AC1 and operator item 2: ``make paper`` runs offline, reproduces every digest and writes no ledger.
 
-- a full rebuild in a scratch copy of the repository (the NA-03 … NA-13 artifacts and the ledgers linked,
-  NA-13's
-  stored positions copied with the manifest) exits 0 with every output digest equal, writes the committed
-  bytes,
-  leaves every ``ledgers/*.jsonl`` byte-identical and imports neither the decision-model client, nor
-  ``newsaction.lock``, nor ``panel.targets`` / ``panel.reactions``;
+- a full rebuild in a scratch copy of the repository (the NA-03 … NA-13 artifacts, PREREG and the
+  ledgers linked, NA-13's stored positions, books and placebo books copied with the manifest) exits 0 with
+  every output digest equal, writes the committed bytes, leaves every ``ledgers/*.jsonl`` byte-identical and
+  imports neither the decision-model client, nor ``newsaction.lock``, nor ``panel.targets`` /
+  ``panel.reactions``;
 - a changed input stops the run before anything is rebuilt;
 - a build that appends to a ledger fails the run (the guard is not vacuous);
 - ``docs/REPLICATION.md`` lists the committed CSV digests and the ledgers' spend.
@@ -29,7 +28,7 @@ from newsaction.figures import paper
 from newsaction.figures import sources as sc
 from newsaction.paths import ROOT, Layout
 
-LINKED = (*(f"artifacts/NA-{n:02d}" for n in range(3, 14)), "ledgers", "configs")
+LINKED = (*(f"artifacts/NA-{n:02d}" for n in range(3, 14)), "ledgers", "configs", "docs/PREREG.md")
 NA14_INPUTS = ("inputs", "captions.yaml", "digests.json")
 
 
@@ -51,7 +50,7 @@ def _scratch(tmp: Path) -> Path:
         else:
             shutil.copy2(src, na14 / name)
     (root / "work" / "strategy").mkdir(parents=True)
-    for name in ("positions_test.parquet", "books_test.parquet"):
+    for name in ("positions_test.parquet", "books_test.parquet", "placebo_test.parquet"):
         shutil.copy2(ROOT / "work" / "strategy" / name, root / "work" / "strategy" / name)
     shutil.copy2(ROOT / "work" / "MANIFEST.json", root / "work" / "MANIFEST.json")
     return root
@@ -118,7 +117,19 @@ def test_a_ledger_write_fails_the_run(tmp_path: Path, monkeypatch: pytest.Monkey
 def test_importing_the_package_loads_no_lock_client_or_outcome_module() -> None:
     mods = ", ".join(
         f"newsaction.figures.{m}"
-        for m in ("paper", "contract", "tables", "data", "render", "captions", "appendix", "fig1_hero_car")
+        for m in (
+            "paper",
+            "contract",
+            "tables",
+            "latex",
+            "preview",
+            "guard",
+            "data",
+            "render",
+            "captions",
+            "appendix",
+            "fig1_validation_test",
+        )
     )
     forbidden = list(paper.FORBIDDEN)
     code = f"import {mods}, sys, json; print(json.dumps([m for m in {forbidden!r} if m in sys.modules]))"

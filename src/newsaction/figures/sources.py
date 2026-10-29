@@ -7,9 +7,12 @@ Each figure CSV is long: one row per plotted value, in ``COLUMNS``. Besides what
 the rows whose value differs, so "no new analysis" is a test, not a promise.
 
 The interval of a row (``ci``) is one of:
-- ``table``: the stored bounds (bootstrap CIs, the placebo's 5th and 95th percentile paths);
+- ``table``: the stored bounds (bootstrap CIs, the placebo's 5th and 95th percentile paths and Sharpe ratios);
 - ``se``: y ± 1.96 × the stored standard error (``se_col``);
+- ``se1``: y ± 1 × the stored standard error (``se_col``; the "±1 SE" bands of an exploratory figure);
 - ``t``: y ± 1.96 × |y / t| with the stored t statistic in ``se_col`` (the Newey–West SE behind a t);
+- ``wilson``: the Wilson score 95% interval of the stored proportion y with the stored number of trials in
+  ``se_col`` (y × n must be a count);
 - empty: no interval.
 
 Upstream files are read as CSV only (no JSON, no parquet) from ``artifacts/``; the NA-14 tables that
@@ -52,7 +55,7 @@ COLUMNS: Final = (
     "hi_col",
     "se_col",
 )
-CI_KINDS: Final = ("", "table", "se", "t")
+CI_KINDS: Final = ("", "table", "se", "se1", "t", "wilson")
 ATOL: Final = 1e-12
 
 NA12_FIG: Final = "artifacts/NA-12/figure_data"
@@ -88,6 +91,31 @@ KEYS: Final[dict[str, tuple[str, ...]]] = {
     COMPANY_ID: ("model",),
     PROBES: ("model",),
 }
+
+
+def wilson(p: float, n: float) -> tuple[float, float]:
+    """The Wilson score 95% interval of a proportion p of n trials; p·n must be a whole number of
+    successes."""
+    if not n > 0 or abs(p * n - round(p * n)) > 1e-6:
+        raise ValueError(f"{p!r} of {n!r} trials is not a count of successes")
+    z2 = Z95 * Z95
+    centre = (p + z2 / (2 * n)) / (1 + z2 / n)
+    half = Z95 * math.sqrt(p * (1 - p) / n + z2 / (4 * n * n)) / (1 + z2 / n)
+    return centre - half, centre + half
+
+
+def _interval(kind: str, y: float, stat: float) -> tuple[float, float]:
+    """The interval of kind ``se``, ``se1``, ``t`` or ``wilson`` around y from one stored statistic."""
+    if kind == "se":
+        return y - Z95 * stat, y + Z95 * stat
+    if kind == "se1":
+        return y - stat, y + stat
+    if kind == "t":
+        s = abs(y / stat) if stat else math.nan
+        return y - Z95 * s, y + Z95 * s
+    if kind == "wilson":
+        return wilson(y, stat)
+    raise ValueError(f"no interval of kind {kind!r} from one statistic")
 
 
 def key_columns(path: str) -> tuple[str, ...]:
@@ -194,13 +222,12 @@ def rows(
     hi = np.full(len(df), np.nan)
     if ci == "table":
         lo, hi = df[lo_col].to_numpy(dtype=float), df[hi_col].to_numpy(dtype=float)
-    elif ci == "se":
-        s = df[se_col].to_numpy(dtype=float)
-        lo, hi = y - Z95 * s, y + Z95 * s
-    elif ci == "t":
+    elif ci:
+        stats = df[se_col].to_numpy(dtype=float)
         with np.errstate(divide="ignore", invalid="ignore"):
-            s = np.abs(y / df[se_col].to_numpy(dtype=float))
-        lo, hi = y - Z95 * s, y + Z95 * s
+            pairs = [_interval(ci, float(a), float(b)) for a, b in zip(y, stats, strict=True)]
+        lo = np.array([p[0] for p in pairs], dtype=float)
+        hi = np.array([p[1] for p in pairs], dtype=float)
     out = pd.DataFrame(
         {
             "panel": panel,
@@ -251,13 +278,12 @@ def trace(fig: pd.DataFrame, src: Sources) -> list[str]:
         lo, hi = float(r["lo"]), float(r["hi"])
         if kind == "table":
             want = (float(rec[str(r["lo_col"])]), float(rec[str(r["hi_col"])]))
-        elif kind == "se":
-            s = float(rec[str(r["se_col"])])
-            want = (y - Z95 * s, y + Z95 * s)
-        elif kind == "t":
-            t = float(rec[str(r["se_col"])])
-            s = abs(y / t) if t else math.nan
-            want = (y - Z95 * s, y + Z95 * s)
+        elif kind:
+            try:
+                want = _interval(kind, y, float(rec[str(r["se_col"])]))
+            except ValueError as exc:
+                bad.append(f"{where}: {exc}")
+                continue
         else:
             want = (math.nan, math.nan)
         if not (_same(lo, want[0]) and _same(hi, want[1])):

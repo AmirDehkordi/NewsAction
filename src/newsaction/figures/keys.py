@@ -3,7 +3,7 @@
 A caption cites a table cell as ``{{table/key/column}}`` (NA-12's convention, ``analysis.tables.cite``), or
 ``{{table/key/column@spec}}`` with a display format:
 
-- ``f0`` … ``f4``: fixed decimals; ``pct0`` / ``pct1``: the value × 100 with a percent sign; ``int``: a count
+- ``f0`` … ``f4``: fixed decimals; ``pct0`` … ``pct2``: the value × 100 with a percent sign; ``int``: a count
   with thousands separators; ``abs2``: the absolute value to 2 decimals; ``signed2``: an explicit sign.
 
 Any other digit in a caption must sit in ``[[...]]``, which marks a label or a design constant (``[[H1]]``,
@@ -28,7 +28,7 @@ CITE: Final = re.compile(r"\{\{([^{}]+)\}\}")
 LITERAL: Final = re.compile(r"\[\[([^\[\]]+)\]\]")
 P_COLUMNS: Final = re.compile(r"(^|_)(p|q)(_|$)|p_holm|p_two|p_dk")
 COUNTS: Final = re.compile(r"^(n|nobs.*|n_.*|.*_n|df_t|rows)$")
-SPECS: Final = ("f0", "f1", "f2", "f3", "f4", "pct0", "pct1", "int", "abs2", "signed2")
+SPECS: Final = ("f0", "f1", "f2", "f3", "f4", "pct0", "pct1", "pct2", "int", "abs2", "signed2")
 MINUS: Final = "−"
 
 
@@ -117,14 +117,24 @@ def cite(text: str, keys: Mapping[str, Any]) -> str:
 # chunks, figures, event-time labels and clock times. A statistic never matches.
 IDENTIFIER: Final = re.compile(
     r"(d1-ultra|span-0[12]|drex-v[12]\.\d|gpt-6-luna|bge-small|[ADEFHQSWfx]\d+[a-z]?|H2-C|NA-\d\d|t\d+[a-z]?"
-    r"|S-D[012]|e5|Top-100|y[02]|N̂_W[02]|§\d+(\.\d+)*|stage-[12]|MA20|MA50|95%|t\+\d+|C_t(\+\d+)?|\d\d:\d\d|R²|Σz²_cc|5th|95th)"
+    r"|S-D[012]|e5|Top-100|y[02]|N̂_W[02]|§\d+(\.\d+)*|stage-[12]|MA20|MA50|95%|t\+\d+|C_t(\+\d+)?|\d\d:\d\d|R²|Σz²_cc|5th|95th"
+    r"|R2|Ct[+-]\d+|tab\d|fig\d|A\d+)"
 )
 _TOKEN_SPLIT: Final = re.compile(r"[\s()\[\]{},;·/–]+")
+_MATH: Final = re.compile(r"\$([^$]*)\$")
+_COMMAND: Final = re.compile(r"\\[A-Za-z]+")
+
+
+def _math(m: re.Match[str]) -> str:
+    """A math segment read as plain tokens: commands, braces, sub- and superscript marks dropped, so that
+    ``$y_2$`` reads "y2" and ``$t{+}20$`` "t+20", while a number such as ``$0.5$`` stays a number."""
+    return " " + re.sub(r"[{}_^\\,]", "", _COMMAND.sub(" ", m.group(1))) + " "
 
 
 def bare_digits(text: str) -> list[str]:
-    """The tokens of ``text`` that hold a digit outside every citation, literal and name (AC2: none may)."""
-    rest = LITERAL.sub(" ", CITE.sub(" ", text))
+    """The tokens of ``text`` that hold a digit outside every citation, literal and name (AC2: none may).
+    Math is read too: a number inside ``$…$`` must be cited or a literal like any other."""
+    rest = _MATH.sub(_math, LITERAL.sub(" ", CITE.sub(" ", text)))
     out = []
     for tok in _TOKEN_SPLIT.split(rest):
         t = tok.strip(".:\"'").removesuffix("'s").removesuffix("’s")

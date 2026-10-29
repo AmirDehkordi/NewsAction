@@ -10,6 +10,8 @@ number as ``{{table/key/column[@spec]}}`` (``keys``); ``check`` returns every pr
   for a
   copied NA-12 table, from the NA-12 CSV it copies;
 - a digit outside every citation and ``[[literal]]`` (an uncited number);
+- in a main figure (1–7), a citation of an exploratory table or row (``index.json``): exploratory material
+  appears only in the appendix;
 - a caption without its figure or a figure without its caption.
 
 ``write`` renders ``captions.md`` (title, caption, files) after ``check`` passes.
@@ -78,6 +80,11 @@ class Cells:
         return v.item() if hasattr(v, "item") else v
 
 
+def main_figure(name: str) -> bool:
+    """Figures 1–7 are the paper's; A1–A15 are the appendix's."""
+    return not name.startswith("figA")
+
+
 def _split_key(k: str, tables: Sequence[str]) -> tuple[str, str, str]:
     """``table/key/column`` → its parts; the key may itself hold "/" (an NA-12 key never does)."""
     table = next((t for t in sorted(tables, key=len, reverse=True) if k.startswith(t + "/")), None)
@@ -96,6 +103,8 @@ def check(layout: Layout | None = None, captions: Mapping[str, Mapping[str, Any]
         (lay.root / sc.TABLES / "index.json").read_text(encoding="utf-8")
     )
     index = {t["name"]: t for t in listing}
+    exploratory = {n for n, t in index.items() if t.get("exploratory")}
+    exploratory_rows = {(n, k) for n, t in index.items() for k in t.get("exploratory_rows", [])}
     cells = Cells(lay.root)
     bad: list[str] = []
     figures = {p.stem for p in (lay.root / sc.FIGURES).glob("*.pdf")}
@@ -118,6 +127,8 @@ def check(layout: Layout | None = None, captions: Mapping[str, Mapping[str, Any]
                 bad.append(f"{name}: {ref!r}: {exc}")
             try:
                 table, key, column = _split_key(k, list(index))
+                if main_figure(name) and (table in exploratory or (table, key) in exploratory_rows):
+                    bad.append(f"{name}: {k!r} is exploratory, which only the appendix may cite")
                 v = cells.cell(table, key, column)
                 if not _equal(keys[k], v):
                     bad.append(f"{name}: {k!r} is {keys[k]!r} in keys.json but {v!r} in {table}.csv")
@@ -140,8 +151,9 @@ def render(layout: Layout | None = None) -> str:
         "",
         "Rendered from `captions.yaml` by `python -m newsaction.figures.captions`; every number is a "
         "table cell "
-        "(`tables/keys.json`). Figures 1–8 are the paper's; A1–A7 the appendix's. Section numbers follow "
-        "`docs/paper_outline.md`.",
+        "(`tables/keys.json`); notation is LaTeX math. Figures 1–7 are the paper's; A1–A15 the appendix's. "
+        "Section "
+        "numbers follow `docs/paper_outline.md`.",
         "",
     ]
     for name, entry in caps.items():
