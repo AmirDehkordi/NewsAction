@@ -116,8 +116,8 @@ def cite(text: str, keys: Mapping[str, Any]) -> str:
 # Names that hold digits but are not numbers: models, decision points, hypotheses, windows, sections, tables,
 # chunks, figures, event-time labels and clock times. A statistic never matches.
 IDENTIFIER: Final = re.compile(
-    r"(d1-ultra|span-0[12]|drex-v[12]\.\d|gpt-6-luna|bge-small|[ADEFHQSWfx]\d+[a-z]?|H2-C|NA-\d\d|t\d+[a-z]?"
-    r"|S-D[012]|e5|Top-100|y[02]|N̂_W[02]|§\d+(\.\d+)*|stage-[12]|MA20|MA50|95%|t\+\d+|C_t(\+\d+)?|\d\d:\d\d|R²|Σz²_cc|5th|95th"
+    r"(d1-ultra|span-0[12]|drex-v[12]\.\d|gpt-6-luna|bge-small|[ADEFHQSWfx]\d+[a-z]?|H2-C|NA-\d\d[a-z]?|t\d+[a-z]?"
+    r"|S-D[012]|e5|Top-100|y[012]|N̂_W[02]|§\d+(\.\d+)*|stage-[12]|MA20|MA50|95%|t\+\d+|C_t(\+\d+)?|\d\d:\d\d|R²|Σz²_cc|5th|95th"
     r"|R2|Ct[+-]\d+|tab\d|fig\d|A\d+)"
 )
 _TOKEN_SPLIT: Final = re.compile(r"[\s()\[\]{},;·/–]+")

@@ -133,6 +133,20 @@ APPENDIX_OUTLINE: Final[Outline] = (
             "t31_market_replication",
         ),
     ),
+    (
+        "When the D0 signal works (exploratory, post hoc; NA-13b)",
+        (
+            "figA16_selective_coverage",
+            "figA17_watch_open",
+            "figA18_conditioning_map",
+            "figA19_output_histograms",
+            "t36_selective_coverage",
+            "t37_watch_open",
+            "t38_conditioning",
+            "t39_conditioning_books",
+            "t43_band_disclosure",
+        ),
+    ),
 )
 
 PREAMBLE: Final = r"""% NA-14 paper preview: every figure and table of the paper, with captions, in the

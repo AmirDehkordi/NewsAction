@@ -22,7 +22,8 @@ from newsaction.paths import Layout, resolve_layout
 
 HEADING: Final = "## NA-14 — paper figures, tables and replication (`newsaction.figures`)"
 AVAIL: Final = (
-    "after NA-12 and NA-13 (test-period results are their stored outputs; nothing here reads the lock)"
+    "after NA-12, NA-13 and NA-13b (test-period results are their stored outputs; nothing here reads the "
+    "lock)"
 )
 FIG_SCHEMA: Final = ", ".join(f"`{c}`" for c in sc.COLUMNS)
 

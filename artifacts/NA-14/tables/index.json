@@ -1304,7 +1304,7 @@
    "reason",
    "freeze"
   ],
-  "rows": 63,
+  "rows": 65,
   "notes": [
    "Date and timing (before or after the NA-11 freeze) as in PREREG \u00a715; chunk, change and reason summarized by NA-14 (inputs/prereg_deviations.yaml); the full text is in the log."
   ],
@@ -1343,6 +1343,362 @@
   "copy_of": "",
   "files": [
    "t35_break_even.csv"
+  ]
+ },
+ {
+  "name": "t36_selective_coverage",
+  "title": "NA-13b risk-coverage curves (exploratory): hit rate, mean signed move and daily IC of the D0 reading by coverage, ranked by conviction |N\u0302| or by the stated confidence, per split and target",
+  "section": "appendix",
+  "exploratory": true,
+  "exploratory_rows": [],
+  "columns": [
+   "key",
+   "model",
+   "ranking",
+   "coverage",
+   "split",
+   "target",
+   "threshold",
+   "sample",
+   "n",
+   "n_days",
+   "hit",
+   "hit_ci_low",
+   "hit_ci_high",
+   "signed",
+   "signed_ci_low",
+   "signed_ci_high",
+   "ic",
+   "ic_t",
+   "ic_ci_low",
+   "ic_ci_high",
+   "ic_days"
+  ],
+  "rows": 990,
+  "notes": [
+   "Exploratory (post hoc): requested after unblinding; no hypothesis, outside every family, no claim.",
+   "NA-13b, the operator's study of when the D0 signal works (PREREG \u00a715, NA-13b row): thresholds and medians from val-A, conditions selected on val-A and val-B by a rule fixed before the test, the test evaluated once. Copied from NA-13b's table with its own row key."
+  ],
+  "sources": [
+   "artifacts/NA-13b/tables/coverage.csv"
+  ],
+  "copy_of": "",
+  "files": [
+   "t36_selective_coverage.csv"
+  ]
+ },
+ {
+  "name": "t37_watch_open",
+  "title": "NA-13b watching the open (exploratory): daily ICs with y1 of the pre-open and 10:00 readings, the revision and the first bar; the mean move when the first bar went against or with the pre-open view",
+  "section": "appendix",
+  "exploratory": true,
+  "exploratory_rows": [],
+  "columns": [
+   "key",
+   "model",
+   "split",
+   "statistic",
+   "kind",
+   "value",
+   "t",
+   "ci_low",
+   "ci_high",
+   "n_days",
+   "n_obs"
+  ],
+  "rows": 36,
+  "notes": [
+   "Exploratory (post hoc): requested after unblinding; no hypothesis, outside every family, no claim.",
+   "NA-13b, the operator's study of when the D0 signal works (PREREG \u00a715, NA-13b row): thresholds and medians from val-A, conditions selected on val-A and val-B by a rule fixed before the test, the test evaluated once. Copied from NA-13b's table with its own row key."
+  ],
+  "sources": [
+   "artifacts/NA-13b/tables/watch_open.csv"
+  ],
+  "copy_of": "",
+  "files": [
+   "t37_watch_open.csv"
+  ]
+ },
+ {
+  "name": "t38_conditioning",
+  "title": "NA-13b conditioning study (exploratory): each (model, condition) pair's validation selection and its one test evaluation on the primary outcome z_id",
+  "section": "appendix",
+  "exploratory": true,
+  "exploratory_rows": [],
+  "columns": [
+   "key",
+   "model",
+   "condition",
+   "group",
+   "label",
+   "level",
+   "seen_on_test",
+   "vendor",
+   "outcome",
+   "role",
+   "split",
+   "n_in",
+   "n_out",
+   "days_in",
+   "days_out",
+   "inside",
+   "inside_t",
+   "outside",
+   "outside_t",
+   "diff",
+   "diff_t",
+   "diff_p",
+   "diff_days",
+   "df",
+   "bh_q",
+   "bh_q_unseen",
+   "selected",
+   "same_sign",
+   "confirmed",
+   "confirmed_unseen",
+   "book_sharpe_gross",
+   "book_placebo_q90",
+   "book_above_q90",
+   "eligible",
+   "t_pooled_val",
+   "candidate",
+   "diff_val_a",
+   "t_val_a",
+   "diff_val_b",
+   "t_val_b",
+   "rule"
+  ],
+  "rows": 75,
+  "notes": [
+   "Exploratory (post hoc): requested after unblinding; no hypothesis, outside every family, no claim.",
+   "NA-13b, the operator's study of when the D0 signal works (PREREG \u00a715, NA-13b row): thresholds and medians from val-A, conditions selected on val-A and val-B by a rule fixed before the test, the test evaluated once. Copied from NA-13b's table with its own row key."
+  ],
+  "sources": [
+   "artifacts/NA-13b/tables/selection.csv"
+  ],
+  "copy_of": "",
+  "files": [
+   "t38_conditioning.csv"
+  ]
+ },
+ {
+  "name": "t39_conditioning_books",
+  "title": "NA-13b tradable versions (exploratory): the books of the selected conditions, E8 and E9, on val-B (in-sample for the selection) and test",
+  "section": "appendix",
+  "exploratory": true,
+  "exploratory_rows": [],
+  "columns": [
+   "key",
+   "book_key",
+   "book",
+   "model",
+   "condition",
+   "split",
+   "exit",
+   "holding",
+   "events_in",
+   "purged",
+   "no_entry_price",
+   "beta_fallback",
+   "zero_return_days",
+   "events",
+   "cohorts",
+   "n_days",
+   "n_active_days",
+   "sharpe_gross",
+   "ann_return_gross",
+   "vol",
+   "turnover_daily",
+   "sharpe_net_5",
+   "ann_return_net_5",
+   "max_dd_net_5",
+   "hit_rate_net_5",
+   "sharpe_net_10",
+   "ann_return_net_10",
+   "max_dd_net_10",
+   "hit_rate_net_10",
+   "sharpe_net_20",
+   "ann_return_net_20",
+   "max_dd_net_20",
+   "hit_rate_net_20",
+   "n_positions",
+   "n_traded_positions",
+   "cohorts_traded",
+   "names_long",
+   "names_short",
+   "break_even_bp",
+   "placebo_pct_gross",
+   "placebo_q90_gross",
+   "placebo_median_gross",
+   "capacity_median_usd",
+   "capacity_p10_usd",
+   "capacity_n_cohorts",
+   "capacity_n_without_adv",
+   "placebo_pct_net_5",
+   "placebo_pct_net_10",
+   "dsr_prob_net_5",
+   "dsr_sr0_net_5",
+   "dsr_prob_net_10",
+   "dsr_sr0_net_10",
+   "n_trials"
+  ],
+  "rows": 40,
+  "notes": [
+   "Exploratory (post hoc): requested after unblinding; no hypothesis, outside every family, no claim.",
+   "NA-13b, the operator's study of when the D0 signal works (PREREG \u00a715, NA-13b row): thresholds and medians from val-A, conditions selected on val-A and val-B by a rule fixed before the test, the test evaluated once. Copied from NA-13b's table with its own row key."
+  ],
+  "sources": [
+   "artifacts/NA-13b/tables/books.csv"
+  ],
+  "copy_of": "",
+  "files": [
+   "t39_conditioning_books.csv"
+  ]
+ },
+ {
+  "name": "t40_conditioning_detail",
+  "title": "NA-13b conditioning study in detail (exploratory): inside, outside and their difference for every pair, outcome and split",
+  "section": "appendix",
+  "exploratory": true,
+  "exploratory_rows": [],
+  "columns": [
+   "key",
+   "model",
+   "condition",
+   "group",
+   "label",
+   "level",
+   "seen_on_test",
+   "vendor",
+   "outcome",
+   "role",
+   "split",
+   "n_in",
+   "n_out",
+   "days_in",
+   "days_out",
+   "inside",
+   "inside_t",
+   "outside",
+   "outside_t",
+   "diff",
+   "diff_t",
+   "diff_p",
+   "diff_days",
+   "df"
+  ],
+  "rows": 888,
+  "notes": [
+   "Exploratory (post hoc): requested after unblinding; no hypothesis, outside every family, no claim.",
+   "NA-13b, the operator's study of when the D0 signal works (PREREG \u00a715, NA-13b row): thresholds and medians from val-A, conditions selected on val-A and val-B by a rule fixed before the test, the test evaluated once. Copied from NA-13b's table with its own row key."
+  ],
+  "sources": [
+   "artifacts/NA-13b/tables/conditioning.csv"
+  ],
+  "copy_of": "",
+  "files": [
+   "t40_conditioning_detail.csv"
+  ]
+ },
+ {
+  "name": "t41_output_histograms",
+  "title": "NA-13b output distributions (exploratory): histograms of N\u0302 and of the stated confidence per model and split, bins from val-A",
+  "section": "appendix",
+  "exploratory": true,
+  "exploratory_rows": [],
+  "columns": [
+   "key",
+   "bin",
+   "lo",
+   "hi",
+   "mid",
+   "n",
+   "share",
+   "model",
+   "measure",
+   "split"
+  ],
+  "rows": 1200,
+  "notes": [
+   "Exploratory (post hoc): requested after unblinding; no hypothesis, outside every family, no claim.",
+   "NA-13b, the operator's study of when the D0 signal works (PREREG \u00a715, NA-13b row): thresholds and medians from val-A, conditions selected on val-A and val-B by a rule fixed before the test, the test evaluated once. Copied from NA-13b's table with its own row key."
+  ],
+  "sources": [
+   "artifacts/NA-13b/tables/histograms.csv"
+  ],
+  "copy_of": "",
+  "files": [
+   "t41_output_histograms.csv"
+  ]
+ },
+ {
+  "name": "t42_output_summary",
+  "title": "NA-13b output distributions (exploratory): mean, SD and percentiles of N\u0302 and of the stated confidence per model and split",
+  "section": "appendix",
+  "exploratory": true,
+  "exploratory_rows": [],
+  "columns": [
+   "key",
+   "model",
+   "measure",
+   "split",
+   "sample",
+   "n",
+   "mean",
+   "sd",
+   "clipped_low",
+   "clipped_high",
+   "q05",
+   "q25",
+   "q50",
+   "q75",
+   "q95",
+   "share_positive"
+  ],
+  "rows": 30,
+  "notes": [
+   "Exploratory (post hoc): requested after unblinding; no hypothesis, outside every family, no claim.",
+   "NA-13b, the operator's study of when the D0 signal works (PREREG \u00a715, NA-13b row): thresholds and medians from val-A, conditions selected on val-A and val-B by a rule fixed before the test, the test evaluated once. Copied from NA-13b's table with its own row key."
+  ],
+  "sources": [
+   "artifacts/NA-13b/tables/output_summary.csv"
+  ],
+  "copy_of": "",
+  "files": [
+   "t42_output_summary.csv"
+  ]
+ },
+ {
+  "name": "t43_band_disclosure",
+  "title": "NA-13b band check (exploratory; the operator's disclosure): |N\u0302| bands at the val-A 50th, 70th and 90th percentiles, hit rate and mean signed moves per split",
+  "section": "appendix",
+  "exploratory": true,
+  "exploratory_rows": [],
+  "columns": [
+   "key",
+   "split",
+   "band",
+   "n",
+   "hit_cc",
+   "cc",
+   "on",
+   "id",
+   "model",
+   "cut_50",
+   "cut_70",
+   "cut_90"
+  ],
+  "rows": 24,
+  "notes": [
+   "Exploratory (post hoc): requested after unblinding; no hypothesis, outside every family, no claim.",
+   "NA-13b, the operator's study of when the D0 signal works (PREREG \u00a715, NA-13b row): thresholds and medians from val-A, conditions selected on val-A and val-B by a rule fixed before the test, the test evaluated once. Copied from NA-13b's table with its own row key."
+  ],
+  "sources": [
+   "artifacts/NA-13b/tables/bands.csv"
+  ],
+  "copy_of": "",
+  "files": [
+   "t43_band_disclosure.csv"
   ]
  },
  {

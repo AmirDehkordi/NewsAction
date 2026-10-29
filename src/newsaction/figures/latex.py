@@ -8,7 +8,8 @@ cell of ``tables/keys.json``, cited by (table, key, column), and the cells of ea
 
 **The tables.** At most six main tables (T1–T6: the primary hypotheses, the IC by target, the over/under
 regression, convergence, explaining moves and the strategies), drawn from several CSVs each, and an appendix
-table for every other CSV the paper shows, plus the summary of the pre-registration deviations.
+table for every other CSV the paper shows, plus the summary of the pre-registration deviations and NA-13b's
+exploratory tables (t36 to t39 and t43, each a view across its CSV's rows).
 
 **The style.** booktabs rules only; threeparttable with the notes (definitions, samples, †, ‡ and the
 significance convention) under the table; siunitx S columns for decimal alignment and true minus signs; IC
@@ -35,6 +36,7 @@ from newsaction.config import load_splits
 from newsaction.figures import keys as kz
 from newsaction.figures import sources as sc
 from newsaction.figures import tables as tb
+from newsaction.figures.appendix import CONDITION as FIGURE_CONDITION
 from newsaction.paths import Layout, resolve_layout
 
 INDEX: Final = f"{sc.TABLES}/latex.json"
@@ -1108,9 +1110,9 @@ def main_strategies() -> Table:
             r"per side, in basis points, at which the mean net return is zero (gross mean $\div$ turnover). "
             r"Placebo: the percentile of the gross Sharpe among 100 random-signal books on the same events. "
             r"DSR: "
-            r"the deflated-Sharpe probability at 10 bp with the {{t22_spend/trials/value@int}} trials of "
-            r"the trials "
-            r"ledger. Each family is "
+            r"the deflated-Sharpe probability at 10 bp with the "
+            r"{{t20_strategies/test|S-CONV|laya_fin|D2|u|close_t+5|all/n_trials@int}} trials in the ledger "
+            r"when NA-13 computed it. Each family is "
             r"shown at its hypothesis' horizon; every book is in Table~\ref{tab:a-strategies}. S-CONV ranks "
             r"by "
             r"the gap $U = V - G^{\mathrm{lvl}}$; S-D0 by $\tilde N$; S-D1 and S-D2 by the judgment $J$ "
@@ -1744,8 +1746,9 @@ VIEWS: Final[tuple[View, ...]] = (
         notes=(
             "Annualized Sharpe ratios gross and net of 5, 10 and 20 bp per side; placebo percentiles among "
             "100 "
-            "random-signal books; DSR at 10 bp with the {{t22_spend/trials/value@int}} trials of the "
-            "ledger; capacity at 1\\% of the 20-session "
+            "random-signal books; DSR at 10 bp with the "
+            "{{t20_strategies/test|S-CONV|laya_fin|D2|u|close_t+5|all/n_trials@int}} trials in the ledger "
+            "when NA-13 computed it; capacity at 1\\% of the 20-session "
             "ADV (median over decisions). Empty RG books of the anchor are left out. "
             + r"The exploratory MA-cross fade (post hoc) is in Table~\ref{tab:a-ma-cross} and Figure A15.",
             NOTE_VENDOR_BOOKS,
@@ -1976,6 +1979,399 @@ def deviations_table(df: pd.DataFrame) -> Table:
     )
 
 
+# --- NA-13b (exploratory, post hoc): when the D0 signal works ----------------------------------------------
+
+T36: Final = "t36_selective_coverage"
+T37: Final = "t37_watch_open"
+T38: Final = "t38_conditioning"
+T39: Final = "t39_conditioning_books"
+T43: Final = "t43_band_disclosure"
+NA13B_MODELS: Final = ("laya_fin", "d1_ultra")
+SPLITS: Final = ("val_a", "val_b", "test")
+TARGETS: Final = ("z_cc", "z_on", "z_id")
+NOTE_NA13B: Final = (
+    "NA-13b, the operator's study of when the D0 signal works (PREREG \\S15, NA-13b row): thresholds and "
+    "medians from val-A, the conditions selected on val-A and val-B by a rule fixed before the test, the "
+    "test evaluated once."
+)
+# The conditions as Figure A18 names them, in LaTeX (one source, so the figure and the tables never differ)
+CONDITION: Final = {k: tex(v) for k, v in FIGURE_CONDITION.items()}
+COVERAGE_ROWS: Final = (1.0, 0.3, 0.1)
+WATCH_ROWS: Final = {
+    "ic_pre_open": r"IC, pre-open reading $\hat N_{\mathrm{D0}}$",
+    "ic_ten": r"IC, 10:00 reading $\hat N_{\mathrm{D1}}$",
+    "ic_revision": "IC, the revision",
+    "ic_first_bar": r"IC, the first bar $G_{\mathrm{D1}}$",
+    "mean_against": "mean, first bar against",
+    "mean_with": "mean, first bar with",
+}
+BANDS: Final = {
+    "bottom 50%": r"bottom 50\%",
+    "50-70%": r"50--70\%",
+    "70-90%": r"70--90\%",
+    "top 10%": r"top 10\%",
+}
+BOOK_EXITS: Final = ("close_t", "close_t+1")  # NA-13b's exits: the entry day's close, the next close
+SPLIT_HEAD: Final = (
+    r" & \multicolumn{2}{c}{val-A} & \multicolumn{2}{c}{val-B} & \multicolumn{2}{c}{Test} \\",
+    r"\cmidrule(lr){2-3}\cmidrule(lr){4-5}\cmidrule(lr){6-7}",
+)
+
+
+def _one_key(df: pd.DataFrame, **match: Any) -> str:
+    """The key of the one row of an NA-13b table whose columns hold the given values (a float to 1e-9)."""
+    mask = pd.Series(True, index=df.index)
+    for col, v in match.items():
+        mask &= (df[col].astype(float) - v).abs() < 1e-9 if isinstance(v, float) else df[col] == v
+    hit = df.loc[mask, "key"]
+    if len(hit) != 1:
+        raise KeyError(f"{match}: {len(hit)} rows, not one")
+    return str(hit.iloc[0])
+
+
+def selective_coverage_table(df: pd.DataFrame) -> Table:
+    """t36 at 100%, 30% and 10% coverage by conviction: Laya-Fin and d1-ultra, every split and target."""
+    panels = []
+    for title, col in (
+        (r"Panel A: mean signed move $\mathrm{sign}(\hat N)\,z$ (typical daily moves)", "signed"),
+        (r"Panel B: hit rate, the share with $\mathrm{sign}(\hat N) = \mathrm{sign}(z)$", "hit"),
+    ):
+        rows = []
+        for model in NA13B_MODELS:
+            for coverage in COVERAGE_ROWS:
+                cells = tuple(
+                    Num(
+                        T36,
+                        _one_key(df, model=model, ranking="conviction", coverage=coverage, split=s, target=t),
+                        col,
+                        "f3",
+                    )
+                    for s in SPLITS
+                    for t in TARGETS
+                )
+                rows.append((f"{MODEL[model]}, {100 * coverage:.0f}\\%", cells))
+        panels.append(Panel(title, tuple(rows)))
+    return Table(
+        T36,
+        "tab:a-selective-coverage",
+        APPENDIX,
+        "Exploratory (post hoc): ranking by conviction concentrates the overnight move, which the open "
+        "prices; the move after the open stays within its 95\\% interval of zero at every coverage on the "
+        "test (NA-13b).",
+        (Col("Model, coverage", "l"), *(Col(WORDS[t]) for _ in SPLITS for t in TARGETS)),
+        tuple(panels),
+        (
+            NOTE_EXPLORATORY + " " + NOTE_NA13B,
+            "Coverage: the D0 events whose conviction $|\\hat N|$ is at or above its val-A quantile at one "
+            "minus the coverage (100\\%: every event); events outside the embargo; moves in typical daily "
+            "moves. The 95\\% intervals (stationary block bootstrap), the daily IC, every coverage, the "
+            "other models and the ranking by the stated confidence are in the table's CSV and Figure A16.",
+            NOTE_API,
+        ),
+        (
+            r" & \multicolumn{3}{c}{val-A} & \multicolumn{3}{c}{val-B} & \multicolumn{3}{c}{Test} \\",
+            r"\cmidrule(lr){2-4}\cmidrule(lr){5-7}\cmidrule(lr){8-10}",
+        ),
+        colsep=r"\setlength{\tabcolsep}{4pt}",
+        sources=(f"{sc.TABLES}/{T36}.csv",),
+    )
+
+
+def watch_open_table(df: pd.DataFrame) -> Table:
+    """t37 (the D1 statistics by split), with the pre-registered D1 results on the test for reference."""
+    a = []
+    for model in NA13B_MODELS:
+        for statistic, text in WATCH_ROWS.items():
+            cells = []
+            for s in SPLITS:
+                k = _one_key(df, model=model, split=s, statistic=statistic)
+                cells += [Num(T37, k, "value", "f3"), Num(T37, k, "t", "t2")]
+            a.append((f"{MODEL[model]}: {text}", tuple(cells)))
+    b = []
+    for model in NA13B_MODELS:
+        for text, cell in (
+            ("over/under $b$ at D1", Num(T2, f"{model}:D1", "b", "f3")),
+            ("over/under $c$ at D1", Num(T2, f"{model}:D1", "c", "f3")),
+            (r"$\kappa$ at 10:00", Num(T6, f"{model}:ladder:10:00", "kappa", "f3")),
+            (r"$\lambda$ at $C_t$ from D1", Num(T7, f"{model}:D1:all:C_t", "lambda", "f3")),
+            ("S-D1 $J$, gross Sharpe", Num(T20, f"test|S-D1|{model}|D1|j|close_t|all", "sharpe_gross", "f2")),
+            (
+                "S-CONV from 10:00, gross Sharpe",
+                Num(T20, f"test|S-CONV|{model}|D1|u|close_t|all", "sharpe_gross", "f2"),
+            ),
+        ):
+            b.append((f"{MODEL[model]}: {text}", (None, None, None, None, cell, None)))
+    return Table(
+        T37,
+        "tab:a-watch-open",
+        APPENDIX,
+        "Exploratory (post hoc): the 10:00 reading adds nothing to the pre-open one; on val-B and the test "
+        "the ICs of the 10:00 reading and of the revision with $y_1$ are negative for both models (NA-13b).",
+        (
+            Col("Model: statistic", r">{\raggedright\arraybackslash}p{2.95in}"),
+            *(c for _ in SPLITS for c in (Col("Value"), Col("$t$"))),
+        ),
+        (
+            Panel("Panel A: watching the open (NA-13b)", tuple(a)),
+            Panel("Panel B: pre-registered D1 results (NA-12, NA-13; test, for reference)", tuple(b)),
+        ),
+        (
+            NOTE_EXPLORATORY + " " + NOTE_NA13B,
+            r"Panel A: the daily IC with $y_1$, the move from 10:00 to the close (PREREG \S5.6), of the "
+            r"pre-open reading $\hat N_{\mathrm{D0}}$, of the 10:00 reading $\hat N_{\mathrm{D1}}$ (Call B "
+            r"at D1), of the revision $z(\hat N_{\mathrm{D1}}) - z(\hat N_{\mathrm{D0}})$ and of the first "
+            r"bar's move $G_{\mathrm{D1}}$, with its Newey--West $t$ (5 lags); then the mean of "
+            r"$\mathrm{sign}(\hat N_{\mathrm{D0}})\,y_1$ over the events whose first bar moved against, or "
+            r"with, the pre-open reading, with a day-clustered $t$. Events outside the embargo; the first "
+            r"bar is the same for both models.",
+            r"Panel B: the pre-registered D1 estimates on the test (NA-12, NA-13): the over/under "
+            r"coefficients $b$ and $c$ (Table~\ref{tab:a-h2-over-under}), $\kappa$ at 10:00 "
+            r"(Table~\ref{tab:a-convergence-ladder}), $\lambda$ at the close from D1 "
+            r"(Table~\ref{tab:a-gap-closure}) and the annualized gross Sharpe ratios of S-D1 $J$ and of "
+            r"S-CONV from 10:00 to the close (Table~\ref{tab:a-strategies}). ---: Panel B holds the test "
+            r"estimates only; their standard errors and $p$ are in those tables.",
+            NOTE_API,
+        ),
+        SPLIT_HEAD,
+        colsep=r"\setlength{\tabcolsep}{4pt}",
+        sources=(
+            f"{sc.TABLES}/{T37}.csv",
+            f"{sc.NA12_TAB}/{T2}.csv",
+            f"{sc.NA12_TAB}/{T6}.csv",
+            f"{sc.NA12_TAB}/{T7}.csv",
+            f"{sc.TABLES}/{T20}.csv",
+        ),
+    )
+
+
+def _flag(v: Any) -> bool:
+    return str(v) == "True"
+
+
+def _condition_label(row: Mapping[str, Any]) -> str:
+    """A pair's condition as Figure A18 names it, after its group: † marks a vendor field (a retrospective
+    label), [seen on test] a condition the test had shown before this study."""
+    text = f"{row['group']} {CONDITION[str(row['condition'])]}"
+    text += r"$^{\dagger}$" if _flag(row["vendor"]) else ""
+    return text + (" [seen on test]" if _flag(row["seen_on_test"]) else "")
+
+
+def conditioning_table(df: pd.DataFrame) -> Table:
+    """t38: every (model, condition) pair's validation selection and its one test evaluation."""
+    panels = []
+    for model in NA13B_MODELS:
+        rows = []
+        for r in df[df["model"] == model].to_dict("records"):
+            k = str(r["key"])
+            rows.append(
+                (
+                    _condition_label({str(c): v for c, v in r.items()}),
+                    (
+                        Num(T38, k, "diff_val_a", "f3"),
+                        Num(T38, k, "t_val_a", "t2"),
+                        Num(T38, k, "diff_val_b", "f3"),
+                        Num(T38, k, "t_val_b", "t2"),
+                        Num(T38, k, "t_pooled_val", "t2"),
+                        Num(T38, k, "selected"),
+                        Num(T38, k, "diff", "f3"),
+                        Num(T38, k, "diff_t", "t2"),
+                        Num(T38, k, "bh_q", "p"),
+                        Num(T38, k, "bh_q_unseen", "p"),
+                        Num(T38, k, "confirmed"),
+                    ),
+                )
+            )
+        panels.append(Panel(MODEL[model], tuple(rows)))
+    return Table(
+        T38,
+        "tab:a-conditioning",
+        APPENDIX,
+        "Exploratory (post hoc): the conditioning study; none of the pairs selected on validation held on "
+        "the test, and no pair of the family is confirmed (NA-13b).",
+        (
+            Col("Condition", r">{\raggedright\arraybackslash}p{2.7in}"),
+            Col("Diff."),
+            Col("$t$"),
+            Col("Diff."),
+            Col("$t$"),
+            Col("Pooled $t$"),
+            Col("Selected", "c"),
+            Col("Diff."),
+            Col("$t$"),
+            Col("BH $q$"),
+            Col("BH $q$, unseen"),
+            Col("Confirmed", "c"),
+        ),
+        tuple(panels),
+        (
+            NOTE_EXPLORATORY + " " + NOTE_NA13B,
+            r"Diff.: the inside-minus-outside difference of the primary outcome $\mathrm{sign}(\hat "
+            r"N)\,z_{id}$ (typical daily moves): at the event level the mean of the daily differences with a "
+            r"day-clustered $t$; at the day level (Friday, Monday, the day's news and earnings counts, macro "
+            r"days, VIX, SPY's overnight move) the difference of the sessions' means with Welch's $t$; for "
+            r"the rank average the mean daily difference to the model's own sign. Selected on validation by "
+            r"the operator's rule, fixed before the test: positive with $t \geq 1$ in val-A and in val-B and "
+            r"a pooled $t \geq 2$ (the three-model agreement: val-B alone, $t \geq 2.5$). The test, once: "
+            r"two-sided $p$, Benjamini--Hochberg at $q = 0.10$ over the family and over the family without "
+            r"the conditions seen on test (unseen); confirmed: selected, the same sign on the test and BH $q "
+            r"< 0.10$.",
+            r"[seen on test]: earnings day, latest article before 08:00 and conviction top 30\%, which the "
+            r"test had shown before this study; reported, never selected. $^{\dagger}$Vendor field: a label "
+            r"the vendor produced retrospectively, possibly look-ahead-contaminated. ---: the three-model "
+            r"agreement has no val-A run (span-02 and drex-v2.0 have no val-A production run), so no pooled "
+            r"$t$; a condition seen on test has no unseen $q$.",
+            NOTE_API,
+        ),
+        (
+            r" & \multicolumn{2}{c}{val-A} & \multicolumn{2}{c}{val-B} & \multicolumn{2}{c}{Validation} & "
+            r"\multicolumn{5}{c}{Test, evaluated once} \\",
+            r"\cmidrule(lr){2-3}\cmidrule(lr){4-5}\cmidrule(lr){6-7}\cmidrule(lr){8-12}",
+        ),
+        size=r"\footnotesize",
+        long=True,
+        landscape=True,
+        colsep=r"\setlength{\tabcolsep}{4pt}",
+        sources=(f"{sc.TABLES}/{T38}.csv",),
+    )
+
+
+def books_table(df: pd.DataFrame) -> Table:
+    """t39: the tradable versions on the test, then on val-B (in-sample for the selection), a panel per model;
+    a book's second row is its second exit."""
+    panels = []
+    for split, head in (("test", "Test"), ("val_b", "Val-B, in-sample for the selection")):
+        for model in NA13B_MODELS:
+            d = df[(df["split"] == split) & (df["model"] == model)]
+            rows = []
+            for book in dict.fromkeys(d["book"]):
+                condition = str(d.loc[d["book"] == book, "condition"].iloc[0])
+                for exit_ in BOOK_EXITS:
+                    k = _one_key(d, book=book, exit=exit_)
+                    rows.append(
+                        (
+                            f"{condition[:2].upper()} {CONDITION[condition]}"
+                            if exit_ == BOOK_EXITS[0]
+                            else "",
+                            (
+                                Txt(RUNG[exit_]),
+                                Num(T39, k, "sharpe_gross", "f2"),
+                                Num(T39, k, "sharpe_net_5", "f2"),
+                                Num(T39, k, "sharpe_net_10", "f2"),
+                                Num(T39, k, "break_even_bp", "bp1"),
+                                Num(T39, k, "names_long", "f1"),
+                                Num(T39, k, "names_short", "f1"),
+                                Num(T39, k, "placebo_pct_gross", "f0"),
+                                Num(T39, k, "dsr_prob_net_10", "p"),
+                            ),
+                        )
+                    )
+            panels.append(Panel(f"{head}: {MODEL[model]}", tuple(rows)))
+    first = _one_key(df, split="test", book=str(df["book"].iloc[0]), exit=BOOK_EXITS[0])
+    return Table(
+        T39,
+        "tab:a-conditioning-books",
+        APPENDIX,
+        "Exploratory (post hoc): the tradable versions; on the test none beats its placebo (NA-13b).",
+        (
+            Col("Book", "l"),
+            Col("Exit", "l"),
+            Col("Gross"),
+            Col("5 bp"),
+            Col("10 bp"),
+            Col("Break-even"),
+            Col("Long"),
+            Col("Short"),
+            Col("Placebo"),
+            Col("DSR"),
+        ),
+        tuple(panels),
+        (
+            NOTE_EXPLORATORY + " " + NOTE_NA13B,
+            r"The books of the selected pairs, E8 and E9 (NA-13's engine): each session's inside events, "
+            r"long those the model reads up and short those it reads down, equal weight within a side, "
+            r"$\beta$-hedged with SPY; entry at the open, exit at the close ($C_t$) or the next close "
+            r"($t{+}1$). Annualized Sharpe ratios, gross and net of 5 and 10 bp per side on both legs and "
+            r"the hedge; break-even in bp per side (annualized gross return $\div$ 252 $\div$ daily "
+            r"turnover); names: the mean longs and shorts of a session with positions; placebo: the gross "
+            r"Sharpe's percentile among 100 random sign assignments of the same events (none reaches the "
+            r"90th on the test); DSR at 10 bp with the "
+            f"{{{{{T39}/{first}/n_trials@int}}}} trials of the ledger after NA-13b. The val-B books are "
+            r"in-sample for the selection. " + NOTE_API,
+        ),
+        (
+            r" & & \multicolumn{3}{c}{Sharpe ratio} & & \multicolumn{2}{c}{Names} & & \\",
+            r"\cmidrule(lr){3-5}\cmidrule(lr){7-8}",
+        ),
+        size=r"\footnotesize",
+        colsep=r"\setlength{\tabcolsep}{4pt}\renewcommand{\arraystretch}{0.92}",  # one page with its notes
+        sources=(f"{sc.TABLES}/{T39}.csv",),
+    )
+
+
+def band_table(df: pd.DataFrame) -> Table:
+    """t43: the operator's band check (disclosed), by model, split and band of conviction."""
+    panels = []
+    for model in NA13B_MODELS:
+        rows = []
+        for s in SPLITS:
+            for band, text in BANDS.items():
+                k = _one_key(df, model=model, split=s, band=band)
+                rows.append(
+                    (
+                        f"{WORDS[s]}, {text}",
+                        (
+                            Num(T43, k, "n", "int"),
+                            Num(T43, k, "hit_cc", "f3"),
+                            Num(T43, k, "cc", "f3"),
+                            Num(T43, k, "on", "f3"),
+                            Num(T43, k, "id", "f3"),
+                        ),
+                    )
+                )
+        panels.append(Panel(MODEL[model], tuple(rows)))
+    return Table(
+        T43,
+        "tab:a-band-disclosure",
+        APPENDIX,
+        "Exploratory (post hoc): the operator's first look by band of conviction; the mean signed overnight "
+        "move is largest in the top 10\\% in every split (NA-13b).",
+        (
+            Col(r"Split, band of $|\hat N|$", "l"),
+            Col("Events"),
+            Col("Hit rate"),
+            Col("$z_{cc}$"),
+            Col("$z_{on}$"),
+            Col("$z_{id}$"),
+        ),
+        tuple(panels),
+        (
+            NOTE_EXPLORATORY + " " + NOTE_NA13B,
+            r"The operator's assistant's first look, disclosed with the operator's prompt and reproduced: "
+            r"bands of the conviction $|\hat N|$ at its val-A 50th, 70th and 90th percentiles; the hit rate "
+            r"against $z_{cc}$ and the mean signed $z_{cc}$, $z_{on}$ and $z_{id}$ (typical daily moves), "
+            r"pooled over the events of each split outside the embargo.",
+            NOTE_API,
+        ),
+        (r" & & & \multicolumn{3}{c}{Mean signed move} \\", r"\cmidrule(lr){4-6}"),
+        sources=(f"{sc.TABLES}/{T43}.csv",),
+    )
+
+
+def selective_tables(root: Path) -> list[Table]:
+    """NA-13b's appendix tables (exploratory), from their NA-14 copies."""
+
+    def read(name: str) -> pd.DataFrame:
+        return pd.read_csv(root / sc.TABLES / f"{name}.csv", keep_default_na=False, na_values=[""])
+
+    return [
+        selective_coverage_table(read(T36)),
+        watch_open_table(read(T37)),
+        conditioning_table(read(T38)),
+        books_table(read(T39)),
+        band_table(read(T43)),
+    ]
+
+
 # --- writing ------------------------------------------------------------------------------------------------
 
 
@@ -2021,7 +2417,7 @@ def appendix_tables(root: Path) -> list[Table]:
         out.append(view_table(v, df, f"tab:a-{v.name.split('_', 1)[1].replace('_', '-')}"))
     dev = pd.read_csv(root / sc.TABLES / "t34_prereg_deviations.csv", keep_default_na=False, na_values=[""])
     out.append(deviations_table(dev))
-    return out
+    return out + selective_tables(root)
 
 
 def build(layout: Layout | None = None) -> list[Table]:

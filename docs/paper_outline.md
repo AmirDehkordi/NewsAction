@@ -1,12 +1,13 @@
 # Paper outline: sections → figures and tables
 
-NA-14 (2026-10-29; revision pass the same day). Structure only: no new analysis. The manuscript is an arXiv
-preprint in LaTeX (article, 11 pt, US letter, 1-inch margins, one column; text width 6.5 in). Every figure lives
-in `artifacts/NA-14/figures/` (PDF, PNG and the CSV of its plotted values), drawn at 6.5 in or 3.15 in and placed
-at 100%; every table in `artifacts/NA-14/tables/` (the keyed CSV, and its LaTeX). The captions, with every number
-cited from a table, are in `artifacts/NA-14/captions.md`, and `artifacts/NA-14/paper_preview.tex` sets every figure
-and table in this order (`make paper-preview` compiles it). Results are stated as found in the NA-12 and NA-13
-REPORTs; under PREREG §1.3 every primary hypothesis is **not supported** for the primary instrument, Laya-Fin.
+NA-14 (2026-10-29; revision pass the same day; NA-13b's exploratory appendix items added after NA-13b). Structure
+only: no new analysis. The manuscript is an arXiv preprint in LaTeX (article, 11 pt, US letter, 1-inch margins, one
+column; text width 6.5 in). Every figure lives in `artifacts/NA-14/figures/` (PDF, PNG and the CSV of its plotted
+values), drawn at 6.5 in or 3.15 in and placed at 100%; every table in `artifacts/NA-14/tables/` (the keyed CSV, and
+its LaTeX). The captions, with every number cited from a table, are in `artifacts/NA-14/captions.md`, and
+`artifacts/NA-14/paper_preview.tex` sets every figure and table in this order (`make paper-preview` compiles it).
+Results are stated as found in the NA-12 and NA-13 REPORTs; under PREREG §1.3 every primary hypothesis is **not
+supported** for the primary instrument, Laya-Fin.
 
 Labels used throughout: the anchor is *uninformative (near-constant outputs)* and stays out of the main figures
 (it appears in the appendix and in the main tables beside the primary); the vendor-label baselines (tags-GBM,
@@ -15,10 +16,11 @@ bge-ridge, price-only, the LLM baseline and the placebo; span-02 carries ‡ and
 post-freeze NA-11 row); the API models fail the §8.3 screens and are model-specific (§1.3).
 
 **Exploratory material appears only in the appendix:** Appendix Figures A6 (the monthly IC with its exploratory
-±1 SE bands), A13 (the probes' descriptive columns), A14 and A15 (post hoc), and the appendix tables t17, t24, t25
-and t31. No main figure (1–7) and no main table (1–6) cites an exploratory table or row: not in a caption, not in a
-LaTeX cell, not in a figure's data (`figures.guard`, `tests/test_figures_exploratory.py`). The CSVs of t11, t20
-and t35 keep their exploratory rows; their LaTeX leaves them out and points to t31, t25 and Figure A15.
+±1 SE bands), A13 (the probes' descriptive columns), A14 and A15 (post hoc), A16 to A19 (NA-13b, post hoc), and the
+appendix tables t17, t24, t25, t31 and t36 to t43 (NA-13b). No main figure (1–7) and no main table (1–6) cites an
+exploratory table or row: not in a caption, not in a LaTeX cell, not in a figure's data, and no main figure plots a
+row of NA-13b's own tables (`figures.guard`, `tests/test_figures_exploratory.py`). The CSVs of t11, t20 and t35
+keep their exploratory rows; their LaTeX leaves them out and points to t31, t25 and Figure A15.
 
 ## 1. Question and decision models
 
@@ -93,9 +95,12 @@ The appendix figures and tables, in the order of the sections above; exploratory
   (exploratory: ±1 implied SE of a month's mean, NA-12 §13); A7 convergence in detail and the anchor; A8 the drift
   for Laya-Fin; A9 Shapley by instrument and tier; A10 Call B ablations; A11 persistence by move reason; A12 the other books and S-CONV
   by tier; A13 the probes' descriptive columns (exploratory); A14 where the D0 signal lives (exploratory, post
-  hoc, with the month-effect test); A15 news and a moving-average cross (exploratory, post hoc).
+  hoc, with the month-effect test); A15 news and a moving-average cross (exploratory, post hoc); A16 to A19 when
+  the D0 signal works (NA-13b, exploratory, post hoc): A16 the risk-coverage curves, A17 the 10:00 reading against
+  the pre-open one, A18 the conditioning study, A19 the outputs beside their reliability.
 - Exploratory tables: t17 (sectors), t24 (NA-12 §13), t25 (NA-13 §9), t31 (the A3.5 market replication,
-  pre-registered as exploratory).
+  pre-registered as exploratory), t36 to t43 (NA-13b: coverage, watching the open, the conditioning study and its
+  detail, the tradable versions, the output histograms and summary, the operator's band check).
 
 ## Figure index
 
@@ -123,12 +128,17 @@ The appendix figures and tables, in the order of the sections above; exploratory
 | A13 | `figA13_probes` | appendix (7), exploratory | NA-11 probes |
 | A14 | `figA14_exploratory_d0` | appendix, exploratory | t24 (NA-12 §13) |
 | A15 | `figA15_exploratory_ma_cross` | appendix, exploratory | t25 (NA-13 §9), NA-13 Figure 7 data |
+| A16 | `figA16_selective_coverage` | appendix, exploratory | t36 (NA-13b) |
+| A17 | `figA17_watch_open` | appendix, exploratory | t37 (NA-13b) |
+| A18 | `figA18_conditioning_map` | appendix, exploratory | t40, t38 (NA-13b) |
+| A19 | `figA19_output_histograms` | appendix, exploratory | t41 (NA-13b), NA-12 figure data (`fa_reliability`), t15 |
 
 ## Table index
 
 Every CSV table and its section, as `artifacts/NA-14/tables/index.json` records it (`tests/test_figures_tables.py`
 checks that the two agree). t1–t19 are NA-12's (copied unchanged), t20 is NA-13's strategy table, t21–t35 are
-NA-14's records, flattened results and aggregations, and the f-tables are figure data (no LaTeX).
+NA-14's records, flattened results and aggregations, t36–t43 are NA-13b's tables (exploratory, copied with their own
+key), and the f-tables are figure data (no LaTeX).
 
 | Table | Section | Source |
 |---|---|---|
@@ -168,6 +178,14 @@ NA-14's records, flattened results and aggregations, and the f-tables are figure
 | `t33_placebo_sharpe` | 6 | NA-13's stored placebo books (quantiles) |
 | `t34_prereg_deviations` | appendix | PREREG §15 and NA-14's one-line summaries |
 | `t35_break_even` | 6 | NA-13 strategy table (gross mean ÷ turnover; its LaTeX leaves out the exploratory MA-cross row) |
+| `t36_selective_coverage` | appendix | NA-13b risk-coverage curves; exploratory (post hoc) |
+| `t37_watch_open` | appendix | NA-13b the 10:00 reading against the pre-open one; exploratory (post hoc) |
+| `t38_conditioning` | appendix | NA-13b the conditioning study, one row per pair; exploratory (post hoc) |
+| `t39_conditioning_books` | appendix | NA-13b the tradable versions; exploratory (post hoc) |
+| `t40_conditioning_detail` | appendix | NA-13b every pair, outcome and split; exploratory (post hoc) |
+| `t41_output_histograms` | appendix | NA-13b histograms of the outputs; exploratory (post hoc) |
+| `t42_output_summary` | appendix | NA-13b summaries of the outputs; exploratory (post hoc) |
+| `t43_band_disclosure` | appendix | NA-13b the operator's band check (disclosed); exploratory (post hoc) |
 | `f1_rg_class_paths` | 4 | NA-12 figure data |
 | `f1_v_decile_paths` | 4 | NA-12 figure data |
 | `f2_drift_vs_g` | 4 | NA-12 figure data |
@@ -199,20 +217,20 @@ shows. Cells: the keyed cells each prints.
 | `t15_calibration.tex` | appendix | t15_calibration | 54 |
 | `t16_robustness.tex` | appendix | t16_robustness | 541 |
 | `t2_h2_over_under.tex` | appendix | t2_h2_over_under | 192 |
-| `t4_secondary.tex` | appendix | t4_secondary | 72 |
+| `t4_secondary.tex` | appendix | t4_secondary | 88 |
 | `t5_heterogeneity.tex` | appendix | t5_heterogeneity | 192 |
 | `t6_convergence_ladder.tex` | appendix | t6_convergence_ladder | 393 |
 | `t7_gap_closure.tex` | appendix | t7_gap_closure | 258 |
 | `t8_tracking_error.tex` | appendix | t8_tracking_error | 144 |
-| `t9_convergence_cuts.tex` | appendix | t9_convergence_cuts | 155 |
+| `t9_convergence_cuts.tex` | appendix | t9_convergence_cuts | 190 |
 | `t13_shapley.tex` | appendix | t13_shapley | 264 |
 | `t10_explanation_ladder.tex` | appendix | t10_explanation_ladder | 472 |
 | `t11_explanation_share_theta.tex` | appendix | t11_explanation_share_theta | 69 |
-| `t12_question_battery.tex` | appendix | t12_question_battery | 430 |
+| `t12_question_battery.tex` | appendix | t12_question_battery | 435 |
 | `t20_strategies.tex` | appendix | t20_strategies | 1567 |
 | `t26_sconv_overlap.tex` | appendix | t26_sconv_overlap | 16 |
 | `t33_placebo_sharpe.tex` | appendix | t33_placebo_sharpe | 315 |
-| `t35_break_even.tex` | appendix | t35_break_even | 264 |
+| `t35_break_even.tex` | appendix | t35_break_even | 261 |
 | `t23_company_identification.tex` | appendix | t23_company_identification | 28 |
 | `t18_probes_val_a.tex` | appendix | t18_probes_val_a | 58 |
 | `t19_monthly_ic.tex` | appendix | t19_monthly_ic | 144 |
@@ -220,4 +238,9 @@ shows. Cells: the keyed cells each prints.
 | `t25_ma_cross.tex` | appendix | t25_ma_cross | 78 |
 | `t31_market_replication.tex` | appendix | t31_market_replication | 3 |
 | `t30_derived.tex` | appendix | t30_derived | 1 |
-| `t34_prereg_deviations.tex` | appendix | t34_prereg_deviations | 315 |
+| `t34_prereg_deviations.tex` | appendix | t34_prereg_deviations | 325 |
+| `t36_selective_coverage.tex` | appendix | t36_selective_coverage | 108 |
+| `t37_watch_open.tex` | appendix | t37_watch_open, t2_h2_over_under, t6_convergence_ladder, t7_gap_closure, t20_strategies | 84 |
+| `t38_conditioning.tex` | appendix | t38_conditioning | 813 |
+| `t39_conditioning_books.tex` | appendix | t39_conditioning_books | 321 |
+| `t43_band_disclosure.tex` | appendix | t43_band_disclosure | 120 |

@@ -16,7 +16,8 @@ The interval of a row (``ci``) is one of:
 - empty: no interval.
 
 Upstream files are read as CSV only (no JSON, no parquet) from ``artifacts/``; the NA-14 tables that
-flatten a results JSON are sources of their own (``artifacts/NA-14/tables``).
+flatten a results JSON are sources of their own (``artifacts/NA-14/tables``). NA-13b's tables (exploratory)
+carry their own unique ``key`` column; the figures read them through the NA-14 tables that copy them.
 """
 
 from __future__ import annotations
@@ -74,6 +75,26 @@ FRONTIER: Final = "artifacts/NA-03/frontier.csv"
 ENCODING: Final = "artifacts/NA-07/encoding_ic.csv"
 COMPANY_ID: Final = "artifacts/NA-11/company_id_matched.csv"
 PROBES: Final = "artifacts/NA-11/probes_val_a.csv"
+# NA-13b (exploratory, post hoc): "When does the signal work?" (newsaction.selective)
+NA13B_TAB: Final = "artifacts/NA-13b/tables"
+COVERAGE: Final = f"{NA13B_TAB}/coverage.csv"
+WATCH_OPEN: Final = f"{NA13B_TAB}/watch_open.csv"
+SELECTION: Final = f"{NA13B_TAB}/selection.csv"
+CONDITIONING: Final = f"{NA13B_TAB}/conditioning.csv"
+SELECTIVE_BOOKS: Final = f"{NA13B_TAB}/books.csv"
+HISTOGRAMS: Final = f"{NA13B_TAB}/histograms.csv"
+OUTPUT_SUMMARY: Final = f"{NA13B_TAB}/output_summary.csv"
+BANDS: Final = f"{NA13B_TAB}/bands.csv"
+NA13B: Final = (
+    COVERAGE,
+    WATCH_OPEN,
+    SELECTION,
+    CONDITIONING,
+    SELECTIVE_BOOKS,
+    HISTOGRAMS,
+    OUTPUT_SUMMARY,
+    BANDS,
+)
 
 KEYS: Final[dict[str, tuple[str, ...]]] = {
     V_DECILES: ("model", "figure", "group", "point"),
@@ -90,6 +111,7 @@ KEYS: Final[dict[str, tuple[str, ...]]] = {
     ENCODING: ("split", "model", "encoding"),
     COMPANY_ID: ("model",),
     PROBES: ("model",),
+    **dict.fromkeys(NA13B, ("key",)),  # each holds its own unique row key
 }
 
 

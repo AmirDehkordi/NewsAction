@@ -2,9 +2,13 @@
 ``figures.latex``).
 
 - NA-12's tables are byte-identical copies whose keys equal NA-12's ``keys.json``; the keyed copies equal
-  their source cells; the flattened tables copy their JSON values;
+  their source cells (NA-13b's with their own key); the flattened tables copy their JSON values;
 - the records: the S-CONV / gap-fade overlap reproduces NA-13 REPORT §4, the spend table the ledgers and
   reports, the release dates the NA-05 catalog and the operator's file, the deviations PREREG §15 row by row;
+- a DSR states the N it was computed with: NA-13's books the trials in the ledger when NA-13 ran (t20's
+  n_trials), NA-13b's books theirs (t39's), not the ledger's current count (t22);
+- NA-13b's LaTeX tables are appendix tables that say "Exploratory (post hoc)" and name NA-13b; t38 marks the
+  conditions seen on test, t39 has both exits of every book and t37 prints the pre-registered D1 results;
 - the LaTeX: at most six main tables; booktabs rules and no vertical rule; threeparttable notes; siunitx
   S columns; a caption above with a label; no raw underscore or internal key in the visible text; every
   number a cited cell of ``keys.json``; the operator's labels on the vendor-label rows, the anchor, span-02;
@@ -65,7 +69,10 @@ def test_na12_copies_are_byte_identical_and_keep_na12_keys() -> None:
 def test_keyed_copies_equal_their_sources(name: str, path: str) -> None:
     mine = pd.read_csv(T / f"{name}.csv")
     src = pd.read_csv(ROOT / path)
-    pd.testing.assert_frame_equal(mine.drop(columns=["key"]), src, check_exact=False, rtol=1e-12)
+    if "key" in src.columns:  # NA-13b's tables hold their own key, which the copy keeps
+        pd.testing.assert_frame_equal(mine, src, check_exact=False, rtol=1e-12)
+    else:
+        pd.testing.assert_frame_equal(mine.drop(columns=["key"]), src, check_exact=False, rtol=1e-12)
     assert mine["key"].is_unique
 
 
@@ -105,7 +112,9 @@ def test_spend_matches_the_ledgers_and_reports() -> None:
     assert t.loc["fmp_requests", "value"] == 15858 and t.loc["fmp_requests", "cap"] == 17000
     assert t.loc["kaggle_na08_gpu_hours", "value"] == 23.38 and t.loc["kaggle_na11_gpu_hours", "value"] == 2.0
     lines = (ROOT / "ledgers" / "trials.jsonl").read_text(encoding="utf-8").count("\n")
-    assert t.loc["trials", "value"] == lines == 545
+    assert t.loc["trials", "value"] == lines  # the ledger now; NA-13's DSRs used the 545 rows it then held
+    t20 = pd.read_csv(T / "t20_strategies.csv")
+    assert (t20["n_trials"] == 545).all() and lines >= 545
 
 
 def test_release_dates_follow_the_sample() -> None:
@@ -123,7 +132,7 @@ def test_release_dates_follow_the_sample() -> None:
 def test_deviations_summary_follows_prereg_15_row_by_row() -> None:
     log = tb.prereg_rows((ROOT / tb.PREREG).read_text(encoding="utf-8"))
     t34 = pd.read_csv(T / "t34_prereg_deviations.csv")
-    assert len(t34) == len(log) >= 63
+    assert len(t34) == len(log) >= 65
     for r, (_, s) in zip(log, t34.iterrows(), strict=True):
         assert s["date"] == r["date"] and s["freeze"] == r["timing"].split()[0].lower()
     assert set(t34["freeze"]) == {"before", "after"}
@@ -336,3 +345,38 @@ def test_the_outline_maps_every_table_to_its_section() -> None:
     assert set(tb.SECTION) == set(csvs)
     for t in _latex():
         assert f"`{t['file']}`" in outline, t["file"]
+
+
+def test_a_dsr_states_the_n_it_was_computed_with() -> None:
+    cited = {t["name"]: t["cells"] for t in _latex()}
+    n13 = "t20_strategies/test|S-CONV|laya_fin|D2|u|close_t+5|all/n_trials"
+    for name in ("tab6_strategies", "t20_strategies"):
+        assert n13 in cited[name] and "t22_spend/trials/value" not in cited[name], name
+    caps = (ROOT / "artifacts" / "NA-14" / "captions.yaml").read_text(encoding="utf-8")
+    assert "t22_spend/trials/value" not in caps and f"{{{{{n13}@int}}}}" in caps
+    t39 = pd.read_csv(T / "t39_conditioning_books.csv")
+    assert t39["n_trials"].nunique() == 1
+    assert [c for c in cited["t39_conditioning_books"] if c.endswith("/n_trials")]
+
+
+def test_na13b_latex_tables() -> None:
+    tables = {t["name"]: t for t in _latex()}
+    na13b = ("t36_selective_coverage", "t37_watch_open", "t38_conditioning", "t39_conditioning_books")
+    for name in (*na13b, "t43_band_disclosure"):
+        tex = (T / f"{name}.tex").read_text(encoding="utf-8")
+        assert tables[name]["section"] == latex.APPENDIX, name
+        assert r"\caption{Exploratory (post hoc):" in tex and "NA-13b" in tex, name
+    t38 = pd.read_csv(T / "t38_conditioning.csv")
+    tex = (T / "t38_conditioning.tex").read_text(encoding="utf-8")
+    assert tex.count("[seen on test]") == int(t38["seen_on_test"].sum()) + 1  # the rows and their note
+    assert tex.count("& yes &") == int(t38["selected"].sum())
+    t39 = pd.read_csv(T / "t39_conditioning_books.csv")
+    tex = (T / "t39_conditioning_books.tex").read_text(encoding="utf-8")
+    assert tex.count("& $C_t$ &") == tex.count("& $t{+}1$ &") == len(t39) // 2
+    b = [c for c in tables["t37_watch_open"]["cells"] if not c.startswith("t37_watch_open/")]
+    assert len(b) == 12 and {c.split("/", 1)[0] for c in b} == {
+        "t2_h2_over_under",
+        "t6_convergence_ladder",
+        "t7_gap_closure",
+        "t20_strategies",
+    }

@@ -2,7 +2,7 @@
 
     uv run python -m newsaction.figures.paper [--root DIR] [--write-digests]
 
-1. **Inputs.** Each file NA-14 reads (``INPUTS``: the NA-03 … NA-13 artifacts, NA-13's stored test
+1. **Inputs.** Each file NA-14 reads (``INPUTS``: the NA-03 … NA-13b artifacts, NA-13's stored test
    positions and
    books, the operator's input file, the captions, two configs and the ledgers) must have the sha256
    recorded in

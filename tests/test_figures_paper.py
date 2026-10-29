@@ -1,6 +1,6 @@
 """NA-14 AC1 and operator item 2: ``make paper`` runs offline, reproduces every digest and writes no ledger.
 
-- a full rebuild in a scratch copy of the repository (the NA-03 … NA-13 artifacts, PREREG and the
+- a full rebuild in a scratch copy of the repository (the NA-03 … NA-13b artifacts, PREREG and the
   ledgers linked, NA-13's stored positions, books and placebo books copied with the manifest) exits 0 with
   every output digest equal, writes the committed bytes, leaves every ``ledgers/*.jsonl`` byte-identical and
   imports neither the decision-model client, nor ``newsaction.lock``, nor ``panel.targets`` /
@@ -28,7 +28,13 @@ from newsaction.figures import paper
 from newsaction.figures import sources as sc
 from newsaction.paths import ROOT, Layout
 
-LINKED = (*(f"artifacts/NA-{n:02d}" for n in range(3, 14)), "ledgers", "configs", "docs/PREREG.md")
+LINKED = (
+    *(f"artifacts/NA-{n:02d}" for n in range(3, 14)),
+    "artifacts/NA-13b",
+    "ledgers",
+    "configs",
+    "docs/PREREG.md",
+)
 NA14_INPUTS = ("inputs", "captions.yaml", "digests.json")
 
 

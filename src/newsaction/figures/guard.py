@@ -8,8 +8,9 @@
 - a main figure's title or caption citing an exploratory table or an exploratory row (``captions.yaml``);
 - a main LaTeX table (T1–T6) printing a cell of one (``tables/latex.json``);
 - a main figure's CSV plotting a row of one (``figures/*.csv``, its ``source`` and ``key``), read from the
-  NA-14 table or from the NA-12 table it copies, or any upstream row whose key names NA-13's "exploratory"
-  family (its MA-cross fade in the strategy table and the Figure 7 data).
+  NA-14 table or from the NA-12 table it copies, any upstream row whose key names NA-13's "exploratory"
+  family (its MA-cross fade in the strategy table and the Figure 7 data), or any row of NA-13b's tables
+  (exploratory as a whole).
 
 The exploratory tables and rows are those ``tables/index.json`` marks (``tables.EXPLORATORY_TABLES`` and
 ``tables.EXPLORATORY_ROWS``); a figure is main unless it is an appendix figure (``figA…``).
@@ -30,6 +31,7 @@ from newsaction.paths import Layout, resolve_layout
 
 NA14_TABLE: Final = f"{sc.TABLES}/"
 EXPLORATORY_FAMILY: Final = "exploratory"  # NA-13's family of its post hoc MA-cross fade, a part of its keys
+EXPLORATORY_SOURCES: Final = (f"{sc.NA13B_TAB}/",)  # NA-13b's tables, exploratory as a whole
 
 
 def exploratory(layout: Layout | None = None) -> tuple[set[str], set[tuple[str, str]]]:
@@ -81,7 +83,11 @@ def violations(
         for src, key in zip(df["source"], df["key"], strict=True):
             s, k = str(src), str(key)
             table = Path(s).stem if s.startswith(NA14_TABLE) else copies.get(s, "")
-            if (table and (table in tables or (table, k) in rows)) or EXPLORATORY_FAMILY in k.split("|"):
+            if (
+                (table and (table in tables or (table, k) in rows))
+                or EXPLORATORY_FAMILY in k.split("|")
+                or s.startswith(EXPLORATORY_SOURCES)
+            ):
                 out.append(f"{fig} data: {table or s}/{k}")
     return out
 

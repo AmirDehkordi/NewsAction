@@ -48,6 +48,10 @@ MODULES: Final = {
     "figA13_probes": "newsaction.figures.appendix:probes",
     "figA14_exploratory_d0": "newsaction.figures.appendix:exploratory_d0",
     "figA15_exploratory_ma_cross": "newsaction.figures.appendix:exploratory_ma_cross",
+    "figA16_selective_coverage": "newsaction.figures.appendix:selective_coverage",
+    "figA17_watch_open": "newsaction.figures.appendix:watch_open",
+    "figA18_conditioning_map": "newsaction.figures.appendix:conditioning_map",
+    "figA19_output_histograms": "newsaction.figures.appendix:output_histograms",
 }
 
 
