@@ -1,0 +1,541 @@
+\begin{thebibliography}{66}
+\providecommand{\natexlab}[1]{#1}
+\providecommand{\url}[1]{\texttt{#1}}
+\expandafter\ifx\csname urlstyle\endcsname\relax
+  \providecommand{\doi}[1]{doi: #1}\else
+  \providecommand{\doi}{doi: \begingroup \urlstyle{rm}\Url}\fi
+
+\bibitem[Bailey and L{\'o}pez~de Prado(2014)]{bailey2014}
+David~H. Bailey and Marcos L{\'o}pez~de Prado.
+\newblock The deflated {Sharpe} ratio: Correcting for selection bias, backtest
+  overfitting, and non-normality.
+\newblock \emph{Journal of Portfolio Management}, 40\penalty0 (5):\penalty0
+  94--107, 2014.
+\newblock \doi{10.3905/jpm.2014.40.5.094}.
+
+\bibitem[Barberis et~al.(1998)Barberis, Shleifer, and Vishny]{barberis1998}
+Nicholas Barberis, Andrei Shleifer, and Robert Vishny.
+\newblock A model of investor sentiment.
+\newblock \emph{Journal of Financial Economics}, 49\penalty0 (3):\penalty0
+  307--343, 1998.
+\newblock \doi{10.1016/S0304-405X(98)00027-0}.
+
+\bibitem[Barlow et~al.(1972)Barlow, Bartholomew, Bremner, and
+  Brunk]{barlow1972}
+Richard~E. Barlow, D.~J. Bartholomew, J.~M. Bremner, and H.~D. Brunk.
+\newblock \emph{Statistical Inference under Order Restrictions: The Theory and
+  Application of Isotonic Regression}.
+\newblock Wiley Series in Probability and Mathematical Statistics. John Wiley
+  \& Sons, 1972.
+\newblock ISBN 0-471-04970-0.
+
+\bibitem[Benjamini and Hochberg(1995)]{benjamini1995}
+Yoav Benjamini and Yosef Hochberg.
+\newblock Controlling the false discovery rate: A practical and powerful
+  approach to multiple testing.
+\newblock \emph{Journal of the Royal Statistical Society: Series B
+  (Methodological)}, 57\penalty0 (1):\penalty0 289--300, 1995.
+\newblock \doi{10.1111/j.2517-6161.1995.tb02031.x}.
+
+\bibitem[Bernard and Thomas(1989)]{bernard1989}
+Victor~L. Bernard and Jacob~K. Thomas.
+\newblock Post-earnings-announcement drift: Delayed price response or risk
+  premium?
+\newblock \emph{Journal of Accounting Research}, 27:\penalty0 1--36, 1989.
+\newblock \doi{10.2307/2491062}.
+
+\bibitem[Boudoukh et~al.(2019)Boudoukh, Feldman, Kogan, and
+  Richardson]{boudoukh2019}
+Jacob Boudoukh, Ronen Feldman, Shimon Kogan, and Matthew Richardson.
+\newblock Information, trading, and volatility: Evidence from firm-specific
+  news.
+\newblock \emph{The Review of Financial Studies}, 32\penalty0 (3):\penalty0
+  992--1033, 2019.
+\newblock \doi{10.1093/rfs/hhy083}.
+
+\bibitem[Busse and Green(2002)]{busse2002}
+Jeffrey~A. Busse and T.~Clifton Green.
+\newblock Market efficiency in real time.
+\newblock \emph{Journal of Financial Economics}, 65\penalty0 (3):\penalty0
+  415--437, 2002.
+\newblock \doi{10.1016/S0304-405X(02)00148-4}.
+
+\bibitem[Cameron et~al.(2011)Cameron, Gelbach, and Miller]{cameron2011}
+A.~Colin Cameron, Jonah~B. Gelbach, and Douglas~L. Miller.
+\newblock Robust inference with multiway clustering.
+\newblock \emph{Journal of Business \& Economic Statistics}, 29\penalty0
+  (2):\penalty0 238--249, 2011.
+\newblock \doi{10.1198/jbes.2010.07136}.
+
+\bibitem[Carlini et~al.(2023)Carlini, Ippolito, Jagielski, Lee, Tramer, and
+  Zhang]{carlini2023}
+Nicholas Carlini, Daphne Ippolito, Matthew Jagielski, Katherine Lee, Florian
+  Tramer, and Chiyuan Zhang.
+\newblock Quantifying memorization across neural language models.
+\newblock In \emph{International Conference on Learning Representations}, 2023.
+\newblock URL \url{https://openreview.net/forum?id=TatRHT_1cK}.
+
+\bibitem[Chan(2003)]{chan2003}
+Wesley~S. Chan.
+\newblock Stock price reaction to news and no-news: drift and reversal after
+  headlines.
+\newblock \emph{Journal of Financial Economics}, 70\penalty0 (2):\penalty0
+  223--260, 2003.
+\newblock \doi{10.1016/S0304-405X(03)00146-6}.
+
+\bibitem[Chen et~al.(2022)Chen, Kelly, and Xiu]{chen2022}
+Yifei Chen, Bryan~T. Kelly, and Dacheng Xiu.
+\newblock Expected returns and large language models.
+\newblock SSRN working paper 4416687, 2022.
+\newblock URL \url{https://ssrn.com/abstract=4416687}.
+\newblock Working paper, version of February 2026.
+
+\bibitem[{Convai Innovations}(2026)]{convaiinnovations2026}
+{Convai Innovations}.
+\newblock Laya.
+\newblock \url{https://huggingface.co/convaiinnovations/laya}, 2026.
+\newblock Open-weights model on Hugging Face (repository
+  convaiinnovations/laya, Apache-2.0); repository created 2026-09-18; accessed
+  2026-10-29.
+
+\bibitem[Corsi(2009)]{corsi2009}
+Fulvio Corsi.
+\newblock A simple approximate long-memory model of realized volatility.
+\newblock \emph{Journal of Financial Econometrics}, 7\penalty0 (2):\penalty0
+  174--196, 2009.
+\newblock \doi{10.1093/jjfinec/nbp001}.
+
+\bibitem[Daniel et~al.(1998)Daniel, Hirshleifer, and Subrahmanyam]{daniel1998}
+Kent Daniel, David Hirshleifer, and Avanidhar Subrahmanyam.
+\newblock Investor psychology and security market under- and overreactions.
+\newblock \emph{Journal of Finance}, 53\penalty0 (6):\penalty0 1839--1885,
+  1998.
+\newblock \doi{10.1111/0022-1082.00077}.
+
+\bibitem[De~Bondt and Thaler(1985)]{debondt1985}
+Werner F.~M. De~Bondt and Richard Thaler.
+\newblock Does the stock market overreact?
+\newblock \emph{Journal of Finance}, 40\penalty0 (3):\penalty0 793--805, 1985.
+\newblock \doi{10.1111/j.1540-6261.1985.tb05004.x}.
+
+\bibitem[DellaVigna and Pollet(2009)]{dellavigna2009}
+Stefano DellaVigna and Joshua~M. Pollet.
+\newblock Investor inattention and {Friday} earnings announcements.
+\newblock \emph{The Journal of Finance}, 64\penalty0 (2):\penalty0 709--749,
+  2009.
+\newblock \doi{10.1111/j.1540-6261.2009.01447.x}.
+
+\bibitem[Driscoll and Kraay(1998)]{driscoll1998}
+John~C. Driscoll and Aart~C. Kraay.
+\newblock Consistent covariance matrix estimation with spatially dependent
+  panel data.
+\newblock \emph{Review of Economics and Statistics}, 80\penalty0 (4):\penalty0
+  549--560, 1998.
+\newblock \doi{10.1162/003465398557825}.
+
+\bibitem[Fama(1970)]{fama1970}
+Eugene~F. Fama.
+\newblock Efficient capital markets: A review of theory and empirical work.
+\newblock \emph{Journal of Finance}, 25\penalty0 (2):\penalty0 383--417, 1970.
+\newblock \doi{10.2307/2325486}.
+
+\bibitem[Fama(1998)]{fama1998}
+Eugene~F. Fama.
+\newblock Market efficiency, long-term returns, and behavioral finance.
+\newblock \emph{Journal of Financial Economics}, 49\penalty0 (3):\penalty0
+  283--306, 1998.
+\newblock \doi{10.1016/S0304-405X(98)00026-9}.
+
+\bibitem[Fedyk and Hodson(2023)]{fedyk2023}
+Anastassia Fedyk and James Hodson.
+\newblock When can the market identify old news?
+\newblock \emph{Journal of Financial Economics}, 149\penalty0 (1):\penalty0
+  92--113, 2023.
+\newblock \doi{10.1016/j.jfineco.2023.04.008}.
+
+\bibitem[Geifman and El-Yaniv(2017)]{geifman2017}
+Yonatan Geifman and Ran El-Yaniv.
+\newblock Selective classification for deep neural networks.
+\newblock In I.~Guyon, U.~Von~Luxburg, S.~Bengio, H.~Wallach, R.~Fergus,
+  S.~Vishwanathan, and R.~Garnett, editors, \emph{Advances in Neural
+  Information Processing Systems}, volume~30. Curran Associates, Inc., 2017.
+\newblock URL
+  \url{https://proceedings.neurips.cc/paper_files/paper/2017/hash/4a8423d5e91fda00bb7e46540e2b0cf1-Abstract.html}.
+
+\bibitem[Glasserman and Lin(2024)]{glasserman2024}
+Paul Glasserman and Caden Lin.
+\newblock Assessing look-ahead bias in stock return predictions generated by
+  {GPT} sentiment analysis.
+\newblock \emph{Journal of Financial Data Science}, 6\penalty0 (1):\penalty0
+  25--42, 2024.
+\newblock \doi{10.3905/jfds.2023.1.143}.
+\newblock Earlier version: arXiv:2309.17322.
+
+\bibitem[Golchin and Surdeanu(2024)]{golchin2024}
+Shahriar Golchin and Mihai Surdeanu.
+\newblock Time travel in {LLMs}: Tracing data contamination in large language
+  models.
+\newblock In B.~Kim, Y.~Yue, S.~Chaudhuri, K.~Fragkiadaki, M.~Khan, and Y.~Sun,
+  editors, \emph{International Conference on Learning Representations}, pages
+  43008--43029, 2024.
+\newblock URL
+  \url{https://proceedings.iclr.cc/paper_files/paper/2024/hash/bc39a59c49b731c51398ad6b12f301d3-Abstract-Conference.html}.
+
+\bibitem[Guo et~al.(2017)Guo, Pleiss, Sun, and Weinberger]{guo2017}
+Chuan Guo, Geoff Pleiss, Yu~Sun, and Kilian~Q. Weinberger.
+\newblock On calibration of modern neural networks.
+\newblock In Doina Precup and Yee~Whye Teh, editors, \emph{Proceedings of the
+  34th International Conference on Machine Learning}, volume~70 of
+  \emph{Proceedings of Machine Learning Research}, pages 1321--1330. PMLR,
+  2017.
+\newblock URL \url{https://proceedings.mlr.press/v70/guo17a.html}.
+
+\bibitem[Halawi et~al.(2024)Halawi, Zhang, Yueh-Han, and
+  Steinhardt]{halawi2024}
+Danny Halawi, Fred Zhang, Chen Yueh-Han, and Jacob Steinhardt.
+\newblock Approaching human-level forecasting with language models.
+\newblock In A.~Globerson, L.~Mackey, D.~Belgrave, A.~Fan, U.~Paquet,
+  J.~Tomczak, and C.~Zhang, editors, \emph{Advances in Neural Information
+  Processing Systems}, volume~37, pages 50426--50468. Curran Associates, Inc.,
+  2024.
+\newblock \doi{10.52202/079017-1598}.
+\newblock URL
+  \url{https://proceedings.neurips.cc/paper_files/paper/2024/hash/5a5acfd0876c940d81619c1dc60e7748-Abstract-Conference.html}.
+
+\bibitem[Hansen et~al.(2011)Hansen, Lunde, and Nason]{hansen2011}
+Peter~R. Hansen, Asger Lunde, and James~M. Nason.
+\newblock The model confidence set.
+\newblock \emph{Econometrica}, 79\penalty0 (2):\penalty0 453--497, 2011.
+\newblock \doi{10.3982/ECTA5771}.
+
+\bibitem[Harvey(2017)]{harvey2017}
+Campbell~R. Harvey.
+\newblock Presidential address: The scientific outlook in financial economics.
+\newblock \emph{Journal of Finance}, 72\penalty0 (4):\penalty0 1399--1440,
+  2017.
+\newblock \doi{10.1111/jofi.12530}.
+
+\bibitem[Harvey et~al.(2016)Harvey, Liu, and Zhu]{harvey2016}
+Campbell~R. Harvey, Yan Liu, and Heqing Zhu.
+\newblock {\ldots} and the cross-section of expected returns.
+\newblock \emph{Review of Financial Studies}, 29\penalty0 (1):\penalty0 5--68,
+  2016.
+\newblock \doi{10.1093/rfs/hhv059}.
+
+\bibitem[Hausman(2001)]{hausman2001}
+Jerry Hausman.
+\newblock Mismeasured variables in econometric analysis: Problems from the
+  right and problems from the left.
+\newblock \emph{Journal of Economic Perspectives}, 15\penalty0 (4):\penalty0
+  57--67, 2001.
+\newblock \doi{10.1257/jep.15.4.57}.
+
+\bibitem[He et~al.(2026)He, Lv, Manela, and Wu]{he2026}
+Songrun He, Linying Lv, Asaf Manela, and Jimmy Wu.
+\newblock Chronologically consistent large language models.
+\newblock \emph{Journal of Financial Economics}, 185:\penalty0 104374, 2026.
+\newblock \doi{10.1016/j.jfineco.2026.104374}.
+\newblock Article 104374. Earlier version: arXiv:2502.21206.
+
+\bibitem[Hirshleifer et~al.(2009)Hirshleifer, Lim, and Teoh]{hirshleifer2009}
+David Hirshleifer, Sonya~Seongyeon Lim, and Siew~Hong Teoh.
+\newblock Driven to distraction: Extraneous events and underreaction to
+  earnings news.
+\newblock \emph{The Journal of Finance}, 64\penalty0 (5):\penalty0 2289--2325,
+  2009.
+\newblock \doi{10.1111/j.1540-6261.2009.01501.x}.
+
+\bibitem[Hoerl and Kennard(1970)]{hoerl1970}
+Arthur~E. Hoerl and Robert~W. Kennard.
+\newblock Ridge regression: Biased estimation for nonorthogonal problems.
+\newblock \emph{Technometrics}, 12\penalty0 (1):\penalty0 55--67, 1970.
+\newblock \doi{10.1080/00401706.1970.10488634}.
+
+\bibitem[Holm(1979)]{holm1979}
+Sture Holm.
+\newblock A simple sequentially rejective multiple test procedure.
+\newblock \emph{Scandinavian Journal of Statistics}, 6\penalty0 (2):\penalty0
+  65--70, 1979.
+
+\bibitem[Hong et~al.(2000)Hong, Lim, and Stein]{hong2000}
+Harrison Hong, Terence Lim, and Jeremy~C. Stein.
+\newblock Bad news travels slowly: Size, analyst coverage, and the
+  profitability of momentum strategies.
+\newblock \emph{The Journal of Finance}, 55\penalty0 (1):\penalty0 265--295,
+  2000.
+\newblock \doi{10.1111/0022-1082.00206}.
+
+\bibitem[Hou et~al.(2020)Hou, Xue, and Zhang]{hou2020}
+Kewei Hou, Chen Xue, and Lu~Zhang.
+\newblock Replicating anomalies.
+\newblock \emph{Review of Financial Studies}, 33\penalty0 (5):\penalty0
+  2019--2133, 2020.
+\newblock \doi{10.1093/rfs/hhy131}.
+
+\bibitem[Jensen et~al.(2023)Jensen, Kelly, and Pedersen]{jensen2023}
+Theis~Ingerslev Jensen, Bryan Kelly, and Lasse~Heje Pedersen.
+\newblock Is there a replication crisis in finance?
+\newblock \emph{Journal of Finance}, 78\penalty0 (5):\penalty0 2465--2518,
+  2023.
+\newblock \doi{10.1111/jofi.13249}.
+
+\bibitem[Jiang et~al.(2021)Jiang, Li, and Wang]{jiang2021}
+Hao Jiang, Sophia~Zhengzi Li, and Hao Wang.
+\newblock Pervasive underreaction: Evidence from high-frequency data.
+\newblock \emph{Journal of Financial Economics}, 141\penalty0 (2):\penalty0
+  573--599, 2021.
+\newblock \doi{10.1016/j.jfineco.2021.04.003}.
+
+\bibitem[Kadavath et~al.(2022)Kadavath, Conerly, Askell, Henighan, Drain,
+  Perez, Schiefer, Hatfield-Dodds, DasSarma, Tran-Johnson, Johnston, El-Showk,
+  Jones, Elhage, Hume, Chen, Bai, Bowman, Fort, Ganguli, Hernandez, Jacobson,
+  Kernion, Kravec, Lovitt, Ndousse, Olsson, Ringer, Amodei, Brown, Clark,
+  Joseph, Mann, McCandlish, Olah, and Kaplan]{kadavath2022}
+Saurav Kadavath, Tom Conerly, Amanda Askell, Tom Henighan, Dawn Drain, Ethan
+  Perez, Nicholas Schiefer, Zac Hatfield-Dodds, Nova DasSarma, Eli
+  Tran-Johnson, Scott Johnston, Sheer El-Showk, Andy Jones, Nelson Elhage,
+  Tristan Hume, Anna Chen, Yuntao Bai, Sam Bowman, Stanislav Fort, Deep
+  Ganguli, Danny Hernandez, Josh Jacobson, Jackson Kernion, Shauna Kravec,
+  Liane Lovitt, Kamal Ndousse, Catherine Olsson, Sam Ringer, Dario Amodei, Tom
+  Brown, Jack Clark, Nicholas Joseph, Ben Mann, Sam McCandlish, Chris Olah, and
+  Jared Kaplan.
+\newblock Language models (mostly) know what they know, 2022.
+\newblock URL \url{https://arxiv.org/abs/2207.05221}.
+
+\bibitem[Kargarzadeh et~al.(2026)Kargarzadeh, Khaledian, Parvini, Ghatak, and
+  Khaledian]{kargarzadeh2026}
+Alireza Kargarzadeh, Nariman Khaledian, Navid Parvini, Sid Ghatak, and Arman
+  Khaledian.
+\newblock Buy the rumor, sell the news: When is news priced in?
+\newblock arXiv preprint arXiv:2608.14014, 2026.
+\newblock URL \url{https://arxiv.org/abs/2608.14014}.
+\newblock Version 2, 18 October 2026. Accepted at the 3rd Workshop on LLMs and
+  Generative AI for Finance (AI4F 2026), held in conjunction with ICAIF 2026,
+  Milan, Italy.
+
+\bibitem[Ke et~al.(2017)Ke, Meng, Finley, Wang, Chen, Ma, Ye, and Liu]{ke2017}
+Guolin Ke, Qi~Meng, Thomas Finley, Taifeng Wang, Wei Chen, Weidong Ma, Qiwei
+  Ye, and Tie-Yan Liu.
+\newblock {LightGBM}: A highly efficient gradient boosting decision tree.
+\newblock In I.~Guyon, U.~Von~Luxburg, S.~Bengio, H.~Wallach, R.~Fergus,
+  S.~Vishwanathan, and R.~Garnett, editors, \emph{Advances in Neural
+  Information Processing Systems}, volume~30. Curran Associates, Inc., 2017.
+\newblock URL
+  \url{https://proceedings.neurips.cc/paper_files/paper/2017/hash/6449f44a102fde848669bdd9eb6b76fa-Abstract.html}.
+
+\bibitem[Ke et~al.(2019)Ke, Kelly, and Xiu]{ke2019}
+Zheng~Tracy Ke, Bryan~T. Kelly, and Dacheng Xiu.
+\newblock Predicting returns with text data.
+\newblock NBER Working Paper 26186, 2019.
+\newblock URL \url{https://www.nber.org/papers/w26186}.
+
+\bibitem[Kelly et~al.(2026)Kelly, Su, and Zhang]{kelly2026}
+Bryan~T. Kelly, Yinan Su, and Chao Zhang.
+\newblock Explaining realized returns: {Roll's} {$R^2$} 40 years later.
+\newblock SSRN working paper 7544058, 2026.
+\newblock URL \url{https://ssrn.com/abstract=7544058}.
+\newblock Also NBER Working Paper 35885, October 2026, doi:10.3386/w35885.
+
+\bibitem[Lo(2002)]{lo2002}
+Andrew~W. Lo.
+\newblock The statistics of {Sharpe} ratios.
+\newblock \emph{Financial Analysts Journal}, 58\penalty0 (4):\penalty0 36--52,
+  2002.
+\newblock \doi{10.2469/faj.v58.n4.2453}.
+
+\bibitem[Lopez-Lira and Tang(2026)]{lopezlira2026}
+Alejandro Lopez-Lira and Yuehua Tang.
+\newblock Can {ChatGPT} forecast stock price movements? return predictability
+  and large language models.
+\newblock \emph{Journal of Financial Economics}, 184:\penalty0 104335, 2026.
+\newblock \doi{10.1016/j.jfineco.2026.104335}.
+\newblock Article 104335. Earlier versions: arXiv:2304.07619 and SSRN working
+  paper 4412788.
+
+\bibitem[Lopez-Lira et~al.(2025)Lopez-Lira, Tang, and Zhu]{lopezlira2025}
+Alejandro Lopez-Lira, Yuehua Tang, and Mingyin Zhu.
+\newblock The memorization problem: Can we trust {LLMs'} economic forecasts?
+\newblock arXiv preprint arXiv:2504.14765, 2025.
+\newblock URL \url{https://arxiv.org/abs/2504.14765}.
+\newblock Also SSRN working paper 5217505.
+
+\bibitem[Loshchilov and Hutter(2019)]{loshchilov2019}
+Ilya Loshchilov and Frank Hutter.
+\newblock Decoupled weight decay regularization.
+\newblock In \emph{International Conference on Learning Representations}, 2019.
+\newblock URL \url{https://openreview.net/forum?id=Bkg6RiCqY7}.
+
+\bibitem[Lou et~al.(2019)Lou, Polk, and Skouras]{lou2019}
+Dong Lou, Christopher Polk, and Spyros Skouras.
+\newblock A tug of war: Overnight versus intraday expected returns.
+\newblock \emph{Journal of Financial Economics}, 134\penalty0 (1):\penalty0
+  192--213, 2019.
+\newblock \doi{10.1016/j.jfineco.2019.03.011}.
+
+\bibitem[Newey and West(1987)]{newey1987}
+Whitney~K. Newey and Kenneth~D. West.
+\newblock A simple, positive semi-definite, heteroskedasticity and
+  autocorrelation consistent covariance matrix.
+\newblock \emph{Econometrica}, 55\penalty0 (3):\penalty0 703--708, 1987.
+\newblock \doi{10.2307/1913610}.
+
+\bibitem[Olken(2015)]{olken2015}
+Benjamin~A. Olken.
+\newblock Promises and perils of pre-analysis plans.
+\newblock \emph{Journal of Economic Perspectives}, 29\penalty0 (3):\penalty0
+  61--80, 2015.
+\newblock \doi{10.1257/jep.29.3.61}.
+
+\bibitem[Pakdaman~Naeini et~al.(2015)Pakdaman~Naeini, Cooper, and
+  Hauskrecht]{pakdamannaeini2015}
+Mahdi Pakdaman~Naeini, Gregory Cooper, and Milos Hauskrecht.
+\newblock Obtaining well calibrated probabilities using {Bayesian} binning.
+\newblock In \emph{Proceedings of the AAAI Conference on Artificial
+  Intelligence}, volume~29. Association for the Advancement of Artificial
+  Intelligence (AAAI), 2015.
+\newblock \doi{10.1609/aaai.v29i1.9602}.
+\newblock URL \url{https://ojs.aaai.org/index.php/AAAI/article/view/9602}.
+
+\bibitem[Patell and Wolfson(1984)]{patell1984}
+James~M. Patell and Mark~A. Wolfson.
+\newblock The intraday speed of adjustment of stock prices to earnings and
+  dividend announcements.
+\newblock \emph{Journal of Financial Economics}, 13\penalty0 (2):\penalty0
+  223--252, 1984.
+\newblock \doi{10.1016/0304-405X(84)90024-2}.
+
+\bibitem[Politis and Romano(1994)]{politis1994}
+Dimitris~N. Politis and Joseph~P. Romano.
+\newblock The stationary bootstrap.
+\newblock \emph{Journal of the American Statistical Association}, 89\penalty0
+  (428):\penalty0 1303--1313, 1994.
+\newblock \doi{10.1080/01621459.1994.10476870}.
+
+\bibitem[Roll(1988)]{roll1988}
+Richard Roll.
+\newblock {$R^2$}.
+\newblock \emph{Journal of Finance}, 43\penalty0 (3):\penalty0 541--566, 1988.
+\newblock \doi{10.1111/j.1540-6261.1988.tb04591.x}.
+
+\bibitem[Sainz et~al.(2023)Sainz, Campos, Garc{\'\i}a-Ferrero, Etxaniz, {Lopez
+  de Lacalle}, and Agirre]{sainz2023}
+Oscar Sainz, Jon Campos, Iker Garc{\'\i}a-Ferrero, Julen Etxaniz, Oier {Lopez
+  de Lacalle}, and Eneko Agirre.
+\newblock {NLP} evaluation in trouble: On the need to measure {LLM} data
+  contamination for each benchmark.
+\newblock In Houda Bouamor, Juan Pino, and Kalika Bali, editors, \emph{Findings
+  of the Association for Computational Linguistics: {EMNLP} 2023}, pages
+  10776--10787, Singapore, December 2023. Association for Computational
+  Linguistics.
+\newblock \doi{10.18653/v1/2023.findings-emnlp.722}.
+\newblock URL \url{https://aclanthology.org/2023.findings-emnlp.722/}.
+
+\bibitem[Sarkar and Vafa(2024)]{sarkar2024}
+Suproteem Sarkar and Keyon Vafa.
+\newblock Lookahead bias in pretrained language models.
+\newblock SSRN working paper 4754678, 2024.
+\newblock URL \url{https://ssrn.com/abstract=4754678}.
+
+\bibitem[Savor(2012)]{savor2012}
+Pavel~G. Savor.
+\newblock Stock returns after major price shocks: The impact of information.
+\newblock \emph{Journal of Financial Economics}, 106\penalty0 (3):\penalty0
+  635--659, 2012.
+\newblock \doi{10.1016/j.jfineco.2012.06.011}.
+
+\bibitem[Schoenegger et~al.(2024)Schoenegger, Tuminauskaite, Park, Bastos, and
+  Tetlock]{schoenegger2024}
+Philipp Schoenegger, Indre Tuminauskaite, Peter~S. Park, Rafael Valdece~Sousa
+  Bastos, and Philip~E. Tetlock.
+\newblock Wisdom of the silicon crowd: {LLM} ensemble prediction capabilities
+  rival human crowd accuracy.
+\newblock \emph{Science Advances}, 10\penalty0 (45):\penalty0 eadp1528, 2024.
+\newblock \doi{10.1126/sciadv.adp1528}.
+
+\bibitem[Shapley(1953)]{shapley1953}
+L.~S. Shapley.
+\newblock A value for {$n$}-person games.
+\newblock In Harold~William Kuhn and Albert~William Tucker, editors,
+  \emph{Contributions to the Theory of Games, Volume {II}}, number~28 in Annals
+  of Mathematics Studies, pages 307--318. Princeton University Press, 1953.
+\newblock \doi{10.1515/9781400881970-018}.
+
+\bibitem[Tetlock(2007)]{tetlock2007}
+Paul~C. Tetlock.
+\newblock Giving content to investor sentiment: The role of media in the stock
+  market.
+\newblock \emph{Journal of Finance}, 62\penalty0 (3):\penalty0 1139--1168,
+  2007.
+\newblock \doi{10.1111/j.1540-6261.2007.01232.x}.
+
+\bibitem[Tetlock(2011)]{tetlock2011}
+Paul~C. Tetlock.
+\newblock All the news that's fit to reprint: Do investors react to stale
+  information?
+\newblock \emph{The Review of Financial Studies}, 24\penalty0 (5):\penalty0
+  1481--1512, 2011.
+\newblock \doi{10.1093/rfs/hhq141}.
+
+\bibitem[Tetlock et~al.(2008)Tetlock, Saar-Tsechansky, and
+  Macskassy]{tetlock2008}
+Paul~C. Tetlock, Maytal Saar-Tsechansky, and Sofus Macskassy.
+\newblock More than words: Quantifying language to measure firms' fundamentals.
+\newblock \emph{Journal of Finance}, 63\penalty0 (3):\penalty0 1437--1467,
+  2008.
+\newblock \doi{10.1111/j.1540-6261.2008.01362.x}.
+
+\bibitem[Warner et~al.(2025)Warner, Chaffin, Clavi{\'e}, Weller, Hallstr{\"o}m,
+  Taghadouini, Gallagher, Biswas, Ladhak, Aarsen, Adams, Howard, and
+  Poli]{warner2025}
+Benjamin Warner, Antoine Chaffin, Benjamin Clavi{\'e}, Orion Weller, Oskar
+  Hallstr{\"o}m, Said Taghadouini, Alexis Gallagher, Raja Biswas, Faisal
+  Ladhak, Tom Aarsen, Griffin~Thomas Adams, Jeremy Howard, and Iacopo Poli.
+\newblock Smarter, better, faster, longer: A modern bidirectional encoder for
+  fast, memory efficient, and long context finetuning and inference.
+\newblock In Wanxiang Che, Joyce Nabende, Ekaterina Shutova, and Mohammad~Taher
+  Pilehvar, editors, \emph{Proceedings of the 63rd Annual Meeting of the
+  Association for Computational Linguistics (Volume 1: Long Papers)}, pages
+  2526--2547, Vienna, Austria, July 2025. Association for Computational
+  Linguistics.
+\newblock ISBN 979-8-89176-251-0.
+\newblock \doi{10.18653/v1/2025.acl-long.127}.
+\newblock URL \url{https://aclanthology.org/2025.acl-long.127/}.
+
+\bibitem[Wegmann et~al.(2026)Wegmann, Aggazzotti, Rivera~Soto, and
+  Nguyen]{wegmann2026}
+Anna Wegmann, Cristina Aggazzotti, Rafael~Alberto Rivera~Soto, and Dong Nguyen.
+\newblock A survey on representing linguistic style: Challenges and
+  opportunities.
+\newblock In Hung-Yi Lee, Sunipa Dev, Jessy Li, and Desmond Elliott, editors,
+  \emph{Proceedings of the 2026 Conference on Empirical Methods in Natural
+  Language Processing}, pages 6772--6806, Budapest, Hungary, October 2026.
+  Association for Computational Linguistics.
+\newblock URL \url{https://aclanthology.org/2026.emnlp-main.295/}.
+
+\bibitem[Wilson(1927)]{wilson1927}
+Edwin~B. Wilson.
+\newblock Probable inference, the law of succession, and statistical inference.
+\newblock \emph{Journal of the American Statistical Association}, 22\penalty0
+  (158):\penalty0 209--212, 1927.
+\newblock \doi{10.1080/01621459.1927.10502953}.
+
+\bibitem[Xiao et~al.(2024)Xiao, Liu, Zhang, Muennighoff, Lian, and
+  Nie]{xiao2024}
+Shitao Xiao, Zheng Liu, Peitian Zhang, Niklas Muennighoff, Defu Lian, and
+  Jian-Yun Nie.
+\newblock {C-Pack}: Packed resources for general {Chinese} embeddings.
+\newblock In \emph{Proceedings of the 47th International ACM SIGIR Conference
+  on Research and Development in Information Retrieval}, pages 641--649, New
+  York, NY, USA, 2024. ACM.
+\newblock \doi{10.1145/3626772.3657878}.
+
+\bibitem[Zhu et~al.(2026)Zhu, Feng, Han, Wang, Yang, Tang, You, and
+  Ji]{zhu2026}
+Kunlun Zhu, Tao Feng, Xu~Han, Heng Wang, Ling Yang, Xiangru Tang, Jiaxuan You,
+  and Heng Ji.
+\newblock {JevAgentHarness}: Benchmarking, deploying and training decision
+  models that share control with {LLMs}.
+\newblock arXiv preprint arXiv:2610.21412, 2026.
+\newblock URL \url{https://arxiv.org/abs/2610.21412}.
+
+\end{thebibliography}

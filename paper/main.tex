@@ -1,0 +1,134 @@
+% The NewsAction paper: an arXiv preprint (article, 11 pt, US letter, 1-inch margins, one column).
+%
+%   make paper-text   writes generated/numbers.tex (every result number, from NA-14's table keys) and
+%                     ../arxiv/abstract.txt, and checks the sources (ASCII only, no hard-coded result number)
+%   make paper-pdf    compiles this file with tectonic and checks the log (no error, no overfull box, no
+%                     undefined reference or citation, figures and tables numbered in order of first mention)
+%
+% The sources are ASCII only and use standard TeX Live packages and no fontspec, so that arXiv's pdflatex
+% compiles them as well as tectonic (XeTeX). Figures and tables are NA-14's, used as they are.
+\documentclass[11pt,letterpaper]{article}
+
+\usepackage{iftex}
+\usepackage[T1]{fontenc}
+\ifPDFTeX
+  \usepackage[utf8]{inputenc}
+  \input{glyphtounicode}
+  \pdfgentounicode=1
+\fi
+\usepackage{lmodern}
+\usepackage[margin=1in]{geometry}
+\usepackage{amsmath,amssymb}
+\usepackage{graphicx}
+\usepackage{booktabs,array,longtable,threeparttable,threeparttablex,pdflscape}
+\usepackage{siunitx}
+\sisetup{group-separator={,},group-minimum-digits=4,group-digits=integer,%
+  table-align-text-before=false,table-align-text-after=false}
+\usepackage[font=small,labelfont=bf,skip=4pt]{caption}
+\usepackage{enumitem}
+\usepackage{needspace}
+\usepackage{placeins}
+\usepackage{xcolor}
+\usepackage[round,authoryear]{natbib}
+\usepackage{microtype}
+\usepackage[hyperfootnotes=false]{hyperref}
+\hypersetup{
+  pdftitle={The Market Reads the News First: A Pre-Registered, Look-Ahead-Free Test of AI Decision Models
+    on Stock-Price Reactions},
+  pdfauthor={Amir Dehkordi, Arman Khaledian, Alireza Kargarzadeh, Nariman Khaledian, Navid Parvini},
+  pdfsubject={Large language models and AI decision models on financial news: a pre-registered,
+    look-ahead-free test of stock-price reactions},
+  pdfkeywords={large language models; AI decision models; financial news; stock returns; market efficiency;
+    look-ahead bias; memorization; pre-registration; overreaction and underreaction},
+  colorlinks=true,
+  linkcolor={blue!50!black},
+  citecolor={blue!50!black},
+  urlcolor={blue!50!black}
+}
+\setlength{\LTcapwidth}{\textwidth}
+
+% Floats: let a text page carry more of them, and fill a float page before starting one.
+\renewcommand{\topfraction}{0.9}
+\renewcommand{\bottomfraction}{0.8}
+\renewcommand{\textfraction}{0.07}
+\renewcommand{\floatpagefraction}{0.75}
+\setcounter{topnumber}{3}
+\setcounter{bottomnumber}{2}
+\setcounter{totalnumber}{4}
+
+% Where NA-14's figures and tables live (the arXiv bundle rewrites these two lines).
+\newcommand{\figdir}{../artifacts/NA-14/figures}
+\newcommand{\tabdir}{../artifacts/NA-14/tables}
+
+% Every result number: \res{name}, defined in generated/numbers.tex from paper/numbers.yaml.
+\input{generated/numbers}
+
+% Notation used throughout.
+\newcommand{\Nhat}{\hat N}
+\newcommand{\Ntilde}{\tilde N}
+\newcommand{\IC}{\mathrm{IC}}
+\newcommand{\AR}{\mathrm{AR}}
+\newcommand{\CARlvl}{\mathrm{CAR}^{\mathrm{lvl}}}
+\newcommand{\Glvl}{G^{\mathrm{lvl}}}
+\newcommand{\ECE}{\mathrm{ECE}}
+
+% A visible marker for what the authors must still provide.
+\newcommand{\placeholder}[1]{\textcolor{red}{\textbf{[#1]}}}
+
+\title{The Market Reads the News First: A Pre-Registered, Look-Ahead-Free Test of AI Decision Models on
+  Stock-Price Reactions%
+  \thanks{Intended arXiv categories: cs.AI (primary); cross-lists q-fin.ST, cs.LG and cs.CL.}%
+  \textsuperscript{,}\thanks{Data and code availability: \placeholder{data and code statement and the URL of the replication
+  package, to be provided by the authors}.}}
+\author{%
+  Amir Dehkordi\thanks{Corresponding author. \placeholder{affiliation and e-mail address to be provided}}
+  \and Arman Khaledian\thanks{\placeholder{affiliation to be provided}}
+  \and Alireza Kargarzadeh\thanks{\placeholder{affiliation to be provided}}
+  \and Nariman Khaledian\thanks{\placeholder{affiliation to be provided}}
+  \and Navid Parvini\thanks{\placeholder{affiliation to be provided}}}
+\date{October 2026}
+
+\begin{document}
+
+\maketitle
+\thispagestyle{empty}
+
+\begin{abstract}
+\noindent\input{sections/abstract}
+\end{abstract}
+
+\noindent\textbf{Keywords:} large language models; AI decision models; financial news; stock returns; market
+efficiency; look-ahead bias; memorization; pre-registration; overreaction and underreaction.
+
+\medskip
+\noindent\textbf{JEL codes:} G14, G12, C45, C52, C12.
+
+\clearpage
+
+\input{sections/introduction}
+\input{sections/related}
+\input{sections/design}
+\input{sections/validation}
+\input{sections/priced_open}
+\input{sections/over_under}
+\input{sections/explaining}
+\input{sections/memorization}
+\input{sections/strategies}
+\input{sections/exploratory}
+\input{sections/limitations}
+\input{sections/conclusion}
+
+\renewcommand{\bibfont}{\small}
+\setlength{\bibsep}{3pt plus 1pt}
+\bibliographystyle{plainnat}
+\bibliography{references}
+
+\clearpage
+\appendix
+\renewcommand{\thefigure}{A\arabic{figure}}\setcounter{figure}{0}
+\renewcommand{\thetable}{A\arabic{table}}\setcounter{table}{0}
+\renewcommand{\theequation}{A\arabic{equation}}\setcounter{equation}{0}
+
+\input{sections/appendix}
+
+\end{document}

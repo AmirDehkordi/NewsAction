@@ -1,0 +1,53 @@
+\section{Clean validation did not survive the blinded test}\label{sec:validation}
+
+Figure~\ref{fig:validation-test} compares each model's daily IC with the close-to-close move on val-B, the
+quarter used for the final selection, with its IC on the test period. Laya-Fin was selected as the primary
+instrument because its val-B IC, \res{lf-ic-valb} ($t = \res{lf-ic-valb-t}$), was the highest among the
+candidates eligible for that role; on val-A, which it was not trained on, its IC had been \res{lf-ic-vala}
+($t = \res{lf-ic-vala-t}$). On the test it fell to \res{lf-ic-test} ($t = \res{lf-ic-test-t}$), below the lower
+end of its val-B 95\% interval (\res{lf-ic-valb-lo} to \res{lf-ic-valb-hi}). The commercial models fell as well,
+though they stayed significant: d1-ultra from \res{d1-ic-valb} to \res{d1-ic-test}, span-02 from
+\res{span-ic-valb} to \res{span-ic-test} and drex-v2.0 from \res{drex-ic-valb} to \res{drex-ic-test}
+($t = \res{span-ic-test-t}$ to \res{drex-ic-test-t}). The untuned Laya model fell from \res{lz-ic-valb} to
+\res{lz-ic-test}. The clean benchmarks are near zero in both periods (on the test, \res{po-ic-test} for the
+price-only model and \res{er-ic-test} for the embedding ridge), and the generative LLM's IC on its subsample fell
+from \res{llm-ic-valb} to \res{llm-ic-test}. The highest test ICs belong to the two baselines built on vendor
+labels (\res{tags-ic-test} for the tag model and \res{sent-ic-test} for vendor sentiment); because the vendor
+produced those labels after the fact, we read them as an upper bound that may contain look-ahead, not as a
+benchmark. Appendix Table~\ref{tab:a-model-comparison} lists every model with its cost per thousand decisions.
+
+\begin{figure}[tbp]
+\centering
+\includegraphics{\figdir/fig1_validation_test.pdf}
+\caption{\textbf{Every validation IC that was positive fell on the blinded test: Laya-Fin's from
+\res{lf-ic-valb} to \res{lf-ic-test}, d1-ultra's from \res{d1-ic-valb} to \res{d1-ic-test}.} Daily IC of the
+pre-open reading $\Nhat$ with the close-to-close move $z_{cc}$ on val-B (hollow; October--December 2025, the
+final-selection quarter) and on the test period (filled; January--July 2026), with 95\% intervals ($\pm 1.96$
+Newey--West standard errors). The commercial models (API models) failed the pre-registered screens, so their
+results are model-specific. The clean benchmarks are near zero; the LLM baseline was run on a 2,000-event
+subsample. $^{\dagger}$Vendor-label baselines: the labels were produced after the fact, so their ICs are a
+possibly look-ahead-contaminated upper bound. $^{\ddagger}$span-02: a stability check that repeats earlier
+requests fired after the freeze; its build was unchanged and the results stand (Appendix~\ref{app:prereg}). The
+anchor's near-constant readings are in Table~\ref{tab:a-model-comparison}.}\label{fig:validation-test}
+\end{figure}
+
+Table~\ref{tab:primary} reports the five primary hypotheses. None is supported for Laya-Fin: the Holm-adjusted
+$p$-values are \res{lf-h3-holm} for H3 and \res{lf-h1-holm} for the other four. H1 and H1b, whether the news is
+priced at the open, are the subject of Section~\ref{sec:priced} and Table~\ref{tab:ic-target}, and H2, the
+over/under regression, of Section~\ref{sec:overunder} and Table~\ref{tab:over-under}. H3 asks whether the post-reaction judgment $J$ adds to price-only and news-only
+features in predicting $y_2$, the move from the next open to the close of $t+5$; the gain in IC is
+\res{lf-h3} (one-sided $p = \res{lf-h3-p}$). The pre-registered Shapley decomposition of this fit
+\citep{shapley1953} divides a total that is about zero (the full model's out-of-sample $R^2$ for $y_2$ is
+\res{h3-r2-total}), so its shares carry no information. H4 asks whether the readings of materiality, surprise and expected
+magnitude predict the size of the day's move, $|z_{cc}|$, beyond a heterogeneous autoregressive model of
+realized volatility \citep{corsi2009}, an earnings-day flag and the size tier; they add \res{lf-h4} to the
+out-of-sample $R^2$ ($p = \res{lf-h4-p}$). Laya-Fin's magnitude head on its own ranks the size of the move
+(an AUC of \res{lf-auc} for moves of at least one typical day), so the models know which stocks will move a lot,
+but no better than the stocks' own recent volatility. The anchor's rows are reported beside Laya-Fin's, but its
+near-constant readings carry no information.
+
+\input{\tabdir/tab1_primary.tex}
+
+The fall from validation to test is not specific to the fine-tuned model: every model whose val-B IC was
+positive fell, the vendor-label baselines included. An exploratory split in Section~\ref{sec:exploratory} shows
+where the decline happened: away from earnings days. On earnings days, the IC held in all three periods.

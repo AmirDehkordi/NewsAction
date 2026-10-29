@@ -1,0 +1,24 @@
+\section{Conclusion}\label{sec:conclusion}
+
+AI decision models read financial news well enough to forecast how a stock will open, and not well enough to
+forecast what it does after that. A fine-tuned open-weights model that looked convincing on two validation
+quarters did not survive a blinded test; the commercial models kept a signal, but only in the overnight gap,
+where the market had already priced the news before anyone could trade on it at the open, as an efficient
+market would \citep{fama1970}. The models could not
+tell an overreaction from an underreaction, their calls of underreaction never caught up, and only the largest
+moves reversed, slightly. No pre-registered strategy survived costs and selection. Out of sample, news explains
+a fraction of a percent of a stock's own daily variance, and the commercial models' stated probabilities overstate
+their accuracy.
+
+Two lessons reach beyond these models. First, validation on a few quarters is weak evidence: the strongest
+exploratory pattern we found, with in-sample Sharpe ratios up to \res{cb-valb-gross-max}, reversed on the test. A frozen plan, a
+trial ledger and a single unblinding are what made that visible. Second, masking is not anonymity: commercial
+models recognize most masked firms, so backtests of language models on historical news should measure
+recognition directly and, where possible, test on news published after the model's release, as our
+pre-registered forward test will. The market reads the news first.
+
+\section*{Acknowledgments and statements}
+\placeholder{Acknowledgments, funding and conflicts of interest, to be provided by the authors.}
+\placeholder{Statement on the use of AI tools, to be confirmed by the authors: an AI coding and research assistant
+implemented and ran the pre-registered pipeline under the authors' direction, and drafted this manuscript from
+the verified outputs; the authors are responsible for the content.}

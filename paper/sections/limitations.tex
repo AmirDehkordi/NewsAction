@@ -1,0 +1,42 @@
+\section{Limitations and the forward test}\label{sec:limits}
+
+\paragraph{Limitations.} The sample is the S\&P 500, the largest and most closely followed US stocks; smaller
+stocks, where news may diffuse more slowly \citep{hong2000}, may behave differently. The horizon is daily, with
+one intraday decision point at 10:00 built from 30-minute bars whose first bar starts at the first trade, not at
+the opening auction. The test period is seven months long (\res{test-d0-sessions} sessions with D0 events), so
+small ICs are hard to detect, and the selection rested on two validation quarters of
+\res{valb-sessions} sessions each. The trained instruments were trained once, with one seed and one epoch, on a
+free GPU budget; the anchor learned the size of moves but not their direction and is uninformative, so the
+study says nothing about what fine-tuning adds. The commercial models failed the pre-registered screens and were
+released after the sample, so their results are model-specific and contamination cannot be ruled out. The
+vendor-label baselines rest on labels produced after the fact. Masking leaves small residues of names and dates,
+below half a percent of states. The strategies charge flat costs per side and model no borrow costs or market
+impact, and the hedge removes market risk only. Some pre-registered items were not run or not completed: three
+robustness variants that needed new model calls (a summary-text variant, vendor tags in the text and a 09:30
+news cutoff; the 08:00 cutoff is approximated), the second and third training seeds, and
+\res{ablation-failed} rate-limited requests of the ablations, which were not retried.
+
+\paragraph{The forward test.} The cleanest test of memorization uses news published after every model's
+release. Seven hypotheses for such a test were pre-registered on 2026-10-29, before any news from the forward
+window was exported and before any forward-period model call; the window runs from the first session after
+2026-10-21 for at least three months, including the January--February 2027 earnings season, with the frozen
+pipeline run unchanged. They are:
+\begin{itemize}[leftmargin=*, itemsep=1pt]
+\item \textbf{F1, memorization:} for each commercial model, the change in IC from the test to the forward window
+  minus the same change for the clean baselines is negative (Holm across the three models);
+\item \textbf{F2, entity against event knowledge:} company identification on masked forward states against
+  masked test states, and against the matched baseline;
+\item \textbf{F3, the conviction book:} the pre-open book restricted to each model's top tenth of $|\Nhat|$
+  (thresholds fixed from val-A) has a positive net Sharpe ratio;
+\item \textbf{F4, priced at the open:} the frozen H1 and H1b on the forward window;
+\item \textbf{F5, over-updating:} the IC of the revision after the first half hour with the rest of the day's
+  move (two-sided);
+\item \textbf{F6, overconfidence:} the commercial models' expected calibration error exceeds Laya-Fin's (Holm
+  across the three models);
+\item \textbf{F7, conviction concentration:} the mean signed overnight move of the top tenth by conviction
+  exceeds that of all events (Holm across four models).
+\end{itemize}
+F5, F6 and F7 turn the exploratory results of Sections~\ref{sec:calibration} and~\ref{sec:exploratory} into
+confirmatory tests. The forward test has not been run. The robustness runs of the anchor (seeds 17 and 23 and a
+longer training run), fixed before unblinding, have not been run either; they are robustness only and cannot
+change any verdict here.

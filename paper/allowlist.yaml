@@ -1,0 +1,91 @@
+# Numbers the manuscript may type by hand: dates, section and identifier names, and design constants fixed by
+# the pre-registration. Everything else (every result) must enter through \res{name} (paper/numbers.yaml).
+# `make paper-text` removes each phrase before it scans the sources, then lets a token with a digit pass only
+# if one of the patterns matches it whole. Each entry gives its reason.
+phrases:
+  # --- names that contain digits
+  - {text: "S\\&P 500", why: "index name"}
+  - {text: "ModernBERT-large", why: "model name"}
+  - {text: "d1-ultra", why: "model name"}
+  - {text: "span-02", why: "model name"}
+  - {text: "drex-v2.0", why: "model name"}
+  - {text: "SHA-256", why: "hash function name"}
+  - {text: "T4 GPUs", why: "GPU model name"}
+  - {text: "cs.AI", why: "arXiv category"}
+  - {text: "q-fin.ST", why: "arXiv category"}
+  - {text: "G14, G12, C45, C52, C12", why: "JEL codes"}
+  # --- the design: universe, tiers, splits (pre-registration sections 3 and 4)
+  - {text: "the 100 largest, ranks 101--250 and ranks 251--500", why: "size tiers"}
+  - {text: "for the 100 largest companies", why: "size tier"}
+  - {text: "the first five sessions", why: "embargo"}
+  # --- returns and scaling (section 5)
+  - {text: "1.4826 times the median absolute deviation", why: "robust scale constant"}
+  - {text: "the 252 sessions up to $t-1$", why: "beta window"}
+  - {text: "the 126 sessions up to $t-1$", why: "volatility window"}
+  - {text: "betas over 252\nsessions to $t-1$", why: "beta window"}
+  - {text: "over 126 sessions to $t-1$", why: "volatility window"}
+  - {text: "1.4826 times the median absolute deviation over 126 sessions to $t-1$", why: "volatility window"}
+  - {text: "10th percentile", why: "volatility floor"}
+  - {text: "$\\pm 10$", why: "z clip"}
+  - {text: "$\\sigma^{cc}\\sqrt{5}$", why: "five-day scale of e5"}
+  # --- the question and the codebook (sections 6.11 and 7)
+  - {text: "m = (-3.5,\\ -2.5,\\ -1.5,\\ -0.75,\\ 0,\\ 0.75,\\ 1.5,\\ 2.5,\\ 3.5)", why: "level midpoints"}
+  - {text: "$|\\Nhat| \\ge 0.5$", why: "RG cut"}
+  - {text: "Under\nabove 0.5, Over below $-0.5$", why: "RG classes"}
+  - {text: "$\\pm 0.5$", why: "class split of the calibration target"}
+  - {text: "15 equal-width bins", why: "ECE bins"}
+  - {text: "15 bins", why: "ECE bins"}
+  # --- selection and screens (section 8)
+  - {text: "700 states", why: "tournament stage 1 sample"}
+  - {text: "3,000 states", why: "tournament stage 2 sample"}
+  - {text: "40\\% or less, against 25\\% by\nchance", why: "screen threshold and chance"}
+  - {text: "70\\% or more", why: "screen threshold"}
+  - {text: "40\\%", why: "screen threshold"}
+  - {text: "30\\% of covered company-days", why: "filter budget"}
+  - {text: "2,000-event", why: "LLM baseline subsample"}
+  - {text: "one seed (13)", why: "training seed"}
+  - {text: "seeds 17 and 23", why: "robustness seeds"}
+  # --- inference (section 11)
+  - {text: "10,000 draws", why: "bootstrap draws"}
+  - {text: "at 0.05", why: "Holm level"}
+  - {text: "$q = 0.10$", why: "Benjamini-Hochberg level"}
+  - {text: "$p < 0.05$", why: "headline rule"}
+  - {text: "95\\%", why: "interval level"}
+  - {text: "$\\pm 1.96$", why: "interval multiplier"}
+  - {text: "$t \\ge 1$", why: "exploratory selection rule (fixed before its test)"}
+  - {text: "$t \\ge 2$", why: "exploratory selection rule (fixed before its test)"}
+  - {text: "$\\kappa_h = 1$", why: "full convergence"}
+  - {text: "\\tfrac{1}{2}", why: "half-life threshold"}
+  # --- strategies (section 12)
+  - {text: "top 20\\%", why: "strategy quantile"}
+  - {text: "5, 10 and 20 basis points", why: "cost levels"}
+  - {text: "10 basis points", why: "cost level"}
+  - {text: "100 books", why: "placebo books"}
+  - {text: "100 random-signal books", why: "placebo books"}
+  - {text: "95th percentile", why: "placebo band"}
+  - {text: "5th to 95th percentile", why: "placebo band"}
+  - {text: "the 5th", why: "placebo band"}
+  - {text: "90th percentile", why: "placebo threshold"}
+  - {text: "70th percentile", why: "frozen confidence gate"}
+  - {text: "top 10\\%", why: "conviction decile"}
+  - {text: "10~basis points", why: "cost level"}
+  # --- the exploratory overlay and the forward test
+  - {text: "20- and 50-day averages", why: "moving-average windows"}
+  - {text: "the 20- and 50-day averages", why: "moving-average windows"}
+  - {text: "within 20 trading days", why: "the ladder's last rung, t+20"}
+  - {text: "within 20 sessions", why: "the ladder's last rung, t+20"}
+  - {text: "0.5 to 2 typical days", why: "bin edges of the size of the move"}
+  - {text: "30-minute bar", why: "intraday bar length"}
+  - {text: "30-minute bars", why: "intraday bar length"}
+  - {text: "60-session volatility", why: "robustness variant"}
+  - {text: "first half-hour bar", why: "intraday bar"}
+  - {text: "\\$30", why: "API budget cap"}
+patterns:
+  - {re: "(19|20)\\d\\d", why: "a year"}
+  - {re: "20\\d\\d-\\d\\d-\\d\\d", why: "a date"}
+  - {re: "(19|20)\\d\\d--(19|20)\\d\\d", why: "a span of years"}
+  - {re: "\\d\\d:\\d\\d", why: "a clock time (decision points, news windows)"}
+  - {re: "(H[1-7]b?|F[1-7]|D[0-2]|E[0-9]|Q[0-9]+|A[1-3])", why: "hypothesis, decision point and amendment names"}
+  - {re: "H2-C", why: "hypothesis name"}
+  - {re: "S-D[0-2]", why: "strategy names (by decision point)"}
+  - {re: "\\d+(\\.\\d+)?(in|pt|em|ex|cm|mm)", why: "a length in a layout command"}

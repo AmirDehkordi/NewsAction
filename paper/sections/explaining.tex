@@ -1,0 +1,75 @@
+\section{News explains little of a stock's own move; the commercial models are overconfident}
+\label{sec:explaining}
+
+\subsection{Explaining realized moves}\label{sec:ladder}
+
+\citet{roll1988} asked how much of a stock's daily return public news explains, and \citet{kelly2026} revisit
+the question for the market with generative AI. We ask it for single stocks, out of sample. For every covered
+company-day of the test period (days without selected news enter with zero news features, as in Roll), we build
+up the explanation of the stock-specific move $z_{cc}$ step by step: the market and the sector (Roll's first
+step), then the pre-open news reading, then the reading of all the day's news, and finally the post-reaction
+reading's explanation of the move, which reads the realized move and is therefore an attribution, not a
+forecast. Each step is a ridge regression fitted out of sample by the pre-registered protocol (validation data
+for the fit and the penalty), and each is scored on the test by
+\begin{equation}\label{eq:r2}
+R^{2}_{\mathrm{OOS}} = 1 - \frac{\sum_{i,t}\bigl(y_{i,t} - \hat y_{i,t}\bigr)^{2}}
+{\sum_{i,t}\bigl(y_{i,t} - \bar y_{\mathrm{ref}}\bigr)^{2}},
+\qquad
+\Delta R^{2}_{s} = R^{2}_{\mathrm{OOS}}(s) - R^{2}_{\mathrm{OOS}}(s-1),
+\end{equation}
+where $\bar y_{\mathrm{ref}}$ is the reference the frozen specification fixes (a zero forecast for the
+stock-specific move, and the val-B mean for the size of the move in H4), $R^{2}_{\mathrm{OOS}}(s)$ is the fit of
+steps one to $s$, and $\Delta R^{2}_{s}$ is what step $s$ adds to the steps before it. A positive $R^{2}_{\mathrm{OOS}}$ means the step predicts better than the reference
+on data it was not fitted on.
+
+The news explains little of a stock's own move (Figure~\ref{fig:explaining}, Table~\ref{tab:explaining}). The
+market and the sector explain \res{roll-r2-pct} of the total daily variance. Of the stock-specific part, the
+pre-open reading explains \res{lf-ladder-ante-pct} for Laya-Fin and \res{d1-ladder-ante-pct} for d1-ultra, and
+the reading of all the day's news \res{lf-ladder-post-pct} and \res{d1-ladder-post-pct}. H5, the secondary
+hypothesis that the same-day news step is positive, is supported for Laya-Fin
+($q = \res{lf-h5-q}$), the only secondary test that survives Benjamini--Hochberg for it, and for d1-ultra
+($q \res{d1-h5-q}$). Much of what the news explains was already knowable before the open
+(\res{lf-knowable-pct} for Laya-Fin, \res{d1-knowable-pct} for d1-ultra). Reading the realized move explains far more: d1-ultra's
+explanation step reaches \res{d1-ladder-expl-pct} of the stock-specific variance on all covered days and
+\res{d1-ladder-expl-event-pct} on days with news.
+
+\begin{figure}[tbp]
+\centering
+\includegraphics{\figdir/fig5_explaining_moves.pdf}
+\caption{\textbf{Same-day news explains \res{lf-ladder-post-pct} of the stock-specific daily variance out of
+sample for Laya-Fin and \res{d1-ladder-post-pct} for d1-ultra; reading the realized move explains
+\res{d1-ladder-expl-pct}.} Test period; out-of-sample $R^2$ in percent of the stock-specific variance (the market
+and the sector removed). (a) d1-ultra's $R^2$ by cut, stacked by step in the legend's order: the pre-open news,
+plus the day's news, plus the post-reaction explanation (which reads the realized move, so it is not a
+forecast). Each total stands above its bar with its 95\% bootstrap interval; the two thin news steps are
+labelled beside each bar. For comparison, the market and the sector explain \res{roll-r2-pct} of the total
+daily variance, a different base. (b) The news steps on their own scale, with 95\% bootstrap intervals, for
+Laya-Fin and d1-ultra (model-specific). Only d1-ultra answers the explanation question; the anchor's near-constant
+readings are in Table~\ref{tab:explaining}.}\label{fig:explaining}
+\end{figure}
+
+\input{\tabdir/tab5_explaining_moves.tex}
+
+Being explained does not predict persistence. Days the model judges explained (the probability that the move
+is explained by the news is at least one half) are \res{expl-events-share} of event days but carry
+\res{expl-var-share} of their stock-specific variance. Yet in the pre-registered persistence regression the
+coefficient on the explanation is \res{theta-d2} after the close (standard error \res{theta-d2-se},
+$p = \res{theta-d2-p}$ for a positive effect): explained moves do not persist more than unexplained ones, and if
+anything reverse slightly more. The size of the move is easier to read than its direction, as
+Section~\ref{sec:validation} showed for H4: the models rank which stocks will move a lot, but add nothing to
+recent volatility.
+
+\subsection{Calibration}\label{sec:calibration}
+
+The pre-registered calibration metric is the expected calibration error \citep{pakdamannaeini2015,guo2017}: the
+pre-open reading's nine levels are grouped into three classes (a fall, no move and a rise, split at half a
+typical daily move), and the top class's stated probability is compared with its hit rate against the realized
+five-day move, in 15 equal-width bins. Laya-Fin is calibrated but compressed: its error is \res{lf-ece} and its
+log-loss improves on the validation base rates by only \res{lf-llskill}, because its probabilities stay close to
+those base rates. The commercial models are overconfident: their stated probabilities overstate their hit rates,
+with errors of \res{d1-ece} (d1-ultra), \res{span-ece} (span-02) and \res{drex-ece} (drex-v2.0) and negative
+log-loss skill. A single temperature fitted on val-A lowers d1-ultra's error from \res{d1-ece-before} to
+\res{d1-ece-after} (Appendix Table~\ref{tab:a-calibration} and Figure~\ref{fig:a-reliability}). Fine-tuning
+does not buy a significant IC gain over the untuned model either: H7's difference between Laya-Fin and Laya
+zero-shot is \res{lf-h7} ($p = \res{lf-h7-p}$, $q = \res{lf-h7-q}$). The cost per thousand decisions is zero for
+the trained models on a free GPU tier, and \res{span-cost} to \res{d1-cost} dollars for the commercial models.

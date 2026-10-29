@@ -2645,7 +2645,7 @@ sha256 on a rerun (labels and export were run twice: 8 of 8 files identical).
 - **Key:** one entry per row of PREREG §15
 - **Rows / coverage:** the one-line summaries of the deviations (t34 checks each against its row)
 - **Availability:** after NA-12, NA-13 and NA-13b (test-period results are their stored outputs; nothing here reads the lock)
-- **sha256:** `ce5550840096c1ba78eb403c98b5d3d616b06d9140e65e0fbf7ef3b25102b6a4`
+- **sha256:** `8e57715e17e53202fc18ac99450db523c594f839b306edfd5d64f40ba0c9123d`
 
 ### `artifacts/NA-14/paper_preview.tex`
 - **Producer:** `newsaction.figures.preview` (make paper)
@@ -2654,7 +2654,7 @@ sha256 on a rerun (labels and export were run twice: 8 of 8 files identical).
 - **Key:** one file
 - **Rows / coverage:** the paper preview; `make paper-preview` compiles it with tectonic (the PDF's digest is reported, not registered)
 - **Availability:** after NA-12, NA-13 and NA-13b (test-period results are their stored outputs; nothing here reads the lock)
-- **sha256:** `b4fb19ba25acedf0f7538f123c75c5465cb5f3b98ac87ccb7c48947916ebfa22`
+- **sha256:** `012277859c2d4b5b39148b9ce3040cbba7861d629c24e6fdcb437fdc6b44a4c6`
 
 ### `artifacts/NA-14/captions.yaml`
 - **Producer:** NA-14 (author)
@@ -2663,7 +2663,7 @@ sha256 on a rerun (labels and export were run twice: 8 of 8 files identical).
 - **Key:** one entry per figure
 - **Rows / coverage:** the caption templates; `python -m newsaction.figures.captions` checks every number
 - **Availability:** after NA-12, NA-13 and NA-13b (test-period results are their stored outputs; nothing here reads the lock)
-- **sha256:** `afe2479f8251a05b357cf8a471ed18666a271db3ebbfea69d83fe75dcb2202da`
+- **sha256:** `bd6cc2b8ac73f409bbdc5d1feaa23acf274fecfba4a03785c2960a678345c1e2`
 
 ### `artifacts/NA-14/captions.md`
 - **Producer:** `newsaction.figures.captions`
@@ -2672,7 +2672,7 @@ sha256 on a rerun (labels and export were run twice: 8 of 8 files identical).
 - **Key:** one file
 - **Rows / coverage:** the rendered captions
 - **Availability:** after NA-12, NA-13 and NA-13b (test-period results are their stored outputs; nothing here reads the lock)
-- **sha256:** `454f46c6c32121717140b161c56a489fe0d16f026a9b80459c36ce801ea3e8f2`
+- **sha256:** `20c05bee394684c0ca018b9c3fa7937654d2cc0ee8e6b35cad5e3d1e1312b886`
 
 ### `artifacts/NA-14/digests.json`
 - **Producer:** `newsaction.figures.paper --write-digests`
@@ -2681,7 +2681,7 @@ sha256 on a rerun (labels and export were run twice: 8 of 8 files identical).
 - **Key:** one file
 - **Rows / coverage:** what `make paper` must reproduce
 - **Availability:** after NA-12, NA-13 and NA-13b (test-period results are their stored outputs; nothing here reads the lock)
-- **sha256:** `30ba96e5c88a5eb2990864e5aa83156c22b7737d95907afce50c61834a60b287`
+- **sha256:** `f36ca84ec4d04e6b456d7395f147a649e33f68b8bc345e53dd4bc41a6e8220c8`
 
 ### `artifacts/NA-14/figures/fig1_validation_test.csv`
 - **Producer:** `newsaction.figures.data` (`fig1`)
@@ -2807,7 +2807,7 @@ sha256 on a rerun (labels and export were run twice: 8 of 8 files identical).
 - **Key:** one file
 - **Rows / coverage:** the figure fig5_explaining_moves at print size
 - **Availability:** after NA-12, NA-13 and NA-13b (test-period results are their stored outputs; nothing here reads the lock)
-- **sha256:** `b544bd3a2913af32f6afcdb14ba7d0250b901ff0c8c90720eb4460d895fdb978`
+- **sha256:** `9c071618d46614d1c6170df88fe6821b3fa48430c489fe36110a67772f0189a4`
 
 ### `artifacts/NA-14/figures/fig5_explaining_moves.png`
 - **Producer:** `newsaction.figures.render` (`newsaction.figures.fig5_explaining_moves`)
@@ -2816,7 +2816,7 @@ sha256 on a rerun (labels and export were run twice: 8 of 8 files identical).
 - **Key:** one file
 - **Rows / coverage:** the figure fig5_explaining_moves at print size
 - **Availability:** after NA-12, NA-13 and NA-13b (test-period results are their stored outputs; nothing here reads the lock)
-- **sha256:** `9c9a23d4d3fbe2638891926d55ca0aa288a2bb853a78bce8ec35fc9111586051`
+- **sha256:** `f1b992deab1d1ac62ff5830f248dbbc05c7abdf53fe67f9885e6c76924883081`
 
 ### `artifacts/NA-14/figures/fig6_strategies.csv`
 - **Producer:** `newsaction.figures.data` (`fig6`)
@@ -3657,12 +3657,12 @@ sha256 on a rerun (labels and export were run twice: 8 of 8 files identical).
 
 ### `artifacts/NA-14/tables/t30_derived.csv`
 - **Producer:** `newsaction.figures.tables`
-- **Inputs:** `artifacts/NA-12/figure_data/fig1_rg_class_paths.csv`
+- **Inputs:** `artifacts/NA-12/figure_data/fig1_rg_class_paths.csv`, `artifacts/NA-06/fig3_data.csv`, `artifacts/NA-13b/tables/selection.csv`, `artifacts/NA-11/ablation_runs.json`
 - **Schema:** `key`, `value`, `formula`, `source`
 - **Key:** `key` unique
-- **Rows / coverage:** 1 rows: Sums of figure-data cells cited in captions
+- **Rows / coverage:** 8 rows: Counts and sums of upstream cells cited in captions and in the paper
 - **Availability:** after NA-12, NA-13 and NA-13b (test-period results are their stored outputs; nothing here reads the lock)
-- **sha256:** `37d0df01b47124dc6db9624b982279ad279f4f5dcfd72b191d37f86f6b37477f`
+- **sha256:** `862b436120f84467d01e458ab70e37d4b64e0ee5ee6d356c6a5e307bb0a11c54`
 
 ### `artifacts/NA-14/tables/t31_market_replication.csv`
 - **Producer:** `newsaction.figures.tables`
@@ -3698,7 +3698,7 @@ sha256 on a rerun (labels and export were run twice: 8 of 8 files identical).
 - **Key:** `key` unique
 - **Rows / coverage:** 66 rows: Pre-registration deviations: every row of PREREG §15 in one line
 - **Availability:** after NA-12, NA-13 and NA-13b (test-period results are their stored outputs; nothing here reads the lock)
-- **sha256:** `21bed8d1c2d2f520d1f44866922aba1699d3093dd540691523634ae40d5e8cfd`
+- **sha256:** `097630190f23e0b57e508b6ef8136c4f5beacba017aae2563e7f6c88aa8c7c87`
 
 ### `artifacts/NA-14/tables/t35_break_even.csv`
 - **Producer:** `newsaction.figures.tables`
@@ -3851,7 +3851,7 @@ sha256 on a rerun (labels and export were run twice: 8 of 8 files identical).
 - **Key:** one file
 - **Rows / coverage:** main table tab:primary (38 cited cells)
 - **Availability:** after NA-12, NA-13 and NA-13b (test-period results are their stored outputs; nothing here reads the lock)
-- **sha256:** `994c2130cc4cafecaeb4df63a472e56af319c202b87185e0b0ead1a798181fa8`
+- **sha256:** `af1bd244eac7dfdff9761efea57e8b8390c543eee8a95a1c503f91fd7257c394`
 
 ### `artifacts/NA-14/tables/tab2_ic_by_target.tex`
 - **Producer:** `newsaction.figures.latex`
@@ -3860,7 +3860,7 @@ sha256 on a rerun (labels and export were run twice: 8 of 8 files identical).
 - **Key:** one file
 - **Rows / coverage:** main table tab:ic-target (60 cited cells)
 - **Availability:** after NA-12, NA-13 and NA-13b (test-period results are their stored outputs; nothing here reads the lock)
-- **sha256:** `6d887c4f30bc2aec6b9576796b99dce45d87a019a53fa667d3a540980e9bf4b2`
+- **sha256:** `0c64fcf6a252caa49d0af569ac7cab0c98d131e28a5c153181478d94fa66632a`
 
 ### `artifacts/NA-14/tables/tab3_over_under.tex`
 - **Producer:** `newsaction.figures.latex`
@@ -3869,7 +3869,7 @@ sha256 on a rerun (labels and export were run twice: 8 of 8 files identical).
 - **Key:** one file
 - **Rows / coverage:** main table tab:over-under (54 cited cells)
 - **Availability:** after NA-12, NA-13 and NA-13b (test-period results are their stored outputs; nothing here reads the lock)
-- **sha256:** `2e49f37b0fb81cc10670f8a966c675aea4842f2d9f20bd51e5341292bc3999ff`
+- **sha256:** `3ff9137cc9cb3ce67ea1320f9331a6b62e18e852d357d4aea4bd77bd5361786a`
 
 ### `artifacts/NA-14/tables/tab4_convergence.tex`
 - **Producer:** `newsaction.figures.latex`
@@ -3878,7 +3878,7 @@ sha256 on a rerun (labels and export were run twice: 8 of 8 files identical).
 - **Key:** one file
 - **Rows / coverage:** main table tab:convergence (96 cited cells)
 - **Availability:** after NA-12, NA-13 and NA-13b (test-period results are their stored outputs; nothing here reads the lock)
-- **sha256:** `cc7cde62a77380029d3f95ced6665b9101ab0daaced0f5c85706eac30f8f43b4`
+- **sha256:** `d47eb43310574850d48370d71000917f76898c9dabbba0cb49efdf8678238d2a`
 
 ### `artifacts/NA-14/tables/tab5_explaining_moves.tex`
 - **Producer:** `newsaction.figures.latex`
@@ -3887,16 +3887,16 @@ sha256 on a rerun (labels and export were run twice: 8 of 8 files identical).
 - **Key:** one file
 - **Rows / coverage:** main table tab:explaining (24 cited cells)
 - **Availability:** after NA-12, NA-13 and NA-13b (test-period results are their stored outputs; nothing here reads the lock)
-- **sha256:** `7e61bc8c23a287621c12ea251b37cd9bb3bae0612919bf93717d4a73cbf3000e`
+- **sha256:** `6155e01bf1b0e3b15c41885e14e00e472a5b48da009e8a8eacb79c4722f83291`
 
 ### `artifacts/NA-14/tables/tab6_strategies.tex`
 - **Producer:** `newsaction.figures.latex`
 - **Inputs:** `artifacts/NA-14/tables/t20_strategies.csv`, `artifacts/NA-14/tables/t35_break_even.csv` (the cells of `keys.json`)
 - **Schema:** LaTeX: booktabs, threeparttable(x) notes, siunitx S columns; a float or a longtable
 - **Key:** one file
-- **Rows / coverage:** main table tab:strategies (73 cited cells)
+- **Rows / coverage:** main table tab:strategies (74 cited cells)
 - **Availability:** after NA-12, NA-13 and NA-13b (test-period results are their stored outputs; nothing here reads the lock)
-- **sha256:** `9a06569f319dd3f0335a041686de8bff4f2f43d0f5ebc915659a13bb5af0337e`
+- **sha256:** `024743597f9df5c6c36db446aaa6b07b5025e497210ef82527e66e432b051821`
 
 ### `artifacts/NA-14/tables/t14_model_comparison.tex`
 - **Producer:** `newsaction.figures.latex`
@@ -3905,7 +3905,7 @@ sha256 on a rerun (labels and export were run twice: 8 of 8 files identical).
 - **Key:** one file
 - **Rows / coverage:** appendix table tab:a-model-comparison (74 cited cells)
 - **Availability:** after NA-12, NA-13 and NA-13b (test-period results are their stored outputs; nothing here reads the lock)
-- **sha256:** `f2014d4318991be45d40ebecc640e3a11dc7d8ce1695cd5167f23f06801b6b9d`
+- **sha256:** `db50c873a2e0dbb54b199fff787919bd33454e3b5f5c3135155c986687c2189e`
 
 ### `artifacts/NA-14/tables/t27_tournament.tex`
 - **Producer:** `newsaction.figures.latex`
@@ -3914,7 +3914,7 @@ sha256 on a rerun (labels and export were run twice: 8 of 8 files identical).
 - **Key:** one file
 - **Rows / coverage:** appendix table tab:a-tournament (84 cited cells)
 - **Availability:** after NA-12, NA-13 and NA-13b (test-period results are their stored outputs; nothing here reads the lock)
-- **sha256:** `fe1d33f8dec52260f67c35fa9ab53ef18301e1a75aa73283a1d6e2a6cdce3b16`
+- **sha256:** `1550a48bb6f030407be2a79e584bf74ed75f431685114ebeff205fb11ea6ed9a`
 
 ### `artifacts/NA-14/tables/t21_release_dates.tex`
 - **Producer:** `newsaction.figures.latex`
@@ -3923,7 +3923,7 @@ sha256 on a rerun (labels and export were run twice: 8 of 8 files identical).
 - **Key:** one file
 - **Rows / coverage:** appendix table tab:a-release-dates (5 cited cells)
 - **Availability:** after NA-12, NA-13 and NA-13b (test-period results are their stored outputs; nothing here reads the lock)
-- **sha256:** `80bf29f66fed5b99240d315e025517e3980e13a441937f1450e0ce1277629f0d`
+- **sha256:** `48c46ee57a76cf878fb44cad7b3338e6ccac19549d1eba91d16db2dfbeab23d8`
 
 ### `artifacts/NA-14/tables/t22_spend.tex`
 - **Producer:** `newsaction.figures.latex`
@@ -3950,7 +3950,7 @@ sha256 on a rerun (labels and export were run twice: 8 of 8 files identical).
 - **Key:** one file
 - **Rows / coverage:** appendix table tab:a-encoding (126 cited cells)
 - **Availability:** after NA-12, NA-13 and NA-13b (test-period results are their stored outputs; nothing here reads the lock)
-- **sha256:** `3d25e9a596729ef8a1525b69baae1bc4fe120eca56336f5ebe2fd7ad831a9290`
+- **sha256:** `8667d5a83efaaced98b5dbdea68810d096ff82b537c06e1a90196bf8db71a4a3`
 
 ### `artifacts/NA-14/tables/t1b_primary_by_model.tex`
 - **Producer:** `newsaction.figures.latex`
@@ -3959,7 +3959,7 @@ sha256 on a rerun (labels and export were run twice: 8 of 8 files identical).
 - **Key:** one file
 - **Rows / coverage:** appendix table tab:a-primary-by-model (138 cited cells)
 - **Availability:** after NA-12, NA-13 and NA-13b (test-period results are their stored outputs; nothing here reads the lock)
-- **sha256:** `fbb04ef011d326360023d03fafb624ce3edee1a88c2a3fcda7bb66e27fce9a92`
+- **sha256:** `686b91a6c1648dce0ba16108ee843a8dab297285ef73db3ad917c94daa83ba71`
 
 ### `artifacts/NA-14/tables/t3_ic.tex`
 - **Producer:** `newsaction.figures.latex`
@@ -3968,7 +3968,7 @@ sha256 on a rerun (labels and export were run twice: 8 of 8 files identical).
 - **Key:** one file
 - **Rows / coverage:** appendix table tab:a-ic (126 cited cells)
 - **Availability:** after NA-12, NA-13 and NA-13b (test-period results are their stored outputs; nothing here reads the lock)
-- **sha256:** `ecb9e3081d01e0fa610c5fd125205a8725bbb1711ef3449926dc3074f543ee9e`
+- **sha256:** `e9d17179e35481689d9dde0dde08d367a276d417f10ccff6e1fea463bdac1172`
 
 ### `artifacts/NA-14/tables/t32_val_b_ic.tex`
 - **Producer:** `newsaction.figures.latex`
@@ -3986,7 +3986,7 @@ sha256 on a rerun (labels and export were run twice: 8 of 8 files identical).
 - **Key:** one file
 - **Rows / coverage:** appendix table tab:a-calibration (54 cited cells)
 - **Availability:** after NA-12, NA-13 and NA-13b (test-period results are their stored outputs; nothing here reads the lock)
-- **sha256:** `c2279a3869566a2757708c6e6518dbdd53097b1593c7520bf5e77f1883f6c28e`
+- **sha256:** `af82d956ef1b2f819c5c11ec7da4ed3e8f3cd7c8b2d50c79d17019a1b71c2dc1`
 
 ### `artifacts/NA-14/tables/t16_robustness.tex`
 - **Producer:** `newsaction.figures.latex`
@@ -3995,7 +3995,7 @@ sha256 on a rerun (labels and export were run twice: 8 of 8 files identical).
 - **Key:** one file
 - **Rows / coverage:** appendix table tab:a-robustness (541 cited cells)
 - **Availability:** after NA-12, NA-13 and NA-13b (test-period results are their stored outputs; nothing here reads the lock)
-- **sha256:** `b09ef922685d9b4d0882bcc61058e400af47fe06bfa56835945c301e5ddbd505`
+- **sha256:** `9f634d2880e9d251b00360f1b1b6db47e89576ea09beeb1151f39986f7df2adf`
 
 ### `artifacts/NA-14/tables/t2_h2_over_under.tex`
 - **Producer:** `newsaction.figures.latex`
@@ -4004,7 +4004,7 @@ sha256 on a rerun (labels and export were run twice: 8 of 8 files identical).
 - **Key:** one file
 - **Rows / coverage:** appendix table tab:a-h2-over-under (192 cited cells)
 - **Availability:** after NA-12, NA-13 and NA-13b (test-period results are their stored outputs; nothing here reads the lock)
-- **sha256:** `096866782f835d21c4f862b5a6601fc1ddd828e6578b0741cd2dc5ea1a2213db`
+- **sha256:** `3dc99fa4a383677697e19e873893a170b7fd9daa5e78e3a31b127d3df7e0d1cc`
 
 ### `artifacts/NA-14/tables/t4_secondary.tex`
 - **Producer:** `newsaction.figures.latex`
@@ -4013,7 +4013,7 @@ sha256 on a rerun (labels and export were run twice: 8 of 8 files identical).
 - **Key:** one file
 - **Rows / coverage:** appendix table tab:a-secondary (88 cited cells)
 - **Availability:** after NA-12, NA-13 and NA-13b (test-period results are their stored outputs; nothing here reads the lock)
-- **sha256:** `39371705e5e2b67ee423eaae3b920098f8bdf78526e6198148391fb1a346d033`
+- **sha256:** `82a85b792d8d06683a77f8f231a7f4ab17a942f0104ce1ec3c96cedc03aeea31`
 
 ### `artifacts/NA-14/tables/t5_heterogeneity.tex`
 - **Producer:** `newsaction.figures.latex`
@@ -4022,7 +4022,7 @@ sha256 on a rerun (labels and export were run twice: 8 of 8 files identical).
 - **Key:** one file
 - **Rows / coverage:** appendix table tab:a-heterogeneity (192 cited cells)
 - **Availability:** after NA-12, NA-13 and NA-13b (test-period results are their stored outputs; nothing here reads the lock)
-- **sha256:** `16587e5cfd560b437cc2b76e2eab48c7d5075758bc817f599d10867d0e4723b8`
+- **sha256:** `47f6534ae9b89ecbff2aee254e1c9797c374e0a8be1f0af08b42a0955fb1cb3d`
 
 ### `artifacts/NA-14/tables/t6_convergence_ladder.tex`
 - **Producer:** `newsaction.figures.latex`
@@ -4031,7 +4031,7 @@ sha256 on a rerun (labels and export were run twice: 8 of 8 files identical).
 - **Key:** one file
 - **Rows / coverage:** appendix table tab:a-convergence-ladder (393 cited cells)
 - **Availability:** after NA-12, NA-13 and NA-13b (test-period results are their stored outputs; nothing here reads the lock)
-- **sha256:** `7771b64e2ff280b6f9ecf53a555de9a1ffb5460d8887d72fa3c54d301d377a5f`
+- **sha256:** `d12dd03772f37465516590ee5b584a16494951d381c4c37b1e71c23164e91570`
 
 ### `artifacts/NA-14/tables/t7_gap_closure.tex`
 - **Producer:** `newsaction.figures.latex`
@@ -4040,7 +4040,7 @@ sha256 on a rerun (labels and export were run twice: 8 of 8 files identical).
 - **Key:** one file
 - **Rows / coverage:** appendix table tab:a-gap-closure (258 cited cells)
 - **Availability:** after NA-12, NA-13 and NA-13b (test-period results are their stored outputs; nothing here reads the lock)
-- **sha256:** `4c8072d6753080b7bcd9a961cd8f1160fad12d546df5bf20e5c79109ae17d0d8`
+- **sha256:** `6e136b373a3815a472d020f126e8871153515ee2704a1bb59be5139b890b4b24`
 
 ### `artifacts/NA-14/tables/t8_tracking_error.tex`
 - **Producer:** `newsaction.figures.latex`
@@ -4049,7 +4049,7 @@ sha256 on a rerun (labels and export were run twice: 8 of 8 files identical).
 - **Key:** one file
 - **Rows / coverage:** appendix table tab:a-tracking-error (144 cited cells)
 - **Availability:** after NA-12, NA-13 and NA-13b (test-period results are their stored outputs; nothing here reads the lock)
-- **sha256:** `d7dfdbe172db4295eaf8a0006d49b3ecbc30c48aa91756715129e81049e78d49`
+- **sha256:** `9c3d54184a07e84799529f3f410c57c182569016eb73fabb7324c43cf065c3eb`
 
 ### `artifacts/NA-14/tables/t9_convergence_cuts.tex`
 - **Producer:** `newsaction.figures.latex`
@@ -4058,7 +4058,7 @@ sha256 on a rerun (labels and export were run twice: 8 of 8 files identical).
 - **Key:** one file
 - **Rows / coverage:** appendix table tab:a-convergence-cuts (190 cited cells)
 - **Availability:** after NA-12, NA-13 and NA-13b (test-period results are their stored outputs; nothing here reads the lock)
-- **sha256:** `640395e05682899c1e1e5f04f9bb10a978419a791a558ec37aaedf990c163612`
+- **sha256:** `44eb1756ee6e126f51a575f4ad0531a4e55d877633ab020156ca76b07bc518ed`
 
 ### `artifacts/NA-14/tables/t13_shapley.tex`
 - **Producer:** `newsaction.figures.latex`
@@ -4067,7 +4067,7 @@ sha256 on a rerun (labels and export were run twice: 8 of 8 files identical).
 - **Key:** one file
 - **Rows / coverage:** appendix table tab:a-shapley (264 cited cells)
 - **Availability:** after NA-12, NA-13 and NA-13b (test-period results are their stored outputs; nothing here reads the lock)
-- **sha256:** `e78b78d8044f2d9651c5b9bc239488c3777f6ec99d6206de7a71551e1cdcd9e1`
+- **sha256:** `a1550093eeb16e25b3dcd3cb6683532cf89bd82bda5883cb0fc9f9ace5787f04`
 
 ### `artifacts/NA-14/tables/t10_explanation_ladder.tex`
 - **Producer:** `newsaction.figures.latex`
@@ -4076,7 +4076,7 @@ sha256 on a rerun (labels and export were run twice: 8 of 8 files identical).
 - **Key:** one file
 - **Rows / coverage:** appendix table tab:a-explanation-ladder (472 cited cells)
 - **Availability:** after NA-12, NA-13 and NA-13b (test-period results are their stored outputs; nothing here reads the lock)
-- **sha256:** `096ac3ec21b3f3ea19670695191a2eef6b9fe307cd6bb51651ffc15a8d7e79d7`
+- **sha256:** `cfeaf657b46df3ef285c9abd4c0b5e569cddfdf7fcfe6008ce8fed8ca6967340`
 
 ### `artifacts/NA-14/tables/t11_explanation_share_theta.tex`
 - **Producer:** `newsaction.figures.latex`
@@ -4085,7 +4085,7 @@ sha256 on a rerun (labels and export were run twice: 8 of 8 files identical).
 - **Key:** one file
 - **Rows / coverage:** appendix table tab:a-explanation-share-theta (69 cited cells)
 - **Availability:** after NA-12, NA-13 and NA-13b (test-period results are their stored outputs; nothing here reads the lock)
-- **sha256:** `b4cac6446d2da3a8ae4bcbda6d8470151b0b5e67c302beafe7309142cc4b400a`
+- **sha256:** `874df866d9fd8de630b4a2aec382c79f824971257c6cbcf0d22b277794668681`
 
 ### `artifacts/NA-14/tables/t12_question_battery.tex`
 - **Producer:** `newsaction.figures.latex`
@@ -4094,7 +4094,7 @@ sha256 on a rerun (labels and export were run twice: 8 of 8 files identical).
 - **Key:** one file
 - **Rows / coverage:** appendix table tab:a-question-battery (435 cited cells)
 - **Availability:** after NA-12, NA-13 and NA-13b (test-period results are their stored outputs; nothing here reads the lock)
-- **sha256:** `6937b3bb25a5510088eddba5bd7e96982dee1649096b96ca626e478af60c1b4b`
+- **sha256:** `01fe2a4513636004ba294f41d33d90f8f866a5ecb9dc8e50ac74e8ff11b18ddd`
 
 ### `artifacts/NA-14/tables/t20_strategies.tex`
 - **Producer:** `newsaction.figures.latex`
@@ -4103,7 +4103,7 @@ sha256 on a rerun (labels and export were run twice: 8 of 8 files identical).
 - **Key:** one file
 - **Rows / coverage:** appendix table tab:a-strategies (1567 cited cells)
 - **Availability:** after NA-12, NA-13 and NA-13b (test-period results are their stored outputs; nothing here reads the lock)
-- **sha256:** `abb2f4e20445ea00827bc80329cae4c3ced1bbd3f2ac07444f9a8af631442b93`
+- **sha256:** `281292529c609f18fb7727a5d372adc05f5b9e7c29de05adfc8e2ab8d0e79ea8`
 
 ### `artifacts/NA-14/tables/t26_sconv_overlap.tex`
 - **Producer:** `newsaction.figures.latex`
@@ -4130,7 +4130,7 @@ sha256 on a rerun (labels and export were run twice: 8 of 8 files identical).
 - **Key:** one file
 - **Rows / coverage:** appendix table tab:a-break-even (261 cited cells)
 - **Availability:** after NA-12, NA-13 and NA-13b (test-period results are their stored outputs; nothing here reads the lock)
-- **sha256:** `fa8e09c3259822966c6f62e24c6b172cac77b109eac4537806a1236f6b56a648`
+- **sha256:** `23f49ad3462f13725875e547ba1b338efc53de79d4438cbf8376423deb96de19`
 
 ### `artifacts/NA-14/tables/t23_company_identification.tex`
 - **Producer:** `newsaction.figures.latex`
@@ -4139,7 +4139,7 @@ sha256 on a rerun (labels and export were run twice: 8 of 8 files identical).
 - **Key:** one file
 - **Rows / coverage:** appendix table tab:a-company-identification (28 cited cells)
 - **Availability:** after NA-12, NA-13 and NA-13b (test-period results are their stored outputs; nothing here reads the lock)
-- **sha256:** `4434f6028463452764da1262215745f3812d86920e53fd74bbbb25ab57b13d5c`
+- **sha256:** `a2177f63ed29cdb8823b5aa51530910a409e7a067801943668c54d90692b4e39`
 
 ### `artifacts/NA-14/tables/t18_probes_val_a.tex`
 - **Producer:** `newsaction.figures.latex`
@@ -4148,7 +4148,7 @@ sha256 on a rerun (labels and export were run twice: 8 of 8 files identical).
 - **Key:** one file
 - **Rows / coverage:** appendix table tab:a-probes-val-a (58 cited cells)
 - **Availability:** after NA-12, NA-13 and NA-13b (test-period results are their stored outputs; nothing here reads the lock)
-- **sha256:** `b5dae027bf782aaa22065c60e6813965e327678bc015f339a281c778c120a86f`
+- **sha256:** `5fa7de1c489ac7a8406e55ba78cbf992300617285fdb045fd4ab183d47b1c3e4`
 
 ### `artifacts/NA-14/tables/t19_monthly_ic.tex`
 - **Producer:** `newsaction.figures.latex`
@@ -4157,7 +4157,7 @@ sha256 on a rerun (labels and export were run twice: 8 of 8 files identical).
 - **Key:** one file
 - **Rows / coverage:** appendix table tab:a-monthly-ic (144 cited cells)
 - **Availability:** after NA-12, NA-13 and NA-13b (test-period results are their stored outputs; nothing here reads the lock)
-- **sha256:** `4c8c3640ba77337d74a2664114a296092f40d759108f5de919f3b4bb8ba0337d`
+- **sha256:** `b9f47d9c1ccbfbb059973b7e404297f4b6cfd345de41bd7b119104d8da336f33`
 
 ### `artifacts/NA-14/tables/t17_sector_exploratory.tex`
 - **Producer:** `newsaction.figures.latex`
@@ -4166,7 +4166,7 @@ sha256 on a rerun (labels and export were run twice: 8 of 8 files identical).
 - **Key:** one file
 - **Rows / coverage:** appendix table tab:a-sector-exploratory (330 cited cells)
 - **Availability:** after NA-12, NA-13 and NA-13b (test-period results are their stored outputs; nothing here reads the lock)
-- **sha256:** `cab48191fb71857d6c629f6c345a8adcf83893609ef6c5bf171d5f5dd248a6ac`
+- **sha256:** `9585cf68d58b8fbf7d94029c3a673bb83072749b1e5778bc050dbe56d1f56b42`
 
 ### `artifacts/NA-14/tables/t25_ma_cross.tex`
 - **Producer:** `newsaction.figures.latex`
@@ -4191,18 +4191,18 @@ sha256 on a rerun (labels and export were run twice: 8 of 8 files identical).
 - **Inputs:** `artifacts/NA-14/tables/t30_derived.csv` (the cells of `keys.json`)
 - **Schema:** LaTeX: booktabs, threeparttable(x) notes, siunitx S columns; a float or a longtable
 - **Key:** one file
-- **Rows / coverage:** appendix table tab:a-derived (1 cited cells)
+- **Rows / coverage:** appendix table tab:a-derived (8 cited cells)
 - **Availability:** after NA-12, NA-13 and NA-13b (test-period results are their stored outputs; nothing here reads the lock)
-- **sha256:** `d22c744e209b3584e8f06741d5c18c10fb55a4f508938e124d441e09fac090ec`
+- **sha256:** `8c6766b47d8c575c643ade8e395098b2d6eeba481ab9e5ce92ad7bf367eba3bd`
 
 ### `artifacts/NA-14/tables/t34_prereg_deviations.tex`
 - **Producer:** `newsaction.figures.latex`
 - **Inputs:** `artifacts/NA-14/tables/t34_prereg_deviations.csv` (the cells of `keys.json`)
 - **Schema:** LaTeX: booktabs, threeparttable(x) notes, siunitx S columns; a float or a longtable
 - **Key:** one file
-- **Rows / coverage:** appendix table tab:a-deviations (330 cited cells)
+- **Rows / coverage:** appendix table tab:a-deviations (331 cited cells)
 - **Availability:** after NA-12, NA-13 and NA-13b (test-period results are their stored outputs; nothing here reads the lock)
-- **sha256:** `529a62eb18cb1623640450a70c772adda0ffc0207fbc6fc712270cc504624d71`
+- **sha256:** `18d65449af8468ff5978f2a8db60a715e180936d8be6a7416c68f6359e800f3e`
 
 ### `artifacts/NA-14/tables/t36_selective_coverage.tex`
 - **Producer:** `newsaction.figures.latex`
@@ -4211,7 +4211,7 @@ sha256 on a rerun (labels and export were run twice: 8 of 8 files identical).
 - **Key:** one file
 - **Rows / coverage:** appendix table tab:a-selective-coverage (108 cited cells)
 - **Availability:** after NA-12, NA-13 and NA-13b (test-period results are their stored outputs; nothing here reads the lock)
-- **sha256:** `2f612a028f55eb9b5ac82f33702cba35a6bdaeaf9ec146f262af6ec826ecb29c`
+- **sha256:** `3617d8312fc39045222410c2e27c4748bfee9d4786aa0ad02dcfc926e36ae2b5`
 
 ### `artifacts/NA-14/tables/t37_watch_open.tex`
 - **Producer:** `newsaction.figures.latex`
@@ -4220,7 +4220,7 @@ sha256 on a rerun (labels and export were run twice: 8 of 8 files identical).
 - **Key:** one file
 - **Rows / coverage:** appendix table tab:a-watch-open (84 cited cells)
 - **Availability:** after NA-12, NA-13 and NA-13b (test-period results are their stored outputs; nothing here reads the lock)
-- **sha256:** `4bad5ecac97d3069007c53890527d50cbd8efd96f6955457a3a242ba8ba8320c`
+- **sha256:** `bd7dc2ab0f2ff061401f21a02477d9da285ec43fbf95d9299d17097ed0e9c14f`
 
 ### `artifacts/NA-14/tables/t38_conditioning.tex`
 - **Producer:** `newsaction.figures.latex`
@@ -4229,7 +4229,7 @@ sha256 on a rerun (labels and export were run twice: 8 of 8 files identical).
 - **Key:** one file
 - **Rows / coverage:** appendix table tab:a-conditioning (813 cited cells)
 - **Availability:** after NA-12, NA-13 and NA-13b (test-period results are their stored outputs; nothing here reads the lock)
-- **sha256:** `79a5b2ae57e3b2ea4f83b5d4dc27a6e0a7f0317502d5bbf58539a71e115ffaa7`
+- **sha256:** `ad686c08cfa15c2c579230a474e5cd79566d669fb136ad55e5fc4a6f87111b18`
 
 ### `artifacts/NA-14/tables/t39_conditioning_books.tex`
 - **Producer:** `newsaction.figures.latex`
@@ -4238,7 +4238,7 @@ sha256 on a rerun (labels and export were run twice: 8 of 8 files identical).
 - **Key:** one file
 - **Rows / coverage:** appendix table tab:a-conditioning-books (321 cited cells)
 - **Availability:** after NA-12, NA-13 and NA-13b (test-period results are their stored outputs; nothing here reads the lock)
-- **sha256:** `275d7d24dd9c6c81fa17506eecd0f8a1feba3036c925a0682b22e452e92be053`
+- **sha256:** `c899101f2f41982096d001a6765b5a0171ad552adf94d2bd3d9b5cd9874ff987`
 
 ### `artifacts/NA-14/tables/t43_band_disclosure.tex`
 - **Producer:** `newsaction.figures.latex`
@@ -4247,7 +4247,7 @@ sha256 on a rerun (labels and export were run twice: 8 of 8 files identical).
 - **Key:** one file
 - **Rows / coverage:** appendix table tab:a-band-disclosure (120 cited cells)
 - **Availability:** after NA-12, NA-13 and NA-13b (test-period results are their stored outputs; nothing here reads the lock)
-- **sha256:** `a6d649724d9ca790148c46033fd840e3d6f9a86f94e0d39fb9c18fddedcb469e`
+- **sha256:** `e12d1098b312bcd1131ce5b48fb984cb580d90b5d6f57608f15ba12b45bb9cd6`
 
 ### `artifacts/NA-14/tables/latex.json`
 - **Producer:** `newsaction.figures.latex`
@@ -4256,7 +4256,7 @@ sha256 on a rerun (labels and export were run twice: 8 of 8 files identical).
 - **Key:** one entry per LaTeX table
 - **Rows / coverage:** which cells each LaTeX table prints
 - **Availability:** after NA-12, NA-13 and NA-13b (test-period results are their stored outputs; nothing here reads the lock)
-- **sha256:** `2e2ed24bc94fe5b60c93a61b14201d57fc86d39ad081d5b6af151ae786c719e2`
+- **sha256:** `f84f42f8fe482ef8c7a7f15fb9730cbb1f8badd8e91e651d16f2e8ce2cae6e9b`
 
 ### `artifacts/NA-14/tables/keys.json`
 - **Producer:** `newsaction.figures.tables`
@@ -4265,7 +4265,7 @@ sha256 on a rerun (labels and export were run twice: 8 of 8 files identical).
 - **Key:** one file
 - **Rows / coverage:** the cells the captions cite
 - **Availability:** after NA-12, NA-13 and NA-13b (test-period results are their stored outputs; nothing here reads the lock)
-- **sha256:** `94b1fcb5b8d1fee659125ce426b6d2cb8c54caca779aef6241096c9f44cbfc5f`
+- **sha256:** `fbeabf1cb3173579772bd8f02c2d2f97fc1ffa544c066efebae0397ae817e769`
 
 ### `artifacts/NA-14/tables/index.json`
 - **Producer:** `newsaction.figures.tables`
@@ -4274,7 +4274,7 @@ sha256 on a rerun (labels and export were run twice: 8 of 8 files identical).
 - **Key:** one file
 - **Rows / coverage:** the table index
 - **Availability:** after NA-12, NA-13 and NA-13b (test-period results are their stored outputs; nothing here reads the lock)
-- **sha256:** `6de6c9301f6e9c2d1865451745725c0ee2b53fbf9cbac39d41ae1475c80ebe43`
+- **sha256:** `6f3f9f1194f748e4fe3810377e004471196e3b20b2459947202349c4142fd5a5`
 
 ## NA-13b — when does the signal work? (`newsaction.selective`, exploratory)
 
@@ -4412,3 +4412,32 @@ sha256 on a rerun (labels and export were run twice: 8 of 8 files identical).
 - **Rows / coverage:** the trial count the books' DSR used
 - **Availability:** exploratory (post hoc); after the NA-13b trials were logged
 - **sha256:** `980ca4fe8fd8ed4da49ac6ad3af3d9e2d9762147237ba9df6497d2e7fb229b57`
+
+## NA-16 — the manuscript (`newsaction.paper`)
+
+### `paper/generated/numbers.tex`
+- **Producer:** `newsaction.paper.numbers` (`make paper-text`)
+- **Inputs:** `paper/numbers.yaml`, `artifacts/NA-14/tables/keys.json`
+- **Schema:** LaTeX: `\res` and one `\@namedef{res@<name>}{<value>}` per registry name, the cell in a comment
+- **Key:** the registry name
+- **Rows / coverage:** every result number the manuscript prints, rendered from NA-14's table keys
+- **Availability:** after NA-14 (every number is a cell of NA-14's committed tables; nothing here reads the lock)
+- **sha256:** `e124fc6d90e4d8bac1d007334c7fe117c4f0a7a63bbfd047c1dea117bb4db992`
+
+### `arxiv/abstract.txt`
+- **Producer:** `newsaction.paper.numbers` (`make paper-text`)
+- **Inputs:** `paper/sections/abstract.tex`, `paper/numbers.yaml`, `artifacts/NA-14/tables/keys.json`
+- **Schema:** plain ASCII text, one line
+- **Key:** one file
+- **Rows / coverage:** the abstract for arXiv's abstract field (180 to 250 words), its numbers resolved
+- **Availability:** after NA-14 (every number is a cell of NA-14's committed tables; nothing here reads the lock)
+- **sha256:** `08090234b509c71e3aabd6b547e815ba18e34c25ad3ce197213451647aab4742`
+
+### `paper/generated/main.bbl`
+- **Producer:** `newsaction.paper.build` (`make paper-pdf`: tectonic's BibTeX on `paper/references.bib`)
+- **Inputs:** `paper/references.bib`, the citations of `paper/sections/*.tex`
+- **Schema:** BibTeX output (plainnat)
+- **Key:** one file
+- **Rows / coverage:** the bibliography arXiv needs (it does not run BibTeX)
+- **Availability:** after NA-14 (every number is a cell of NA-14's committed tables; nothing here reads the lock)
+- **sha256:** `1efdbaab22f5f72acbe9da1c4428d4bb3cae60dab81d37a1fcc98d920c522ca6`

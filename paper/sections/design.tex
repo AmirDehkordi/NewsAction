@@ -1,0 +1,188 @@
+\section{Data and design}\label{sec:design}
+
+The pre-registration, its amendments and its deviations log are part of the replication package.
+Appendix~\ref{app:prereg} summarizes the log (Table~\ref{tab:a-deviations}), and Appendix~\ref{app:notation}
+collects the notation (Table~\ref{tab:notation}).
+
+\subsection{Universe, sample periods and returns}\label{sec:universe}
+
+The universe is the point-in-time membership of the S\&P 500: a stock is in the sample on a session only if it
+was an index member on that session, and companies with several share classes count once. Each month the
+members are split into three size tiers by market capitalization at the previous month-end: the 100 largest,
+ranks 101--250 and ranks 251--500. The sample is split by time into a training period (2024-07-01 to
+2025-06-30), two validation quarters and a test period. The first validation quarter, val-A (2025-07-01 to
+2025-09-30), is used for search and for fitting calibration maps, temperatures and thresholds; the second, val-B
+(2025-10-01 to 2025-12-31), for confirmation and the final selection. The test period, 2026-01-02 to
+2026-07-31, was blinded until the analysis plan was frozen and was then used once. A target enters an
+evaluation only if its whole horizon ends inside its period, and the first five sessions of each evaluation
+period are left out.
+
+Daily prices are adjusted for splits, dividends and spin-offs, and the opening price is put on the same basis.
+For stock $i$ on session $t$, the close-to-close return splits at the open into an overnight return, from the
+previous close to the open, and an intraday return, from the open to the close:
+\begin{equation}\label{eq:split}
+1 + r^{cc}_{i,t} = \bigl(1 + r^{on}_{i,t}\bigr)\bigl(1 + r^{id}_{i,t}\bigr),
+\qquad
+z^{k}_{i,t} = \frac{\AR^{k}_{i,t}}{\sigma^{k}_{i,t-1}}, \quad k \in \{cc, on, id\}.
+\end{equation}
+In logs, the close-to-close move is the sum of the overnight move and the move after the open. Each part is made
+abnormal by removing the market and the stock's sector, $\AR^{k}_{i,t} = r^{k}_{i,t} - \beta^{m}_{i}\,
+r^{k}_{m,t} - \beta^{s}_{i}\,(r^{k}_{s,t} - r^{k}_{m,t})$, where $r_{m}$ is the return of the S\&P 500 ETF
+(SPY), $r_{s}$ the equal-weighted return of the other members of the stock's sector, and the betas come from
+the 252 sessions up to $t-1$. It is then divided by $\sigma^{k}_{i,t-1}$, a robust scale (1.4826 times the
+median absolute deviation) of the stock's abnormal returns over the 126 sessions up to $t-1$. A value of
+$z^{k}_{i,t}$ is therefore a move in units of the stock's typical daily move, scaled by information known before
+the session. Equation~\eqref{eq:split} defines what ``priced at the open'' means in this paper: news is priced
+at the open when a model's reading predicts $z^{on}$ but not $z^{id}$. Where the indices are clear we write
+$z_{cc}$, $z_{on}$ and $z_{id}$, as the tables and figures do. Multi-day targets add up abnormal returns over
+their window and divide by the window's ex-ante volatility; the main one, $y_2$, runs from the next open to the
+close of $t+5$.
+
+\subsection{News, events and decision points}\label{sec:news}
+
+The news comes from a commercial company-news feed (titles and snippets with publication times). An article is
+available at its time stamp, or at the end of the hour or day when the stamp is rounded to the hour or carries
+only a date. We drop items marked as non-news, price commentary and promotion, automatic institutional-holdings
+reports, non-English articles, near-duplicates, and two kinds of item whose time stamp precedes its content:
+explainers of a stock's move and running market stories updated in place. We fix three decision points per
+session $t$:
+\begin{itemize}[leftmargin=*, itemsep=1pt]
+\item \textbf{D0}, at 09:15~ET, before the open. The model reads the news published since the previous close;
+  a trade enters at the official open.
+\item \textbf{D1}, at 10:00~ET, after the first 30-minute bar. The model also sees the move so far; a trade
+  enters at the price at the end of that bar.
+\item \textbf{D2}, after the close. The model reads the day's news and the day's move; a trade enters at the
+  next open.
+\end{itemize}
+The observed reaction $G$ is the move up to the decision point in typical-move units: at D2 it is the day's
+$z_{cc}$, and at D1 the abnormal move from the previous close to 10:00, divided by its ex-ante volatility. Its
+level version $\Glvl$ divides by $\sigma^{cc}$ without a square-root-of-time adjustment, so that moves at
+different horizons add up.
+
+A learned importance filter, a logistic regression on sentence embeddings of the news \citep{xiao2024}, selects
+the company-days that enter the analysis. A pre-registered rule chose it on val-A among seven candidate filters:
+at a budget of 30\% of covered company-days it captures \res{f5-recall} of the company-days with a material
+price reaction. An \emph{event} is a company-session with selected news: D0 events use the news up to 09:15, D2
+events the news up to the close. The test period has \res{test-d0-events} D0 events on \res{test-d0-sessions}
+sessions and \res{test-d2-events} D2 events.
+
+Each event becomes a \emph{state}, a JSON document with fixed keys: the company's context (sector, size tier,
+market sensitivity, volatility regime, recent abnormal performance, analyst-estimate revisions and whether an
+earnings report is scheduled), the market's context (the previous session's market move, the level and change
+of the VIX, rates, credit spreads, the dollar, oil and scheduled macroeconomic releases), attention (the number
+of articles against the stock's usual number) and up to six news items with their source type and timing. Every
+number passes through a codebook of words: a move of between one and two typical daily moves is ``moderate'',
+followed by its multiple of a typical day's move. A post-reaction state
+adds the reaction so far: the stock's move, the market's move over the same period and the volume against
+normal.
+
+\paragraph{The two readings.} The \emph{pre-open reading} asks, among other questions, ``Once investors fully
+absorb the news, how will the company's stock perform relative to the overall market and its sector over the
+next five trading days?'' on nine levels, from a very large fall (more than three typical daily moves) to a very
+large rise. With $p_k$ the probability of level $k$ and $m_k$ the level's midpoint in typical daily moves, the
+\emph{news-implied move} is the model's expected move,
+\[
+\Nhat = \sum_{k=1}^{9} p_k m_k, \qquad m = (-3.5,\ -2.5,\ -1.5,\ -0.75,\ 0,\ 0.75,\ 1.5,\ 2.5,\ 3.5).
+\] The \emph{news-implied value} $V$ maps $\Nhat$ to the realized five-day level move
+with an isotonic regression \citep{barlow1972} fitted on val-A for each model: it is the model's estimate of where the abnormal
+price settles once the news is absorbed. The \emph{post-reaction reading} also asks whether the reaction so far
+is in the wrong direction, much too small, too small, about right, too large or much too large for what the
+news justifies, and whether the move will reverse, stall or continue over the next five days. Its judgment
+$J = P(\text{much too small}) + P(\text{too small}) - P(\text{too large}) - P(\text{much too large})$ is positive
+when the model calls the reaction an underreaction. A pre-registered check found that the post-reaction readings
+anchor on the move the model is shown, so $\Nhat$ always comes from the pre-open reading.
+
+\paragraph{Masking.} The states hide the company. Names, aliases, tickers and cashtags become ``the company'';
+person names become ``an executive'' or ``a person''; dates, weekdays, years and fiscal-period labels become
+``recently'' or ``the latest quarter''; share-price levels and every percent price move of any security (the
+company's, other companies', indexes, commodities and currencies) are removed. Fundamental figures, such as
+earnings per share, revenue and guidance, are kept, because they are the news. An independent leak scanner,
+written without the masker's rules, and reading of the remaining candidates checked the result; the residues
+that remain were accepted below half a percent of states for names, tickers and dates, and are disclosed in the
+deviations log. Masking cannot hide a company whose news is distinctive, and Section~\ref{sec:memorization}
+measures how often the models still recognize it.
+
+\subsection{The models}\label{sec:models}
+
+\paragraph{Laya-Fin, the primary instrument.} Laya is an open-weights decision model built on the
+ModernBERT-large encoder \citep{convaiinnovations2026,warner2025}. We fine-tuned it on the training period's states with three
+heads: the nine-level move (labelled with the realized five-day move), a five-level magnitude head (the size of
+the same-day move) and, for the post-reaction reading, a three-class continuation head. Training ran for one
+epoch on two T4 GPUs of Kaggle's free tier, with AdamW \citep{loshchilov2019} and early stopping on val-A, and one
+temperature per head was fitted on val-A. The pre-registered plan called for three seeds; one seed (13) was
+trained before the freeze, and the other seeds are pending robustness runs (Section~\ref{sec:limits}).
+
+\paragraph{Commercial decision models.} Every eligible decision model in a public model router's catalogue, plus
+the local Laya models, entered a two-stage zero-shot tournament on val-A: \res{tourn-models} models answered the
+same 700 states. A model confidence set \citep{hansen2011} kept all of them, because about a dozen events a
+session cannot separate daily ICs. The six with the highest first-stage IC then answered 3,000 states and faced
+four pre-registered screens: company identification on masked states (pass at 40\% or less, against 25\% by
+chance), the share of counterfactual edits (beat or miss, raise or cut, upgrade or downgrade) that move the
+reading the right way (pass at 70\% or more), the IC gain from unmasking, and a shuffled-news control. No model
+passed: all six identified the masked company in \res{mem-na06-min} to \res{mem-na06-max} of states, and five
+also failed the counterfactual screen. By a decision logged before the freeze, the three with the highest
+second-stage IC, d1-ultra, span-02 and drex-v2.0, were carried to the test as \emph{screen-failing,
+model-specific comparators}: we report their results, but they cannot support a general claim. All three were
+released in October 2026, after the sample ended.
+
+\paragraph{The untuned model, the anchor and the baselines.} Laya zero-shot is the untuned Laya model answering
+the same questions. The anchor is the December 2024 ModernBERT-large checkpoint \citep{warner2025}, fine-tuned
+with the same heads and recipe as Laya-Fin; it was meant to show what training adds to a model whose
+pretraining ended before the sample. After one epoch its outputs are nearly constant, so we report it as
+\emph{uninformative}, not as a null, and make no claim about the effect of training. The baselines are vendor
+sentiment and a gradient-boosted model \citep{ke2017} on the vendor's topic tags, both built on labels the vendor
+produced after the fact and therefore an upper bound that may carry look-ahead, not a benchmark; a ridge
+regression \citep{hoerl1970} on sentence embeddings of the news; a gradient-boosted model on price, volume and
+size alone; and a generative LLM prompted for the same nine-level forecast on a 2,000-event subsample.
+
+\subsection{Pre-registration, freeze and blinding}\label{sec:prereg}
+
+The pre-registration was written on 2026-10-24, before any panel, target or model output existed. It fixes the
+universe, the splits, the targets, the masking, the questions, the selection rules for filters, encodings and
+models, the hypotheses with their families and corrections, the strategies and the inference. Three amendments
+were added the same day, before any data: convergence to the news-implied value, a wider question battery and
+the firm-level explanation analysis. Changes after that go only into an append-only deviations log, with the
+date, the reason and whether they came before or after the freeze. Selection used validation data only.
+
+On 2026-10-28, before any 2026 model call, the analysis plan was frozen: a SHA-256 hash over the
+pre-registration (up to its deviations log), every configuration file and the code of the targets, the
+reactions and the analysis specification was recorded and tagged in version control. Prices from 2026 were
+sealed: they could be read only through a lock that checks the frozen hash and logs every read. The lock was
+opened after the freeze to build the post-reaction states (reactions only), and once, in a single logged
+sequence, to release the test outcomes. Three append-only, hash-chained ledgers record API spend (capped at
+\$30; \$\res{spend-total} used), every evaluated variant as a trial (\res{ntrials-strat} when the pre-registered
+strategies were evaluated, \res{ntrials-total} after the exploratory study) and every access to test-period
+data. The deviations log holds \res{dev-rows} entries; Appendix~\ref{app:prereg} summarizes the material ones.
+
+\subsection{Inference}\label{sec:inference}
+
+The main statistic is the daily information coefficient,
+\begin{equation}\label{eq:ic}
+\IC_t(\Nhat, z) = \rho_{S}\bigl(\{\Nhat_{i,t}\}_{i \in \mathcal{E}_t},\, \{z_{i,t}\}_{i \in \mathcal{E}_t}\bigr),
+\qquad
+\overline{\IC} = \frac{1}{T}\sum_{t=1}^{T} \IC_t(\Nhat, z),
+\end{equation}
+the Spearman rank correlation $\rho_{S}$ between the readings and the moves across the events $\mathcal{E}_t$ of
+session $t$ (sessions with at least five events), averaged over the $T$ sessions of a period. Its $t$-statistic
+uses Newey--West standard errors with five lags \citep{newey1987}. A positive IC means that the readings rank
+the day's moves in the right order on average; the IC is the usual measure of a cross-sectional signal. The
+hypotheses that news is priced at the open compare the IC with the overnight move and with the move after the
+open:
+\begin{equation}\label{eq:h1}
+\text{H1: } \Delta = \frac{1}{T}\sum_{t}\Bigl[\IC_t(\Nhat, z^{on}) - \IC_t(\Nhat, z^{id})\Bigr] > 0,
+\qquad
+\text{H1b: } \frac{1}{T}\sum_{t} \IC_t(\Nhat, z^{id}) > 0.
+\end{equation}
+H1 says that the news is priced mostly at the open, H1b that it is not fully priced there, so that a position
+taken at the open can still earn. Both are tested one-sided with a stationary block bootstrap over sessions
+\citep{politis1994}, with blocks of five sessions and 10,000 draws. H1b was added to the pre-registration before
+the freeze, because the pre-registered strategy that enters at the open needs it.
+
+The five primary hypotheses (H1, H1b, H2, H3 and H4, defined where they are tested) form one family, corrected by
+Holm's method at 0.05 \citep{holm1979}; the secondary hypotheses form families corrected by
+Benjamini--Hochberg at $q = 0.10$ \citep{benjamini1995}. Regressions are pooled OLS with day-by-tier fixed
+effects and standard errors clustered by date and by firm \citep{cameron2011}, with Driscoll--Kraay standard
+errors \citep{driscoll1998} as a check. A primary result counts as a general claim only if it holds with the same
+sign and $p < 0.05$ for the primary instrument and for the anchor; if it holds for the primary instrument alone,
+it is model-specific. Because the anchor is uninformative and the commercial models failed the screens, no
+result in this paper can be more than model-specific.

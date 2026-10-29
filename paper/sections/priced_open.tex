@@ -1,0 +1,52 @@
+\section{Pre-open news is priced at the open}\label{sec:priced}
+
+Equation~\eqref{eq:split} splits each day's move at the open. Figure~\ref{fig:priced-open} and
+Table~\ref{tab:ic-target} show on which side of the open the models' readings predict it. For the three
+commercial models the answer is clear. Their daily IC with the overnight move $z_{on}$ is \res{d1-ic-on-test}
+(d1-ultra), \res{span-ic-on-test} (span-02) and \res{drex-ic-on-test} (drex-v2.0), with $t$-statistics of
+\res{d1-ic-on-test-t}, \res{span-ic-on-test-t} and \res{drex-ic-on-test-t}; their IC with the move after the
+open, $z_{id}$, is \res{d1-ic-id-test}, \res{span-ic-id-test} and \res{drex-ic-id-test}. H1, the difference, is
+\res{d1-h1} for d1-ultra (95\% interval \res{d1-h1-lo} to \res{d1-h1-hi}, $p = \res{d1-h1-p}$), and the same to
+three decimals for the other two. Sorted by d1-ultra's reading, the top quintile of a day's events moves
+\res{d1-qspread-on} typical daily moves more overnight than the bottom quintile ($t = \res{d1-qspread-on-t}$).
+The untuned Laya
+model shows the same pattern at a smaller scale (H1 $= \res{lz-h1}$, $p = \res{lz-h1-p}$). Because the
+commercial models failed the screens, these results are model-specific.
+
+\begin{figure}[tbp]
+\centering
+\includegraphics{\figdir/fig2_priced_at_open.pdf}
+\caption{\textbf{The commercial models' pre-open signal is in the overnight move (daily IC \res{d1-ic-on-test} to
+\res{drex-ic-on-test}), not in the move after the open (about zero).} (a) Daily IC of the pre-open reading
+$\Nhat$ with the overnight move $z_{on}$ (previous close to open; filled) and with the move after the open
+$z_{id}$ (open to close; hollow) on the test period, with 95\% bootstrap intervals. (b) H1, the difference of the
+two, with its bootstrap interval. For d1-ultra, H1 $= \res{d1-h1}$ ($p = \res{d1-h1-p}$); the commercial models
+are model-specific because they failed the pre-registered screens. Laya-Fin's ICs are small on both sides
+(\res{lf-ic-on-test} and \res{lf-ic-id-test}), so H1 and H1b are not supported for it (Holm
+$p = \res{lf-h1-holm}$), although on val-B its IC with $z_{id}$ had been \res{lf-ic-id-valb}
+($t = \res{lf-ic-id-valb-t}$). $^{\ddagger}$span-02: see Figure~\ref{fig:validation-test}. The anchor is in
+Table~\ref{tab:primary}.}\label{fig:priced-open}
+\end{figure}
+
+No model predicts the move after the open. H1b, the IC with $z_{id}$, is not significant for any model on the
+test: \res{lf-ic-id-test} for Laya-Fin ($t = \res{lf-ic-id-test-t}$), and between \res{lz-ic-id-test} and
+\res{drex-ic-id-test} for the others. This matters for Laya-Fin, whose validation signal seemed to reach past
+the open: on val-B its IC with $z_{id}$ was \res{lf-ic-id-valb} ($t = \res{lf-ic-id-valb-t}$), as large as its
+IC with $z_{on}$ (\res{lf-ic-on-valb}). That is why H1b was added to the pre-registration before the freeze. On
+the test, both of Laya-Fin's ICs are small (\res{lf-ic-on-test} and \res{lf-ic-id-test}) and neither hypothesis
+is supported.
+
+\input{\tabdir/tab2_ic_by_target.tex}
+
+\paragraph{Robustness.} No pre-registered robustness variant changes these conclusions
+(Appendix Figure~\ref{fig:a-robustness}): dollar-volume tiers, dropping articles with date-only or
+hour-rounded time stamps, a non-overlapping sample, placebo-adjusted targets, a 60-session volatility, dropping
+delisting horizons and dropping text about price moves. Two variants speak to when the news arrives. For
+d1-ultra, the overnight IC is largest when the latest article arrives between 08:00 and 09:15
+(\res{d1-ic-on-0815}, $t = \res{d1-ic-on-0815-t}$), smaller for 04:00 to 08:00 (\res{d1-ic-on-0408}) and not
+significant when the latest article precedes 04:00 (\res{d1-ic-on-pre04}, $t = \res{d1-ic-on-pre04-t}$). For
+Laya-Fin, the IC with $z_{cc}$ is \res{lf-ic-cc-pre04} when the latest article precedes 04:00 and
+\res{lf-ic-cc-0408} and \res{lf-ic-cc-0815} in the two later windows. Unmasking does not raise d1-ultra's IC: on
+\res{unmask-n} test events its IC with $z_{cc}$ is \res{unmask-ic-masked} with masked states and
+\res{unmask-ic-unmasked} with the same states unmasked. The market reads the news before the open, and for
+d1-ultra the closer to the open the news arrives, the more of the overnight move its reading predicts.

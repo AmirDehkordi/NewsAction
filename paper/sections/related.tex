@@ -1,0 +1,58 @@
+\section{Related work}\label{sec:related}
+
+\paragraph{Language models and stock returns.} Text has long been used to predict returns, from dictionary
+measures of the tone of news \citep{tetlock2007,tetlock2008} to sentiment scores learned from returns
+\citep{ke2019}. Large language models extend this line: \citet{lopezlira2026} find that ChatGPT's reading of
+headlines predicts next-day returns, and \citet{chen2022} find that LLM representations of news predict the
+cross-section of returns. \citet{kelly2026} use generative AI to explain realized market returns with the
+reasons given in daily market summaries, revisiting \citet{roll1988}, who found that market, industry and
+public news explain only a small part of individual stock returns; we carry their explanation ladder to the
+firm level. Decision models are a newer interface
+\citep{zhu2026}: the model returns probabilities for typed questions instead of text, so no free
+text needs parsing and every output is a forecast that can be scored.
+
+\paragraph{Look-ahead bias and memorization.} \citet{glasserman2024} test for look-ahead bias in GPT's
+sentiment readings of news by anonymizing the companies; \citet{sarkar2024} analyze look-ahead bias in
+pretrained language models used for prediction; \citet{lopezlira2025} show that LLMs recall economic and
+financial data from their training period, so forecasting tests inside that period are not out of sample; and
+\citet{he2026} train language models only on text available at each date. In machine learning, memorization
+and benchmark contamination are documented and measured directly \citep{carlini2023,golchin2024,sainz2023}. Every
+decision model we use was released after our sample ended, so none can be assumed ignorant of it. We therefore
+mask the states, measure how often a model still identifies the company, and pre-register a forward test on
+news published after the models' release.
+
+\paragraph{News, attention and price reactions.} Prices incorporate firm news quickly
+\citep{patell1984,busse2002} but not always completely. Earnings news drifts \citep{bernard1989}; price moves
+that come with news continue while moves without identifiable news reverse \citep{chan2003,savor2012};
+high-frequency evidence points to underreaction to news \citep{jiang2021}; and identifying the relevant news
+sharpens the link between information and volatility \citep{boudoukh2019}. Stale or recombined news is
+mispriced \citep{tetlock2011,fedyk2023}, and distracted or inattentive investors underreact
+\citep{hirshleifer2009,dellavigna2009}. Behavioral models explain both underreaction and overreaction
+\citep{barberis1998,daniel1998}, building on the overreaction evidence of \citet{debondt1985}, while
+\citet{fama1998} argues that the two kinds of anomaly are about equally frequent and fragile to the choice of
+method. The split of a daily return into an overnight and an intraday part \citep{lou2019} is central here: we
+ask on which side of the open the news is priced.
+
+\paragraph{Selective prediction and calibration.} A model that can abstain trades coverage for accuracy
+\citep{geifman2017}, and whether its confidence is a useful guide depends on calibration, which modern neural
+networks often lack \citep{pakdamannaeini2015,guo2017}. Language models are partly calibrated about what they know
+\citep{kadavath2022}, and LLM forecasts can approach the accuracy of human forecasters
+\citep{halawi2024,schoenegger2024}. We measure calibration with the pre-registered expected calibration error
+and use selective prediction only in the exploratory section.
+
+\paragraph{Pre-registration and replication in finance.} Many published return predictors do not survive
+multiple-testing adjustments or replication \citep{harvey2016,hou2020}, although \citet{jensen2023} find that
+most factors replicate once the evidence is aggregated properly. \citet{harvey2017} calls for pre-registration
+and other safeguards in financial economics, and \citet{olken2015} discusses the benefits and limits of
+pre-analysis plans in economics. For trading strategies, the deflated Sharpe ratio adjusts a backtest for the
+number of trials behind it \citep{bailey2014}. We pre-register hypotheses, families and corrections, log every
+trial, and report every pre-registered result.
+
+\paragraph{Our earlier work.} \citet{kargarzadeh2026} ask when news is priced in, using millions of news
+articles on about three thousand US stocks, each tagged by an LLM-distilled classifier with an event type and
+several attributes. They find that the reaction is concentrated before and on the day of publication, that
+markets underreact to numbers and overreact to stories, and that news carries width as well as direction. This
+paper extends that work in three ways. It replaces the event tags with decision models that read the masked
+news and forecast the move directly; it splits the reaction at the open and at fixed decision points, so that
+it can ask whether a reader of the news can trade on it; and it moves from a descriptive study to a
+pre-registered, blinded test with a single unblinding.

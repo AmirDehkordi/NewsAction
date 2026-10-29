@@ -1,0 +1,202 @@
+\section{Pre-registration and deviations}\label{app:prereg}
+
+The pre-registration fixes every definition, constant, split, hypothesis and selection rule. After it was
+written, changes could only be appended to its deviations log, each with its date, the section it touches, the
+reason and whether it came before or after the freeze; the freeze record holds the log's length at the freeze, and
+the lock refused to release the test outcomes unless the log was an unchanged prefix of the current one.
+Table~\ref{tab:a-deviations} gives every entry in one line. Most entries make precise what the pre-registration
+left open (how a filter reaches its budget, which events a sample holds, how a variable is scaled) and were written
+before the freeze. The material deviations are these.
+\begin{itemize}[leftmargin=*, itemsep=1pt]
+\item \emph{Amendments before any data.} Convergence to the news-implied value, a wider question battery and the
+  firm-level explanation analysis were added on the day the pre-registration was written.
+\item \emph{Masking.} The masking rules were widened several times before the freeze, after independent checks
+  found residual names, dates and price moves; non-English articles, move explainers and running market stories
+  were excluded; residues below half a percent of states were accepted and disclosed.
+\item \emph{The commercial models} failed the pre-registered screens. Instead of dropping them, the three with
+  the highest second-stage IC were kept as screen-failing, model-specific comparators (before the freeze).
+\item \emph{Training.} The trained instruments are one seed and one epoch each, not the pre-registered three-seed
+  ensemble, because of a week's free GPU quota; the other seeds are robustness runs, fixed before unblinding and
+  not yet run.
+\item \emph{H1b} (the IC with the move after the open) was added to the primary family before the freeze, because
+  the strategy that enters at the open needs it.
+\item \emph{Company identification} was re-run with activity-matched distractors before the freeze, because a
+  guess from news activity alone beat chance in the original design.
+\item \emph{Items not run.} Three robustness variants needed new model calls and were not run (a summary-text
+  variant, vendor tags in the text and a 09:30 news cutoff); the 08:00 cutoff is approximated from time stamps.
+  Of the ablation requests, \res{ablation-failed} were rate-limited and not retried.
+\item \emph{The canary.} After the freeze, a stability check that repeats earlier requests fired for span-02
+  before production. Its build string was unchanged and the drift was close to its own repeat noise, so production
+  went ahead under a rule recorded before the end-of-production check: a model counts as updated only if its build
+  changes or two independent checks fire. At the end of production neither condition held for any model.
+\item \emph{The price-only baseline's post-close predictions} were moved after unblinding, because one of their
+  inputs, the day's overnight move, is a test-period outcome; the model was unchanged and first reproduced its
+  validation predictions exactly.
+\item \emph{Analysis and strategies.} The operationalization of the frozen specification and of the strategies
+  was written before the outcomes were read; three code fixes found when the code first met the test data changed
+  no pre-registered number.
+\item \emph{Exploratory work after unblinding} is dated in the log. The conditioning study's validation selection
+  was committed before its single test run; its two definitional choices (the VIX close of the previous session,
+  read from a registered copy of the market data, and payroll release dates added from the Bureau of Labor
+  Statistics) were made on validation data.
+\item \emph{The forward test} was pre-registered after the paper's analyses and before any forward-period data
+  existed (Section~\ref{sec:limits}).
+\end{itemize}
+
+\input{\tabdir/t34_prereg_deviations.tex}
+
+\section{Notation}\label{app:notation}
+
+{\small
+\begin{longtable}{@{}>{\raggedright\arraybackslash}p{1.35in}>{\raggedright\arraybackslash}p{4.95in}@{}}
+\caption{Notation.}\label{tab:notation} \\
+\toprule
+Symbol & Meaning \\
+\midrule
+\endfirsthead
+\multicolumn{2}{@{}l}{\textit{Table \ref{tab:notation}, continued}} \\
+\toprule
+Symbol & Meaning \\
+\midrule
+\endhead
+\bottomrule
+\endlastfoot
+D0, D1, D2 & Decision points: 09:15~ET before the open (pre-open reading); 10:00~ET after the first 30-minute bar
+and after the close (post-reaction readings). \\
+val-A, val-B, test & 2025-07-01 to 2025-09-30; 2025-10-01 to 2025-12-31; 2026-01-02 to 2026-07-31. \\
+$r^{cc}, r^{on}, r^{id}$ & Close-to-close, overnight (close to open) and intraday (open to close) returns, with
+$1 + r^{cc} = (1 + r^{on})(1 + r^{id})$; Equation~\eqref{eq:split}. \\
+$\AR^{k}$, $\sigma^{k}_{i,t-1}$ & Abnormal return (market and leave-one-out sector removed, betas over 252
+sessions to $t-1$); its ex-ante scale (1.4826 times the median absolute deviation over 126 sessions to $t-1$,
+floored at the day's cross-sectional 10th percentile). \\
+$z^{k}$; $z_{cc}, z_{on}, z_{id}$ & $\AR^{k}/\sigma^{k}_{i,t-1}$, the move in typical daily moves (clipped at
+$\pm 10$). \\
+$y_0, y_1, y_2$ & Outcomes after D0, D1 and D2: $z_{id}$; the move from 10:00 to the close; the move from the next
+open to the close of $t+5$, each over its ex-ante volatility. \\
+$e_5$ & The move from the previous close to the close of $t+4$ over $\sigma^{cc}\sqrt{5}$: the training label and
+the calibration target. \\
+$G$, $\Glvl$ & The observed reaction at D1 or D2 in typical-move units; its level version, divided by
+$\sigma^{cc}$ without a square-root-of-time factor. \\
+$\Nhat$, $\Ntilde$ & The news-implied move $\sum_k p_k m_k$ over the nine levels of the pre-open reading; its
+calibrated version (an isotonic map to $e_5$ fitted on val-A), which ranks the pre-open strategy. \\
+$V$, $U$ & The news-implied value (an isotonic map of $\Nhat$ to the level move to $t+4$, fitted on val-A); the
+remaining gap $V - \Glvl$ at D1 or D2. \\
+$J$ & The post-reaction judgment $P(\text{much too small}) + P(\text{too small}) - P(\text{too large}) -
+P(\text{much too large})$. \\
+Under, Fair, Over & Post-reaction classes from $(\Nhat - G)\,\mathrm{sign}(\Nhat)$ for $|\Nhat| \ge 0.5$: Under
+above 0.5, Over below $-0.5$, Fair between. \\
+$\CARlvl_{h}$ & The level cumulative abnormal return from the previous close to rung $h$. \\
+$\kappa_h$, $\theta_V$ & The convergence slope at rung $h$ (Equation~\eqref{eq:ladder}); the reliability of $V$
+(Equation~\eqref{eq:attenuation}). \\
+$\lambda_h$, $\psi_h$, $h^{*}$ & The share of the gap closed by rung $h$, the convergence to a shrunken value and
+the half-life (Equation~\eqref{eq:gap}). \\
+$\IC_t$, $\overline{\IC}$ & The daily Spearman information coefficient and its mean over sessions
+(Equation~\eqref{eq:ic}). \\
+$R^{2}_{\mathrm{OOS}}$, $\Delta R^{2}$ & The out-of-sample $R^2$ and a step's increment
+(Equation~\eqref{eq:r2}). \\
+$\mathrm{Acc}_m$, $p_0$ & Company-identification accuracy and the matched baseline
+(Equation~\eqref{eq:memorization}). \\
+ECE & Expected calibration error of the top class of three (a fall, no move or a rise, split at $\pm 0.5$
+typical moves against $e_5$), 15 equal-width bins. \\
+DSR, $\mathrm{SR}_0$ & The deflated-Sharpe probability and its benchmark (Equation~\eqref{eq:dsr}). \\
+H1, H1b, H2, H3, H4 & Primary hypotheses (Holm at 0.05). \\
+H5, H6, H7, H2-C & Secondary hypotheses (Benjamini--Hochberg at $q = 0.10$): explaining moves, style, the
+instruments, convergence. \\
+F1 to F7 & The forward test's hypotheses (Section~\ref{sec:limits}). \\
+\end{longtable}
+}
+
+\section{The deflated Sharpe ratio}\label{app:dsr}
+
+For a book with $T$ daily net returns, a per-period Sharpe ratio $\widehat{\mathrm{SR}}$, skewness
+$\hat\gamma_3$ and kurtosis $\hat\gamma_4$, the deflated-Sharpe probability \citep{bailey2014} is computed as
+\begin{equation}\label{eq:dsr}
+\mathrm{DSR} = \Phi\!\left(\frac{(\widehat{\mathrm{SR}} - \mathrm{SR}_0)\sqrt{T-1}}
+{\sqrt{1 - \hat\gamma_3\,\widehat{\mathrm{SR}} + \tfrac{\hat\gamma_4 - 1}{4}\,\widehat{\mathrm{SR}}^{2}}}\right),
+\qquad
+\mathrm{SR}_0 = \sqrt{\mathcal{V}}\left[(1 - \gamma)\,\Phi^{-1}\!\left(1 - \frac{1}{N}\right)
++ \gamma\,\Phi^{-1}\!\left(1 - \frac{1}{N\mathrm{e}}\right)\right],
+\end{equation}
+where $\Phi$ is the standard normal distribution function, $\gamma$ the Euler--Mascheroni constant, $N$ the
+number of trials and $\mathcal{V} = (1 + \widehat{\mathrm{SR}}^{2}/2)/(T-1)$ the variance of a Sharpe-ratio
+estimate \citep{lo2002}; the analytic variance is used because most of the ledger's other trials are information
+coefficients, recalls and losses, not Sharpe ratios. $\mathrm{SR}_0$ is the Sharpe ratio that the best of $N$
+independent trials without skill would reach in expectation, so it rises with $N$: a book must beat it, not zero.
+With the \res{ntrials-strat} trials of the ledger when the pre-registered strategies were evaluated and
+\res{sconv-ndays} test days, $\mathrm{SR}_0$ is \res{dsr-sr0} per day for the convergence strategy, far above any
+book's daily Sharpe ratio. The exploratory books of Section~\ref{sec:exploratory} were deflated with all
+\res{ntrials-total} trials of the ledger after the exploratory study, which raises the bar further.
+
+\section{Additional pre-registered results}\label{app:results}
+
+This appendix gives the pre-registered results that the main text cites but does not show: every model's IC
+and cost (Table~\ref{tab:a-model-comparison}), the robustness variants (Figure~\ref{fig:a-robustness}), the
+heterogeneity cuts (Table~\ref{tab:a-heterogeneity}), the secondary hypotheses (Table~\ref{tab:a-secondary}) and
+calibration (Table~\ref{tab:a-calibration} and Figure~\ref{fig:a-reliability}). Further tables and figures are
+in the replication package.
+
+\input{\tabdir/t14_model_comparison.tex}
+
+\begin{figure}[htbp]
+\centering
+\includegraphics{\figdir/figA5_robustness.pdf}
+\caption{\textbf{No pre-registered robustness variant changes a conclusion: Laya-Fin's H1 and H1b stay within
+their intervals of zero, and d1-ultra's H1 stays positive in every variant, from \res{d1-h1-pre04} when the
+latest article precedes 04:00 to \res{d1-h1-0815} when it arrives between 08:00 and 09:15.} Test period, D0
+events. Each variant raw (filled) and with placebo-adjusted targets (hollow), below the main estimate (diamond,
+from the stationary block bootstrap), with 95\% intervals ($\pm 1.96$ Newey--West standard errors for the
+variants). (a) and (d), both H1, share a scale; (b) and (c) have their own. d1-ultra is
+model-specific.}\label{fig:a-robustness}
+\end{figure}
+
+\input{\tabdir/t5_heterogeneity.tex}
+
+\input{\tabdir/t4_secondary.tex}
+
+\input{\tabdir/t15_calibration.tex}
+
+\begin{figure}[htbp]
+\centering
+\includegraphics{\figdir/figA4_reliability.pdf}
+\caption{\textbf{Laya-Fin's three-class forecasts are calibrated but compressed (expected calibration error
+\res{lf-ece}); the commercial models are overconfident (\res{drex-ece} to \res{span-ece}).} Reliability of the
+pre-open reading's three classes (a fall, no move or a rise, split at $\pm 0.5$ typical moves) against the
+five-day move $e_5$ on the test period: the hit rate of the top class by bin of its stated probability (15 bins;
+the dot area grows with the number of events in the bin; the diagonal is perfect calibration). The anchor's
+near-constant readings sit in two bins. $^{\ddagger}$span-02: see Figure~\ref{fig:validation-test}. The commercial
+models are model-specific.}\label{fig:a-reliability}
+\end{figure}
+
+\FloatBarrier
+\section{Exploratory: the conditioning study}\label{app:exploratory}
+
+Figure~\ref{fig:a-conditioning} shows every (model, condition) pair of the post hoc conditioning study of
+Section~\ref{sec:exploratory}, with the \res{cond-selected} pairs that the validation rule selected shaded. It is exploratory:
+the study was requested after unblinding, and the figure supports no claim.
+
+\begin{figure}[htbp]
+\centering
+\includegraphics{\figdir/figA18_conditioning_map.pdf}
+\caption{\textbf{Exploratory (post hoc): none of the \res{cond-selected} conditions selected on two validation
+quarters held on the test; \res{cond-reversed} changed sign.} For each (model, condition) pair, the difference
+inside minus outside the condition of the mean $\mathrm{sign}(\Nhat)\cdot z_{id}$ (typical daily moves) on val-A
+(circles), val-B (squares) and the test (dots), with 95\% intervals; shaded rows were selected by the rule fixed
+before the test run (positive with $t \ge 1$ in both validation quarters and a pooled $t \ge 2$). $^{\dagger}$Vendor
+fields are retrospective labels and only split events descriptively. ``(seen)'' marks conditions whose test values
+the authors' assistant had seen before the study, which were never selected. Requested after unblinding; no
+claim.}\label{fig:a-conditioning}
+\end{figure}
+
+\section{The replication package}\label{app:replication}
+
+The replication package is the project's repository \placeholder{repository URL to be provided by the authors}.
+It holds the pre-registration with its amendments and its deviations log; the freeze record (the hash, its time
+and the version-control tag); the code of every stage, from the price panel and the masked news states to the
+model calls, the analysis and the strategies, with its tests; the committed outputs and a report of every stage;
+the append-only, hash-chained ledgers of API spend, trials, test-data access and data requests; and the sources of
+this paper. Further tables and figures are in the replication package. One command rebuilds every table, figure
+and caption of the paper from the committed outputs (plus three stored strategy files that the strategy stage
+regenerates) and checks each against a committed digest; another writes the macros through which every result
+number in this paper enters the text, each a cell of those tables, and checks that no result number in the
+sources is typed by hand. Neither needs raw data, an API, a GPU or the lock. The news text is licensed and is not
+redistributed; \placeholder{data availability statement to be provided by the authors}.

@@ -1,0 +1,46 @@
+# Placeholder: the authors complete the repository URL, the license and the arXiv identifier before release.
+cff-version: 1.2.0
+message: >-
+  If you use this replication package, please cite the paper below. This file is a placeholder: the repository
+  URL, the license and the arXiv identifier are to be added by the authors.
+title: >-
+  NewsAction: replication package for "The Market Reads the News First: A Pre-Registered, Look-Ahead-Free Test of
+  AI Decision Models on Stock-Price Reactions"
+type: software
+authors:
+  - family-names: Dehkordi
+    given-names: Amir
+  - family-names: Khaledian
+    given-names: Arman
+  - family-names: Kargarzadeh
+    given-names: Alireza
+  - family-names: Khaledian
+    given-names: Nariman
+  - family-names: Parvini
+    given-names: Navid
+keywords:
+  - large language models
+  - AI decision models
+  - financial news
+  - stock returns
+  - look-ahead bias
+  - memorization
+  - pre-registration
+preferred-citation:
+  type: article
+  title: >-
+    The Market Reads the News First: A Pre-Registered, Look-Ahead-Free Test of AI Decision Models on Stock-Price
+    Reactions
+  authors:
+    - family-names: Dehkordi
+      given-names: Amir
+    - family-names: Khaledian
+      given-names: Arman
+    - family-names: Kargarzadeh
+      given-names: Alireza
+    - family-names: Khaledian
+      given-names: Nariman
+    - family-names: Parvini
+      given-names: Navid
+  year: 2026
+  notes: "Preprint; the arXiv identifier is to be added."

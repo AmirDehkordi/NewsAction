@@ -1,0 +1,77 @@
+\section{Exploratory analyses (post hoc): where the signal lives}\label{sec:exploratory}
+
+Everything in this section is exploratory. The analyses were requested after unblinding, they are outside every
+pre-registered family and they support no claim; they suggest where to look, and the forward test of
+Section~\ref{sec:limits} re-tests two of them as pre-registered hypotheses. Earlier looks at the test period by
+the authors' AI research assistant, at two of the statistics below (hit rates and mean moves by conviction
+band, and the statistics of the 10:00 reading), shaped the design of this exploratory study. Every exploratory
+variant is logged as a trial: the ledger grew from \res{ntrials-strat} to \res{ntrials-total} trials.
+
+\paragraph{Earnings days carry the signal.} In a post hoc split, every signal's pre-open IC is concentrated on
+the events with a scheduled earnings report (\res{earn-n-test} of the \res{test-d0-events} test events), and
+there it held in all three periods. In this exploratory split, Laya-Fin's IC with $z_{cc}$ on earnings days was
+\res{lf-earn-vala}, \res{lf-earn-valb} and \res{lf-earn-test} on val-A, val-B and the test
+($t = \res{lf-earn-test-t}$ on the test), against \res{lf-rest-vala}, \res{lf-rest-valb} and \res{lf-rest-test}
+on the other events, and d1-ultra's was \res{d1-earn-vala}, \res{d1-earn-valb} and \res{d1-earn-test}
+($t = \res{d1-earn-test-t}$), against \res{d1-rest-vala}, \res{d1-rest-valb} and \res{d1-rest-test}. Post hoc, the
+fall from validation to test of Section~\ref{sec:validation} is therefore a fall on the other events. The
+exploratory split also shows the commercial models pricing earnings news at the open: d1-ultra's earnings-day IC
+on the test is \res{d1-earn-on-test} with $z_{on}$ and \res{d1-earn-id-test} with $z_{id}$.
+
+\paragraph{Selective prediction: the most confident calls carry most of the signal, in the overnight gap.} We
+ranked events post hoc by conviction, the size of $|\Nhat|$ against its val-A distribution, and kept only the
+top share of them, which traces a coverage curve \citep{geifman2017} (Figure~\ref{fig:selective}). In this
+exploratory analysis, d1-ultra's mean overnight move in the direction of its reading,
+$\mathrm{sign}(\Nhat)\cdot z_{on}$, is \res{sel-d1-on-10-vala}, \res{sel-d1-on-10-valb} and
+\res{sel-d1-on-10-test} typical moves in its top 10\% (val-A, val-B and the test), against
+\res{sel-d1-on-all-vala}, \res{sel-d1-on-all-valb} and \res{sel-d1-on-all-test} for all events; for the
+close-to-close move the post hoc figures are \res{sel-d1-cc-10-vala}, \res{sel-d1-cc-10-valb} and
+\res{sel-d1-cc-10-test} against \res{sel-d1-cc-all-vala}, \res{sel-d1-cc-all-valb} and
+\res{sel-d1-cc-all-test}. Post hoc hit rates move less: d1-ultra's top 10\% gets the sign of $z_{cc}$ right
+\res{sel-d1-hit-10-test} of the time on the test, against \res{sel-d1-hit-all-test} for all events. After the
+open, selectivity gains little in this exploratory analysis: the top 10\%'s mean move in the direction of the
+reading is \res{sel-d1-id-10-test} for d1-ultra (95\% interval \res{sel-d1-id-10-test-lo} to
+\res{sel-d1-id-10-test-hi}) and \res{sel-lf-id-10-test} for Laya-Fin on the test, and no test interval of this
+post hoc mean excludes zero at any coverage.
+
+\begin{figure}[tbp]
+\centering
+\includegraphics{\figdir/figA16_selective_coverage.pdf}
+\caption{\textbf{Exploratory (post hoc): d1-ultra's most confident tenth of pre-open readings carries most of
+the overnight signal in all three periods (mean signed overnight move \res{sel-d1-on-10-vala},
+\res{sel-d1-on-10-valb} and \res{sel-d1-on-10-test} typical moves, against \res{sel-d1-on-all-vala},
+\res{sel-d1-on-all-valb} and \res{sel-d1-on-all-test} for all events), but not the move after the open.}
+Coverage curves: events ranked by conviction $|\Nhat|$ (lines) or by the stated confidence (circles), keeping the
+most confident share, with thresholds from val-A; 95\% intervals from the stationary bootstrap over sessions.
+(a) Mean $\mathrm{sign}(\Nhat)\cdot z_{on}$; (b) mean $\mathrm{sign}(\Nhat)\cdot z_{id}$; (c) the hit rate
+against $z_{cc}$. The dashed line marks the frozen confidence gate (the val-A 70th percentile). Requested after
+unblinding; the authors' assistant had looked at the conviction bands on the test before this study, which
+shaped it. d1-ultra, span-02$^{\ddagger}$ and drex-v2.0 are model-specific.}\label{fig:selective}
+\end{figure}
+
+\paragraph{Watching the open adds nothing.} In a post hoc comparison, the reading at 10:00, after the first
+half-hour bar, never predicts the rest of the day better than the pre-open reading on val-B or the test (the one
+exploratory exception is d1-ultra on val-A, \res{watch-d1-ten-vala} against \res{watch-d1-pre-vala}, neither
+significant). Post hoc, the revision from the pre-open to the 10:00 reading has a zero or negative IC with the
+move from 10:00 to the close on val-B and the test (Laya-Fin \res{watch-lf-rev-valb} and \res{watch-lf-rev-test},
+$t = \res{watch-lf-rev-test-t}$ on the test; d1-ultra \res{watch-d1-rev-valb} and \res{watch-d1-rev-test}): in
+this exploratory comparison the models over-update toward the first bar. The comparison involves many
+statistics, so a few large $t$-values are expected by chance and the post hoc pattern is weak evidence.
+
+\paragraph{Validation-to-test decay, the strongest instance.} A post hoc conditioning study asked whether the
+after-the-open signal $\mathrm{sign}(\Nhat)\cdot z_{id}$ is stronger under some condition: the type and timing
+of the news, d1-ultra's own labels of it, the day, the stock, the models' internals, agreement between models
+and a cost hurdle, for \res{cond-pairs} (model, condition) pairs. A strict rule of this exploratory study, fixed
+before its test run, selected the pairs positive with $t \ge 1$ in both validation quarters and a pooled
+$t \ge 2$: \res{cond-selected} pairs passed, with pooled $t$ from \res{cond-pooled-t-min} to
+\res{cond-pooled-t-max}. On the test, \res{cond-reversed} of the post hoc selections changed sign and the other
+\res{cond-positive} are small (largest $t = \res{cond-pos-t-max}$); in this exploratory family the smallest
+Benjamini--Hochberg $q$ is \res{cond-q-selected-min} among the selected pairs and \res{cond-q-min} overall
+(Appendix Figure~\ref{fig:a-conditioning}). The exploratory tradable versions had in-sample gross Sharpe ratios
+of \res{cb-lf-valb-min} to \res{cb-lf-valb-max} (Laya-Fin) and \res{cb-d1-valb-min} to \res{cb-d1-valb-max}
+(d1-ultra) on val-B; on the test these post hoc books' gross Sharpe ratios run from \res{cb-test-min} to
+\res{cb-test-max}, none reaches the 90th percentile of its placebo, and every one loses net of 10 basis points.
+A post hoc moving-average-cross overlay chosen on validation failed the same way: after crosses of the 20- and
+50-day averages without news, the mean abnormal return in the direction of the cross over the next five days was
+\res{ma-val-bp} basis points on validation ($t = \res{ma-val-t}$) and \res{ma-test-bp} on the test
+($t = \res{ma-test-t}$), so this post hoc reversal did not replicate.

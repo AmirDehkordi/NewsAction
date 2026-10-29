@@ -1,0 +1,45 @@
+\section{What the models know about masked firms}\label{sec:memorization}
+
+Masking removes names, but news is distinctive: a drug approval, a store count or a guidance range can point to
+one company. We measure how often a model recognizes the company behind a masked state. Each of \res{mem-n}
+masked val-A states is shown with four candidate companies from the same sector and size tier, the true one
+and three distractors chosen to match its news activity, and the model picks one. For model $m$,
+\begin{equation}\label{eq:memorization}
+\mathrm{Acc}_m = \frac{1}{n}\sum_{i=1}^{n} \mathbf{1}\bigl[\hat c_{i} = c_{i}\bigr],
+\qquad
+\text{excess}_m = \mathrm{Acc}_m - p_0,
+\end{equation}
+where $c_i$ is the true company, $\hat c_i$ the model's choice and $p_0 = \res{mem-baseline-f2}$ the matched
+baseline: the accuracy of a guess that uses no reading, only the candidates' news activity. Intervals are
+Wilson score intervals \citep{wilson1927}. The matched baseline matters: with distractors drawn at random, a
+guess based on news activity alone already scores \res{mem-baseline-na06}, because the true company always has
+news.
+
+The commercial decision models recognize the company far more often than the baseline
+(Figure~\ref{fig:memorization}): from \res{mem-min} of states (mercury-decide) to \res{mem-max} (d1-ultra), and
+\res{mem-span} and \res{mem-drex} for the other two comparators. The open-weights Laya model, the base of
+Laya-Fin, does so in \res{mem-laya}, close to the baseline. All of the commercial models therefore fail the
+pre-registered screen of 40\%, and every model in the figure was released after the sample ended: Laya on
+\res{rel-laya} and the commercial models between \res{rel-drex} and \res{rel-span}. Their training data are
+undisclosed, so we cannot rule out that they saw text from the test period.
+
+\begin{figure}[tbp]
+\centering
+\includegraphics{\figdir/fig7_memorisation.pdf}
+\caption{\textbf{Commercial decision models identify the company behind masked news in \res{mem-min} to
+\res{mem-max} of states, against a matched baseline of \res{mem-baseline}; the open-weights Laya model does so in
+\res{mem-laya}.} Company identification on masked val-A states with activity-matched distractors: the share of
+states in which each model names the company among four candidates, sorted, with its Wilson 95\% interval,
+against the matched baseline (a guess that uses no reading; solid line) and the pre-registered screening
+threshold (40\%; dashed line). The three commercial models carried to the test are in the comparator colour,
+the other commercial models and Laya zero-shot in gray. Every model was released after the sample ended.
+Identifying a company is not the same as remembering its returns. $^{\ddagger}$span-02: see
+Figure~\ref{fig:validation-test}.}\label{fig:memorization}
+\end{figure}
+
+Recognition is not the same as remembering returns, and two results suggest that it did not drive the
+commercial models' signal: unmasking the states does not raise d1-ultra's IC (Section~\ref{sec:priced}), and
+their ICs fell from validation to test as the other signals' did, which is not what an advantage from having
+seen the test period would produce. Neither is a test of memorization. The result is, however, a warning for
+backtests of language models on historical news: masking hides names, not companies. The pre-registered forward
+test (Section~\ref{sec:limits}) asks the question directly, on news published after the models were released.

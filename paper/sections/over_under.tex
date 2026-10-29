@@ -1,0 +1,154 @@
+\section{The models cannot tell over- from under-reaction}\label{sec:overunder}
+
+\subsection{The over/under regression}\label{sec:h2}
+
+The central pre-registered hypothesis, H2, asks whether a model's reading of the news separates the part of a
+day's move that will persist from the part that will reverse. After the close (D2) we regress the next week's
+move on the news-implied move and on the day's move:
+\begin{equation}\label{eq:h2}
+y_{i,t} = a + b\,\Nhat_{i,t} + c\,G_{i,t} + \alpha_{d(t)\times\tau(i)} + \varepsilon_{i,t},
+\end{equation}
+where $y_{i,t} = y_2$ is the abnormal move from the next open to the close of $t+5$ in typical-move units,
+$\Nhat_{i,t}$ is the model's reading of the day's news (all of it, up to the close, with price language removed),
+$G_{i,t} = z^{cc}_{i,t}$ is the day's move and $\alpha_{d(t)\times\tau(i)}$ is a day-by-tier fixed effect; there is
+no conditioning on the size of $G$. H2 predicts $b > 0$ (moves the news explains persist: underreaction to news)
+and $c < 0$ (moves the news does not explain reverse: overreaction to price); both must hold, and each is tested
+one-sided with standard errors clustered by date and firm.
+
+Table~\ref{tab:over-under} reports the estimates. For Laya-Fin, $b = \res{lf-h2-b-d2}$ (standard error
+\res{lf-h2-bse-d2}, $p = \res{lf-h2-bp-d2}$) and $c = \res{lf-h2-c-d2}$ (\res{lf-h2-cse-d2},
+$p = \res{lf-h2-cp-d2}$) on \res{lf-h2-n-d2} events. The reversal coefficient has the predicted sign for every
+model but is never significant, and the news coefficient is not positive: d1-ultra's is negative
+($b = \res{d1-h2-b-d2}$, $p = \res{d1-h2-bp-d2}$). The two earlier decision points, reported outside the family,
+do not change the picture: at 10:00, Laya-Fin's $b$ is \res{lf-h2-b-d1} ($p = \res{lf-h2-bp-d1}$), and before
+the open, with the move after the open as the outcome, \res{lf-h2-b-d0} ($p = \res{lf-h2-bp-d0}$). None of the
+eight pre-registered heterogeneity cuts (three size tiers, quantified against story news, small moves, press
+wires, low usual coverage and busy days) changes the coefficients for Laya-Fin (Wald $p$ from \res{het-p-min} to
+\res{het-p-max}, Benjamini--Hochberg $q \geq \res{het-q-min}$; Appendix Table~\ref{tab:a-heterogeneity}). Nor does
+the style of the coverage matter. Work on linguistic style treats it as a dimension of text separate from
+content \citep{wegmann2026}, and the secondary hypothesis H6 asks whether a more promotional or sensational tone
+predicts reversal once the content is controlled for; for d1-ultra, the only model asked about tone, the
+coefficient is \res{d1-h6} with the wrong sign (standard error \res{d1-h6-se}, $q = \res{d1-h6-q}$).
+
+\input{\tabdir/tab3_over_under.tex}
+
+\subsection{Convergence to the news-implied value}\label{sec:convergence}
+
+The convergence analysis asks the same question along the whole path from the open to $t+20$. For each rung
+$h$ of a ladder from the open to the close of $t+20$, we regress the level move from the previous close to $h$
+on the news-implied value:
+\begin{equation}\label{eq:ladder}
+\CARlvl_{i,h} = \kappa_h V_i + \alpha_{d(t)\times\tau(i)} + \varepsilon_{i,h},
+\qquad h \in \{O_t,\ \text{10:00},\ C_t,\ C_{t+1},\ C_{t+2},\ C_{t+5},\ C_{t+10},\ C_{t+20}\},
+\end{equation}
+where $\CARlvl_{i,h}$ is the cumulative abnormal return in typical daily moves, without square-root-of-time
+scaling, so that it is comparable with $V$. $\kappa_h = 1$ means that by rung $h$ the price has moved all the way
+to the model's value; a rising $\kappa_h$ means drift toward it and a falling one means reversal.
+
+Figure~\ref{fig:convergence} and Table~\ref{tab:convergence} show the ladder. Prices move part of the way to the
+model's value on day $t$ and no further. For Laya-Fin, $\kappa_h$ is \res{lf-kappa-ot} at the open,
+\res{lf-kappa-ct} at the close and \res{lf-kappa-t2} at $t+2$, then falls back to \res{lf-kappa-t10} at $t+10$
+and \res{lf-kappa-t20} at $t+20$; its pre-registered increase from the open to $t+20$ is \res{lf-kappa-incr}
+($p = \res{lf-kappa-incr-p}$). For d1-ultra the path is higher and has the same shape: \res{d1-kappa-ot} at the
+open, \res{d1-kappa-10} at 10:00, \res{d1-kappa-ct} at the close, then \res{d1-kappa-t10} at $t+10$ and
+\res{d1-kappa-t20} at $t+20$ (increase \res{d1-kappa-incr}, $p = \res{d1-kappa-incr-p}$). The top decile of
+d1-ultra's value (mean $V = \res{d1-dec10-v}$) stands \res{d1-dec10-open} above the previous close at the open,
+\res{d1-dec10-close} at the close and \res{d1-dec10-t20} at $t+20$; the bottom decile (mean
+$V = \res{d1-dec1-v}$) stands at \res{d1-dec1-open}, \res{d1-dec1-close} and \res{d1-dec1-t20}. Before the event,
+prices drift in $V$'s direction: five sessions earlier, the top decile stood \res{d1-dec10-pre5} and the bottom
+decile \res{d1-dec1-pre5} relative to the previous close. The states describe the company's recent abnormal
+performance in words, so part of $V$ reflects momentum.
+
+\begin{figure}[tbp]
+\centering
+\includegraphics{\figdir/fig3_convergence.pdf}
+\caption{\textbf{Prices move part of the way to the model's news-implied value by the close, then partly fade:
+the convergence slope is \res{lf-kappa-ct} at the close for Laya-Fin and \res{d1-kappa-ct} for d1-ultra, and the
+gap's half-life is not reached within 20 sessions.} Test period. Event time is not to scale: $O_t$ is the open,
+10:00 the D1 decision point, $C_t$ the close of day $t$ and $+k$ the close of session $t+k$. (a) d1-ultra's top
+and bottom deciles of the news-implied value $V$: the level move $\CARlvl$ from the previous close, in typical
+daily moves, with $\pm 1.96$ event-level standard-error bands (descriptive), against each decile's mean $V$
+(dashed). (b) The convergence ladder $\kappa_h$ of Equation~\eqref{eq:ladder}, with 95\% intervals from
+standard errors clustered by date and firm, against full convergence at $\kappa_h = 1$. d1-ultra is
+model-specific. The anchor's near-constant readings are in Table~\ref{tab:convergence}.}\label{fig:convergence}
+\end{figure}
+
+\subsection{What the ladder identifies}\label{sec:attenuation}
+
+A slope below one does not by itself mean that the market underreacts, because $V$ is a model's estimate. A
+standard errors-in-variables argument \citep{hausman2001} makes this precise; we add it as an interpretation, not
+as a new test. Suppose the model's value is a noisy measure of the true news-implied value, $V = V^{*} + e$, with
+classical error: $e$ has mean zero and is independent of $V^{*}$ and of the regression error, after the fixed
+effects are partialled out. Then the slope in Equation~\eqref{eq:ladder} converges to
+\begin{equation}\label{eq:attenuation}
+\hat\kappa_h \;\to\; \theta_V\,\kappa^{*}_h,
+\qquad
+\theta_V = \frac{\operatorname{Var}(V^{*})}{\operatorname{Var}(V^{*}) + \operatorname{Var}(e)} \le 1,
+\end{equation}
+where $\kappa^{*}_h$ is the slope on the true value. Two consequences follow. First, the \emph{level} of
+$\kappa_h$ mixes market efficiency with model noise, so $\kappa_h < 1$ alone is not evidence of underreaction.
+Second, the \emph{shape} of the ladder is identified up to the same factor: on a common set of events,
+$\hat\kappa_{h'} - \hat\kappa_h \to \theta_V(\kappa^{*}_{h'} - \kappa^{*}_h)$. The factor is positive, so the sign
+is preserved: a rise after the decision point means drift toward the true value and a fall means reversal. This
+is why the pre-registered tests read the ladder's shape (the increase $\kappa_{t+20} - \kappa_{O_t}$ and the gap
+closure below) rather than its level, and why the fade after the close is the informative fact in
+Figure~\ref{fig:convergence}: whatever the model's noise, the part of the day's move that lines up with the news
+does not continue, and partly gives back. The pre-registered increase is not significant for either model,
+so the fade is descriptive.
+
+\input{\tabdir/tab4_convergence.tex}
+
+\subsection{Gap closure}\label{sec:gap}
+
+The gap between the model's value and the price after the reaction, $U_{i,\tau} = V_i - \Glvl_{i,\tau}$ at
+decision point $\tau$ (D1 or D2), should close if the price converges to the value. With $\AR(\tau \to h)$ the
+abnormal move from the decision point to rung $h$,
+\begin{equation}\label{eq:gap}
+\frac{\AR_{i}(\tau \to h)}{\sigma^{cc}_{i}} = \alpha_{d(t)\times\tau(i)} + \lambda_h\,U_{i,\tau} + \psi_h V_i
++ \varepsilon_{i,h},
+\qquad
+h^{*} = \min\bigl\{h : \lambda_h \ge \tfrac{1}{2}\bigr\},
+\end{equation}
+where $\lambda_h$ is the share of the gap closed by rung $h$, $\psi_h$ captures convergence to a shrunken value,
+and the half-life $h^{*}$ is ``not reached'' when no rung qualifies. The gap does not close. After the close,
+Laya-Fin's $\lambda_h$ is \res{lf-lambda-t1} at $t+1$, \res{lf-lambda-t5} at $t+5$ ($p = \res{lf-lambda-t5-p}$)
+and \res{lf-lambda-t20} at $t+20$; from 10:00 every $\lambda_h$ is at or below zero; and the half-life is not
+reached within $t+20$ for any model. The $\lambda_h$ are almost the same for every model because $V$ is small
+next to the day's move, so that $U \approx -\Glvl$: $\lambda_h$ measures how much of the day's move reverses, not
+convergence to $V$. The tracking error between the price and the model's value is no smaller than that of a
+naive value of zero (ratio \res{lf-tracking-t20} at $t+20$, $p = \res{lf-tracking-t20-p}$). None of the
+convergence tests is supported after Benjamini--Hochberg (Appendix Table~\ref{tab:a-secondary}).
+
+\subsection{Under, over and the size of the move}\label{sec:rg}
+
+The post-reaction reading classifies each event as an underreaction, a fair reaction or an overreaction, by how
+far the day's move fell short of or exceeded the model's value. Figure~\ref{fig:over-under}~(a) follows
+d1-ultra's classes after the close, signed in the direction of the news. The \res{rg-under-n} ``Under'' events
+moved against the news on day $t$ (\res{rg-under-t0}) and never catch up (\res{rg-under-t20} at $t+20$, against a
+mean value of \res{rg-under-v}); the \res{rg-over-n} ``Over'' events give back part of their move, from
+\res{rg-over-t0} at the close to \res{rg-over-t20}; and the \res{rg-fair-n} ``Fair'' events stay near
+\res{rg-fair-t20}. Laya-Fin calls too few events either way to draw (\res{lf-rg-events} events with
+$|\Nhat| \ge 0.5$). Panel (b) asks the question by the size of the move instead. Only the largest moves reverse:
+moves of at least three typical days reverse slightly in every tercile of news strength (\res{drift-g3-strong},
+\res{drift-g3-medium} and \res{drift-g3-weak} typical moves over the next week), and smaller moves show small
+means of both signs. There is no sign that important news with a small move is underpriced.
+
+\begin{figure}[tbp]
+\centering
+\includegraphics{\figdir/fig4_over_under.pdf}
+\caption{\textbf{The models' ``underreaction'' calls never catch up, and only moves of three or more typical days
+reverse, slightly (\res{drift-g3-weak} to \res{drift-g3-medium} typical moves over the next week).} Test period,
+d1-ultra (model-specific). (a) D2 events by the post-reaction class, pooled over the size tiers and signed in the
+news' direction ($\mathrm{sign}(\Nhat)\cdot\CARlvl$), with $\pm 1.96$ event-level standard-error bands, against
+each class's mean signed value $\bar V$ (dashed: dotted for Under, short dashes for Fair, long dashes for Over).
+(b) Drift after the close, $\mathrm{sign}(G)\cdot y_2$ (next open to the close of $t+5$, in the direction of the
+day's move), by the size of the day's move $|G|$, one line per tercile of news strength $|V|$, with 95\%
+intervals. The strong tercile also reverses slightly for moves of 0.5 to 2 typical days. The pre-registered
+regression (Table~\ref{tab:over-under}) finds no support for H2.}\label{fig:over-under}
+\end{figure}
+
+Two descriptive cuts, pre-registered for reporting but not as tests, show where convergence is strongest. Laya-Fin's
+slope at the close is \res{lf-kappa-ct-top100} for the 100 largest companies against \res{lf-kappa-ct-mid} and
+\res{lf-kappa-ct-rest} for the other tiers. And by d1-ultra's own label of the news, prices at $t+20$ reflect the
+value of numerical news ($\kappa_{t+20} = \res{d1-kappa-t20-numbers}$, $p = \res{d1-kappa-t20-numbers-p}$) but not
+that of narrative news (\res{d1-kappa-t20-narrative}).

@@ -1,0 +1,47 @@
+\section{Economic significance}\label{sec:strategies}
+
+The pre-registered strategies turn each reading into a daily long-short book within size tiers, hedged against
+the market with SPY, and ask whether the readings are worth trading. The \emph{convergence strategy} buys the
+events whose price lies furthest below the model's value (the top 20\% of the gap $U$) and sells those furthest
+above it, after the first half hour (D1) or after the close (D2). Three more families rank the pre-open reading
+(entering at the open), and the post-reaction judgment $J$, signed by the move, at 10:00 and after the close.
+The tables label the books by their entry point: S-D0 for the pre-open reading, S-D1 and S-D2 for the judgment at
+10:00 and after the close, and S-CONV for the convergence strategy; an RG book trades only the events the model
+calls an under- or over-reaction, and a gated book only its most confident readings. Costs are charged at 5, 10 and 20 basis points per side on both legs and on the hedge. Each book is compared
+with 100 books built on random signals over the same events, and its Sharpe ratio is deflated for the number of
+trials behind it \citep{bailey2014}. We deflate with the \res{ntrials-strat} trials the ledger held when the
+strategies were evaluated: every selection of filters, encodings, models and baselines, and every strategy
+variant up to then. The exploratory study of Section~\ref{sec:exploratory} later raised the ledger to
+\res{ntrials-total} trials, which would only raise the bar (Appendix~\ref{app:dsr} gives the formula).
+
+No pre-registered strategy is worth trading after costs (Table~\ref{tab:strategies} and
+Figure~\ref{fig:strategies}). Gross of costs, no book reaches the 95th percentile of its random-signal placebo,
+and Laya-Fin's post-reaction book after the close falls below the 5th (percentile \res{sd2j-pct}), as expected
+of judgments that carry no positive information about the next week. Net of 10 basis points every main book
+loses except the tiny book on the model's under- and over-reaction calls, which holds one stock a side on a
+handful of days. The convergence strategy earns a gross Sharpe ratio of \res{sconv-gross} for Laya-Fin and
+\res{sconv-net} net of costs. It is, in effect, a price-only gap fade: because the model's value is small next
+to the day's move, ranking by the gap $U = V - \Glvl$ buys the day's losers and sells its winners. The two books
+share \res{sconv-shared} of their positions, \res{sconv-same-side} of them on the same side, and their daily
+returns correlate \res{sconv-corr}. The highest gross Sharpe ratio, \res{sd0-gated-gross} for the pre-open book
+restricted to Laya-Fin's most confident readings and held to the next close, reaches percentile
+\res{sd0-gated-pct} of its placebo and breaks even at \res{sd0-gated-be} basis points per side. The one-day books turn
+over about \res{sd0-turnover} times their capital a day, so costs decide their sign. With \res{ntrials-strat}
+trials the deflation benchmark is a daily Sharpe ratio of \res{dsr-sr0}, and the largest deflated-Sharpe
+probability of any test book is \res{dsr-max}. Short-sale borrow costs, which would lower every net figure, are
+not modelled.
+
+\input{\tabdir/tab6_strategies.tex}
+
+\begin{figure}[tbp]
+\centering
+\includegraphics{\figdir/fig6_strategies.pdf}
+\caption{\textbf{No pre-registered strategy survives costs: net of 10 basis points every main book loses, and
+the convergence strategy is effectively a price-only gap fade (\res{sconv-shared} of positions shared, daily
+correlation \res{sconv-corr}).} Test period. (a, b) Annualized Sharpe ratio of each main book, gross and net of
+10 basis points per side on both legs and the SPY hedge, at the exit of its hypothesis' horizon; the gray box is
+the 5th to 95th percentile of 100 random-signal books on the same events; (b) has its own scale. (c) The
+convergence strategy's cumulative net return (Laya-Fin and d1-ultra) against the price-only gap fade, with the
+placebo's 5th to 95th percentile band. Every book is in the replication package. d1-ultra is
+model-specific.}\label{fig:strategies}
+\end{figure}
