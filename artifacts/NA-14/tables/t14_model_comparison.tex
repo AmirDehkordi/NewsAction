@@ -1,0 +1,35 @@
+% t14_model_comparison: tab:a-model-comparison (NA-14 figures.latex, from artifacts/NA-14/tables/t14_model_comparison.csv)
+\begin{table}[htbp]
+\centering
+\footnotesize
+\begin{threeparttable}
+\caption{Model comparison: the daily IC with $z_{cc}$ on val-B and test, the cost and the latency.}\label{tab:a-model-comparison}
+\begin{tabular}{@{}>{\raggedright\arraybackslash}p{1.75in}S[table-format=-1.3]S[table-format=-1.2]S[table-format=-1.3]S[table-format=-1.2]S[table-format=5.0]S[table-format=1.3]S[table-format=4.0]@{}}
+\toprule
+Model & {IC val-B} & {$t$} & {IC test} & {$t$} & {Events} & {USD/1,000} & {p50 (ms)} \\
+\midrule
+Laya-Fin & 0.065 & 3.64 & 0.020 & 1.67 & 13748 & 0.000 & {---} \\
+anchor & -0.020 & -1.52 & 0.008 & 0.83 & 13748 & 0.000 & {---} \\
+Laya zero-shot & 0.029 & 1.94 & 0.005 & 0.37 & 13748 & 0.000 & 536 \\
+d1-ultra & 0.097 & 5.38 & 0.039 & 3.23 & 13748 & 0.063 & 288 \\
+span-02$^{\ddagger}$ & 0.099 & 5.83 & 0.041 & 3.10 & 13748 & 0.028 & 2262 \\
+drex-v2.0 & 0.075 & 4.10 & 0.044 & 3.70 & 13748 & 0.045 & 680 \\
+vendor sentiment$^{\dagger}$ & 0.087 & 4.39 & 0.047 & 3.36 & 13748 & {---} & {---} \\
+bge-ridge & 0.002 & 0.10 & 0.004 & 0.45 & 13748 & {---} & {---} \\
+tags-GBM$^{\dagger}$ & 0.108 & 6.03 & 0.055 & 3.91 & 13748 & {---} & {---} \\
+LLM baseline & 0.052 & 1.93 & 0.001 & 0.02 & 1977 & {---} & {---} \\
+price-only & 0.004 & 0.33 & -0.003 & -0.26 & 13748 & {---} & {---} \\
+Laya-Fin, LLM's 2,000-event subsample & {---} & {---} & -0.012 & -0.37 & 1977 & {---} & {---} \\
+LLM baseline, its subsample & {---} & {---} & 0.001 & 0.02 & 1977 & {---} & {---} \\
+price-only (D2, IC with $y_2$) & {---} & {---} & 0.012 & 1.18 & 17188 & {---} & {---} \\
+\bottomrule
+\end{tabular}
+\begin{tablenotes}[flushleft]\footnotesize
+\item ---: the source table has no value for the row; the statistic does not apply to it or was not computed.
+\item $^{\dagger}$Vendor-label baseline (vendor sentiment, tags-GBM): the labels were produced retrospectively, so its IC is a possibly look-ahead-contaminated upper bound, not the benchmark; the clean benchmarks are bge-ridge, price-only, the LLM baseline and the random-signal placebo.
+\item $^{\ddagger}$span-02: the S5 canary fired a STOP after the freeze; the operator chose to proceed (PREREG \S15, post-freeze NA-11 row).
+\item The anchor's readings are uninformative (near-constant outputs after one epoch); its rows are reported, not read as nulls.
+\item The API models fail the \S8.3 contamination screens, so their results are model-specific (\S1.3).
+\end{tablenotes}
+\end{threeparttable}
+\end{table}

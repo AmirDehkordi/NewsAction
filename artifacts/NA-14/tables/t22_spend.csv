@@ -1,0 +1,14 @@
+key,item,value,cap,source
+openrouter_total,"OpenRouter spend, all chunks (USD)",15.730549523998887,30.0,ledgers/spend.jsonl (Σ usd of spend lines)
+openrouter:NA-05,"OpenRouter spend, NA-05 (USD)",0.1039223410000001,,ledgers/spend.jsonl
+openrouter:NA-06,"OpenRouter spend, NA-06 (USD)",3.526621698999973,,ledgers/spend.jsonl
+openrouter:NA-07,"OpenRouter spend, NA-07 (USD)",1.2404853120000043,,ledgers/spend.jsonl
+openrouter:NA-09,"OpenRouter spend, NA-09 (USD)",0.038884416,,ledgers/spend.jsonl
+openrouter:NA-11,"OpenRouter spend, NA-11 (USD)",10.820635755998909,,ledgers/spend.jsonl
+openrouter_spend_lines,spend lines in the ledger,310587.0,,ledgers/spend.jsonl
+fmp_requests,FMP requests (NA-10),15858.0,17000.0,ledgers/fmp_requests.jsonl
+kaggle_na08_gpu_hours,"Kaggle GPU-hours, NA-08 (training)",23.38,,artifacts/NA-08/REPORT.md
+kaggle_na11_gpu_hours,"Kaggle GPU-hours, NA-11 (test inference)",2.0,,artifacts/NA-11/REPORT.md
+kaggle_total_gpu_hours,"Kaggle GPU-hours, NA-08 + NA-11",25.38,,the sum of the two rows above
+trials,rows of the trials ledger (the DSR's N),545.0,,ledgers/trials.jsonl
+test_access,lines of the test-access ledger,29.0,,ledgers/test_access.jsonl

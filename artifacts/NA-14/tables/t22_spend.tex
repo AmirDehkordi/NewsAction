@@ -1,0 +1,31 @@
+% t22_spend: tab:a-spend (NA-14 figures.latex, from artifacts/NA-14/tables/t22_spend.csv)
+\begin{table}[htbp]
+\centering
+\small
+\begin{threeparttable}
+\caption{Spend and requests of the whole project, from the ledgers.}\label{tab:a-spend}
+\begin{tabular}{@{}lS[table-format=6.2]S[table-format=5.0]@{}}
+\toprule
+Item & {Value} & {Cap} \\
+\midrule
+OpenRouter spend, all chunks (USD) & 15.73 & 30 \\
+OpenRouter spend, NA-05 (USD) & 0.10 & {---} \\
+OpenRouter spend, NA-06 (USD) & 3.53 & {---} \\
+OpenRouter spend, NA-07 (USD) & 1.24 & {---} \\
+OpenRouter spend, NA-09 (USD) & 0.04 & {---} \\
+OpenRouter spend, NA-11 (USD) & 10.82 & {---} \\
+spend lines in the ledger & 310587 & {---} \\
+FMP requests (NA-10) & 15858 & 17000 \\
+Kaggle GPU-hours, NA-08 (training) & 23.38 & {---} \\
+Kaggle GPU-hours, NA-11 (test inference) & 2.00 & {---} \\
+Kaggle GPU-hours, NA-08 + NA-11 & 25.38 & {---} \\
+rows of the trials ledger (the DSR's N) & 545 & {---} \\
+lines of the test-access ledger & 29 & {---} \\
+\bottomrule
+\end{tabular}
+\begin{tablenotes}[flushleft]\footnotesize
+\item ---: no cap.
+\item Spend in USD and GPU-hours to two decimals; counts are whole numbers. Kaggle GPU-hours from the NA-08 and NA-11 reports (Kaggle keeps no ledger here). NA-12, NA-13 and NA-14 made no API call, Kaggle run or FMP request.
+\end{tablenotes}
+\end{threeparttable}
+\end{table}

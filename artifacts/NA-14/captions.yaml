@@ -1,0 +1,387 @@
+# NA-14 captions (PRD NA-14 S4; the operator's revision pass). Every number is cited as {{table/key/column[@spec]}}
+# from artifacts/NA-14/tables (keys.json); [[...]] marks a label or a design constant. Notation is LaTeX math between
+# dollar signs; captions.md and the LaTeX preview render the same text. `python -m newsaction.figures.captions`
+# fails on an unknown key, a bare number (in text or math), a cited value that differs from its table cell, or a main
+# figure that cites exploratory material. Results are captioned as found (NA-12 and NA-13 REPORTs).
+
+fig1_validation_test:
+  section: 1
+  title: Every validation IC that is positive falls on test
+  caption: >-
+    Daily IC of the pre-open news reading $\hat N$ with the close-to-close move $z_{cc}$, on val-B (hollow) and on
+    the test period (filled), each with its 95% interval ($\pm$[[1.96]] Newey–West SE), for the instruments and the
+    baselines (NA-12). Laya-Fin, the primary instrument, falls from {{t14_model_comparison/laya_fin/ic_val_b@f3}} to
+    {{t14_model_comparison/laya_fin/ic_test@f3}}; d1-ultra, the API comparator, from
+    {{t14_model_comparison/d1_ultra/ic_val_b@f3}} to {{t14_model_comparison/d1_ultra/ic_test@f3}}; span-02 and
+    drex-v2.0 alike. The API models fail the §8.3 contamination screens, so their results are model-specific (§1.3).
+    The clean benchmarks are about zero in both periods: price-only {{t14_model_comparison/baseline:price_only/ic_test@f3}}
+    and bge-ridge {{t14_model_comparison/baseline:embed_ridge/ic_test@f3}} on test; the LLM baseline, on a
+    [[2,000]]-event subsample, {{t14_model_comparison/baseline:llm/ic_test@f3}}. The highest test ICs belong to the
+    vendor-label baselines ($\dagger$: tags-GBM {{t14_model_comparison/baseline:tags_gbm/ic_test@f3}}, vendor
+    sentiment {{t14_model_comparison/baseline:sentiment/ic_test@f3}}), whose labels were produced retrospectively: a
+    possibly look-ahead-contaminated upper bound, not the benchmark. The anchor is uninformative (near-constant
+    outputs); its ICs are in the appendix's model comparison. $\ddagger$ span-02: the S5 canary fired a STOP after the freeze and
+    the operator chose to proceed (PREREG §15, post-freeze NA-11 row).
+
+fig2_priced_at_open:
+  section: 3
+  title: The API models' signal is priced at the open; no model predicts the move after it
+  caption: >-
+    (a) Daily IC of $\hat N$ with the overnight move $z_{on}$ (previous close to open, filled) and with the move
+    after the open $z_{id}$ (open to close, hollow), test period, with 95% bootstrap intervals (NA-12). (b) H1,
+    their difference, with its bootstrap interval. The API models' IC is all overnight: d1-ultra
+    {{t3_ic/d1_ultra:z_on/ic@f3}} with $z_{on}$ and {{t3_ic/d1_ultra:z_id/ic@f3}} with $z_{id}$, H1 =
+    {{t1b_primary_by_model/d1_ultra:H1/estimate@f3}} (p {{t1b_primary_by_model/d1_ultra:H1/p}}), model-specific
+    (§1.3); Laya zero-shot's H1 is {{t1b_primary_by_model/laya_zs:H1/estimate@f3}}. For Laya-Fin, the primary
+    instrument, both ICs are small ({{t3_ic/laya_fin:z_on/ic@f3}} and {{t3_ic/laya_fin:z_id/ic@f3}}): [[H1]] is
+    {{t1_primary/H1/verdict}} (Holm p {{t1_primary/H1/primary_p_holm}}) and so is [[H1b]], the IC with $z_{id}$
+    (Holm p {{t1_primary/H1b/primary_p_holm}}), although on val-B its IC with $z_{id}$ had been
+    {{t32_val_b_ic/laya_fin/ic_z_id@f3}} (t {{t32_val_b_ic/laya_fin/ic_z_id_t@f2}}; [[Table 2]]). The anchor is
+    uninformative (near-constant outputs) and is in [[Table 1]]. $\ddagger$ span-02: the S5 canary fired a STOP after the
+    freeze and the operator chose to proceed (PREREG §15).
+
+fig3_convergence:
+  section: 4
+  title: Prices move part of the way to the model's value on day t, then partly fade
+  caption: >-
+    Convergence to the news-implied value $V$ (PREREG A1), test period. Event time is not to scale: $O_t$ is the open,
+    [[10:00]] the D1 decision point, $C_t$ the close of day $t$ and $+k$ the close of session $t+k$. (a) d1-ultra's
+    top and bottom deciles of $V$: $\mathrm{CAR}^{\mathrm{lvl}}$, the abnormal return from the previous close in
+    typical daily moves, with SE bands ($\pm$[[1.96]] event-level SE; descriptive), against each decile's mean $V$
+    (dashed). The top decile (mean $V$ {{f1_v_decile_paths/d1_ultra|v_decile|10|car_post0/mean_v@f2}}) stands at
+    {{f1_v_decile_paths/d1_ultra|v_decile|10|car_lvl_o0/mean@signed2}} at the open,
+    {{f1_v_decile_paths/d1_ultra|v_decile|10|car_post0/mean@signed2}} at the close and
+    {{f1_v_decile_paths/d1_ultra|v_decile|10|car_post20/mean@signed2}} at [[t+20]]; the bottom decile (mean $V$
+    {{f1_v_decile_paths/d1_ultra|v_decile|1|car_post0/mean_v@signed2}}) at
+    {{f1_v_decile_paths/d1_ultra|v_decile|1|car_lvl_o0/mean@signed2}},
+    {{f1_v_decile_paths/d1_ultra|v_decile|1|car_post0/mean@signed2}} and
+    {{f1_v_decile_paths/d1_ultra|v_decile|1|car_post20/mean@signed2}}. Before the event prices drift in $V$'s
+    direction (not drawn): five sessions earlier the top decile stood
+    {{f1_v_decile_paths/d1_ultra|v_decile|10|car_pre5/mean@signed2}} and the bottom decile
+    {{f1_v_decile_paths/d1_ultra|v_decile|1|car_pre5/mean@signed2}} from the previous close, so part of $V$ reflects
+    momentum. The other deciles, and Laya-Fin's, are in Appendix Figure A7. (b) The convergence ladder $\kappa_h$,
+    the slope of $\mathrm{CAR}^{\mathrm{lvl}}_h$ on $V$ with day $\times$ tier fixed effects, with 95% intervals from
+    two-way clustered SEs, against full convergence at $\kappa_h = [[1]]$. $\kappa_h$ peaks on day $t$ or just after and
+    is far from one: Laya-Fin {{t6_convergence_ladder/laya_fin:ladder:C_t/kappa@f2}} at the close and
+    {{t6_convergence_ladder/laya_fin:ladder:C_t+2/kappa@f2}} at [[t+2]], d1-ultra
+    {{t6_convergence_ladder/d1_ultra:ladder:10:00/kappa@f2}} at [[10:00]]; it fades by [[t+10]]
+    ({{t6_convergence_ladder/laya_fin:ladder:C_t+10/kappa@f2}} and
+    {{t6_convergence_ladder/d1_ultra:ladder:C_t+10/kappa@f2}}). Laya-Fin's increase from the open to [[t+20]] is
+    {{t6_convergence_ladder/laya_fin:ladder:increase/kappa@signed2}} (p
+    {{t6_convergence_ladder/laya_fin:ladder:increase/kappa_p}}). The half-life of the gap $U = V - G^{\mathrm{lvl}}$,
+    the first rung at which $\lambda_h$ reaches [[0.5]], is not reached within [[t+20]] for any model
+    ({{t7_gap_closure/laya_fin:D2:all:half_life/lambda}}; [[Table 4]]). The convergence tests ([[H2-C]]) are not supported
+    after Benjamini–Hochberg. The anchor is uninformative (near-constant outputs) and appears in Figure A7. d1-ultra
+    fails the §8.3 screens and is model-specific (§1.3).
+
+fig4_over_under:
+  section: 4
+  title: No small-move underreaction; large moves reverse slightly
+  caption: >-
+    Over- and under-reaction, test period (NA-12 figure data). (a) d1-ultra's D2 events by RG class, pooled over the
+    tiers and signed in the news' direction ($\mathrm{sign}(\hat N)\cdot\mathrm{CAR}^{\mathrm{lvl}}$), with SE bands
+    ($\pm$[[1.96]] event-level SE), against each class's mean signed $V$ ($\bar V$ in the labels; dashed in the
+    class's colour, dotted for Under, short dashes for Fair and long dashes for Over, since the three lie close). The
+    {{f1_rg_class_paths/d1_ultra|rg_class_signed|Under|car_post0/n_group@int}} Under events moved against the news on
+    day $t$ ({{f1_rg_class_paths/d1_ultra|rg_class_signed|Under|car_post0/mean@signed2}}) and never catch up
+    ({{f1_rg_class_paths/d1_ultra|rg_class_signed|Under|car_post20/mean@signed2}} at [[t+20]], against a target of
+    {{f1_rg_class_paths/d1_ultra|rg_class_signed|Under|car_post0/mean_v@f2}}); the
+    {{f1_rg_class_paths/d1_ultra|rg_class_signed|Over|car_post0/n_group@int}} Over events give back part of their
+    move, from {{f1_rg_class_paths/d1_ultra|rg_class_signed|Over|car_post0/mean@signed2}} at the close to
+    {{f1_rg_class_paths/d1_ultra|rg_class_signed|Over|car_post20/mean@signed2}}. Laya-Fin has only
+    {{t30_derived/laya_fin:rg_events/value@int}} D2 events with $|\hat N| \geq [[0.5]]$, too few to draw. (b)
+    d1-ultra's drift after the close, $\mathrm{sign}(G)\,y_2$ (next open to the close of [[t+5]], in the direction of
+    the day's move $G$), by bin of $|G|$, one line per tercile of news strength, with 95% intervals. The terciles are
+    on $|V|$, Call A's value on the day's news (NA-12's figure data), not on $|\hat N|$. Moves with $|G| \geq [[3]]$
+    reverse slightly in every tercile (strong {{f2_drift_vs_g/d1_ultra|strong|[3, inf)/mean@signed2}}, medium
+    {{f2_drift_vs_g/d1_ultra|medium|[3, inf)/mean@signed2}}, weak {{f2_drift_vs_g/d1_ultra|weak|[3,
+    inf)/mean@signed2}}); below that the means are small and of both signs, except the strong tercile, which also
+    reverses slightly at [[0.5]] to [[2]] ({{f2_drift_vs_g/d1_ultra|strong|[0.5, 1)/mean@signed2}} and
+    {{f2_drift_vs_g/d1_ultra|strong|[1, 2)/mean@signed2}}). There is no small-move underreaction. Laya-Fin's panel is
+    Appendix Figure A8. The pre-registered regression [[H2]] finds, for Laya-Fin, b =
+    {{t2_h2_over_under/laya_fin:D2/b@signed2}} (p {{t2_h2_over_under/laya_fin:D2/b_p}}) and c =
+    {{t2_h2_over_under/laya_fin:D2/c@f3}} (p {{t2_h2_over_under/laya_fin:D2/c_p}}): {{t1_primary/H2/verdict}} ([[Table
+    3]]). d1-ultra is model-specific (§1.3).
+
+fig5_explaining_moves:
+  section: 5
+  title: The news explains little of a stock's own move; reading the move explains more
+  caption: >-
+    Explaining realized moves at the firm level (PREREG A3, after Kelly–Su–Zhang), test period (NA-12), as
+    out-of-sample $R^2$ in % of the stock-specific variance. (a) d1-ultra's $R^2$ of the stock-specific move $z_{cc}$
+    by cut, stacked by step in the order of the legend: the ex-ante (D0) news, + the same-day news (Call A), + the
+    explanation (Call B reads the realized move, so this step is not a prediction). The total stands above each bar
+    with its 95% bootstrap interval: {{t10_explanation_ladder/d1_ultra:all:explanation/r2@pct1}} of all covered
+    member-days and {{t10_explanation_ladder/d1_ultra:event_days:explanation/r2@pct1}} of event days. The two news
+    steps are too thin to read, so their values stand beside each bar after a swatch of their colour: the ex-ante
+    step's $R^2$, then the same-day step's increment. For comparison, the market and the sector, Roll's first step,
+    explain {{t10_explanation_ladder/roll_r2/r2@pct1}} of total daily variance, a different base. (b) The news steps
+    on their own scale, the zoom that makes them readable: the $R^2$ after the ex-ante and after the same-day news,
+    with 95% bootstrap intervals. Laya-Fin's same-day news explains
+    {{t10_explanation_ladder/laya_fin:all:ex_post/r2@pct2}} of the stock-specific variance, the only secondary test
+    that survives Benjamini–Hochberg ([[H5]], q {{t4_secondary/laya_fin:H5/q}}), and
+    {{t10_explanation_ladder/laya_fin:all:ex_ante/r2@pct2}} was knowable before the open; d1-ultra's steps reach
+    {{t10_explanation_ladder/d1_ultra:all:ex_post/r2@pct2}} and
+    {{t10_explanation_ladder/d1_ultra:all:ex_ante/r2@pct2}}. The trained models give no explanation answer; the anchor
+    is uninformative (near-constant outputs; [[Table 5]]). d1-ultra is model-specific (§1.3).
+
+fig6_strategies:
+  section: 6
+  title: No pre-registered book survives costs and the deflated Sharpe; S-CONV is effectively the gap fade
+  caption: >-
+    Strategies on the test period (NA-13). (a, b) Annualized Sharpe ratio of each main book, gross and net of [[10
+    bp]] per side on both legs and the SPY hedge, at the exit of its hypothesis' horizon; the gray box is the [[5th]]
+    to [[95th]] percentile of the book's [[100]] random-signal books; (b) has its own scale. Gross, every book lies
+    inside its placebo range (S-CONV's: {{t33_placebo_sharpe/D2|close_t+5|32ca4af468b92207/sharpe_gross_q05@signed2}}
+    to {{t33_placebo_sharpe/D2|close_t+5|32ca4af468b92207/sharpe_gross_q95@signed2}}); net, every one is negative
+    (Laya-Fin's S-CONV {{t20_strategies/test|S-CONV|laya_fin|D2|u|close_t+5|all/sharpe_net_10@signed2}}, gross
+    {{t20_strategies/test|S-CONV|laya_fin|D2|u|close_t+5|all/sharpe_gross@signed2}}; S-D0
+    {{t20_strategies/test|S-D0|laya_fin|D0|n_tilde|close_t|all/sharpe_net_10@signed2}}; S-D1 $J$
+    {{t20_strategies/test|S-D1|laya_fin|D1|j|close_t|all/sharpe_net_10@signed2}}). The one-day books lose most to
+    costs: they turn over {{t20_strategies/test|S-D0|laya_fin|D0|n_tilde|close_t|all/turnover_daily@f2}} times their
+    capital a day against {{t20_strategies/test|S-CONV|laya_fin|D2|u|close_t+5|all/turnover_daily@f2}} for S-CONV. (c)
+    S-CONV's cumulative net return at [[10 bp]] against the price-only gap fade, with the placebo's [[5th]] to
+    [[95th]] percentile band. S-CONV is effectively the gap fade, because $V$ is small next to $G$ ($U \approx
+    -G^{\mathrm{lvl}}$): the two share {{t26_sconv_overlap/laya_fin:D2:close_t+5/shared_share@pct0}} of their
+    positions, {{t26_sconv_overlap/laya_fin:D2:close_t+5/same_side_share@pct1}} of them on the same side, and their
+    daily returns correlate {{t26_sconv_overlap/laya_fin:D2:close_t+5/corr_gross@f2}}. The only books positive net are
+    Laya-Fin's RG books, with {{t20_strategies/test|S-D1|laya_fin|D1|rg|close_t+5|all/n_positions@int}} to
+    {{t20_strategies/test|S-D2|laya_fin|D2|rg|close_t+1|all/n_positions@int}} positions over the whole test period,
+    and the anchor's gated S-D2 $J$ held to [[t+20]] (the anchor is uninformative, with near-constant outputs); none
+    clears its placebo or the deflated Sharpe. The highest gross Sharpe, the gated S-D0 held to the close of [[t+1]]
+    ({{t20_strategies/test|S-D0|laya_fin|D0|n_tilde|close_t+1|gated/sharpe_gross@f2}}), reaches placebo percentile
+    {{t20_strategies/test|S-D0|laya_fin|D0|n_tilde|close_t+1|gated/placebo_pct_gross@f0}}; with
+    {{t22_spend/trials/value@int}} trials in the ledger, the largest deflated-Sharpe probability of any test book is
+    {{t20_strategies/test|S-D2|laya_fin|D2|rg|close_t+5|all/dsr_prob_net_10@f3}}. Every book is in the appendix's
+    strategy table, the other books' paths and the tier sub-books in Figure A12. Borrow costs are not modelled.
+
+fig7_memorisation:
+  section: 7
+  title: The API models identify the masked company; Laya zero-shot hardly does
+  caption: >-
+    Company identification on masked val-A states with activity-matched distractors (NA-11; the §8.3 screen): the
+    share of states in which each model names the company among four candidates, as a bar, sorted, with its Wilson 95%
+    interval and its value at the bar's end, against the matched baseline (a no-reading guess,
+    {{t23_company_identification/liquid:d1-ultra/baseline_matched@pct0}}; solid) and the screening threshold
+    ({{t23_company_identification/liquid:d1-ultra/screen_threshold@pct0}}; dashed). The production comparators
+    (d1-ultra, span-02, drex-v2.0) are in the comparator colour, the other API models and Laya zero-shot in gray. The
+    API models name it in {{t23_company_identification/inception:mercury-decide/accuracy@pct0}} to
+    {{t23_company_identification/liquid:d1-ultra/accuracy@pct0}} of states, so they fail the screen and are
+    model-specific (§1.3); Laya zero-shot, Laya-Fin's base, names it in
+    {{t23_company_identification/local:laya-typed-decisions/accuracy@pct0}}. Every model was released after the
+    sample, which ends on {{t21_release_dates/sample_end/date}}: Laya's open weights on
+    {{t21_release_dates/laya/date}} ({{t21_release_dates/laya/days_after_sample_end@int}} days later; the operator's
+    date) and the API models between {{t21_release_dates/drex_v2/date}} and {{t21_release_dates/span_02/date}} (NA-05
+    catalog). Identifying a company is not the same as remembering its returns, and the test does not settle that.
+    $\ddagger$ span-02: the S5 canary fired a STOP after the freeze and the operator chose to proceed (PREREG §15).
+
+figA1_tournament:
+  section: appendix
+  title: The zero-shot tournament
+  caption: >-
+    The zero-shot tournament on NA-06's val-A stage-1 sample: (a) the daily IC of Call A's $\hat N$ with $z_{cc}$ and
+    its 95% bootstrap interval, models sorted by IC; (b) the cost per [[1,000]] decisions (log scale; the local Laya
+    models cost nothing). Every model is in the model confidence set; the highest IC is mercury-decide's
+    ({{t27_tournament/inception:mercury-decide/ic@f3}}) and d1-ultra's is {{t27_tournament/liquid:d1-ultra/ic@f3}}. The
+    six models that ran the stage-2 screens (squares) all failed them ([[Figure 7]]). $\ddagger$ span-02: the S5 canary
+    fired a STOP after the freeze and the operator chose to proceed (PREREG §15).
+
+figA2_filters:
+  section: appendix
+  title: An embedding filter selects material news better than rule filters
+  caption: >-
+    Material recall against the share of val-A days selected, per candidate importance filter (NA-03 frontier, budgets
+    from [[5%]] to [[50%]] of days). The frozen filter F5, a logistic regression on bge-small embeddings, selects
+    {{t28_filter_frontier/F5|0.3/selected_share@pct0}} of days at its budget with material recall
+    {{t28_filter_frontier/F5|0.3/recall_material@f3}}. F6 (gradient boosting) reaches
+    {{t28_filter_frontier/F6|0.3/recall_material@f3}} at the same budget, a tie within one point that goes to the filter
+    with fewer inputs (§6.8). The rule filters F1 to F4 recall {{t28_filter_frontier/F2|0.3/recall_material@f3}} to
+    {{t28_filter_frontier/F3|0.3/recall_material@f3}} there, close to random selection (dashed); F0 keeps every clean
+    article.
+
+figA3_encoding:
+  section: appendix
+  title: How numbers are written in the state hardly matters
+  caption: >-
+    The encoding of numbers in states (NA-07; §8.4): daily IC of $\hat N$ with $z_{cc}$ by encoding [[E0]] to [[E4]] on
+    NA-07's val-A sample (filled, 95% bootstrap intervals) and the val-B confirmation of [[E1]] and [[E3]] (hollow),
+    for the three API comparators; the gray column is the frozen encoding. [[E1]] had the best mean val-A rank
+    ({{t29_encoding/val_a|pooled|E1/rank@f2}}) but fell short of [[E3]] on val-B by more than one standard error, so
+    NA-07's rule kept [[E3]] (d1-ultra on val-B: {{t29_encoding/val_b|liquid:d1-ultra|E1/ic@f3}} with [[E1]],
+    {{t29_encoding/val_b|liquid:d1-ultra|E3/ic@f3}} with [[E3]]). $\ddagger$ span-02: the S5 canary fired a STOP after
+    the freeze and the operator chose to proceed (PREREG §15).
+
+figA4_reliability:
+  section: appendix
+  title: Reliability of the three-class forecasts
+  caption: >-
+    Reliability of Q1's three classes (fall, no move or rise at $\pm$[[0.5]] typical moves) against $e_5$ on the test
+    period: the hit rate of the top class by bin of its confidence ([[15]] bins; dot area grows with the events in the
+    bin; the diagonal is perfect calibration; NA-12). The trained models are calibrated but barely informative: ECE
+    {{t15_calibration/laya_fin:e5/ece@f3}} for Laya-Fin and {{t15_calibration/anchor:e5/ece@f3}} for the anchor
+    (uninformative, near-constant outputs), with log-loss skill {{t15_calibration/laya_fin:e5/log_loss_skill@f3}} for
+    Laya-Fin. The zero-shot and API models are overconfident: ECE {{t15_calibration/laya_zs:e5/ece@f3}} for Laya
+    zero-shot, {{t15_calibration/d1_ultra:e5/ece@f3}} for d1-ultra, {{t15_calibration/span_02:e5/ece@f3}} for span-02
+    and {{t15_calibration/drex_v2:e5/ece@f3}} for drex-v2.0. $\ddagger$ span-02: the S5 canary fired a STOP after the
+    freeze and the operator chose to proceed (PREREG §15).
+
+figA5_robustness:
+  section: appendix
+  title: No robustness variant changes a conclusion
+  caption: >-
+    Robustness of the D0 results (§11.6): Laya-Fin's [[H1]], [[H1b]] and IC of $\hat N$ with $z_{cc}$, and d1-ultra's
+    [[H1]], in each variant raw (filled) and placebo-adjusted (hollow), below the main estimate (diamond; stationary
+    block bootstrap) with 95% intervals ($\pm$[[1.96]] Newey–West SE for the variants). (a) and (d), both [[H1]],
+    share a scale; (b) and (c) have their own. Laya-Fin's [[H1]] and [[H1b]] stay within their intervals of zero in
+    every variant. d1-ultra's [[H1]] stays positive in every variant, from
+    {{t16_robustness/d1_ultra:D0:timing_before_04:00:raw/H1@f3}} when the latest article precedes [[04:00]] to
+    {{t16_robustness/d1_ultra:D0:timing_08:00_09:15:raw/H1@f3}} when it falls between [[08:00]] and [[09:15]]; it is
+    model-specific (§1.3).
+
+figA6_monthly_ic:
+  section: appendix
+  title: "Exploratory: the monthly IC, with the implied standard error of a month's mean"
+  caption: >-
+    Exploratory (post hoc): the bands come from NA-12 §13, requested after unblinding; no hypothesis, no claim. The
+    monthly mean of the daily IC of $\hat N$ with $z_{cc}$ over val-A, val-B and the test period for Laya-Fin and
+    d1-ultra (model-specific), with $\pm$[[1]] implied standard error of a month's mean (iid; on test
+    {{t24_exploratory_d0_signal/monthly:laya_fin:test/se_month_iid@f3}} for Laya-Fin). In the last two test months the
+    ICs are about zero (Laya-Fin {{f4_monthly_ic/laya_fin|test|2026-06/ic@signed2}} and
+    {{f4_monthly_ic/laya_fin|test|2026-07/ic@signed2}}, d1-ultra {{f4_monthly_ic/d1_ultra|test|2026-06/ic@signed2}}
+    and {{f4_monthly_ic/d1_ultra|test|2026-07/ic@signed2}}), within about one standard error of a month's mean. Every
+    release lies after the sample, where the time axis stops, which ends on {{t21_release_dates/sample_end/date}}:
+    Laya on {{t21_release_dates/laya/date}}, the API models from {{t21_release_dates/drex_v2/date}}; a contamination
+    cliff at a release would fall outside the data. The anchor (uninformative, near-constant outputs) has no implied
+    SE; its monthly ICs are in the appendix's monthly table. $\ddagger$ span-02, whose release closes the API models'
+    range: the S5 canary fired a STOP after the freeze and the operator chose to proceed (PREREG §15).
+
+figA7_convergence_detail:
+  section: appendix
+  title: Convergence in detail, every decile and the anchor
+  caption: >-
+    (a, b) $\mathrm{CAR}^{\mathrm{lvl}}$ of every decile of $V$ for Laya-Fin and d1-ultra (gray: deciles [[2]] to
+    [[9]]; the extreme deciles with SE bands and their mean $V$ dashed), on one scale. Laya-Fin's deciles are ordered
+    like d1-ultra's but smaller and noisier: its top decile (mean $V$
+    {{f1_v_decile_paths/laya_fin|v_decile|10|car_post0/mean_v@f2}}) stands at
+    {{f1_v_decile_paths/laya_fin|v_decile|10|car_post0/mean@signed2}} at the close. (c) The ladder $\kappa_h$ with the
+    anchor, whose readings are uninformative (near-constant outputs): its $\kappa_h$ is about zero throughout
+    ({{t6_convergence_ladder/anchor:ladder:C_t/kappa@f2}} at the close). Event time is not to scale; d1-ultra is
+    model-specific (§1.3).
+
+figA8_drift_laya_fin:
+  section: appendix
+  title: Laya-Fin's drift after the close by the size of the move
+  caption: >-
+    [[Figure 4]] (b) for Laya-Fin: $\mathrm{sign}(G)\,y_2$ by bin of $|G|$, one line per tercile of news strength $|V|$, with
+    95% intervals. Moves with $|G| \geq [[3]]$ reverse slightly in every tercile (strong
+    {{f2_drift_vs_g/laya_fin|strong|[3, inf)/mean@signed2}}, medium {{f2_drift_vs_g/laya_fin|medium|[3, inf)/mean@signed2}},
+    weak {{f2_drift_vs_g/laya_fin|weak|[3, inf)/mean@signed2}}); smaller moves do not drift.
+
+figA9_shapley:
+  section: appendix
+  title: The value of information at the close is about zero for every feature group
+  caption: >-
+    Exact Shapley values of the test-period out-of-sample $R^2$ (a to c) and mean daily IC (d to f) of $y_2$ at D2
+    over the feature groups $R$ (price and reaction), $N$ (news, Call A) and $J$ (judgements, Call B), for all
+    member-days and by size tier, with the full model's total $R + N + J$ (diamond), from the [[H3]] ridge fits
+    (§11.5); values in units of [[$10^{-3}$]], and each row on one scale. One column per instrument: Laya-Fin,
+    d1-ultra (model-specific) and the anchor (uninformative, near-constant outputs). Every $R^2$ total is negative, in
+    every tier; for all member-days it is {{t13_shapley/laya_fin:all:r2:total/shapley@f4}} for Laya-Fin,
+    {{t13_shapley/d1_ultra:all:r2:total/shapley@f4}} for d1-ultra and {{t13_shapley/anchor:all:r2:total/shapley@f4}}
+    for the anchor, so the Shapley shares are shares of nothing and are not drawn. The IC totals are small and of both
+    signs, from {{t13_shapley/laya_fin:mid:ic:total/shapley@f3}} (Laya-Fin, [[101 to 250]]) to
+    {{t13_shapley/laya_fin:top100:ic:total/shapley@f3}} (Laya-Fin, Top-100). [[H3]] is {{t1_primary/H3/verdict}} for
+    Laya-Fin (Holm p {{t1_primary/H3/primary_p_holm}}).
+
+figA10_ablations:
+  section: appendix
+  title: Call B's judgments carry no information about the drift, with or without the news
+  caption: >-
+    Call B ablations for d1-ultra (S8, on the same test events): the IC of $J$, $C$ and $\hat N$ with $y_2$, real
+    news (filled) against (a) the news removed and (b) shuffled news (hollow), with 95% intervals ($\pm$[[1.96]]
+    Newey–West SE). $J$'s IC is {{t16_robustness/d1_ultra:D2:b2_no_news:j:real/ic_y2@signed2}} with the news and
+    {{t16_robustness/d1_ultra:D2:b2_no_news:j:ablated/ic_y2@signed2}} without it, and
+    {{t16_robustness/d1_ultra:D2:b2_shuffled:j:real/ic_y2@signed2}} against
+    {{t16_robustness/d1_ultra:D2:b2_shuffled:j:ablated/ic_y2@signed2}} with shuffled news. d1-ultra is model-specific
+    (§1.3).
+
+figA11_persistence:
+  section: appendix
+  title: Explained moves do not persist more
+  caption: >-
+    Persistence after D2, the mean of $\mathrm{sign}(G)\,y_2$, by d1-ultra's reason for the move (95% intervals), and
+    $\theta$, the D2 regression of persistence on being explained: {{t11_explanation_share_theta/theta:d2/value@signed2}}
+    (SE {{t11_explanation_share_theta/theta:d2/se@f3}}, p {{t11_explanation_share_theta/theta:d2/p}}). No reason persists
+    significantly. Days that d1-ultra judges explained are {{t11_explanation_share_theta/share:all/events_share@pct0}} of
+    event days and carry {{t11_explanation_share_theta/share:all/value@pct0}} of their squared moves. d1-ultra is
+    model-specific (§1.3).
+
+figA12_strategy_paths:
+  section: appendix
+  title: The other books, and S-CONV by tier
+  caption: >-
+    Cumulative net returns at [[10 bp]] per side over the test period (NA-13). (a) S-D0 from the open to the close,
+    with vendor sentiment ($\dagger$: a possibly look-ahead-contaminated upper bound, not the benchmark); (b) S-D1 $J$
+    from [[10:00]] to the close; (c) S-D2 $J$ from the next open to [[t+5]], each against the gap fade where it
+    applies and the placebo's [[5th]] to [[95th]] percentile band of Laya-Fin's universe. The steep declines of the
+    one-day books are mostly costs (net Sharpe
+    {{t20_strategies/test|S-D0|laya_fin|D0|n_tilde|close_t|all/sharpe_net_10@signed2}} and
+    {{t20_strategies/test|S-D1|laya_fin|D1|j|close_t|all/sharpe_net_10@signed2}}, gross
+    {{t20_strategies/test|S-D0|laya_fin|D0|n_tilde|close_t|all/sharpe_gross@signed2}} and
+    {{t20_strategies/test|S-D1|laya_fin|D1|j|close_t|all/sharpe_gross@signed2}}). (d to f) Laya-Fin's S-CONV and the
+    gap fade by tier: descriptive sub-books of a null book, not separate tests. (a) and (b) share a scale, as do (d)
+    to (f); (c) has its own, since S-D2 loses far less. d1-ultra is model-specific (§1.3).
+
+figA13_probes:
+  section: appendix
+  title: "Exploratory: the probes' descriptive columns"
+  caption: >-
+    Exploratory (post hoc): the probes' descriptive columns (NA-11, val-A), not hypotheses. (a) ICs on masked and
+    unmasked states: unmasking does not raise them materially (d1-ultra
+    {{t18_probes_val_a/liquid_d1-ultra/ic_masked@f3}} masked and {{t18_probes_val_a/liquid_d1-ultra/ic_unmasked@f3}}
+    unmasked; the largest rise, drex-v2.0's, is {{t18_probes_val_a/nace-ai_drex-v2.0/unmasked_minus_masked@signed2}},
+    t {{t18_probes_val_a/nace-ai_drex-v2.0/unmasked_minus_masked_t@f2}}). Both panels share the IC scale. (b) ICs on
+    real against shuffled news on the same events (Laya-Fin {{t18_probes_val_a/laya_fin/ic_real_same_events@f3}} and
+    {{t18_probes_val_a/laya_fin/ic_shuffled@f3}}, inconclusive); the anchor is uninformative (near-constant outputs).
+    $\ddagger$ span-02: the S5 canary fired a STOP after the freeze and the operator chose to proceed (PREREG §15).
+
+figA14_exploratory_d0:
+  section: appendix
+  title: "Exploratory (post hoc): where the D0 signal lives"
+  caption: >-
+    Exploratory (post hoc): requested after unblinding (NA-12 §13); no hypothesis, no claim. (a) Every signal's IC
+    sits on earnings-day events (squares), and there it held from val-B (hollow) to test (filled): Laya-Fin
+    {{t24_exploratory_d0_signal/earnings:laya_fin:val_b:earnings/ic_z_cc@f2}} and
+    {{t24_exploratory_d0_signal/earnings:laya_fin:test:earnings/ic_z_cc@f2}}, d1-ultra
+    {{t24_exploratory_d0_signal/earnings:d1_ultra:val_b:earnings/ic_z_cc@f2}} and
+    {{t24_exploratory_d0_signal/earnings:d1_ultra:test:earnings/ic_z_cc@f2}}. On other events (circles) it fell, for
+    Laya-Fin from {{t24_exploratory_d0_signal/earnings:laya_fin:val_b:rest/ic_z_cc@f3}} to
+    {{t24_exploratory_d0_signal/earnings:laya_fin:test:rest/ic_z_cc@f3}}, and for every other signal too. (b) By size
+    tier on test the API models' IC sits in the two smaller tiers (d1-ultra
+    {{t24_exploratory_d0_signal/tier:d1_ultra:test:top100/ic_z_cc@f3}} in the Top-100 against
+    {{t24_exploratory_d0_signal/tier:d1_ultra:test:rest/ic_z_cc@f3}} in the [[251–500]] tier). The earnings-day ICs of
+    (a) are several times the tier ICs of (b), so the two panels have their own scales. (c) The spread of the
+    per-company rank correlations against a within-company shuffle (gray: its 95% range): Laya-Fin's
+    ({{t24_exploratory_d0_signal/company:laya_fin/sd@f3}}, p {{t24_exploratory_d0_signal/company:laya_fin/p}}) and
+    tags-GBM's exceed it, the others' do not; the test cannot tell company-specific skill from company-specific noise.
+    Not drawn: a one-way test of the daily ICs on the calendar month finds no month effect on test (p
+    {{t24_exploratory_d0_signal/monthly:laya_fin:test/p@f2}} for Laya-Fin and
+    {{t24_exploratory_d0_signal/monthly:d1_ultra:test/p@f2}} for d1-ultra). $\dagger$ Vendor-label baselines: a
+    possibly look-ahead-contaminated upper bound. $\ddagger$ span-02: the S5 canary fired a STOP after the freeze and
+    the operator chose to proceed (PREREG §15).
+
+figA15_exploratory_ma_cross:
+  section: appendix
+  title: "Exploratory (post hoc): news and a moving-average cross"
+  caption: >-
+    Exploratory (post hoc): the operator's [[MA20/MA50]] cross add-on (NA-13 §9), designed on validation and run once
+    on test; no claim. (a, b) Mean signed abnormal return over [[5]] and [[20]] days after a cross, by group (95%
+    intervals, $\pm$[[1.96]] Newey–West SE), validation (hollow) against test (filled); the two panels have their own
+    scales, since [[20]]-day returns spread wider than [[5]]-day ones. The validation reversal of crosses without news
+    ({{t25_ma_cross/periods:validation:statistics:none|5/mean_bp@f1}} bp, t
+    {{t25_ma_cross/periods:validation:statistics:none|5/nw_t@f2}}) did not replicate on test
+    ({{t25_ma_cross/periods:test:statistics:none|5/mean_bp@f1}} bp, t
+    {{t25_ma_cross/periods:test:statistics:none|5/nw_t@f2}}). (c) The tradable no-news fade on test, cumulative net at
+    [[10 bp]]: net Sharpe {{t25_ma_cross/periods:test:fade_no_news/sharpe_net_10@signed2}} (gross
+    {{t25_ma_cross/periods:test:fade_no_news/sharpe_gross@f2}}, after
+    {{t25_ma_cross/periods:validation:fade_no_news/sharpe_gross@f2}} on validation, where its design was chosen).

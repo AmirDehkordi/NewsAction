@@ -1,0 +1,50 @@
+% t2_h2_over_under: tab:a-h2-over-under (NA-14 figures.latex, from artifacts/NA-14/tables/t2_h2_over_under.csv)
+\begin{landscape}
+\begin{table}[htbp]
+\centering
+\small
+\begin{threeparttable}
+\caption{The over/under regression for every model, decision point and $|G|$ bin.}\label{tab:a-h2-over-under}
+\begin{tabular}{@{}lS[table-format=-1.3]S[table-format=1.3, table-space-text-pre=(, table-space-text-post=)]S[table-format=1.3]S[table-format=-1.3]S[table-format=1.3, table-space-text-pre=(, table-space-text-post=)]S[table-format=1.3]S[table-format=1.3]S[table-format=1.3]S[table-format=5.0]@{}}
+\toprule
+Model, regression & {$b$} & {SE} & {$p_b$} & {$c$} & {SE} & {$p_c$} & {$p_b$ DK} & {$p_c$ DK} & {Events} \\
+\midrule
+Laya-Fin, D2 & -0.044 & {(}0.149{)} & 0.616 & -0.015 & {(}0.012{)} & 0.110 & 0.615 & 0.117 & 17188 \\
+Laya-Fin, D1 & 0.229 & {(}0.148{)} & 0.062 & 0.013 & {(}0.012{)} & 0.861 & 0.105 & 0.824 & 13203 \\
+Laya-Fin, D0 & 0.278 & {(}0.212{)} & 0.096 & {---} & {---} & {---} & 0.121 & {---} & 13439 \\
+Laya-Fin, D2, $|G| \in [0, 1)$ & -0.187 & {(}0.242{)} & 0.779 & -0.016 & {(}0.037{)} & 0.338 & 0.758 & 0.330 & 9795 \\
+Laya-Fin, D2, $|G| \in [1, 2)$ & -0.172 & {(}0.273{)} & 0.735 & -0.025 & {(}0.026{)} & 0.171 & 0.736 & 0.179 & 4647 \\
+Laya-Fin, D2, $|G| \in [2, \infty)$ & 0.092 & {(}0.254{)} & 0.358 & -0.013 & {(}0.012{)} & 0.138 & 0.315 & 0.157 & 2746 \\
+anchor, D2 & 0.748 & {(}1.377{)} & 0.294 & -0.015 & {(}0.012{)} & 0.111 & 0.341 & 0.121 & 17188 \\
+anchor, D1 & 1.964 & {(}2.482{)} & 0.215 & 0.014 & {(}0.012{)} & 0.874 & 0.269 & 0.838 & 13203 \\
+anchor, D0 & -4.510 & {(}3.236{)} & 0.917 & {---} & {---} & {---} & 0.898 & {---} & 13439 \\
+anchor, D2, $|G| \in [0, 1)$ & -0.086 & {(}3.523{)} & 0.510 & -0.016 & {(}0.037{)} & 0.331 & 0.513 & 0.323 & 9795 \\
+anchor, D2, $|G| \in [1, 2)$ & 1.336 & {(}3.596{)} & 0.355 & -0.026 & {(}0.026{)} & 0.167 & 0.371 & 0.174 & 4647 \\
+anchor, D2, $|G| \in [2, \infty)$ & 0.273 & {(}2.604{)} & 0.458 & -0.013 & {(}0.012{)} & 0.150 & 0.456 & 0.168 & 2746 \\
+Laya zero-shot, D2 & {---} & {---} & {---} & {---} & {---} & {---} & {---} & {---} & {---} \\
+Laya zero-shot, D1 & -0.001 & {(}0.063{)} & 0.504 & 0.014 & {(}0.012{)} & 0.871 & 0.504 & 0.833 & 13203 \\
+Laya zero-shot, D0 & -0.021 & {(}0.069{)} & 0.619 & {---} & {---} & {---} & 0.608 & {---} & 13439 \\
+d1-ultra, D2 & -0.076 & {(}0.031{)} & 0.991 & -0.011 & {(}0.012{)} & 0.171 & 0.985 & 0.175 & 17188 \\
+d1-ultra, D1 & -0.018 & {(}0.032{)} & 0.711 & 0.015 & {(}0.012{)} & 0.884 & 0.707 & 0.853 & 13203 \\
+d1-ultra, D0 & 0.022 & {(}0.037{)} & 0.277 & {---} & {---} & {---} & 0.280 & {---} & 13439 \\
+d1-ultra, D2, $|G| \in [0, 1)$ & -0.067 & {(}0.043{)} & 0.939 & -0.015 & {(}0.037{)} & 0.348 & 0.898 & 0.340 & 9795 \\
+d1-ultra, D2, $|G| \in [1, 2)$ & -0.086 & {(}0.053{)} & 0.947 & -0.023 & {(}0.026{)} & 0.189 & 0.972 & 0.196 & 4647 \\
+d1-ultra, D2, $|G| \in [2, \infty)$ & -0.080 & {(}0.056{)} & 0.920 & -0.009 & {(}0.013{)} & 0.237 & 0.948 & 0.249 & 2746 \\
+span-02$^{\ddagger}$, D2 & {---} & {---} & {---} & {---} & {---} & {---} & {---} & {---} & {---} \\
+span-02$^{\ddagger}$, D1 & -0.010 & {(}0.023{)} & 0.666 & 0.014 & {(}0.012{)} & 0.882 & 0.660 & 0.850 & 13203 \\
+span-02$^{\ddagger}$, D0 & 0.013 & {(}0.023{)} & 0.282 & {---} & {---} & {---} & 0.293 & {---} & 13439 \\
+drex-v2.0, D2 & {---} & {---} & {---} & {---} & {---} & {---} & {---} & {---} & {---} \\
+drex-v2.0, D1 & -0.032 & {(}0.026{)} & 0.889 & 0.015 & {(}0.012{)} & 0.890 & 0.859 & 0.857 & 13203 \\
+drex-v2.0, D0 & 0.011 & {(}0.030{)} & 0.356 & {---} & {---} & {---} & 0.354 & {---} & 13439 \\
+\bottomrule
+\end{tabular}
+\begin{tablenotes}[flushleft]\footnotesize
+\item ---: not estimated for that row (at D0 there is no $G$, so no $c$).
+\item DK: Driscoll--Kraay standard errors (5 lags) as robustness.
+\item The anchor's readings are uninformative (near-constant outputs after one epoch); its rows are reported, not read as nulls.
+\item The API models fail the \S8.3 contamination screens, so their results are model-specific (\S1.3).
+\item $^{\ddagger}$span-02: the S5 canary fired a STOP after the freeze; the operator chose to proceed (PREREG \S15, post-freeze NA-11 row).
+\end{tablenotes}
+\end{threeparttable}
+\end{table}
+\end{landscape}

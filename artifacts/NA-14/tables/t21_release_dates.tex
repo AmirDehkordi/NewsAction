@@ -1,0 +1,25 @@
+% t21_release_dates: tab:a-release-dates (NA-14 figures.latex, from artifacts/NA-14/tables/t21_release_dates.csv)
+\begin{table}[htbp]
+\centering
+\small
+\begin{threeparttable}
+\caption{Release dates: every decision model came out after the sample; only the anchor's checkpoint predates it.}\label{tab:a-release-dates}
+\begin{tabular}{@{}lS[table-format=2.0]@{}}
+\toprule
+Model & {Days after the sample} \\
+\midrule
+end of the test period, 2026-07-31 & 0 \\
+Laya (open weights; Laya-Fin's base), 2026-09-18 & 49 \\
+drex-v2.0, 2026-10-12 & 73 \\
+d1-ultra, 2026-10-15 & 76 \\
+span-02$^{\ddagger}$, 2026-10-16 & 77 \\
+ModernBERT-large (the anchor's checkpoint), 2024-12 & {---} \\
+\bottomrule
+\end{tabular}
+\begin{tablenotes}[flushleft]\footnotesize
+\item ---: the anchor's checkpoint is dated by month only, before the sample, so it has no day count.
+\item Release dates from the NA-05 catalog; Laya's from the operator (Convai's release, weights on Hugging Face); the anchor's checkpoint is known to the month only.
+\item $^{\ddagger}$span-02: the S5 canary fired a STOP after the freeze; the operator chose to proceed (PREREG \S15, post-freeze NA-11 row).
+\end{tablenotes}
+\end{threeparttable}
+\end{table}

@@ -1,0 +1,2 @@
+key,item,value,n,p,ci_low,ci_high,available,source
+market:r2,"A3.5 market replication, OOS R² of SPY's r_cc (exploratory)",0.02144570441,144.0,0.3087691231,-0.06572958181,0.1069113685,True,artifacts/NA-12/tables/t11_explanation_share_theta.csv (row market:r2)

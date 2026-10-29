@@ -1,0 +1,39 @@
+% t29_encoding: tab:a-encoding (NA-14 figures.latex, from artifacts/NA-14/tables/t29_encoding.csv)
+\begin{table}[htbp]
+\centering
+\small
+\begin{threeparttable}
+\caption{Encodings of numbers in states: E1 ranked best in the val-A search but fell short of E3 on val-B, so E3 was kept.}\label{tab:a-encoding}
+\begin{tabular}{@{}lS[table-format=1.3]cS[table-format=1.2]S[table-format=4.0]S[table-format=1.0]@{}}
+\toprule
+Split, model, encoding & {IC} & 95\% CI & {$t$} & {Events} & {Rank} \\
+\midrule
+val-A, d1-ultra, E0 & 0.076 & [$0.003$, $0.141$] & 2.29 & 1500 & 4 \\
+val-A, d1-ultra, E1 & 0.081 & [$0.024$, $0.131$] & 3.11 & 1500 & 1 \\
+val-A, d1-ultra, E2 & 0.066 & [$-0.001$, $0.127$] & 2.14 & 1500 & 5 \\
+val-A, d1-ultra, E3 & 0.080 & [$0.014$, $0.138$] & 2.68 & 1500 & 2 \\
+val-A, d1-ultra, E4 & 0.079 & [$0.012$, $0.139$] & 2.64 & 1500 & 3 \\
+val-A, span-02$^{\ddagger}$, E0 & 0.065 & [$0.013$, $0.113$] & 2.56 & 1500 & 4 \\
+val-A, span-02$^{\ddagger}$, E1 & 0.069 & [$0.017$, $0.116$] & 2.72 & 1500 & 2 \\
+val-A, span-02$^{\ddagger}$, E2 & 0.069 & [$0.016$, $0.120$] & 2.71 & 1500 & 1 \\
+val-A, span-02$^{\ddagger}$, E3 & 0.063 & [$0.017$, $0.108$] & 2.79 & 1500 & 5 \\
+val-A, span-02$^{\ddagger}$, E4 & 0.068 & [$0.013$, $0.118$] & 2.61 & 1500 & 3 \\
+val-A, drex-v2.0, E0 & 0.085 & [$0.037$, $0.131$] & 3.65 & 1500 & 1 \\
+val-A, drex-v2.0, E1 & 0.074 & [$0.024$, $0.122$] & 3.07 & 1500 & 2 \\
+val-A, drex-v2.0, E2 & 0.070 & [$0.023$, $0.115$] & 3.07 & 1500 & 5 \\
+val-A, drex-v2.0, E3 & 0.071 & [$0.017$, $0.123$] & 2.66 & 1500 & 4 \\
+val-A, drex-v2.0, E4 & 0.073 & [$0.016$, $0.127$] & 2.46 & 1500 & 3 \\
+val-B, d1-ultra, E1 & 0.058 & [$0.013$, $0.102$] & 2.53 & 1500 & 2 \\
+val-B, d1-ultra, E3 & 0.063 & [$0.023$, $0.102$] & 3.14 & 1500 & 1 \\
+val-B, span-02$^{\ddagger}$, E1 & 0.063 & [$0.012$, $0.111$] & 2.58 & 1500 & 2 \\
+val-B, span-02$^{\ddagger}$, E3 & 0.077 & [$0.029$, $0.124$] & 3.25 & 1500 & 1 \\
+val-B, drex-v2.0, E1 & 0.030 & [$-0.030$, $0.084$] & 1.01 & 1500 & 2 \\
+val-B, drex-v2.0, E3 & 0.044 & [$-0.013$, $0.096$] & 1.55 & 1500 & 1 \\
+\bottomrule
+\end{tabular}
+\begin{tablenotes}[flushleft]\footnotesize
+\item $^{\ddagger}$span-02: the S5 canary fired a STOP after the freeze; the operator chose to proceed (PREREG \S15, post-freeze NA-11 row).
+\item The API models fail the \S8.3 contamination screens, so their results are model-specific (\S1.3).
+\end{tablenotes}
+\end{threeparttable}
+\end{table}

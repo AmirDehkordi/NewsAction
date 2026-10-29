@@ -1,0 +1,69 @@
+# One-line summaries of the rows of PREREG §15 (the Deviations log), in order, for the paper's one-page appendix
+# table t34 (operator's revision pass, 2026-10-29). Written by NA-14 from the rows themselves; the date and the
+# timing (before or after the freeze) are read from the log, and `figures.tables.prereg_deviations` checks that
+# each summary sits on its row (number and date). Notation is LaTeX math between dollar signs. Lengths: change at
+# most 58 characters, reason at most 34, chunk at most 12, so each row fits one line.
+rows:
+  - {row: 1, date: 2026-10-24, chunk: NA-00, change: "Freeze hash stops at §15; §15 checked as append-only", reason: "The log must grow after the freeze"}
+  - {row: 2, date: 2026-10-24, chunk: NA-00, change: "Test-year adjusted closes sit outside the sealed folder", reason: "Data/ is read-only"}
+  - {row: 3, date: 2026-10-24, chunk: operator, change: "Amendment A1: convergence to $V$, H2-C, S-CONV", reason: "Operator, before any data"}
+  - {row: 4, date: 2026-10-24, chunk: operator, change: "Amendments A2, A3: battery v2, explaining moves", reason: "Operator, before any data"}
+  - {row: 5, date: 2026-10-24, chunk: NA-01, change: "Share classes grouped by issuer name", reason: "ATOM rarely has a CIK"}
+  - {row: 6, date: 2026-10-24, chunk: NA-01, change: "Company cap from one class; shares on the split basis", reason: "CIQ shares are company-level"}
+  - {row: 7, date: 2026-10-24, chunk: NA-01, change: "Test-month ranking closes rebuilt from adjusted ones", reason: "Tiers needed before the freeze"}
+  - {row: 8, date: 2026-10-24, chunk: NA-01, change: "Ids without Data/prices use ATOM's total return", reason: "Else about 7% of members drop"}
+  - {row: 9, date: 2026-10-24, chunk: NA-01, change: "Sector pool: one class per company, own company out", reason: "No company in its own factor"}
+  - {row: 10, date: 2026-10-24, chunk: NA-01, change: "Target details: volume, $\\sigma$ floor, multi-day scaling", reason: "PREREG leaves them open"}
+  - {row: 11, date: 2026-10-24, chunk: NA-01 verif., change: "Share counts checked against Yahoo, used when CIQ is off", reason: "Bad CIQ shares for large names"}
+  - {row: 12, date: 2026-10-24, chunk: NA-01 verif., change: "Price-level check at dividend dates; HON rescaled", reason: "ATOM's HON closes were halved"}
+  - {row: 13, date: 2026-10-24, chunk: NA-01 verif., change: "ATOM raw volume put on the traded share basis", reason: "Pre-split volume was adjusted"}
+  - {row: 14, date: 2026-10-24, chunk: NA-02, change: "News tickers mapped through dated aliases", reason: "ATOM holds no renames"}
+  - {row: 15, date: 2026-10-24, chunk: NA-02, change: "Near-duplicates grouped in time order; novelty fixed", reason: "Keeps grouping point-in-time"}
+  - {row: 16, date: 2026-10-24, chunk: NA-02, change: "Rules of the after-the-fact price-talk detector", reason: "PREREG names categories only"}
+  - {row: 17, date: 2026-10-24, chunk: NA-02, change: "Leakage audit of vendor sentiment ($z_{id}$ vs $z_{on}$)", reason: "PREREG states it in words"}
+  - {row: 18, date: 2026-10-25, chunk: NA-03, change: "Rule filters reach the budget by seeded thinning", reason: "A yes-or-no rule has no threshold"}
+  - {row: 19, date: 2026-10-25, chunk: NA-03, change: "Filter comparison sample purged and embargoed", reason: "Purge and embargo left open"}
+  - {row: 20, date: 2026-10-25, chunk: NA-03, change: "F5, F6 trained on articles; tuning metric fixed", reason: "Training unit left open"}
+  - {row: 21, date: 2026-10-25, chunk: NA-03, change: "D2 events, third-party exclusion, data end defined", reason: "PREREG does not cover them"}
+  - {row: 22, date: 2026-10-25, chunk: NA-04, change: "The company block carries the GICS sector only", reason: "ATOM has no industry level"}
+  - {row: 23, date: 2026-10-25, chunk: NA-04, change: "Codebook scales for multi-day moves, market series", reason: "PREREG gives them no scale"}
+  - {row: 24, date: 2026-10-25, chunk: NA-04, change: "Publication lags of market, FRED, earnings fields", reason: "Availability left to NA-04"}
+  - {row: 25, date: 2026-10-25, chunk: NA-04, change: "Masking widened: periods, dates, tickers, names", reason: "Residue above the target"}
+  - {row: 26, date: 2026-10-25, chunk: NA-04, change: "No pre-market talk in Call B; question text written", reason: "Numbers stay in the codebook"}
+  - {row: 27, date: 2026-10-25, chunk: NA-04, change: "Move explainers and TradingView items left out", reason: "They carry the session's move"}
+  - {row: 28, date: 2026-10-25, chunk: NA-04, change: "Residual names (about 1% of states) accepted", reason: "Content alone identifies half"}
+  - {row: 29, date: 2026-10-26, chunk: NA-04, change: "Non-English articles and English price talk removed", reason: "Price talk in 2.5% of states"}
+  - {row: 30, date: 2026-10-26, chunk: NA-04, change: "More date forms; every price move and level removed", reason: "Date residue failed AC2"}
+  - {row: 31, date: 2026-10-26, chunk: NA-04, change: "Running market stories left out of pre-open states", reason: "Live pages held the outcome"}
+  - {row: 32, date: 2026-10-26, chunk: NA-04, change: "Residues below 0.5% of states accepted, disclosed", reason: "The seventh verification passed"}
+  - {row: 33, date: 2026-10-26, chunk: NA-02, change: "Articles of undecided parsing status allowed", reason: "Operator decision A"}
+  - {row: 34, date: 2026-10-26, chunk: NA-06, change: "Tournament samples, IC, confidence set, screens fixed", reason: "PREREG leaves details open"}
+  - {row: 35, date: 2026-10-27, chunk: op. (NA-06), change: "No API model passes §8.3; top three kept, model-specific", reason: "Within-model tests stay valid"}
+  - {row: 36, date: 2026-10-27, chunk: NA-07, change: "Encoding search and anchoring test operationalized", reason: "PREREG gives rules only"}
+  - {row: 37, date: 2026-10-27, chunk: NA-07, change: "Numeracy gate for encodings other than E3", reason: "The fallback was undefined"}
+  - {row: 38, date: 2026-10-27, chunk: op. (NA-10), change: "FMP request cap raised from 3,000 to 17,000", reason: "FMP serves 30 days a request"}
+  - {row: 39, date: 2026-10-27, chunk: NA-10, change: "Decision point D1: the 10:00 price, returns, scales", reason: "PREREG leaves them open"}
+  - {row: 40, date: 2026-10-27, chunk: NA-10, change: "Per-session basis of 30-minute bars; 5 bp bound failing", reason: "Vendor data need it"}
+  - {row: 41, date: 2026-10-27, chunk: NA-10, change: "The D1 Call B state and its half-hour wording", reason: "No phrase for the 10:00 move"}
+  - {row: 42, date: 2026-10-27, chunk: NA-10 verif., change: "Request counts and the 5 bp gap corrected", reason: "Recomputed from the ledger"}
+  - {row: 43, date: 2026-10-27, chunk: operator, change: "Two attention cuts; timing and text robustness", reason: "Limited attention; leak checks"}
+  - {row: 44, date: 2026-10-26, chunk: NA-08, change: "Trained models read 1,036 tokens instead of 1,024", reason: "No state or question is cut"}
+  - {row: 45, date: 2026-10-27, chunk: NA-08, change: "One seed and one epoch per trained model for now", reason: "One week's Kaggle quota"}
+  - {row: 46, date: 2026-10-27, chunk: NA-09, change: "Baselines operationalized: events, features, LLM", reason: "PREREG names them only"}
+  - {row: 47, date: 2026-10-28, chunk: NA-11, change: "Analysis spec: samples, inference, bootstrap, families", reason: "Frozen code must fix them"}
+  - {row: 48, date: 2026-10-28, chunk: NA-11, change: "Freeze hash also covers inference and metrics code", reason: "The frozen spec runs them"}
+  - {row: 49, date: 2026-10-28, chunk: op. (NA-11), change: "Trained instruments pinned to the seed-13 runs", reason: "Later seeds must not change them"}
+  - {row: 50, date: 2026-10-28, chunk: NA-11, change: "Final selection: val-B IC on common events", reason: "Event set left open"}
+  - {row: 51, date: 2026-10-28, chunk: op. (NA-11), change: "Company identification with matched distractors", reason: "Removes baseline bias"}
+  - {row: 52, date: 2026-10-28, chunk: NA-11, change: "Live-format residue counted with the frozen pattern", reason: "First count was narrow"}
+  - {row: 53, date: 2026-10-28, chunk: op. (NA-11), change: "H1b, the IC with $z_{id}$, joins the Holm family", reason: "Tests what S-D0 trades"}
+  - {row: 54, date: 2026-10-28, chunk: op. (NA-11), change: "Production plan: d1-ultra as the API comparator", reason: "The PRD names no rule"}
+  - {row: 55, date: 2026-10-28, chunk: op. (NA-11), change: "Three robustness variants dropped; 08:00 approximated", reason: "They need new states"}
+  - {row: 56, date: 2026-10-28, chunk: op. (NA-11), change: "Canary baselines and drift check for API models", reason: "NA-05 had none for them"}
+  - {row: 57, date: 2026-10-28, chunk: op. (NA-11), change: "span-02's canary STOP judged noise; proceed", reason: "Inside its own repeat range"}
+  - {row: 58, date: 2026-10-28, chunk: op. (NA-11), change: "Price-only D2 test predictions moved to NA-12", reason: "A feature is a test outcome"}
+  - {row: 59, date: 2026-10-28, chunk: operator, change: "Anchor robustness runs fixed before unblinding", reason: "Near-constant anchor outputs"}
+  - {row: 60, date: 2026-10-28, chunk: NA-12, change: "NA-12's calls of the frozen spec fixed in advance", reason: "Caller fixes joins, families"}
+  - {row: 61, date: 2026-10-28, chunk: NA-12, change: "Figure data definitions and code fixes", reason: "No pre-registered number moves"}
+  - {row: 62, date: 2026-10-28, chunk: op. (NA-12), change: "Exploratory analyses after unblinding, dated", reason: "Paper trail for post hoc work"}
+  - {row: 63, date: 2026-10-28, chunk: NA-13, change: "Strategy engine fixed before any test-period return", reason: "PREREG gives books, not joins"}

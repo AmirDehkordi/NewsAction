@@ -1,0 +1,28 @@
+% tab1_primary: tab:primary (NA-14 figures.latex, from artifacts/NA-12/tables/t1_primary.csv)
+\begin{table}[htbp]
+\centering
+\small
+\begin{threeparttable}
+\caption{Primary hypotheses on the test period: none is supported for the primary instrument, Laya-Fin.}\label{tab:primary}
+\begin{tabular}{@{}lS[table-format=-1.4]cS[table-format=1.3]S[table-format=1.3]S[table-format=-1.4]S[table-format=1.3]l@{}}
+\toprule
+ & \multicolumn{4}{c}{Laya-Fin (primary)} & \multicolumn{2}{c}{Anchor} & \\
+\cmidrule(lr){2-5}\cmidrule(lr){6-7}
+Hypothesis & {Estimate} & 95\% CI & {$p$} & {Holm $p$} & {Estimate} & {$p$} & Verdict (\S1.3) \\
+\midrule
+H1 & 0.005 & [$-0.035$, $0.041$] & 0.409 & 0.853 & 0.004 & 0.406 & not supported \\
+H1b & 0.010 & [$-0.014$, $0.037$] & 0.213 & 0.853 & 0.002 & 0.427 & not supported \\
+H2 & -0.044 & --- & 0.616 & 0.853 & 0.015 & 0.294 & not supported \\
+H3 & 0.0038 & [$-0.0008$, $0.0085$] & 0.054 & 0.269 & 0.0013 & 0.017 & not supported \\
+H4 & 0.0012 & [$-0.0017$, $0.0042$] & 0.216 & 0.853 & -0.0004 & 0.773 & not supported \\
+\bottomrule
+\end{tabular}
+\begin{tablenotes}[flushleft]\footnotesize
+\item The tests: H1, $\mathrm{IC}(\hat N, z_{on}) - \mathrm{IC}(\hat N, z_{id}) > 0$; H1b, $\mathrm{IC}(\hat N, z_{id}) > 0$; H2, $b > 0$ and $c < 0$ at D2; H3, $\Delta\mathrm{IC}$ of $J$ for $y_2 > 0$; H4, $\Delta R^2$ of the news for $|z_{cc}| > 0$.
+\item Test period 2026-01-02 to 2026-07-31, events outside the embargo. Estimates in each hypothesis' direction; $p$ one-sided; 95\% CIs and $p$ from a stationary block bootstrap over sessions (block 5, 10,000 draws); Holm over H1, H1b, H2, H3 and H4 at 0.05.
+\item H2: the estimate is $\min(b, -c)$ and $p = \max(p_b, p_c)$ (both must hold), so it has no single interval (---); $b$ and $c$ with their standard errors are in Table~\ref{tab:over-under}. Estimates and CIs to three decimals, H3's and H4's to four, since those increments are an order smaller.
+\item Verdict (\S1.3): general if Laya-Fin's Holm $p < 0.05$ with the predicted sign and the anchor's own $p < 0.05$ with the same sign; model-specific if only Laya-Fin's holds; otherwise not supported. The anchor's readings are uninformative (near-constant outputs after one epoch); its rows are reported, not read as nulls. Its $p$ is its own, not Holm-adjusted.
+\item Significance: no stars are used; $p$ is one-sided unless stated.
+\end{tablenotes}
+\end{threeparttable}
+\end{table}

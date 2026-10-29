@@ -1,0 +1,40 @@
+% t3_ic: tab:a-ic (NA-14 figures.latex, from artifacts/NA-14/tables/t3_ic.csv)
+\begin{table}[htbp]
+\centering
+\small
+\begin{threeparttable}
+\caption{Daily IC by target on the test period, with the quintile spread.}\label{tab:a-ic}
+\begin{tabular}{@{}lS[table-format=-1.3]cS[table-format=-1.2]S[table-format=5.0]S[table-format=-1.3]S[table-format=1.3, table-space-text-pre={$<$}]@{}}
+\toprule
+ & & & & & \multicolumn{2}{c}{Quintile spread} \\
+\cmidrule(lr){6-7}
+Model, target & {IC} & 95\% CI & {$t$} & {Events} & {Top $-$ bottom} & {$p$} \\
+\midrule
+Laya-Fin, $z_{cc}$ & 0.020 & [$-0.003$, $0.042$] & 1.67 & 13748 & 0.127 & 0.024 \\
+Laya-Fin, $z_{on}$ & 0.015 & [$-0.011$, $0.041$] & 1.08 & 13439 & 0.174 & 0.044 \\
+Laya-Fin, $z_{id}$ & 0.010 & [$-0.015$, $0.036$] & 0.82 & 13439 & 0.050 & 0.201 \\
+anchor, $z_{cc}$ & 0.008 & [$-0.011$, $0.026$] & 0.83 & 13748 & -0.001 & 0.500 \\
+anchor, $z_{on}$ & 0.006 & [$-0.016$, $0.027$] & 0.50 & 13439 & -0.011 & 0.544 \\
+anchor, $z_{id}$ & 0.002 & [$-0.020$, $0.022$] & 0.18 & 13439 & 0.002 & 0.495 \\
+Laya zero-shot, $z_{cc}$ & 0.005 & [$-0.023$, $0.032$] & 0.37 & 13748 & 0.056 & 0.236 \\
+Laya zero-shot, $z_{on}$ & 0.037 & [$0.015$, $0.058$] & 3.22 & 13439 & 0.281 & {$<$}0.001 \\
+Laya zero-shot, $z_{id}$ & -0.017 & [$-0.043$, $0.008$] & -1.25 & 13439 & -0.102 & 0.953 \\
+d1-ultra, $z_{cc}$ & 0.039 & [$0.015$, $0.062$] & 3.23 & 13748 & 0.410 & {$<$}0.001 \\
+d1-ultra, $z_{on}$ & 0.074 & [$0.043$, $0.104$] & 4.74 & 13439 & 0.812 & {$<$}0.001 \\
+d1-ultra, $z_{id}$ & -0.001 & [$-0.021$, $0.020$] & -0.07 & 13439 & -0.006 & 0.547 \\
+span-02$^{\ddagger}$, $z_{cc}$ & 0.041 & [$0.015$, $0.064$] & 3.10 & 13748 & 0.406 & {$<$}0.001 \\
+span-02$^{\ddagger}$, $z_{on}$ & 0.074 & [$0.040$, $0.106$] & 4.49 & 13439 & 0.803 & {$<$}0.001 \\
+span-02$^{\ddagger}$, $z_{id}$ & -0.001 & [$-0.021$, $0.020$] & -0.05 & 13439 & -0.008 & 0.566 \\
+drex-v2.0, $z_{cc}$ & 0.044 & [$0.021$, $0.067$] & 3.70 & 13748 & 0.384 & {$<$}0.001 \\
+drex-v2.0, $z_{on}$ & 0.077 & [$0.048$, $0.105$] & 5.34 & 13439 & 0.760 & {$<$}0.001 \\
+drex-v2.0, $z_{id}$ & 0.002 & [$-0.018$, $0.023$] & 0.18 & 13439 & -0.005 & 0.541 \\
+\bottomrule
+\end{tabular}
+\begin{tablenotes}[flushleft]\footnotesize
+\item Quintile spread: the mean target in the top quintile of $\hat N$ minus the bottom quintile, in typical daily moves, and its $p$; the IC's own test is its $t$.
+\item The anchor's readings are uninformative (near-constant outputs after one epoch); its rows are reported, not read as nulls.
+\item The API models fail the \S8.3 contamination screens, so their results are model-specific (\S1.3).
+\item $^{\ddagger}$span-02: the S5 canary fired a STOP after the freeze; the operator chose to proceed (PREREG \S15, post-freeze NA-11 row).
+\end{tablenotes}
+\end{threeparttable}
+\end{table}

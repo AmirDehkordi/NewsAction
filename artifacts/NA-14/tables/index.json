@@ -1,0 +1,1533 @@
+[
+ {
+  "name": "t1_primary",
+  "title": "Primary hypotheses (Holm over H1, H1b, H2, H3, H4; \u00a71.3 headline rule): Laya-Fin and the anchor",
+  "section": "3",
+  "exploratory": false,
+  "exploratory_rows": [],
+  "columns": [
+   "key",
+   "hypothesis",
+   "statement",
+   "primary_estimate",
+   "primary_ci_low",
+   "primary_ci_high",
+   "primary_p",
+   "primary_p_holm",
+   "anchor_estimate",
+   "anchor_ci_low",
+   "anchor_ci_high",
+   "anchor_p",
+   "verdict"
+  ],
+  "rows": 5,
+  "notes": [
+   "Estimates in each hypothesis' direction (H2: min(b, \u2212c)); p one-sided; the anchor's p is its own (\u00a71.3), not Holm-adjusted. H2's CI is in t2 (b and c separately).",
+   "The anchor's direction, H2 and continuation readings are uninformative (NA-11 REPORT \u00a77.1)."
+  ],
+  "sources": [
+   "artifacts/NA-12/tables/t1_primary.csv"
+  ],
+  "copy_of": "artifacts/NA-12/tables/t1_primary.csv",
+  "files": [
+   "t1_primary.csv"
+  ]
+ },
+ {
+  "name": "t1b_primary_by_model",
+  "title": "H1\u2013H4 for every decision model (the API models screen-failing and model-specific)",
+  "section": "3",
+  "exploratory": false,
+  "exploratory_rows": [],
+  "columns": [
+   "key",
+   "model",
+   "test",
+   "role",
+   "estimate",
+   "ci_low",
+   "ci_high",
+   "nw_t",
+   "p",
+   "n_days",
+   "n_obs",
+   "available",
+   "p_holm_within_model",
+   "footnote",
+   "reason"
+  ],
+  "rows": 30,
+  "notes": [
+   "Holm within each model is descriptive; only Laya-Fin's Holm enters the headline rule."
+  ],
+  "sources": [
+   "artifacts/NA-12/tables/t1b_primary_by_model.csv"
+  ],
+  "copy_of": "artifacts/NA-12/tables/t1b_primary_by_model.csv",
+  "files": [
+   "t1b_primary_by_model.csv"
+  ]
+ },
+ {
+  "name": "t2_h2_over_under",
+  "title": "Over/under regression y = a + b\u00b7N\u0302 + c\u00b7G + day \u00d7 tier FE by decision point and within |G| bins",
+  "section": "4",
+  "exploratory": false,
+  "exploratory_rows": [],
+  "columns": [
+   "key",
+   "model",
+   "variant",
+   "available",
+   "b",
+   "b_se",
+   "b_t",
+   "b_p",
+   "b_se_dk",
+   "b_p_dk",
+   "c",
+   "c_se",
+   "c_t",
+   "c_p",
+   "c_se_dk",
+   "c_p_dk",
+   "p",
+   "p_dk",
+   "nobs",
+   "n_sessions",
+   "n_firms",
+   "df_t",
+   "r2_within",
+   "reason"
+  ],
+  "rows": 27,
+  "notes": [
+   "Two-way clustered (session, firm) SEs; Driscoll\u2013Kraay (5 lags) SEs and p in the _dk columns.",
+   "D2: y2, G = z_cc,t, N\u0302 from Call A on W2; D1: y1, G at 10:00, N\u0302_W0; D0: y0 = z_id, no G."
+  ],
+  "sources": [
+   "artifacts/NA-12/tables/t2_h2_over_under.csv"
+  ],
+  "copy_of": "artifacts/NA-12/tables/t2_h2_over_under.csv",
+  "files": [
+   "t2_h2_over_under.csv"
+  ]
+ },
+ {
+  "name": "t3_ic",
+  "title": "Daily IC of N\u0302_W0 with z_cc, z_on and z_id, and quintile spreads (\u00a711.1)",
+  "section": "3",
+  "exploratory": false,
+  "exploratory_rows": [],
+  "columns": [
+   "key",
+   "model",
+   "target",
+   "ic",
+   "ic_t",
+   "ic_ci_low",
+   "ic_ci_high",
+   "n_days",
+   "n_obs",
+   "qspread",
+   "qspread_t",
+   "qspread_p"
+  ],
+  "rows": 18,
+  "notes": [],
+  "sources": [
+   "artifacts/NA-12/tables/t3_ic.csv"
+  ],
+  "copy_of": "artifacts/NA-12/tables/t3_ic.csv",
+  "files": [
+   "t3_ic.csv"
+  ]
+ },
+ {
+  "name": "t4_secondary",
+  "title": "Secondary hypotheses (BH, q = 0.10, within each instrument; pooled sensitivity family)",
+  "section": "4",
+  "exploratory": false,
+  "exploratory_rows": [],
+  "columns": [
+   "key",
+   "model",
+   "test",
+   "available",
+   "estimate",
+   "p",
+   "in_family",
+   "q",
+   "q_pooled",
+   "reason",
+   "ci_low",
+   "ci_high",
+   "se",
+   "nobs"
+  ],
+  "rows": 24,
+  "notes": [
+   "H6 and A3.4 need tone and the explanation answer (Q16), which the trained models do not give.",
+   "The pooled family adds d1-ultra's H6 and A3.4 to Laya-Fin's six (PREREG \u00a715 NA-12 row)."
+  ],
+  "sources": [
+   "artifacts/NA-12/tables/t4_secondary.csv"
+  ],
+  "copy_of": "artifacts/NA-12/tables/t4_secondary.csv",
+  "files": [
+   "t4_secondary.csv"
+  ]
+ },
+ {
+  "name": "t5_heterogeneity",
+  "title": "Heterogeneity cuts on H2 at D2: Wald test of N\u0302\u00b71[cut] and G\u00b71[cut], BH over each model's eight cuts",
+  "section": "4",
+  "exploratory": false,
+  "exploratory_rows": [],
+  "columns": [
+   "key",
+   "model",
+   "cut",
+   "n_in",
+   "n_out",
+   "wald_f",
+   "wald_q",
+   "p",
+   "b_diff",
+   "b_diff_se",
+   "b_diff_t",
+   "b_diff_se_dk",
+   "b_diff_p_two",
+   "c_diff",
+   "c_diff_se",
+   "c_diff_t",
+   "c_diff_se_dk",
+   "c_diff_p_two",
+   "b_in",
+   "b_in_se",
+   "c_in",
+   "c_in_se",
+   "b_out",
+   "b_out_se",
+   "c_out",
+   "c_out_se",
+   "q"
+  ],
+  "rows": 24,
+  "notes": [
+   "Laya-Fin's eight cuts are the family; the anchor's and d1-ultra's are reported."
+  ],
+  "sources": [
+   "artifacts/NA-12/tables/t5_heterogeneity.csv"
+  ],
+  "copy_of": "artifacts/NA-12/tables/t5_heterogeneity.csv",
+  "files": [
+   "t5_heterogeneity.csv"
+  ]
+ },
+ {
+  "name": "t6_convergence_ladder",
+  "title": "A1 convergence ladder: \u03ba_h of CAR^lvl_h on V (D0 events, day \u00d7 tier FE) and the shares \u03ba_h / \u03ba_h*",
+  "section": "4",
+  "exploratory": false,
+  "exploratory_rows": [],
+  "columns": [
+   "key",
+   "model",
+   "variant",
+   "rung",
+   "available",
+   "kappa",
+   "kappa_se",
+   "kappa_t",
+   "kappa_p",
+   "kappa_se_dk",
+   "kappa_p_dk",
+   "share_of_h_star",
+   "nobs",
+   "ci_low",
+   "ci_high"
+  ],
+  "rows": 84,
+  "notes": [
+   "ladder_clean: each rung on its clean-window events; ladder_h10: h* = t+10; ladder_plateau: the mean CAR^lvl over t+16..t+20. The C_t+60 rung is exploratory."
+  ],
+  "sources": [
+   "artifacts/NA-12/tables/t6_convergence_ladder.csv"
+  ],
+  "copy_of": "artifacts/NA-12/tables/t6_convergence_ladder.csv",
+  "files": [
+   "t6_convergence_ladder.csv"
+  ]
+ },
+ {
+  "name": "t7_gap_closure",
+  "title": "A1 gap closure AR(\u03c4\u2192h)/\u03c3 = a + \u03bb_h\u00b7U_\u03c4 + \u03c8_h\u00b7V (+ FE) at D2 and D1; half-life (first \u03bb_h >= 0.5)",
+  "section": "4",
+  "exploratory": false,
+  "exploratory_rows": [],
+  "columns": [
+   "key",
+   "model",
+   "point",
+   "variant",
+   "rung",
+   "available",
+   "lambda",
+   "lambda_se",
+   "lambda_p",
+   "lambda_p_dk",
+   "psi",
+   "psi_se",
+   "psi_p_two",
+   "nobs",
+   "ci_low",
+   "ci_high"
+  ],
+  "rows": 48,
+  "notes": [
+   "\u03c8 carries its two-sided p (\u03c8_h* = 0, outside every family); a half-life of \u221e is beyond t+20."
+  ],
+  "sources": [
+   "artifacts/NA-12/tables/t7_gap_closure.csv"
+  ],
+  "copy_of": "artifacts/NA-12/tables/t7_gap_closure.csv",
+  "files": [
+   "t7_gap_closure.csv"
+  ]
+ },
+ {
+  "name": "t8_tracking_error",
+  "title": "A1 tracking error RMSE(CAR^lvl_h \u2212 V) relative to the naive 0 and to the price-only V",
+  "section": "4",
+  "exploratory": false,
+  "exploratory_rows": [],
+  "columns": [
+   "key",
+   "model",
+   "rung",
+   "rmse",
+   "nobs",
+   "naive_ratio",
+   "naive_ci_low",
+   "naive_ci_high",
+   "naive_p",
+   "price_only_ratio",
+   "price_only_ci_low",
+   "price_only_ci_high",
+   "price_only_p"
+  ],
+  "rows": 24,
+  "notes": [],
+  "sources": [
+   "artifacts/NA-12/tables/t8_tracking_error.csv"
+  ],
+  "copy_of": "artifacts/NA-12/tables/t8_tracking_error.csv",
+  "files": [
+   "t8_tracking_error.csv"
+  ]
+ },
+ {
+  "name": "t9_convergence_cuts",
+  "title": "A1 by tier, quantified vs story (vendor; d1-ultra's own label) and |G| bin",
+  "section": "4",
+  "exploratory": false,
+  "exploratory_rows": [],
+  "columns": [
+   "key",
+   "model",
+   "cut",
+   "level",
+   "kappa_t20",
+   "kappa_t20_p",
+   "nobs_d0",
+   "kappa_ct",
+   "kappa_ct_p",
+   "lambda_t5",
+   "lambda_t5_p",
+   "psi_t5",
+   "half_life",
+   "nobs_gap",
+   "tracking_naive_t20",
+   "tracking_naive_t20_p"
+  ],
+  "rows": 35,
+  "notes": [
+   "|G| bins apply to gap closure only (the D0 ladder has no G); PREREG \u00a715 NA-12 row."
+  ],
+  "sources": [
+   "artifacts/NA-12/tables/t9_convergence_cuts.csv"
+  ],
+  "copy_of": "artifacts/NA-12/tables/t9_convergence_cuts.csv",
+  "files": [
+   "t9_convergence_cuts.csv"
+  ]
+ },
+ {
+  "name": "t10_explanation_ladder",
+  "title": "A3.2 explanation ladder: out-of-sample share of stock-specific daily variance (z_cc) by step",
+  "section": "5",
+  "exploratory": false,
+  "exploratory_rows": [],
+  "columns": [
+   "key",
+   "model",
+   "cut",
+   "step",
+   "r2",
+   "n",
+   "r2_ci_low",
+   "r2_ci_high",
+   "r2_p",
+   "increment",
+   "increment_p",
+   "lambda"
+  ],
+  "rows": 94,
+  "notes": [
+   "Ridge fit on val-B, \u03bb on val-A, evaluated on test (\u00a711.5); news features are 0 on days without an event."
+  ],
+  "sources": [
+   "artifacts/NA-12/tables/t10_explanation_ladder.csv"
+  ],
+  "copy_of": "artifacts/NA-12/tables/t10_explanation_ladder.csv",
+  "files": [
+   "t10_explanation_ladder.csv"
+  ]
+ },
+ {
+  "name": "t11_explanation_share_theta",
+  "title": "A3.3\u2013A3.5 (d1-ultra, model-specific): explained share, \u03b8, persistence by reason, the market",
+  "section": "5",
+  "exploratory": false,
+  "exploratory_rows": [
+   "market:r2"
+  ],
+  "columns": [
+   "key",
+   "item",
+   "value",
+   "events_share",
+   "n",
+   "variance_share",
+   "se",
+   "p",
+   "ci_low",
+   "ci_high",
+   "available"
+  ],
+  "rows": 29,
+  "notes": [],
+  "sources": [
+   "artifacts/NA-12/tables/t11_explanation_share_theta.csv"
+  ],
+  "copy_of": "artifacts/NA-12/tables/t11_explanation_share_theta.csv",
+  "files": [
+   "t11_explanation_share_theta.csv"
+  ]
+ },
+ {
+  "name": "t12_question_battery",
+  "title": "A2.5: mechanism cuts (own labels and vendor tags), horizon validity, H4 width, reading validity",
+  "section": "5",
+  "exploratory": false,
+  "exploratory_rows": [],
+  "columns": [
+   "key",
+   "model",
+   "analysis",
+   "label",
+   "level",
+   "b",
+   "b_p",
+   "c",
+   "c_p",
+   "nobs",
+   "available",
+   "kappa_t20",
+   "kappa_t20_p",
+   "rho",
+   "ci_low",
+   "ci_high",
+   "p",
+   "delta_r2",
+   "agreement"
+  ],
+  "rows": 130,
+  "notes": [],
+  "sources": [
+   "artifacts/NA-12/tables/t12_question_battery.csv"
+  ],
+  "copy_of": "artifacts/NA-12/tables/t12_question_battery.csv",
+  "files": [
+   "t12_question_battery.csv"
+  ]
+ },
+ {
+  "name": "t13_shapley",
+  "title": "\u00a711.5 Shapley decomposition of the test OOS R\u00b2 and mean daily IC over {R, N, J}, pooled and by tier",
+  "section": "4",
+  "exploratory": false,
+  "exploratory_rows": [],
+  "columns": [
+   "key",
+   "model",
+   "tier",
+   "metric",
+   "group",
+   "shapley",
+   "share",
+   "n"
+  ],
+  "rows": 96,
+  "notes": [],
+  "sources": [
+   "artifacts/NA-12/tables/t13_shapley.csv"
+  ],
+  "copy_of": "artifacts/NA-12/tables/t13_shapley.csv",
+  "files": [
+   "t13_shapley.csv"
+  ]
+ },
+ {
+  "name": "t14_model_comparison",
+  "title": "Model comparison: daily IC of N\u0302_W0 with z_cc (val-B, test, common test events), cost, latency",
+  "section": "1",
+  "exploratory": false,
+  "exploratory_rows": [],
+  "columns": [
+   "key",
+   "model",
+   "name",
+   "role",
+   "ic_val_b",
+   "ic_val_b_t",
+   "ic_val_b_n",
+   "ic_test",
+   "ic_test_t",
+   "ic_test_n",
+   "ic_common",
+   "ic_common_t",
+   "ic_common_n",
+   "cost_per_1000",
+   "latency_p50_ms",
+   "latency_p95_ms",
+   "coverage",
+   "footnote"
+  ],
+  "rows": 14,
+  "notes": [
+   "The API models are screen-failing and model-specific (\u00a715 NA-06 row). span-02: the S5 canary fired a STOP and the operator chose to proceed (PREREG \u00a715, post-freeze NA-11 row).",
+   "Costs per 1,000 decisions include answers paid by earlier chunks; the price-only D2 row is IC with y2."
+  ],
+  "sources": [
+   "artifacts/NA-12/tables/t14_model_comparison.csv"
+  ],
+  "copy_of": "artifacts/NA-12/tables/t14_model_comparison.csv",
+  "files": [
+   "t14_model_comparison.csv"
+  ]
+ },
+ {
+  "name": "t15_calibration",
+  "title": "\u00a711.2 calibration of Q1's three classes (ECE; log-loss and Brier skill vs val-A climatology); H7",
+  "section": "appendix",
+  "exploratory": false,
+  "exploratory_rows": [],
+  "columns": [
+   "key",
+   "model",
+   "target",
+   "ece",
+   "log_loss",
+   "brier",
+   "log_loss_skill",
+   "brier_skill",
+   "n",
+   "auc",
+   "temperature",
+   "ece_before",
+   "ece_after",
+   "source"
+  ],
+  "rows": 22,
+  "notes": [],
+  "sources": [
+   "artifacts/NA-12/tables/t15_calibration.csv"
+  ],
+  "copy_of": "artifacts/NA-12/tables/t15_calibration.csv",
+  "files": [
+   "t15_calibration.csv"
+  ]
+ },
+ {
+  "name": "t16_robustness",
+  "title": "\u00a711.6 and operator rows (a)\u2013(b): every robustness variant, raw and placebo-adjusted",
+  "section": "appendix",
+  "exploratory": false,
+  "exploratory_rows": [],
+  "columns": [
+   "key",
+   "model",
+   "point",
+   "variant",
+   "adjustment",
+   "H1",
+   "H1_t",
+   "H1_p",
+   "n",
+   "H1b",
+   "H1b_t",
+   "H1b_p",
+   "ic_z_cc",
+   "ic_z_cc_t",
+   "ic_z_on",
+   "ic_z_on_t",
+   "ic_z_id",
+   "ic_z_id_t",
+   "b",
+   "b_p",
+   "c",
+   "c_p",
+   "H2_p",
+   "nobs",
+   "ic_y2",
+   "ic_y2_t",
+   "note"
+  ],
+  "rows": 127,
+  "notes": [
+   "At D0 each variant re-runs H1, H1b and the ICs; at D2, H2 (\u00a715 NA-11 row (xii))."
+  ],
+  "sources": [
+   "artifacts/NA-12/tables/t16_robustness.csv"
+  ],
+  "copy_of": "artifacts/NA-12/tables/t16_robustness.csv",
+  "files": [
+   "t16_robustness.csv"
+  ]
+ },
+ {
+  "name": "t17_sector_exploratory",
+  "title": "Exploratory (outside every family, no claim): IC of N\u0302_W0 by GICS sector and leave-one-sector-out",
+  "section": "appendix",
+  "exploratory": true,
+  "exploratory_rows": [],
+  "columns": [
+   "key",
+   "model",
+   "kind",
+   "sector",
+   "ic_z_cc",
+   "ic_z_cc_t",
+   "ic_z_cc_ci_low",
+   "ic_z_cc_ci_high",
+   "ic_z_cc_n",
+   "ic_z_on",
+   "ic_z_on_t",
+   "ic_z_on_ci_low",
+   "ic_z_on_ci_high",
+   "ic_z_on_n",
+   "ic_z_id",
+   "ic_z_id_t",
+   "ic_z_id_ci_low",
+   "ic_z_id_ci_high",
+   "ic_z_id_n"
+  ],
+  "rows": 66,
+  "notes": [
+   "Exploratory (post hoc): requested after unblinding; no hypothesis, outside every family, no claim."
+  ],
+  "sources": [
+   "artifacts/NA-12/tables/t17_sector_exploratory.csv"
+  ],
+  "copy_of": "artifacts/NA-12/tables/t17_sector_exploratory.csv",
+  "files": [
+   "t17_sector_exploratory.csv"
+  ]
+ },
+ {
+  "name": "t18_probes_val_a",
+  "title": "Disclosed val-A probes (NA-11; not hypotheses), next to the model comparison",
+  "section": "appendix",
+  "exploratory": false,
+  "exploratory_rows": [],
+  "columns": [
+   "key",
+   "model",
+   "flip_rate",
+   "flip_pairs",
+   "flip_screen",
+   "edit_mean_shift",
+   "flip_rate_all_pairs",
+   "flip_pairs_valid",
+   "right_way",
+   "edit_shift_t",
+   "n_hat_sd_val_a",
+   "shift_sd",
+   "ic_masked",
+   "ic_masked_t",
+   "ic_unmasked",
+   "ic_unmasked_t",
+   "unmasked_minus_masked",
+   "unmasked_minus_masked_t",
+   "masked_screen",
+   "ic_shuffled",
+   "ic_shuffled_t",
+   "shuffled_screen_t",
+   "ic_real_same_events",
+   "ic_real_same_events_t",
+   "real_minus_shuffled",
+   "real_minus_shuffled_t",
+   "real_shuffled_events",
+   "kind",
+   "screen_company_identification",
+   "screen_counterfactual_flip",
+   "screen_masked_vs_unmasked",
+   "screen_shuffled_news",
+   "screen_all"
+  ],
+  "rows": 9,
+  "notes": [],
+  "sources": [
+   "artifacts/NA-12/tables/t18_probes_val_a.csv"
+  ],
+  "copy_of": "artifacts/NA-12/tables/t18_probes_val_a.csv",
+  "files": [
+   "t18_probes_val_a.csv"
+  ]
+ },
+ {
+  "name": "t19_monthly_ic",
+  "title": "Monthly mean daily IC of N\u0302_W0 with z_cc (val-A, val-B, test)",
+  "section": "appendix",
+  "exploratory": false,
+  "exploratory_rows": [],
+  "columns": [
+   "key",
+   "model",
+   "split",
+   "month",
+   "ic",
+   "n_days"
+  ],
+  "rows": 72,
+  "notes": [
+   "anchor: 2024-12 (answerdotai/ModernBERT-large Dec-2024 checkpoint (PREREG \u00a79.2))",
+   "d1_ultra: 2026-10-15 (NA-05 catalog created)",
+   "span_02: 2026-10-16 (NA-05 catalog created)",
+   "drex_v2: 2026-10-12 (NA-05 catalog created)"
+  ],
+  "sources": [
+   "artifacts/NA-12/tables/t19_monthly_ic.csv"
+  ],
+  "copy_of": "artifacts/NA-12/tables/t19_monthly_ic.csv",
+  "files": [
+   "t19_monthly_ic.csv"
+  ]
+ },
+ {
+  "name": "t20_strategies",
+  "title": "NA-13 strategies, test and val-B (reference): every pre-registered book, S-CONV first, and the benchmarks",
+  "section": "6",
+  "exploratory": false,
+  "exploratory_rows": [
+   "test|exploratory|ma_cross|fade_no_news|close_t+5",
+   "validation|exploratory|ma_cross|fade_no_news|close_t+5"
+  ],
+  "columns": [
+   "key",
+   "order",
+   "split",
+   "family",
+   "model",
+   "point",
+   "signal",
+   "exit",
+   "gated",
+   "role",
+   "rule",
+   "universe",
+   "events",
+   "n_days",
+   "n_positions",
+   "mean_names_per_side",
+   "sharpe_gross",
+   "sharpe_net_5",
+   "sharpe_net_10",
+   "sharpe_net_20",
+   "ann_return_gross",
+   "ann_return_net_10",
+   "vol",
+   "max_dd_net_10",
+   "turnover_daily",
+   "hit_rate_net_10",
+   "placebo_pct_gross",
+   "placebo_pct_net_5",
+   "placebo_pct_net_10",
+   "placebo_pct_net_20",
+   "placebo_pct_mean_net_10",
+   "capacity_median_usd",
+   "capacity_p10_usd",
+   "dsr_prob_net_5",
+   "dsr_stat_net_5",
+   "dsr_sr0_net_5",
+   "sharpe_daily_net_5",
+   "dsr_prob_net_10",
+   "dsr_stat_net_10",
+   "dsr_sr0_net_10",
+   "sharpe_daily_net_10",
+   "dsr_prob_net_20",
+   "dsr_stat_net_20",
+   "dsr_sr0_net_20",
+   "sharpe_daily_net_20",
+   "note",
+   "n_trials"
+  ],
+  "rows": 194,
+  "notes": [
+   "Sharpe ratios annualized with \u221a252; costs per side on both legs and the SPY hedge; no borrow cost. DSR with n_trials from the trials ledger."
+  ],
+  "sources": [
+   "artifacts/NA-13/strategy_table.csv"
+  ],
+  "copy_of": "",
+  "files": [
+   "t20_strategies.csv"
+  ]
+ },
+ {
+  "name": "t21_release_dates",
+  "title": "Release dates of the decision models against the sample (test period ends at sample_end)",
+  "section": "7",
+  "exploratory": false,
+  "exploratory_rows": [],
+  "columns": [
+   "key",
+   "name",
+   "date",
+   "days_after_sample_end",
+   "source"
+  ],
+  "rows": 6,
+  "notes": [
+   "Days after the end of the test period; the anchor's checkpoint is known to the month only."
+  ],
+  "sources": [
+   "artifacts/NA-05/catalog.json",
+   "artifacts/NA-14/inputs/operator.yaml",
+   "artifacts/NA-12/results/monthly_ic.json",
+   "configs/splits.yaml"
+  ],
+  "copy_of": "",
+  "files": [
+   "t21_release_dates.csv"
+  ]
+ },
+ {
+  "name": "t22_spend",
+  "title": "Spend and requests of the whole project (ledgers; caps from configs/project.yaml)",
+  "section": "2",
+  "exploratory": false,
+  "exploratory_rows": [],
+  "columns": [
+   "key",
+   "item",
+   "value",
+   "cap",
+   "source"
+  ],
+  "rows": 13,
+  "notes": [
+   "NA-12, NA-13 and NA-14 made no API call, Kaggle run or FMP request."
+  ],
+  "sources": [
+   "ledgers/spend.jsonl",
+   "ledgers/fmp_requests.jsonl",
+   "ledgers/trials.jsonl",
+   "ledgers/test_access.jsonl",
+   "artifacts/NA-08/REPORT.md",
+   "artifacts/NA-11/REPORT.md",
+   "configs/project.yaml"
+  ],
+  "copy_of": "",
+  "files": [
+   "t22_spend.csv"
+  ]
+ },
+ {
+  "name": "t23_company_identification",
+  "title": "Company identification with activity-matched distractors (NA-11; val-A, masked states)",
+  "section": "7",
+  "exploratory": false,
+  "exploratory_rows": [],
+  "columns": [
+   "key",
+   "model",
+   "n",
+   "valid",
+   "accuracy",
+   "mean_p_true",
+   "cost",
+   "accuracy_na06_design",
+   "baseline_matched",
+   "baseline_na06_design",
+   "screen_threshold"
+  ],
+  "rows": 7,
+  "notes": [],
+  "sources": [
+   "artifacts/NA-11/company_id_matched.csv"
+  ],
+  "copy_of": "",
+  "files": [
+   "t23_company_identification.csv"
+  ]
+ },
+ {
+  "name": "t24_exploratory_d0_signal",
+  "title": "Where the D0 signal lives (NA-12 \u00a713): earnings days, size tiers, months, companies, market state",
+  "section": "appendix",
+  "exploratory": true,
+  "exploratory_rows": [],
+  "columns": [
+   "key",
+   "laya_fin",
+   "d1_ultra",
+   "span_02",
+   "drex_v2",
+   "laya_zs",
+   "sentiment",
+   "tags_gbm",
+   "min_names_per_day",
+   "constant_day_ic",
+   "nw_lags",
+   "embargo",
+   "block",
+   "reps",
+   "seed",
+   "ci",
+   "split",
+   "min_events",
+   "draws",
+   "signal",
+   "ic_z_cc",
+   "ic_z_cc_t",
+   "ic_z_cc_ci_low",
+   "ic_z_cc_ci_high",
+   "ic_z_cc_days",
+   "ic_z_cc_n",
+   "ic_z_on",
+   "ic_z_on_t",
+   "ic_z_on_ci_low",
+   "ic_z_on_ci_high",
+   "ic_z_on_days",
+   "ic_z_on_n",
+   "ic_z_id",
+   "ic_z_id_t",
+   "ic_z_id_ci_low",
+   "ic_z_id_ci_high",
+   "ic_z_id_days",
+   "ic_z_id_n",
+   "mean",
+   "nw_t",
+   "se",
+   "n_days",
+   "available",
+   "reason",
+   "n_months",
+   "f",
+   "p",
+   "ms_within",
+   "mean_days_per_month",
+   "se_month_iid",
+   "se_month_nw",
+   "sd_month_means",
+   "df",
+   "month",
+   "ic",
+   "n_companies",
+   "n_events",
+   "sd",
+   "null_sd_mean",
+   "null_sd_p2_5",
+   "null_sd_p97_5",
+   "high",
+   "low",
+   "mid",
+   "t"
+  ],
+  "rows": 433,
+  "notes": [
+   "Exploratory (post hoc): requested after unblinding; no hypothesis, outside every family, no claim.",
+   "Copied from artifacts/NA-12/results/exploratory_d0_signal.json; key = JSON path."
+  ],
+  "sources": [
+   "artifacts/NA-12/results/exploratory_d0_signal.json"
+  ],
+  "copy_of": "",
+  "files": [
+   "t24_exploratory_d0_signal.csv"
+  ]
+ },
+ {
+  "name": "t25_ma_cross",
+  "title": "News and an MA20/MA50 cross (NA-13 \u00a79, operator item 9): group statistics and the no-news fade",
+  "section": "appendix",
+  "exploratory": true,
+  "exploratory_rows": [],
+  "columns": [
+   "key",
+   "n_crosses",
+   "n_up",
+   "n_no_news",
+   "span",
+   "group",
+   "horizon",
+   "mean_bp",
+   "nw_t",
+   "n_days",
+   "period",
+   "exit",
+   "events_in",
+   "purged",
+   "no_entry_price",
+   "beta_fallback",
+   "zero_return_days",
+   "events",
+   "cohorts",
+   "n_active_days",
+   "sharpe_gross",
+   "ann_return_gross",
+   "vol",
+   "turnover_daily",
+   "sharpe_net_5",
+   "ann_return_net_5",
+   "max_dd_net_5",
+   "hit_rate_net_5",
+   "sharpe_net_10",
+   "ann_return_net_10",
+   "max_dd_net_10",
+   "hit_rate_net_10",
+   "sharpe_net_20",
+   "ann_return_net_20",
+   "max_dd_net_20",
+   "hit_rate_net_20",
+   "capacity_median_usd",
+   "capacity_p10_usd",
+   "capacity_n_cohorts",
+   "capacity_n_without_adv",
+   "placebo_pct_gross",
+   "placebo_pct_net_5",
+   "placebo_median_net_5",
+   "placebo_pct_net_10",
+   "placebo_median_net_10",
+   "placebo_pct_net_20",
+   "placebo_median_net_20",
+   "n_positions"
+  ],
+  "rows": 28,
+  "notes": [
+   "Exploratory (post hoc): requested after unblinding; no hypothesis, outside every family, no claim.",
+   "Copied from artifacts/NA-13/results/ma_cross.json; key = JSON path."
+  ],
+  "sources": [
+   "artifacts/NA-13/results/ma_cross.json"
+  ],
+  "copy_of": "",
+  "files": [
+   "t25_ma_cross.csv"
+  ]
+ },
+ {
+  "name": "t26_sconv_overlap",
+  "title": "S-CONV against the price-only gap fade on test: shared positions, same side, daily-return correlation",
+  "section": "6",
+  "exploratory": false,
+  "exploratory_rows": [],
+  "columns": [
+   "key",
+   "book",
+   "benchmark",
+   "n_positions",
+   "n_benchmark",
+   "shared_share",
+   "same_side_share",
+   "corr_gross",
+   "n_days"
+  ],
+  "rows": 4,
+  "notes": [
+   "Positions are (session, symbol) pairs of the book; shared_share = |book \u2229 gap fade| / |book|; same_side_share among the shared; corr_gross = Pearson correlation of the daily gross returns (tier all) over common sessions. Recomputed from work/strategy (NA-13) because NA-13 REPORT \u00a74 states these numbers but no file held them."
+  ],
+  "sources": [
+   "work/strategy/positions_test.parquet",
+   "work/strategy/books_test.parquet"
+  ],
+  "copy_of": "",
+  "files": [
+   "t26_sconv_overlap.csv"
+  ]
+ },
+ {
+  "name": "t27_tournament",
+  "title": "NA-06 zero-shot tournament (val-A stage-1 sample): daily IC, cost per 1,000 decisions, MCS membership, \u00a78.3 screens",
+  "section": "1",
+  "exploratory": false,
+  "exploratory_rows": [],
+  "columns": [
+   "key",
+   "model",
+   "kind",
+   "cost_per_1000_decisions",
+   "ic",
+   "ci_low",
+   "ci_high",
+   "mcs_member",
+   "stage2",
+   "screen"
+  ],
+  "rows": 21,
+  "notes": [],
+  "sources": [
+   "artifacts/NA-06/fig3_data.csv"
+  ],
+  "copy_of": "",
+  "files": [
+   "t27_tournament.csv"
+  ]
+ },
+ {
+  "name": "t28_filter_frontier",
+  "title": "NA-03 importance filters on val-A: selection share and recall by budget",
+  "section": "2",
+  "exploratory": false,
+  "exploratory_rows": [],
+  "columns": [
+   "key",
+   "filter",
+   "target_share",
+   "selected_share",
+   "threshold",
+   "recall_material",
+   "recall_delayed",
+   "precision"
+  ],
+  "rows": 70,
+  "notes": [],
+  "sources": [
+   "artifacts/NA-03/frontier.csv"
+  ],
+  "copy_of": "",
+  "files": [
+   "t28_filter_frontier.csv"
+  ]
+ },
+ {
+  "name": "t29_encoding",
+  "title": "NA-07 encodings of numbers in states (val-A search, val-B confirmation)",
+  "section": "appendix",
+  "exploratory": false,
+  "exploratory_rows": [],
+  "columns": [
+   "key",
+   "split",
+   "model",
+   "encoding",
+   "n_events",
+   "n_answered",
+   "n_paid_na07",
+   "ic",
+   "t",
+   "nw_se",
+   "boot_se",
+   "ci_low",
+   "ci_high",
+   "n_days",
+   "rank",
+   "best",
+   "chosen"
+  ],
+  "rows": 26,
+  "notes": [],
+  "sources": [
+   "artifacts/NA-07/encoding_ic.csv"
+  ],
+  "copy_of": "",
+  "files": [
+   "t29_encoding.csv"
+  ]
+ },
+ {
+  "name": "t30_derived",
+  "title": "Sums of figure-data cells cited in captions",
+  "section": "4",
+  "exploratory": false,
+  "exploratory_rows": [],
+  "columns": [
+   "key",
+   "value",
+   "formula",
+   "source"
+  ],
+  "rows": 1,
+  "notes": [],
+  "sources": [
+   "artifacts/NA-12/figure_data/fig1_rg_class_paths.csv"
+  ],
+  "copy_of": "",
+  "files": [
+   "t30_derived.csv"
+  ]
+ },
+ {
+  "name": "t31_market_replication",
+  "title": "A3.5 market-level replication (exploratory; d1-ultra): out-of-sample R\u00b2 of SPY's daily return on the model's reading of the market news",
+  "section": "appendix",
+  "exploratory": true,
+  "exploratory_rows": [],
+  "columns": [
+   "key",
+   "item",
+   "value",
+   "n",
+   "p",
+   "ci_low",
+   "ci_high",
+   "available",
+   "source"
+  ],
+  "rows": 1,
+  "notes": [
+   "Exploratory (PREREG A3.5: optional, exploratory): outside every family, no claim. The row of t11_explanation_share_theta.csv (NA-12) that the LaTeX of t11 leaves out; fit on validation, evaluated on the test sessions (n)."
+  ],
+  "sources": [
+   "artifacts/NA-12/tables/t11_explanation_share_theta.csv"
+  ],
+  "copy_of": "",
+  "files": [
+   "t31_market_replication.csv"
+  ]
+ },
+ {
+  "name": "t32_val_b_ic",
+  "title": "Val-B daily ICs of N\u0302_W0 with z_cc, z_on and z_id (NA-11's run of the frozen spec on val-B, before the freeze)",
+  "section": "3",
+  "exploratory": false,
+  "exploratory_rows": [],
+  "columns": [
+   "key",
+   "model_id",
+   "split",
+   "signal",
+   "ic_z_cc",
+   "ic_z_cc_t",
+   "ic_z_cc_ci_low",
+   "ic_z_cc_ci_high",
+   "ic_z_cc_days",
+   "ic_z_cc_n",
+   "ic_z_on",
+   "ic_z_on_t",
+   "ic_z_on_ci_low",
+   "ic_z_on_ci_high",
+   "ic_z_on_days",
+   "ic_z_on_n",
+   "ic_z_id",
+   "ic_z_id_t",
+   "ic_z_id_ci_low",
+   "ic_z_id_ci_high",
+   "ic_z_id_days",
+   "ic_z_id_n",
+   "source"
+  ],
+  "rows": 3,
+  "notes": [
+   "Copied from the val-B smoke run of NA-11 (production.smoke_spec), the frozen spec's code on val-B; it covers the trained and zero-shot Laya models only, so the API models have no val-B IC with z_on or z_id."
+  ],
+  "sources": [
+   "artifacts/NA-11/spec_smoke_val_b.json"
+  ],
+  "copy_of": "",
+  "files": [
+   "t32_val_b_ic.csv"
+  ]
+ },
+ {
+  "name": "t33_placebo_sharpe",
+  "title": "Random-signal placebo (NA-13): 5th, 50th and 95th percentile of the annualized Sharpe ratios of the 100 placebo books of each test universe, gross and net of 5, 10 and 20 bp per side",
+  "section": "6",
+  "exploratory": false,
+  "exploratory_rows": [],
+  "columns": [
+   "key",
+   "point",
+   "exit",
+   "n_books",
+   "sharpe_gross_q05",
+   "sharpe_gross_q50",
+   "sharpe_gross_q95",
+   "sharpe_net_5_q05",
+   "sharpe_net_5_q50",
+   "sharpe_net_5_q95",
+   "sharpe_net_10_q05",
+   "sharpe_net_10_q50",
+   "sharpe_net_10_q95",
+   "sharpe_net_20_q05",
+   "sharpe_net_20_q50",
+   "sharpe_net_20_q95",
+   "source"
+  ],
+  "rows": 45,
+  "notes": [
+   "numpy.quantile (linear interpolation, as NA-13) over the universe's 100 books (seeds 2027\u20132126) in work/strategy/placebo_test.parquet (registered, hash-checked on read). A universe is a decision point, an exit and a set of events; Laya-Fin's, d1-ultra's and the gap fade's books of one family share it."
+  ],
+  "sources": [
+   "work/strategy/placebo_test.parquet"
+  ],
+  "copy_of": "",
+  "files": [
+   "t33_placebo_sharpe.csv"
+  ]
+ },
+ {
+  "name": "t34_prereg_deviations",
+  "title": "Pre-registration deviations: every row of PREREG \u00a715 in one line",
+  "section": "appendix",
+  "exploratory": false,
+  "exploratory_rows": [],
+  "columns": [
+   "key",
+   "row",
+   "date",
+   "chunk",
+   "change",
+   "reason",
+   "freeze"
+  ],
+  "rows": 63,
+  "notes": [
+   "Date and timing (before or after the NA-11 freeze) as in PREREG \u00a715; chunk, change and reason summarized by NA-14 (inputs/prereg_deviations.yaml); the full text is in the log."
+  ],
+  "sources": [
+   "docs/PREREG.md",
+   "artifacts/NA-14/inputs/prereg_deviations.yaml"
+  ],
+  "copy_of": "",
+  "files": [
+   "t34_prereg_deviations.csv"
+  ]
+ },
+ {
+  "name": "t35_break_even",
+  "title": "Break-even cost per side of each test book (NA-13): the cost at which the mean net return is zero",
+  "section": "6",
+  "exploratory": false,
+  "exploratory_rows": [
+   "exploratory|ma_cross|fade_no_news|close_t+5"
+  ],
+  "columns": [
+   "key",
+   "ann_return_gross",
+   "turnover_daily",
+   "break_even_bp",
+   "formula",
+   "source"
+  ],
+  "rows": 88,
+  "notes": [
+   "Net daily return = gross \u2212 cost \u00d7 turnover (NA-13 strategy.costs), so the mean net return is zero at cost = mean gross \u00f7 mean turnover; ann_return_gross and turnover_daily are copied from NA-13's strategy table."
+  ],
+  "sources": [
+   "artifacts/NA-13/strategy_table.csv"
+  ],
+  "copy_of": "",
+  "files": [
+   "t35_break_even.csv"
+  ]
+ },
+ {
+  "name": "f1_rg_class_paths",
+  "title": "Figure 4 data (NA-12): CAR^lvl paths by RG class",
+  "section": "4",
+  "exploratory": false,
+  "exploratory_rows": [],
+  "columns": [
+   "key",
+   "model",
+   "figure",
+   "group",
+   "point",
+   "mean",
+   "se",
+   "n",
+   "mean_v",
+   "n_group"
+  ],
+  "rows": 312,
+  "notes": [],
+  "sources": [
+   "artifacts/NA-12/figure_data/fig1_rg_class_paths.csv"
+  ],
+  "copy_of": "",
+  "files": [
+   "f1_rg_class_paths.csv"
+  ]
+ },
+ {
+  "name": "f1_v_decile_paths",
+  "title": "Figure 3 data (NA-12): CAR^lvl paths by V decile",
+  "section": "4",
+  "exploratory": false,
+  "exploratory_rows": [],
+  "columns": [
+   "key",
+   "model",
+   "figure",
+   "group",
+   "point",
+   "mean",
+   "se",
+   "n",
+   "mean_v",
+   "n_group"
+  ],
+  "rows": 1230,
+  "notes": [],
+  "sources": [
+   "artifacts/NA-12/figure_data/fig1_v_decile_paths.csv"
+  ],
+  "copy_of": "",
+  "files": [
+   "f1_v_decile_paths.csv"
+  ]
+ },
+ {
+  "name": "f2_drift_vs_g",
+  "title": "Figure 4 data (NA-12): sign(G)\u00b7y2 by |G| bin and news-strength tercile",
+  "section": "4",
+  "exploratory": false,
+  "exploratory_rows": [],
+  "columns": [
+   "key",
+   "model",
+   "figure",
+   "tercile",
+   "g_bin",
+   "mean",
+   "se",
+   "n",
+   "mean_abs_strength"
+  ],
+  "rows": 45,
+  "notes": [],
+  "sources": [
+   "artifacts/NA-12/figure_data/fig2_drift_vs_g.csv"
+  ],
+  "copy_of": "",
+  "files": [
+   "f2_drift_vs_g.csv"
+  ]
+ },
+ {
+  "name": "f4_monthly_ic",
+  "title": "Appendix Figure A6 data (NA-12): monthly mean daily IC",
+  "section": "appendix",
+  "exploratory": false,
+  "exploratory_rows": [],
+  "columns": [
+   "key",
+   "model",
+   "split",
+   "month",
+   "ic",
+   "n_days"
+  ],
+  "rows": 72,
+  "notes": [],
+  "sources": [
+   "artifacts/NA-12/figure_data/fig4_monthly_ic.csv"
+  ],
+  "copy_of": "",
+  "files": [
+   "f4_monthly_ic.csv"
+  ]
+ },
+ {
+  "name": "f5_shapley_shares",
+  "title": "NA-12 Shapley shares (not drawn: their totals are about zero)",
+  "section": "appendix",
+  "exploratory": false,
+  "exploratory_rows": [],
+  "columns": [
+   "key",
+   "model",
+   "tier",
+   "metric",
+   "group",
+   "share",
+   "value",
+   "n"
+  ],
+  "rows": 72,
+  "notes": [],
+  "sources": [
+   "artifacts/NA-12/figure_data/fig5_shapley_shares.csv"
+  ],
+  "copy_of": "",
+  "files": [
+   "f5_shapley_shares.csv"
+  ]
+ },
+ {
+  "name": "f8_explanation_ladder",
+  "title": "Figure 7 data (NA-12): the explanation ladder",
+  "section": "5",
+  "exploratory": false,
+  "exploratory_rows": [],
+  "columns": [
+   "key",
+   "model",
+   "step",
+   "r2",
+   "ci_low",
+   "ci_high",
+   "p"
+  ],
+  "rows": 7,
+  "notes": [],
+  "sources": [
+   "artifacts/NA-12/figure_data/fig8_explanation_ladder.csv"
+  ],
+  "copy_of": "",
+  "files": [
+   "f8_explanation_ladder.csv"
+  ]
+ },
+ {
+  "name": "fa_reliability",
+  "title": "Appendix Figure A4 data (NA-12): reliability bins",
+  "section": "appendix",
+  "exploratory": false,
+  "exploratory_rows": [],
+  "columns": [
+   "key",
+   "model",
+   "target",
+   "bin",
+   "lo",
+   "hi",
+   "n",
+   "confidence",
+   "hit_rate"
+  ],
+  "rows": 180,
+  "notes": [],
+  "sources": [
+   "artifacts/NA-12/figure_data/appendix_reliability.csv"
+  ],
+  "copy_of": "",
+  "files": [
+   "fa_reliability.csv"
+  ]
+ }
+]

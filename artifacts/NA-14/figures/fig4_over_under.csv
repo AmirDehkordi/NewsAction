@@ -1,0 +1,43 @@
+panel,series,label,role,x,xv,y,lo,hi,ci,source,key,y_col,x_col,lo_col,hi_col,se_col
+a,Fair,d1_ultra,path,car_pre1,0.0,0.0,0.0,0.0,se,artifacts/NA-12/figure_data/fig1_rg_class_paths.csv,d1_ultra|rg_class_signed|Fair|car_pre1,mean,,,,se
+a,Fair,d1_ultra,path,car_post0,3.0,0.7737647065,0.7569280926780549,0.790601320321945,se,artifacts/NA-12/figure_data/fig1_rg_class_paths.csv,d1_ultra|rg_class_signed|Fair|car_post0,mean,,,,se
+a,Fair,d1_ultra,path,car_post1,4.0,0.8341295489,0.76869807831272,0.8995610194872801,se,artifacts/NA-12/figure_data/fig1_rg_class_paths.csv,d1_ultra|rg_class_signed|Fair|car_post1,mean,,,,se
+a,Fair,d1_ultra,path,car_post2,5.0,0.8035084091,0.7121518138801225,0.8948650043198775,se,artifacts/NA-12/figure_data/fig1_rg_class_paths.csv,d1_ultra|rg_class_signed|Fair|car_post2,mean,,,,se
+a,Fair,d1_ultra,path,car_post5,6.0,0.7352337253,0.5887245984130569,0.881742852186943,se,artifacts/NA-12/figure_data/fig1_rg_class_paths.csv,d1_ultra|rg_class_signed|Fair|car_post5,mean,,,,se
+a,Fair,d1_ultra,path,car_post10,7.0,0.7229727843,0.5115658995225005,0.9343796690774995,se,artifacts/NA-12/figure_data/fig1_rg_class_paths.csv,d1_ultra|rg_class_signed|Fair|car_post10,mean,,,,se
+a,Fair,d1_ultra,path,car_post20,8.0,0.6985957701,0.4023724519010069,0.994819088298993,se,artifacts/NA-12/figure_data/fig1_rg_class_paths.csv,d1_ultra|rg_class_signed|Fair|car_post20,mean,,,,se
+a,Over,d1_ultra,path,car_pre1,0.0,0.0,0.0,0.0,se,artifacts/NA-12/figure_data/fig1_rg_class_paths.csv,d1_ultra|rg_class_signed|Over|car_pre1,mean,,,,se
+a,Over,d1_ultra,path,car_post0,3.0,3.157420287,3.040662142557727,3.2741784314422726,se,artifacts/NA-12/figure_data/fig1_rg_class_paths.csv,d1_ultra|rg_class_signed|Over|car_post0,mean,,,,se
+a,Over,d1_ultra,path,car_post1,4.0,3.183541644,3.0392105664665534,3.3278727215334465,se,artifacts/NA-12/figure_data/fig1_rg_class_paths.csv,d1_ultra|rg_class_signed|Over|car_post1,mean,,,,se
+a,Over,d1_ultra,path,car_post2,5.0,3.07990772,2.913069528328057,3.246745911671943,se,artifacts/NA-12/figure_data/fig1_rg_class_paths.csv,d1_ultra|rg_class_signed|Over|car_post2,mean,,,,se
+a,Over,d1_ultra,path,car_post5,6.0,2.997111193,2.7785035230410493,3.2157188629589504,se,artifacts/NA-12/figure_data/fig1_rg_class_paths.csv,d1_ultra|rg_class_signed|Over|car_post5,mean,,,,se
+a,Over,d1_ultra,path,car_post10,7.0,2.899693121,2.6191742903860593,3.1802119516139404,se,artifacts/NA-12/figure_data/fig1_rg_class_paths.csv,d1_ultra|rg_class_signed|Over|car_post10,mean,,,,se
+a,Over,d1_ultra,path,car_post20,8.0,2.822602663,2.4652392522052002,3.1799660737948,se,artifacts/NA-12/figure_data/fig1_rg_class_paths.csv,d1_ultra|rg_class_signed|Over|car_post20,mean,,,,se
+a,Under,d1_ultra,path,car_pre1,0.0,0.0,0.0,0.0,se,artifacts/NA-12/figure_data/fig1_rg_class_paths.csv,d1_ultra|rg_class_signed|Under|car_pre1,mean,,,,se
+a,Under,d1_ultra,path,car_post0,3.0,-0.9469190334,-0.9848945195363081,-0.908943547263692,se,artifacts/NA-12/figure_data/fig1_rg_class_paths.csv,d1_ultra|rg_class_signed|Under|car_post0,mean,,,,se
+a,Under,d1_ultra,path,car_post1,4.0,-0.98339695,-1.041517503539965,-0.925276396460035,se,artifacts/NA-12/figure_data/fig1_rg_class_paths.csv,d1_ultra|rg_class_signed|Under|car_post1,mean,,,,se
+a,Under,d1_ultra,path,car_post2,5.0,-0.9809753858,-1.054766221221967,-0.9071845503780329,se,artifacts/NA-12/figure_data/fig1_rg_class_paths.csv,d1_ultra|rg_class_signed|Under|car_post2,mean,,,,se
+a,Under,d1_ultra,path,car_post5,6.0,-1.004195203,-1.1122364659887582,-0.8961539400112419,se,artifacts/NA-12/figure_data/fig1_rg_class_paths.csv,d1_ultra|rg_class_signed|Under|car_post5,mean,,,,se
+a,Under,d1_ultra,path,car_post10,7.0,-0.992306645,-1.1391334139400886,-0.8454798760599114,se,artifacts/NA-12/figure_data/fig1_rg_class_paths.csv,d1_ultra|rg_class_signed|Under|car_post10,mean,,,,se
+a,Under,d1_ultra,path,car_post20,8.0,-1.043248184,-1.2471751222017988,-0.8393212457982013,se,artifacts/NA-12/figure_data/fig1_rg_class_paths.csv,d1_ultra|rg_class_signed|Under|car_post20,mean,,,,se
+a,Fair,d1_ultra,target,target,,0.295893783,,,,artifacts/NA-12/figure_data/fig1_rg_class_paths.csv,d1_ultra|rg_class_signed|Fair|car_post0,mean_v,,,,
+a,Over,d1_ultra,target,target,,0.4690234475,,,,artifacts/NA-12/figure_data/fig1_rg_class_paths.csv,d1_ultra|rg_class_signed|Over|car_post0,mean_v,,,,
+a,Under,d1_ultra,target,target,,0.3830199056,,,,artifacts/NA-12/figure_data/fig1_rg_class_paths.csv,d1_ultra|rg_class_signed|Under|car_post0,mean_v,,,,
+a,Fair,d1_ultra,n_events,n,,2113.0,,,,artifacts/NA-12/figure_data/fig1_rg_class_paths.csv,d1_ultra|rg_class_signed|Fair|car_post0,n_group,,,,
+a,Over,d1_ultra,n_events,n,,1783.0,,,,artifacts/NA-12/figure_data/fig1_rg_class_paths.csv,d1_ultra|rg_class_signed|Over|car_post0,n_group,,,,
+a,Under,d1_ultra,n_events,n,,5021.0,,,,artifacts/NA-12/figure_data/fig1_rg_class_paths.csv,d1_ultra|rg_class_signed|Under|car_post0,n_group,,,,
+b,weak,d1_ultra,drift,"[0, 0.5)",0.0,-0.02472841968,-0.10201330524079599,0.05255646588079599,se,artifacts/NA-12/figure_data/fig2_drift_vs_g.csv,"d1_ultra|weak|[0, 0.5)",mean,,,,se
+b,weak,d1_ultra,drift,"[0.5, 1)",1.0,0.00272175776,-0.08338226086937849,0.08882577638937848,se,artifacts/NA-12/figure_data/fig2_drift_vs_g.csv,"d1_ultra|weak|[0.5, 1)",mean,,,,se
+b,weak,d1_ultra,drift,"[1, 2)",2.0,-0.00679562926,-0.0974740103808497,0.08388275186084969,se,artifacts/NA-12/figure_data/fig2_drift_vs_g.csv,"d1_ultra|weak|[1, 2)",mean,,,,se
+b,weak,d1_ultra,drift,"[2, 3)",3.0,0.1341237635,-0.023030071236744165,0.29127759823674415,se,artifacts/NA-12/figure_data/fig2_drift_vs_g.csv,"d1_ultra|weak|[2, 3)",mean,,,,se
+b,weak,d1_ultra,drift,"[3, inf)",4.0,-0.08795382649,-0.3261059076452092,0.15019825466520917,se,artifacts/NA-12/figure_data/fig2_drift_vs_g.csv,"d1_ultra|weak|[3, inf)",mean,,,,se
+b,medium,d1_ultra,drift,"[0, 0.5)",0.0,0.0516026534,-0.023175053601236943,0.12638036040123693,se,artifacts/NA-12/figure_data/fig2_drift_vs_g.csv,"d1_ultra|medium|[0, 0.5)",mean,,,,se
+b,medium,d1_ultra,drift,"[0.5, 1)",1.0,0.01402238875,-0.06746080667684942,0.09550558417684943,se,artifacts/NA-12/figure_data/fig2_drift_vs_g.csv,"d1_ultra|medium|[0.5, 1)",mean,,,,se
+b,medium,d1_ultra,drift,"[1, 2)",2.0,0.01582538328,-0.06951455046547553,0.10116531702547552,se,artifacts/NA-12/figure_data/fig2_drift_vs_g.csv,"d1_ultra|medium|[1, 2)",mean,,,,se
+b,medium,d1_ultra,drift,"[2, 3)",3.0,-0.02322403096,-0.15999189441583378,0.11354383249583377,se,artifacts/NA-12/figure_data/fig2_drift_vs_g.csv,"d1_ultra|medium|[2, 3)",mean,,,,se
+b,medium,d1_ultra,drift,"[3, inf)",4.0,-0.1791247179,-0.3868878983126526,0.028638462512652535,se,artifacts/NA-12/figure_data/fig2_drift_vs_g.csv,"d1_ultra|medium|[3, inf)",mean,,,,se
+b,strong,d1_ultra,drift,"[0, 0.5)",0.0,0.0340683836,-0.037175723756752765,0.10531249095675277,se,artifacts/NA-12/figure_data/fig2_drift_vs_g.csv,"d1_ultra|strong|[0, 0.5)",mean,,,,se
+b,strong,d1_ultra,drift,"[0.5, 1)",1.0,-0.08092934622,-0.15805150104746635,-0.003807191392533646,se,artifacts/NA-12/figure_data/fig2_drift_vs_g.csv,"d1_ultra|strong|[0.5, 1)",mean,,,,se
+b,strong,d1_ultra,drift,"[1, 2)",2.0,-0.07803642906,-0.15427273384986778,-0.0018001242701322084,se,artifacts/NA-12/figure_data/fig2_drift_vs_g.csv,"d1_ultra|strong|[1, 2)",mean,,,,se
+b,strong,d1_ultra,drift,"[2, 3)",3.0,-0.06934507023,-0.19206092585911985,0.05337078539911985,se,artifacts/NA-12/figure_data/fig2_drift_vs_g.csv,"d1_ultra|strong|[2, 3)",mean,,,,se
+b,strong,d1_ultra,drift,"[3, inf)",4.0,-0.1385861234,-0.2716967632670103,-0.005475483532989683,se,artifacts/NA-12/figure_data/fig2_drift_vs_g.csv,"d1_ultra|strong|[3, inf)",mean,,,,se
