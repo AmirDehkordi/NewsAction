@@ -13,17 +13,21 @@ test was evaluated once.
 - **Selective prediction concentrates the signal where it is priced: at the open.** d1-ultra's top 10% by
   conviction |N̂|: signed z_on 1.52 / 1.16 / 0.93 and z_cc 0.80 / 0.75 / 0.59 (val-A / val-B / test), against
   0.22 / 0.26 / 0.21 and 0.13 / 0.16 / 0.10 for all events. After the open (z_id, the tradable move) the top 10% gives
-  0.004 / 0.140 / 0.101 (d1-ultra) and 0.106 / 0.123 / 0.068 (Laya-Fin); every 95% interval at 10% coverage includes
-  zero on the test.
+  0.004 / 0.140 / 0.101 (d1-ultra) and 0.106 / 0.123 / 0.068 (Laya-Fin); no 95% interval of this mean signed move
+  excludes zero on the test, at any coverage. The rank IC inside the covered set says a little more: among the events
+  that pass Laya-Fin's frozen confidence gate (30% coverage by the stated confidence, a threshold fixed at NA-11), its
+  daily IC with z_id is 0.057 / 0.079 / 0.042 (t 2.6 / 2.5 / 2.1), above zero in all three periods — though 6 of the
+  110 test intervals of this IC exclude zero, about what chance gives.
 - **Calibrated but compressed against overconfident.** Laya-Fin's N̂ has SD 0.11–0.12 and a median stated confidence
   of 0.006–0.007 (three-class probabilities near uniform; NA-12's test ECE 0.057); the API models' N̂ is wide and skewed
   positive (d1-ultra SD ≈ 0.61, 73–77% positive; span-02 SD ≈ 0.9) and their stated confidence overstates the hit rate
   (ECE 0.21–0.36).
-- **The 10:00 reading never beats the pre-open reading** for y1 (10:00 → close), the model's revision after the first
-  bar has IC ≤ 0 on val-B and the test (Laya-Fin −0.027 / −0.036, d1-ultra −0.043 / −0.011: over-updating toward the
-  first bar), and no first-bar momentum or reversal holds across periods.
+- **Watching the open adds nothing.** For y1 (10:00 → close) the 10:00 reading beats the pre-open reading only for
+  d1-ultra on val-A (IC 0.029 against 0.014, neither significant); on val-B and the test both models' 10:00 ICs are
+  negative. The revision after the first bar has IC ≤ 0 on val-B and the test (Laya-Fin −0.027 / −0.036, d1-ultra
+  −0.043 / −0.011: over-updating toward the first bar), and no first-bar momentum or reversal holds across periods.
 - **The conditioning study's validation choices did not hold.** 8 of 75 (model, condition) pairs were SELECTED on
-  validation (pooled t 2.3–3.5). On the test five changed sign and three are small and positive (t ≤ 1.0); the
+  validation (pooled t 2.3–3.5). On the test five changed sign and three are small and positive (t ≤ 1.01); the
   smallest BH q among them is 0.94 and the smallest in the whole family 0.79. Their tradable versions, gross Sharpe
   4.6–6.8 (Laya-Fin) and 1.7–2.3 (d1-ultra) on val-B (in-sample), are −0.73 to +0.67 on the test, all below their
   placebo's 90th percentile and all net-negative at 10 bp. **No forward-test candidate qualifies.**
@@ -47,18 +51,19 @@ test was evaluated once.
 | Check | Evidence | Result |
 |---|---|---|
 | C1 The three disclosures reproduce exactly | the assistant's transcript code rerun, then this chunk's code: (c) every band number, (d) the 24 ICs, (e) the preview's baselines, four pairs and the low-uncertainty row (`tests/test_selective_data.py`, every printed digit) | PASS |
-| C2 Selection on validation only, fixed before the test | `validation` cuts the study to val-A/val-B before any statistic (test `test_the_validation_stage_passes_no_test_row_to_the_statistics`); the selection committed at e451062 (17:07:29 UTC) and §15 row 65 at d587293 (17:07:29), the test run at 17:07:57 on d587293 (`results/test_run.json`) | PASS |
-| C3 The test is evaluated once | `run test` refuses an uncommitted or changed selection and changed val-A cut points (tests); one `test_run.json`; the trials ledger refuses a re-logged row with another value | PASS |
+| C2 Selection on validation only, fixed before the test | `validation` drops the test rows of the study frame before any statistic (test `test_the_validation_stage_passes_no_test_row_to_the_statistics`); the selection committed at e451062 (17:07:29 UTC) and §15 row 65 at d587293 (17:07:29), the test run at 17:07:57 on d587293 (`results/test_run.json`) | PASS |
+| C3 The test is evaluated once | `run test` refuses an uncommitted or changed selection and changed val-A cut points (tests of `committed()` on a real git repository, of the selection's hash and of the cut points); one `test_run.json`; the trials ledger refuses a re-logged row with another value | PASS |
 | C4 The selection is computed right | two independent re-implementations from a written specification reproduced all 221 validation statistics and the 8 pairs bit for bit; a third reproduced the two E4 conditions the operator's decisions changed | PASS |
-| C5 No look-ahead in the books | every input's instant ≤ the 09:15 decision (`portfolios.check_timing`), the val-A cut points and, on the test, the validation selection included; a condition known only at the open is refused (tests) | PASS |
+| C5 No look-ahead in the books | every input's instant ≤ the 09:15 decision (`portfolios.check_timing`), the val-A cut points and, on the test, the validation selection included; each condition's instant is tested (SPY's overnight move at the open, the day counts at 09:15, VIX at the close of t−1, E8 at its map's calibration); books on SPY's move or on a `selection_only` vendor label are refused (tests); 12 guard mutations all turn a test red | PASS |
 | C6 BH over the whole family | `selection.csv` `bh_q` over 75 pairs, `bh_q_unseen` over the 69 not [seen on test] | PASS |
 | C7 Trials logged | 1,075 rows (330 + 36 + 669 + 40), kind "exploratory", `make ledgers` OK | PASS |
 | C8 References verified | 14 of 14 against primary records (decisions file) | PASS |
-| GAC1 `make verify` | exit 0: ruff and format clean, mypy --strict 179 files, 2,192 passed / 3 skipped / 2 xfailed (the expected strict ones), manifest 483 artifacts OK, ledgers OK; `make paper` "paper: OK" (all equal); `make paper-preview` 0 overfull, 0 undefined | PASS |
-| GAC2 `Data/` untouched | `git status --porcelain Data/` empty; `Data/` is read-only | PASS |
+| C9 Independent review | an adversarial review of the branch (statistics, protocol and look-ahead, paper wiring, report accuracy; a skeptic per finding) confirmed 28 findings, none changing a number: wording (the IC result, the D1 reading, the disclosures in the paper's captions), two break-even roundings, the data contract's inputs, three untested guards and the t22 label; all fixed | PASS |
+| GAC1 `make verify` | exit 0: ruff and format clean, mypy --strict 179 files, 2,197 passed / 3 skipped / 2 xfailed (the expected strict ones), manifest 484 artifacts OK, ledgers OK; `make paper` "paper: OK" (all equal); `make paper-preview` 0 overfull, 0 undefined | PASS |
+| GAC2 `Data/` untouched | `make manifest`: the 10 `Data/` inputs keep their size and mtime; NA-13b's code opens no file under `Data/` (it reads NA-00's registered copy `work/market/market_prices.parquet`); `Data/` is read-only by policy (CLAUDE.md rule 19) | PASS |
 | GAC3 2026 data only through the allowed routes | NA-12's frames, `analysis/targets_test`, NA-13's `strategy/market_test` (its one logged lock sequence) and, by the operator's decision, the ^VIX closes up to t−1 from NA-00's `work/market/market_prices.parquet`; `ledgers/test_access.jsonl` unchanged at 29 lines; `tests/test_blinding.py` passes | PASS |
 | GAC4 No API call | spend ledger unchanged; NA-13b $0.00, cumulative $15.73 | PASS |
-| GAC5 Data contract | `## NA-13b` section in `docs/DATA_CONTRACT.md` (14 entries), sha256 equal to the manifest (`make manifest` OK) | PASS |
+| GAC5 Data contract | `## NA-13b` section in `docs/DATA_CONTRACT.md` (15 entries), sha256 equal to the manifest (`make manifest` OK) | PASS |
 
 ## 3. (a) Selective prediction
 
@@ -79,14 +84,21 @@ covered events (typical daily moves); 95% CIs from the frozen stationary bootstr
 
 - On the test, d1-ultra's top-10% z_on is 0.930 [0.680, 1.135] and z_cc 0.592 [0.410, 0.759]; its z_id 0.101
   [−0.021, 0.241]. Laya-Fin's top-10% z_id is 0.068 [−0.036, 0.168]. span-02's and drex-v2.0's curves have the same
-  shape (top-10% test z_on 0.72 and 0.77); Laya zero-shot's is flat.
+  shape (top-10% test z_on 0.72 and 0.77); Laya zero-shot's is weaker (top-10% test z_on 0.20 [0.07, 0.33], z_cc
+  0.15 [0.02, 0.28], z_id 0.008).
 - **Ranking by the stated confidence** (the frozen gate's measure) gives the same picture for d1-ultra; for
   Laya-Fin its top 10% had the largest validation z_id (0.214 [0.083, 0.372] / 0.164 [0.050, 0.346]) and 0.072
   [−0.025, 0.167] on the test. At the frozen gate (30% coverage by confidence) the test z_id is 0.048 (Laya-Fin) and
   0.025 (d1-ultra).
 - Hit rates move little: d1-ultra's top 10% hits z_cc's sign 0.587 / 0.566 / 0.556 of the time, 0.506 for all events
   on the test.
-- The mean daily IC inside the covered set is noisy (sessions with ≥ 5 covered names thin out below 30% coverage).
+- **The mean daily IC inside the covered set.** Below 30% coverage, sessions with ≥ 5 covered names thin out (79–109
+  test sessions at 10%) and the IC is noisier than the signed mean. At the frozen gate (30% by the stated confidence)
+  Laya-Fin's IC with z_id is 0.057 [0.015, 0.100] / 0.079 [0.019, 0.144] / 0.042 [0.004, 0.082], above zero in all
+  three periods; its top 10% by confidence has a test IC of 0.073 [0.007, 0.143]. d1-ultra's top 10% by conviction
+  has a test IC of 0.100 [0.031, 0.174] but 0.010 and 0.011 on val-A and val-B. On the test, 6 of the 110 IC
+  intervals for z_id exclude zero (all five models, both rankings, 11 coverages), about the 5.5 expected by chance;
+  the gate's result is the one consistent across the three periods, and its threshold was fixed at NA-11.
 
 ## 4. (b) Output distributions
 
@@ -139,12 +151,14 @@ reference** (NA-12, NA-13; test): H2 at D1 (y1 on N̂_W0 and G) b = +0.229 (p 0.
 the 10:00 gap does not close); S-D1 J gross Sharpe +0.76 / −0.28 and S-CONV at D1 +1.61 (83rd placebo pct) / +0.03,
 all net-negative at 10 bp.
 
-**Reading.** The 10:00 reading never beats the pre-open reading. The revision after the first bar is zero or
+**Reading.** The 10:00 reading beats the pre-open reading only for d1-ultra on val-A (0.029 against 0.014, neither
+significant); on val-B and the test it never does. The revision after the first bar is zero or
 negative on val-B and the test, which points to over-updating toward the first bar (the frozen forward test F5 asks
 this question two-sided). No first-bar momentum or reversal holds across periods: the first-bar IC and the
 against/with means change sign between splits. **Multiple comparisons:** 36 statistics (6 × 2 models × 3 splits;
 the first-bar IC is the same for both models, so 33 distinct); about two with |t| > 2 are expected by chance, and
-six appear (three on val-A, one on val-B, two on the test), none of them consistent across the three periods.
+six appear (three on val-A, one on val-B, two on the test). Only Laya-Fin's pre-open IC keeps its sign in all three
+periods (t 3.9 / 0.5 / 2.1); none of the D1-specific statistics does.
 
 ## 7. (e) The conditioning study
 
@@ -185,17 +199,18 @@ the hedge; placebo 100 coin-flip sign assignments of the same events; DSR at N =
 |---|---|---|---|---|---|---|
 | Laya-Fin × "numbers" | 5.43 (100) | −0.73 (41) | −3.15 / −5.54 | −1.5 | 17.4 / 14.1 | 0.000 |
 | Laya-Fin × "material" | 5.50 (100) | 0.19 (66) | −3.24 / −6.63 | 0.3 | 22.7 / 19.9 | 0.000 |
-| Laya-Fin × P(no effect) low | 4.60 (98) | −0.57 (38) | −3.93 / −7.27 | −0.9 | 30.3 / 24.7 | 0.000 |
+| Laya-Fin × P(no effect) low | 4.60 (98) | −0.57 (38) | −3.93 / −7.27 | −0.8 | 30.3 / 24.7 | 0.000 |
 | Laya-Fin × busy news day | 5.99 (100) | 0.35 (64) | −2.77 / −5.88 | 0.6 | 30.2 / 23.7 | 0.000 |
 | Laya-Fin × own H-mag high | 5.56 (100) | 0.67 (67) | −2.75 / −6.15 | 1.0 | 33.0 / 28.6 | 0.000 |
 | Laya-Fin × E9 | 6.78 (100) | −0.71 (31) | −2.45 / −4.18 | −2.0 | 10.7 / 11.2 | 0.000 |
 | Laya-Fin × E8 (cost hurdle) | 1.28 (76) | 0.88 (73) | −0.38 / −1.63 | 3.5 | 4.9 / 7.3 | 0.000 |
-| d1-ultra × the day's news count high | 2.25 (78) | 0.36 (60) | −2.81 / −5.25 | 0.6 | 133.9 / 37.4 | 0.000 |
+| d1-ultra × the day's news count high | 2.25 (78) | 0.36 (60) | −2.81 / −5.25 | 0.5 | 133.9 / 37.4 | 0.000 |
 | d1-ultra × agrees with Laya-Fin | 1.69 (78) | 0.62 (66) | −2.84 / −6.32 | 0.9 | 48.2 / 14.7 | 0.000 |
 | d1-ultra × E8 (cost hurdle) | 2.92 (95) | 0.05 (54) | −1.66 / −3.36 | 0.2 | 11.8 / 8.2 | 0.000 |
 
 At C_{t+1} every test book is also net-negative at 10 bp except Laya-Fin × E8 (+0.01; gross 1.47, 85th placebo pct).
-The largest DSR probability is 0.0045 (10 bp) and 0.079 (5 bp). Capacity medians $10–80M.
+On the test the largest DSR probability is 0.0004 (10 bp) and 0.002 (5 bp), both Laya-Fin × E8 at C_{t+1}; over all
+40 books it is 0.0045 and 0.079, both val-B (in-sample). Test capacity medians $10–80M.
 
 **Forward-test candidates** (SELECTED; the same sign on the test with BH q < 0.10; a test book above its placebo's
 90th percentile): **none.**
@@ -211,7 +226,9 @@ states that N from NA-13's table.
 ## 9. What NA-13b may conclude
 
 - **Where the signal lives.** By conviction: in the most confident readings, and mostly in the overnight gap (priced
-  at the open); after the open the gain from selectivity is small and imprecise on the test. By news type, day,
+  at the open); after the open the gain from selectivity is small: no signed-move interval excludes zero on the test,
+  and the one after-open pattern that holds in all three periods is Laya-Fin's rank IC among the events passing its
+  frozen confidence gate (exploratory, one of 110 variants a split). By news type, day,
   stock and model combination: on validation, Laya-Fin's after-open signal looked concentrated in d1-ultra's
   "numbers" and "material" news, on busy news days and in its own high predicted magnitude; **none of these held on
   the 2026 test** (five reversed, none significant, every q ≥ 0.79).
@@ -242,7 +259,8 @@ states that N from NA-13's table.
   | Input | Available at | ≤ the decision (09:15 of t) |
   |---|---|---|
   | Call A readings on W0 news (all models) | the latest W0 article (≤ 09:15) | yes |
-  | Event attributes (vendor fields, timing, attention, tier, σ, z_m20) | W0 / t−1 (PIT registry) | yes |
+  | Event attributes (the timestamp precision, timing, attention, tier, σ, z_m20) | W0 / t−1 (PIT registry) | yes |
+  | E1 vendor fields (vendor-quantified, press wire: the rank-0 item's `tag_quantified`, `source_class`) | `selection_only` in the PIT registry: produced retrospectively (CLAUDE.md A6) | **not guaranteed** — they only split events in the descriptive family (marked †); no E1 pair was selected, and a book on them is refused |
   | val-A thresholds, medians, the rank-average distribution | close of val-A's last session | yes (val-B, test) |
   | Frozen V maps (E8) | the model's calibration instant | yes |
   | Day counts (D0 events, earnings events) | 09:15 of t | yes |
@@ -280,8 +298,8 @@ states that N from NA-13's table.
 ruff check src tests scripts      All checks passed!
 ruff format --check               318 files already formatted
 mypy --strict src/                Success: no issues found in 179 source files
-pytest -q -m "not network"         2192 passed, 3 skipped, 2 xfailed in 233.02s
-manifest                          483 artifacts, 10 inputs checked: OK
+pytest -q -m "not network"         2197 passed, 3 skipped, 2 xfailed in 233.85s
+manifest                          484 artifacts, 10 inputs checked: OK
 ledgers                           OK (trials.jsonl=1620, test_access.jsonl=29)
-peak RSS                          9.7 GB
+peak RSS                          9.4 GB
 ```

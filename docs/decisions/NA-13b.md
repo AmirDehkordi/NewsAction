@@ -56,8 +56,9 @@ in the PRD.
    - *E3 04:00–08:00 vs 08:00–09:15* leaves out events whose latest article precedes 04:00 (31% of val-A).
    - *E4 busy news day* is two conditions: the event's own W0 attention ratio ≥ 1.5 (event level; the codebook's
      "busy", the stock's articles against its 60-session mean — not Hirshleifer–Lim–Teoh's market-wide count), and
-     the session's number of D0 events above its val-A median (day level; a firm count, the distraction measure of
-     Hirshleifer et al.). 10 of 11 val-A Mondays are busy days by the second, since their W0 spans the weekend.
+     the session's number of D0 events above its val-A median (day level; a count of firms with news, in the spirit
+     of Hirshleifer et al.'s count of same-day announcements, not their measure). 10 of 11 val-A Mondays are busy
+     days by the second, since their W0 spans the weekend.
    - *E4 macro day* = an FOMC, CPI or payroll release day (see the operator decisions).
    - *E4 VIX at t−1* = the ^VIX close of the previous session, above its val-A median (15.70).
    - *E4 |SPY overnight|*: (1 + r_cc)/(1 + r_id) − 1 of NA-13's market files, which is O_t/C_{t−1} − 1. It is known
@@ -87,7 +88,9 @@ in the PRD.
    entry at the open, exits at the close and C_{t+1}, costs on both legs and the hedge, capacity, Sharpe over the
    window). Placebo: a coin flip per event (seeds 2027–2126; NA-13's MA-cross convention, since sign books have no
    quantile sides). Timing: every input must be known by 09:15, the val-A cut points included; on the test the
-   selection (which read val-B outcomes) must precede the decision; val-B books are in-sample.
+   selection (which read val-B outcomes) must precede the decision; val-B books are in-sample. A condition on SPY's
+   overnight move (known at the open) or on a vendor label the PIT registry keeps for selection only
+   (`tag_quantified`, `source_class`) gets no valid instant, so its book is refused; neither was selected.
 9. **Forward-test candidates**: SELECTED, the same sign on the test with BH q < 0.10, and a test book (exit at the
    close: the primary outcome is the open → close move) whose gross Sharpe is above its placebo's 90th percentile;
    if more than three qualified, the three with the largest pooled-validation t (a validation quantity).
@@ -111,6 +114,12 @@ in the PRD.
    November data on 2025-12-16) and by the 2026 lapse (January data on 2026-02-11). They are in
    `artifacts/NA-13b/inputs/payrolls.yaml`, outside `configs/` (the freeze hash covers `configs/*.yaml`) and `src/`
    (no test-period date literals).
+
+## The payroll file and the selection record
+
+`payrolls.yaml` was written after the two web checks and before the validation run (17:02 UTC), which read it; it
+was committed with the run's result in e451062. The selection record names the code commit (1e2b0db), which predates
+the file; the file's content is the one the run read (its sha256 is in the manifest and the data contract).
 
 ## The critic's review of the operationalization (before the selection was frozen)
 
@@ -151,6 +160,20 @@ proceedings.neurips.cc, PubMed); none dropped.
 *Process note:* one verifying agent sent three Crossref API requests with an e-mail address in the User-Agent
 (Crossref's "polite pool" convention) without authorization; it stopped there and disclosed it, and the
 operator is told in the session's summary.
+
+## The independent review of the branch (after the test)
+
+An adversarial review (four lenses — statistics, protocol and look-ahead, paper wiring, report accuracy — and a
+skeptic for every finding) confirmed 28 findings and refuted 5. None changed a number, a selection or a conclusion.
+Fixed: the coverage curves' IC result was understated (Laya-Fin's IC with z_id at its frozen confidence gate is
+positive in all three periods; now reported with the multiplicity caveat); "the 10:00 reading never beats the pre-open
+reading" was false for d1-ultra on val-A; the paper's A16/A17 captions and the t36/t37/t43 notes said "the test was
+evaluated once" where the operator's assistant's earlier looks at the test shaped them (now disclosed, with the
+caveat of 36 statistics); the data contract lacked the VIX source and the payroll file; the timing map, `committed()`
+and the selection's hash check had no test (now tested; 12 guard mutations turn a test red); a book on a
+`selection_only` vendor label would have passed the timing guard (now refused); two break-even values were rounded
+twice; t22 still called the live ledger count "the DSR's N". The refuted findings (E8's sign, the scope of the 2026
+VIX read, A19's axes, a REPORT phrase) were checked and left as they are.
 
 ## Findings that shaped the reporting
 
