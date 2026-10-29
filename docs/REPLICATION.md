@@ -123,8 +123,8 @@ The full list (inputs, outputs, figures) is `artifacts/NA-14/digests.json`. The 
 
 | File | sha256 |
 |---|---|
-| `fig1_validation_test.csv` | `3d3fa11d672f538f6ffc900ec1cefee5ba48766f7dcdb33b9e3880faff1bb069` |
-| `fig2_priced_at_open.csv` | `be9a29497719fce6cd167396fcfe77716c5c41c530648bdae051fb88e4cd92aa` |
+| `fig1_validation_test.csv` | `cea6875a9d36f35381c183587312fe9cfb1be88c89d3264a96ac267bdaa1fa35` |
+| `fig2_priced_at_open.csv` | `d9a566f040c884875fb7ef02802f1055080c6aced5524aa6abd05672b222de20` |
 | `fig3_convergence.csv` | `c258a042b0e8a856d29f17a253c16ba84642333966b64124ed9bbade3489c4b3` |
 | `fig4_over_under.csv` | `57cfc40e379a83ac114969a20f574ae20403ba5481c14b667055043b2a870e4f` |
 | `fig5_explaining_moves.csv` | `5efe9ce25a2ae7395425a44042d0cba0f796837907403043ae1e6b2a849ecb8a` |

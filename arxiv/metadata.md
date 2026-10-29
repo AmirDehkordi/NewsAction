@@ -5,8 +5,7 @@ Fields for the arXiv submission form. The abstract is `arxiv/abstract.txt` (writ
 
 - **Title:** The Market Reads the News First: A Pre-Registered, Look-Ahead-Free Test of AI Decision Models on
   Stock-Price Reactions
-- **Authors:** Amir Dehkordi, Arman Khaledian, Alireza Kargarzadeh, Nariman Khaledian, Navid Parvini
-  (the corresponding author's spelling to be confirmed)
+- **Authors:** Amir Dehkordi, Arman Khaledian, Nariman Khaledian
 - **Primary category:** cs.AI
 - **Cross-lists:** q-fin.ST, cs.LG, cs.CL
 - **Comments:** 41 pages, 11 figures, 12 tables; pre-registered (analysis plan frozen by hash before the test
@@ -15,8 +14,9 @@ Fields for the arXiv submission form. The abstract is `arxiv/abstract.txt` (writ
 - **Journal reference:** none
 - **DOI:** none
 - **License:** [to be chosen by the authors]
-- **Keywords (in the paper):** large language models; AI decision models; financial news; stock returns; market
-  efficiency; look-ahead bias; memorization; pre-registration; overreaction and underreaction
+- **Keywords (in the paper):** large language models (LLMs); AI decision models; stock return prediction;
+  financial news; look-ahead bias; memorization; data contamination; backtest overfitting; deflated Sharpe ratio;
+  pre-registration; overnight returns; market efficiency; overreaction and underreaction; calibration
 - **JEL codes (in the paper):** G14, G12, C45, C52, C12
 
 ## Source bundle

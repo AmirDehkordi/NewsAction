@@ -12,20 +12,22 @@ authors:
     given-names: Amir
   - family-names: Khaledian
     given-names: Arman
-  - family-names: Kargarzadeh
-    given-names: Alireza
   - family-names: Khaledian
     given-names: Nariman
-  - family-names: Parvini
-    given-names: Navid
 keywords:
   - large language models
+  - LLM
   - AI decision models
+  - stock return prediction
   - financial news
-  - stock returns
   - look-ahead bias
   - memorization
+  - data contamination
+  - backtest overfitting
+  - deflated Sharpe ratio
   - pre-registration
+  - overnight returns
+  - market efficiency
 preferred-citation:
   type: article
   title: >-
@@ -36,11 +38,7 @@ preferred-citation:
       given-names: Amir
     - family-names: Khaledian
       given-names: Arman
-    - family-names: Kargarzadeh
-      given-names: Alireza
     - family-names: Khaledian
       given-names: Nariman
-    - family-names: Parvini
-      given-names: Navid
   year: 2026
   notes: "Preprint; the arXiv identifier is to be added."

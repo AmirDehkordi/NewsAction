@@ -62,8 +62,8 @@ Date: 2026-10-29 · Branch `feat/NA-16-paper` (main checkout, cut from main @ 83
      Market";
   2. "Clean Validation, Null Test: AI Decision Models, Financial News and Stock-Price Reactions in a
      Pre-Registered, Look-Ahead-Free Design".
-- **Authors**, in the given order: Amir Dehkordi (corresponding; spelling to confirm), Arman Khaledian, Alireza
-  Kargarzadeh, Nariman Khaledian, Navid Parvini; affiliations and e-mail are red placeholders.
+- **Authors** (operator, 2026-10-29: these three for now): Amir Dehkordi (corresponding), Arman Khaledian,
+  Nariman Khaledian; affiliations and e-mail are red placeholders.
 - **Abstract:** 221 words, from the prompt's draft with every number checked and four edits: "return
   probabilities" (not "calibrated probabilities", since the commercial models are overconfident); "where the
   models predict anything, it is the overnight gap" (Laya-Fin's test ICs are small on both sides); "survives
@@ -163,7 +163,7 @@ paper (arXiv 2608.14014, v2) is summarized from its verified abstract.
 ## 8. Build and the look at every page
 
 `make paper-text` then `make paper-pdf` (about 30 s). The build copies `main.bbl` to `paper/generated/` for arXiv.
-PDF sha256 `e077f5ea885f1324f049995f261d1839ead121ebd86dbae7161af08380f290ce` (tectonic's bundle decides the bytes; reported, not enforced). Every page was rendered at
+PDF sha256 `393c734cf8fce69025025e704b3cc04902bf8c6c74c0b46c3c27607126030d72` (after §13's changes) (tectonic's bundle decides the bytes; reported, not enforced). Every page was rendered at
 72 and 115 dpi and inspected. Fixes made from the look: the two title footnote marks overlapped (now separated);
 an inline list of level midpoints ran into the margin (now a display); "Key findings" sat alone at a page foot
 (`needspace`); three tables sat alone on half-empty float pages (float fractions loosened); the notation table
@@ -182,7 +182,7 @@ a TeX Live image (for example Docker's `texlive/texlive`); the prompt asks for y
 
 ## 10. Open placeholders
 
-Affiliations of all five authors; the corresponding author's e-mail and name spelling; the data and code statement
+Affiliations of the three authors; the corresponding author's e-mail; the data and code statement
 and the replication-package URL (title footnote, Appendix F, `arxiv/metadata.md`, `CITATION.cff`); the data
 availability statement; acknowledgments, funding and conflicts; the AI-use statement (suggested wording in the
 paper, to confirm); the license and the arXiv identifier (`CITATION.cff`); the title choice (§3).
@@ -225,3 +225,22 @@ manifest                          487 artifacts, 10 inputs checked: OK
 ledgers                           OK (trials.jsonl=1620, test_access.jsonl=29)
 peak RSS                          about 8.0 GB
 ```
+
+## 13. Operator changes after the session (2026-10-29)
+
+- **Figures 1 and 2 redrawn** in NA-14's generator (`figures/fig1_validation_test.py`, `fig2_priced_at_open.py`):
+  the val-B and test points (Figure 1) and the overnight and after-the-open points (Figure 2) were offset above
+  and below each model's row, so the dots did not line up with the labels. Each quantity now has its own panel,
+  with one dot per model exactly on its row and one shared scale: Figure 1 (a) val-B, (b) test, now full width;
+  Figure 2 (a) overnight, (b) after the open, (c) H1. The plotted numbers are unchanged; only the CSVs' `panel`
+  column changed (Figure 1: val-B a, test b; Figure 2: z_on a, z_id b, H1 c). Captions in
+  `artifacts/NA-14/captions.yaml` and the manuscript no longer say "hollow" or "filled".
+- **Authors:** Amir Dehkordi, Arman Khaledian and Nariman Khaledian, for now (`paper/main.tex`, `CITATION.cff`,
+  `arxiv/metadata.md`).
+- **Findability:** keywords widened (LLMs, stock return prediction, data contamination, backtest overfitting,
+  deflated Sharpe ratio, overnight returns, calibration) in the paper, the PDF metadata, `arxiv/metadata.md` and
+  `CITATION.cff`; the abstract now says "predict", "non-generative language models" and "look-ahead bias in
+  backtests of large language models (LLMs)" (227 words, 1,466 characters). No number or claim changed.
+- Rebuilt: `make paper` (all digests equal after `--write-digests`), `figures.contract`, the two figure-CSV
+  digests in `docs/REPLICATION.md`, `make paper-preview`, `make paper-pdf` (0 errors, 0 overfull, 41 pages),
+  `paper.contract`; `make verify` exit 0 (2,208 passed, 3 skipped, 2 xfailed; manifest and ledgers OK).

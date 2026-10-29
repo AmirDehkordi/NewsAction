@@ -8,8 +8,8 @@ fig1_validation_test:
   section: 1
   title: Every validation IC that is positive falls on test
   caption: >-
-    Daily IC of the pre-open news reading $\hat N$ with the close-to-close move $z_{cc}$, on val-B (hollow) and on
-    the test period (filled), each with its 95% interval ($\pm$[[1.96]] Newey–West SE), for the instruments and the
+    Daily IC of the pre-open news reading $\hat N$ with the close-to-close move $z_{cc}$, on (a) val-B and (b) the
+    test period, on the same scale and one row per model, each with its 95% interval ($\pm$[[1.96]] Newey–West SE), for the instruments and the
     baselines (NA-12). Laya-Fin, the primary instrument, falls from {{t14_model_comparison/laya_fin/ic_val_b@f3}} to
     {{t14_model_comparison/laya_fin/ic_test@f3}}; d1-ultra, the API comparator, from
     {{t14_model_comparison/d1_ultra/ic_val_b@f3}} to {{t14_model_comparison/d1_ultra/ic_test@f3}}; span-02 and
@@ -27,9 +27,9 @@ fig2_priced_at_open:
   section: 3
   title: The API models' signal is priced at the open; no model predicts the move after it
   caption: >-
-    (a) Daily IC of $\hat N$ with the overnight move $z_{on}$ (previous close to open, filled) and with the move
-    after the open $z_{id}$ (open to close, hollow), test period, with 95% bootstrap intervals (NA-12). (b) H1,
-    their difference, with its bootstrap interval. The API models' IC is all overnight: d1-ultra
+    Daily IC of $\hat N$ on the test period with (a) the overnight move $z_{on}$ (previous close to open) and (b)
+    the move after the open $z_{id}$ (open to close), with 95% bootstrap intervals (NA-12); (c) H1, their
+    difference, with its bootstrap interval. The three panels share one scale and one row per model. The API models' IC is all overnight: d1-ultra
     {{t3_ic/d1_ultra:z_on/ic@f3}} with $z_{on}$ and {{t3_ic/d1_ultra:z_id/ic@f3}} with $z_{id}$, H1 =
     {{t1b_primary_by_model/d1_ultra:H1/estimate@f3}} (p {{t1b_primary_by_model/d1_ultra:H1/p}}), model-specific
     (§1.3); Laya zero-shot's H1 is {{t1b_primary_by_model/laya_zs:H1/estimate@f3}}. For Laya-Fin, the primary
