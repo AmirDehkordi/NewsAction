@@ -4050,3 +4050,131 @@ sha256 on a rerun (labels and export were run twice: 8 of 8 files identical).
 - **Rows / coverage:** the table index
 - **Availability:** after NA-12 and NA-13 (test-period results are their stored outputs; nothing here reads the lock)
 - **sha256:** `ca17d7f84f6e65da487a9395bf425fc3ec286c73bd773bb27417fd734a573d57`
+
+## NA-13b — when does the signal work? (`newsaction.selective`, exploratory)
+
+### `artifacts/NA-13b/results/selection_validation.json`
+- **Producer:** `newsaction.selective.run` `validation`
+- **Inputs:** `work/analysis/frame_d0_{laya_fin,d1_ultra}.parquet`, NA-11's span-02 / drex-v2.0 production readings, `work/states/context_market.parquet`, `work/strategy/market_public.parquet`, `work/panel/panel_public.parquet`
+- **Schema:** the selection rule, the selected (model, condition) pairs, the val-A cut points, each condition's definition, the sha256 of the two validation tables, git sha
+- **Key:** one object
+- **Rows / coverage:** the validation selection, committed before the test stage ran
+- **Availability:** exploratory (post hoc); val-A and val-B only (no test row read)
+- **sha256:** `f058695c3180ee2f2574ad87326af851a1821382ed67e3ee673faf3cfb570e11`
+
+### `artifacts/NA-13b/tables/cuts.csv`
+- **Producer:** `newsaction.selective.run` `validation`
+- **Inputs:** as the selection
+- **Schema:** `key`, `name`, `value`
+- **Key:** `key` unique
+- **Rows / coverage:** every val-A threshold of the conditions (medians, the 70th percentile of |N̂|)
+- **Availability:** exploratory (post hoc); val-A only
+- **sha256:** `afb0c5b3ddf002962d2ccc533800b787d6efe51ebb544f669c139ae8a20e31f2`
+
+### `artifacts/NA-13b/tables/selection_validation.csv`
+- **Producer:** `newsaction.selective.run` `validation`
+- **Inputs:** as the selection
+- **Schema:** `key`, `model`, `condition`, `group`, `label`, `level`, `seen_on_test`, `val_b_only`, `diff_val_a`, `t_val_a`, `diff_val_b`, `t_val_b`, `t_pooled`, `selected`, `rule`
+- **Key:** `key` = model|condition unique
+- **Rows / coverage:** every (model, condition) pair of E1–E9 on the primary outcome sign(N̂)·z_id
+- **Availability:** exploratory (post hoc); val-A and val-B only
+- **sha256:** `779b992f294ee97c5d60e5de5d70759a1d6f2484b94fde0b8633ca2a7a19de08`
+
+### `artifacts/NA-13b/tables/conditioning.csv`
+- **Producer:** `newsaction.selective.run` `test`
+- **Inputs:** as the selection, and the test rows of `work/analysis/frame_d0_{laya_fin,d1_ultra}.parquet` and `work/analysis/targets_test.parquet`
+- **Schema:** `key`, `model`, `condition`, `group`, `label`, `level`, `seen_on_test`, `vendor`, `outcome`, `role`, `split`, `n_in`, `n_out`, `days_in`, `days_out`, `df`, `inside`, `inside_t`, `outside`, `outside_t`, `diff`, `diff_t`, `diff_p`, `diff_days`
+- **Key:** `key` = model|condition|outcome|split unique
+- **Rows / coverage:** every pair × outcome (z_id, z_o0_c1, z_on) × split (val-A, val-B, pooled validation, test)
+- **Availability:** exploratory (post hoc); test-period outcomes from NA-12's frames and `work/analysis/targets_test.parquet`, test market returns from NA-13's `work/strategy/market_test.parquet` (no lock read)
+- **sha256:** `5d8e9174eb1ff609d25b0cec422d6a03be9dea35afac138c574263dc82231afc`
+
+### `artifacts/NA-13b/tables/selection.csv`
+- **Producer:** `newsaction.selective.run` `test`
+- **Inputs:** the conditioning table and the books
+- **Schema:** the test rows of the primary outcome, `bh_q` (Benjamini–Hochberg over the family), `selected`, `same_sign`, `confirmed`, the test book's gross Sharpe and placebo 90th percentile, `eligible`, `t_pooled_val`, `candidate`
+- **Key:** `key` = model|condition unique
+- **Rows / coverage:** every pair of the family on the test
+- **Availability:** exploratory (post hoc); test-period outcomes from NA-12's frames and `work/analysis/targets_test.parquet`, test market returns from NA-13's `work/strategy/market_test.parquet` (no lock read)
+- **sha256:** `a3734abb257babb3f0968c104d3d4384482d9083f332026cc564d5893b5c78c4`
+
+### `artifacts/NA-13b/tables/books.csv`
+- **Producer:** `newsaction.selective.run` `test`, then `dsr`
+- **Inputs:** the conditions, NA-13's market files, `configs/frozen.yaml` (V maps), `ledgers/trials.jsonl` (DSR)
+- **Schema:** `key`, `book_key`, `book`, `model`, `condition`, `split`, `exit`, `holding`, NA-13's counts and `portfolios.summary` columns, `n_positions`, `names_long`, `names_short`, `break_even_bp`, placebo percentiles and quantiles, capacity, `dsr_prob_net_{5,10}`, `dsr_sr0_net_{5,10}`, `n_trials`
+- **Key:** `key` = book|exit|split unique
+- **Rows / coverage:** the tradable versions (the selected pairs, E8, E9) on val-B (in-sample) and the test
+- **Availability:** exploratory (post hoc); test-period outcomes from NA-12's frames and `work/analysis/targets_test.parquet`, test market returns from NA-13's `work/strategy/market_test.parquet` (no lock read)
+- **sha256:** `98674a442ec7f0fa3c3eb4e715c6156ce15a10f0c52bd7f7789f3bb3620c3854`
+
+### `work/selective/books_daily.parquet`
+- **Producer:** `newsaction.selective.run` `test`
+- **Inputs:** as the books
+- **Schema:** `session`, `gross`, `turnover`, `active`, `net_5`, `net_10`, `book`, `model`, `condition`, `split`, `exit`
+- **Key:** (`book`, `split`, `exit`, `session`) unique
+- **Rows / coverage:** every book's daily series over its window
+- **Availability:** exploratory (post hoc); test-period outcomes from NA-12's frames and `work/analysis/targets_test.parquet`, test market returns from NA-13's `work/strategy/market_test.parquet` (no lock read)
+- **sha256:** `7b7e5d7571061d6dea6ce3cc7e07179ceb921510757c9d01f3d6058ed8b4dbe6`
+
+### `artifacts/NA-13b/tables/coverage.csv`
+- **Producer:** `newsaction.selective.run` `test`
+- **Inputs:** `work/analysis/frame_d0_{laya_fin,d1_ultra}.parquet`, NA-11's and NA-09's readings, NA-06's stage-2 sample (span-02, drex-v2.0 val-A), `work/panel/panel_public.parquet`, `work/analysis/targets_test.parquet`
+- **Schema:** `key`, `model`, `ranking`, `coverage`, `split`, `target`, `threshold`, `sample`, `n`, `n_days`, `hit`, `hit_ci_low`, `hit_ci_high`, `signed`, `signed_ci_low`, `signed_ci_high`, `ic`, `ic_t`, `ic_ci_low`, `ic_ci_high`, `ic_days`
+- **Key:** `key` = model|ranking|coverage|split|target unique
+- **Rows / coverage:** the risk–coverage curves: 5 models × 2 rankings × 11 coverages × 3 splits × 3 targets
+- **Availability:** exploratory (post hoc); test-period outcomes from NA-12's frames and `work/analysis/targets_test.parquet`, test market returns from NA-13's `work/strategy/market_test.parquet` (no lock read)
+- **sha256:** `16154cc72359b8d414061f7ebb2e22f04c03ba298d85bee274bd6bf445448a27`
+
+### `artifacts/NA-13b/tables/histograms.csv`
+- **Producer:** `newsaction.selective.run` `test`
+- **Inputs:** as the coverage curves
+- **Schema:** `key`, `bin`, `lo`, `hi`, `mid`, `n`, `share`, `model`, `measure`, `split`
+- **Key:** `key` = model|measure|split|bin unique
+- **Rows / coverage:** 40-bin histograms of N̂ and of the stated confidence per model and split
+- **Availability:** exploratory (post hoc); test-period outcomes from NA-12's frames and `work/analysis/targets_test.parquet`, test market returns from NA-13's `work/strategy/market_test.parquet` (no lock read)
+- **sha256:** `6317987a9ebb8ffb65e0015a85929c5d3b5daa5b737394d1cf134a5f0fa779df`
+
+### `artifacts/NA-13b/tables/output_summary.csv`
+- **Producer:** `newsaction.selective.run` `test`
+- **Inputs:** as the coverage curves
+- **Schema:** `key`, `model`, `measure`, `split`, `sample`, `n`, `mean`, `sd`, `clipped_low`, `clipped_high`, `q05`, `q25`, `q50`, `q75`, `q95`, `share_positive`
+- **Key:** `key` = model|measure|split unique
+- **Rows / coverage:** the outputs' moments and quantiles
+- **Availability:** exploratory (post hoc); test-period outcomes from NA-12's frames and `work/analysis/targets_test.parquet`, test market returns from NA-13's `work/strategy/market_test.parquet` (no lock read)
+- **sha256:** `a186b3713f04c6882579a2f67b69277442a667f388f5ddaade0cc87a08fc63c7`
+
+### `artifacts/NA-13b/tables/bands.csv`
+- **Producer:** `newsaction.selective.run` `test`
+- **Inputs:** `work/analysis/frame_d0_{laya_fin,d1_ultra}.parquet`
+- **Schema:** `key`, `split`, `band`, `n`, `hit_cc`, `cc`, `on`, `id`, `model`, `cut_50`, `cut_70`, `cut_90`
+- **Key:** `key` = model|split|band unique
+- **Rows / coverage:** the operator's assistant's band check, reproduced (disclosure)
+- **Availability:** exploratory (post hoc); test-period outcomes from NA-12's frames and `work/analysis/targets_test.parquet`, test market returns from NA-13's `work/strategy/market_test.parquet` (no lock read)
+- **sha256:** `ce108532ca82e063a29424137a518bd2bcd898657480546bc1326ea7c1b59d33`
+
+### `artifacts/NA-13b/tables/watch_open.csv`
+- **Producer:** `newsaction.selective.run` `test`
+- **Inputs:** `work/analysis/frame_d0_{laya_fin,d1_ultra}.parquet`
+- **Schema:** `key`, `model`, `split`, `statistic`, `kind`, `value`, `t`, `ci_low`, `ci_high`, `n_days`, `n_obs`
+- **Key:** `key` = model|split|statistic unique
+- **Rows / coverage:** the D1 (10:00) against D0 statistics: four daily ICs with y1 and two conditional means
+- **Availability:** exploratory (post hoc); test-period outcomes from NA-12's frames and `work/analysis/targets_test.parquet`, test market returns from NA-13's `work/strategy/market_test.parquet` (no lock read)
+- **sha256:** `9839242fef8e8a86c9d43ae5f3fbc7dea2b991776f8181aeccb7c3be75899729`
+
+### `artifacts/NA-13b/results/test_run.json`
+- **Producer:** `newsaction.selective.run` `test`
+- **Inputs:** the selection record
+- **Schema:** the selected pairs, the books, the forward-test candidates, git sha, lock reads (0)
+- **Key:** one object
+- **Rows / coverage:** the record of the one test run
+- **Availability:** exploratory (post hoc); test-period outcomes from NA-12's frames and `work/analysis/targets_test.parquet`, test market returns from NA-13's `work/strategy/market_test.parquet` (no lock read)
+- **sha256:** `3942cf94a8496349e2d70c4a8e185fb489e96aa7a7d6147c35a4532f2aaf21b8`
+
+### `artifacts/NA-13b/results/dsr.json`
+- **Producer:** `newsaction.selective.run` `dsr`
+- **Inputs:** `ledgers/trials.jsonl`
+- **Schema:** `n_trials`, `parts` (rows by kind), git sha
+- **Key:** one object
+- **Rows / coverage:** the trial count the books' DSR used
+- **Availability:** exploratory (post hoc); after the NA-13b trials were logged
+- **sha256:** `980ca4fe8fd8ed4da49ac6ad3af3d9e2d9762147237ba9df6497d2e7fb229b57`

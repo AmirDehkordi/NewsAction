@@ -1,0 +1,32 @@
+{
+ "exploratory": true,
+ "stage": "test (once, after the validation selection was committed)",
+ "written_at": "2026-10-29T17:07:57.387957+00:00",
+ "git_sha": "d587293bfee95c048012b94f5654ac263e28d126",
+ "selection_record": "artifacts/NA-13b/results/selection_validation.json",
+ "selected": [
+  "laya_fin|e2_numbers",
+  "laya_fin|e2_material",
+  "laya_fin|e2_effect",
+  "laya_fin|e4_busy_event",
+  "d1_ultra|e4_busy_day",
+  "laya_fin|e6_lf_mag",
+  "d1_ultra|e7_agree",
+  "laya_fin|e9_division"
+ ],
+ "books": [
+  "exploratory|selective|laya_fin|e2_numbers",
+  "exploratory|selective|laya_fin|e2_material",
+  "exploratory|selective|laya_fin|e2_effect",
+  "exploratory|selective|laya_fin|e4_busy_event",
+  "exploratory|selective|d1_ultra|e4_busy_day",
+  "exploratory|selective|laya_fin|e6_lf_mag",
+  "exploratory|selective|d1_ultra|e7_agree",
+  "exploratory|selective|laya_fin|e9_division",
+  "exploratory|selective|laya_fin|e8_cost",
+  "exploratory|selective|d1_ultra|e8_cost"
+ ],
+ "candidates": [],
+ "lock_reads": 0,
+ "seconds": 17.5
+}
