@@ -32,3 +32,6 @@ htmlcov/
 
 # NA-14 preview build log (names the temporary build directory)
 /artifacts/NA-14/paper_preview.log
+
+# NA-16 paper build log (names the temporary build directory)
+/artifacts/NA-16/paper.log

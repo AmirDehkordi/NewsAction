@@ -38,6 +38,8 @@ from newsaction.provenance import git_sha_cached, utc_now_iso
 
 MANIFEST_VERSION: Final = 1
 DATA_CONTRACT: Final = "DATA_CONTRACT.md"
+# Committed outputs that may be registered: the chunks' artifacts and the manuscript's files (NA-16).
+COMMITTED_ROOTS: Final = ("artifacts", "paper", "arxiv")
 _CHUNK: Final = 8 * 1024 * 1024
 _CONTRACT_HEADING: Final = re.compile(r"^###\s+`([^`]+)`")
 _CONTRACT_SHA: Final = re.compile(r"\*\*sha256:\*\*\s*`([0-9a-f]{64})`")
@@ -194,12 +196,13 @@ def register_file(
 def register_artifact(
     relpath: str, *, producer: str, description: str, layout: Layout | None = None
 ) -> dict[str, Any]:
-    """Register a committed output under ``artifacts/`` (e.g. a parquet a later chunk reads) in the manifest,
-    so ``make manifest`` re-hashes it and checks its docs/DATA_CONTRACT.md entry like a work/ file."""
+    """Register a committed output under ``artifacts/`` (e.g. a parquet a later chunk reads), or one of the
+    manuscript's generated files under ``paper/`` or ``arxiv/`` (NA-16), in the manifest, so ``make manifest``
+    re-hashes it and checks its docs/DATA_CONTRACT.md entry like a work/ file."""
     lay = resolve_layout(layout)
     rel = PurePosixPath(relpath)
-    if rel.is_absolute() or ".." in rel.parts or len(rel.parts) < 2 or rel.parts[0] != "artifacts":
-        raise ManifestError(f"relpath must be under artifacts/ without '..': {relpath!r}")
+    if rel.is_absolute() or ".." in rel.parts or len(rel.parts) < 2 or rel.parts[0] not in COMMITTED_ROOTS:
+        raise ManifestError(f"relpath must be under artifacts/, paper/ or arxiv/ without '..': {relpath!r}")
     path = lay.root.joinpath(*rel.parts)
     if not path.is_file():
         raise ManifestError(f"cannot register missing file {path}")
