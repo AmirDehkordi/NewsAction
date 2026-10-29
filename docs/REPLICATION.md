@@ -1,8 +1,9 @@
 # Replication
 
-NA-14 (2026-10-29). How to rebuild the paper's figures, tables and captions, what the rebuild needs, and what it
-must reproduce. The analyses themselves were run once, chunk by chunk (NA-00 … NA-13), and their outputs are
-committed under `artifacts/`; each chunk's `artifacts/NA-xx/REPORT.md` gives its own commands.
+NA-14 (2026-10-29; revision pass the same day). How to rebuild the paper's figures, tables, captions and LaTeX
+preview, what the rebuild needs, and what it must reproduce. The analyses themselves were run once, chunk by chunk
+(NA-00 … NA-13), and their outputs are committed under `artifacts/`; each chunk's `artifacts/NA-xx/REPORT.md` gives
+its own commands.
 
 ## Environment
 
@@ -11,29 +12,32 @@ committed under `artifacts/`; each chunk's `artifacts/NA-xx/REPORT.md` gives its
 - Install with `uv sync --locked --all-extras`. Do not run `make sync`: it is an exact sync and removes the
   optional extras (`embed`, `laya`, `kaggle`) that earlier chunks use. `make paper` itself needs only the core
   dependencies.
-- Fonts: DejaVu Sans, which ships with matplotlib, so the figures do not depend on the system's fonts. The PDF
-  and PNG bytes still depend on the matplotlib and FreeType builds; the plotted numbers are the CSVs.
-- LaTeX (optional): `artifacts/NA-14/tables/paper_tables.tex` compiles every table (NA-14 checked it with
-  `tectonic`, which fetches its TeX bundle over the network). It is not part of `make paper`.
+- Fonts: Computer Modern, through matplotlib's bundled `cmr10` and mathtext's `cm` set, so the figures match a
+  default LaTeX document and do not depend on the system's fonts. The PDF and PNG bytes still depend on the
+  matplotlib and FreeType builds; the plotted numbers are the CSVs.
+- LaTeX (for `make paper-preview` only): `tectonic` (Homebrew; it fetches its TeX bundle over the network on first
+  use). `make paper` writes the LaTeX but does not compile it.
 
 ## What `make paper` needs
 
-All of it is committed except the two NA-13 work files.
+All of it is committed except three NA-13 work files.
 
 | Input | Where | Committed |
 |---|---|---|
-| NA-03, NA-06, NA-07, NA-11, NA-12, NA-13 outputs | `artifacts/NA-xx/` (figure data, tables, results JSON) | yes |
+| NA-03, NA-06, NA-07, NA-11, NA-12, NA-13 outputs | `artifacts/NA-xx/` (figure data, tables, results JSON; NA-11's val-B run of the frozen spec) | yes |
 | NA-05 model catalog (release dates) | `artifacts/NA-05/catalog.json` | yes |
 | NA-08 and NA-11 REPORTs (Kaggle GPU-hours) | `artifacts/NA-08/REPORT.md`, `artifacts/NA-11/REPORT.md` | yes |
 | The operator's input (Laya's release date) | `artifacts/NA-14/inputs/operator.yaml` | yes |
+| The summaries of the pre-registration deviations | `artifacts/NA-14/inputs/prereg_deviations.yaml`, checked against `docs/PREREG.md` §15 | yes |
 | The caption templates | `artifacts/NA-14/captions.yaml` | yes |
 | The test split's end, the budget caps | `configs/splits.yaml`, `configs/project.yaml` | yes |
 | The ledgers (spend, FMP requests, trials, test access) | `ledgers/*.jsonl` (read only) | yes |
-| NA-13's stored test positions and daily books | `work/strategy/positions_test.parquet`, `work/strategy/books_test.parquet`, registered in `work/MANIFEST.json` | no (gitignored) |
+| NA-13's stored test positions, daily books and placebo books | `work/strategy/{positions,books,placebo}_test.parquet`, registered in `work/MANIFEST.json` | no (gitignored) |
 
-The two work files feed one table only, t26 (the S-CONV / gap-fade overlap that NA-13's REPORT §4 states but no
-committed file holds). Without them, rebuild NA-13 first (its REPORT §12 lists the commands; the test-period
-returns come through one `newsaction.lock` read after unblinding, as NA-13 did once).
+The three work files feed two tables: t26 (the S-CONV / gap-fade overlap that NA-13's REPORT §4 states but no
+committed file holds) and t33 (the placebo's Sharpe quantiles, which NA-13's REPORT §7 quotes in part). Without
+them, rebuild NA-13 first (its REPORT §12 lists the commands; the test-period returns come through one
+`newsaction.lock` read after unblinding, as NA-13 did once).
 
 `make paper` reads nothing else: no raw data (`Data/`), no ATOM snapshot, no decision-model cache, no API, no
 Kaggle, no FMP. It never imports the decision-model client, `newsaction.lock`, `panel.targets` or
@@ -44,34 +48,45 @@ Kaggle, no FMP. It never imports the decision-model client, `newsaction.lock`, `
 ```bash
 uv sync --locked --all-extras                       # the locked environment, extras kept
 make verify                                         # lint, types, tests, manifest, ledger chains
-make paper                                          # rebuild tables, figure CSVs, figures and captions; check digests
+make paper                                          # rebuild tables, LaTeX, figure CSVs, figures, captions, preview .tex
+make paper-preview                                  # compile artifacts/NA-14/paper_preview.tex with tectonic and check it
 uv run --locked python -m newsaction.figures.captions   # re-check every caption number against its table
-uv run --locked python -m newsaction.figures.render fig1_convergence   # one figure from its CSV
+uv run --locked python -m newsaction.figures.render fig3_convergence   # one figure from its CSV
 ```
 
-`make paper` (`newsaction.figures.paper`) runs in about 7 seconds and 0.3 GB:
+`make paper` (`newsaction.figures.paper`) runs in about 12 seconds:
 
-1. checks the sha256 of each of its 33 inputs against `artifacts/NA-14/digests.json` and stops if one differs;
-2. writes the tables (`artifacts/NA-14/tables`: CSV, LaTeX, `keys.json`, `index.json`), the 15 figure CSVs, the
-   15 figures (PDF and 300-dpi PNG) and `captions.md`, after checking that every number in a caption equals its
-   table cell;
-3. compares the sha256 of its 87 text outputs (CSV, LaTeX, JSON, Markdown) with the committed digests and fails on
-   any difference; the 30 PDF and PNG digests are compared and reported, not enforced;
+1. checks the sha256 of each of its 37 inputs against `artifacts/NA-14/digests.json` and stops if one differs;
+2. writes the tables (`artifacts/NA-14/tables`: CSV, `keys.json`, `index.json`), their LaTeX (six main tables
+   `tab1` … `tab6` and an appendix table per CSV, with `latex.json` listing every cell each one prints), the 22
+   figure CSVs, the 22 figures (PDF and 300-dpi PNG), `captions.md` after checking that every number in a caption
+   equals its table cell, and `paper_preview.tex`;
+3. compares the sha256 of its 110 text outputs (CSV, LaTeX, JSON, Markdown) with the committed digests and fails on
+   any difference; the 44 PDF and PNG digests are compared and reported, not enforced;
 4. fails if any `ledgers/*.jsonl` changed during the run.
 
+`make paper-preview` (`newsaction.figures.preview --compile`) compiles the preview with tectonic in deterministic
+mode and fails on a TeX error, an overfull box wider than 1 pt or a font that is not embedded; it copies the PDF to
+`artifacts/NA-14/paper_preview.pdf` and reports its sha256 (not enforced: tectonic's bundle decides the bytes).
+
 The author's steps after a deliberate change: `python -m newsaction.figures.paper --write-digests`, then
-`python -m newsaction.figures.contract` (registers every NA-14 file in `work/MANIFEST.json` and rewrites the
-NA-14 section of `docs/DATA_CONTRACT.md`).
+`python -m newsaction.figures.contract` (registers every NA-14 file in `work/MANIFEST.json`, drops the entries of
+NA-14 files that no longer exist, and rewrites the NA-14 section of `docs/DATA_CONTRACT.md`).
 
 ## How every number traces
 
 - Each figure reads only its CSV (`render.read`; the figure modules read no file). A figure CSV holds one row per
   plotted value and names its upstream file, row key and column; `tests/test_figures_trace.py` re-reads every one
-  of those cells. Intervals are the stored bootstrap bounds, or ±1.96 × a stored standard error, or ±1.96 × |value
-  / t| from a stored t statistic.
+  of those cells. Intervals are the stored bootstrap bounds, or ±1.96 × a stored standard error (±1 in the
+  exploratory monthly figure), or ±1.96 × |value / t| from a stored t statistic, or the Wilson interval of a stored
+  share and its stored number of trials.
+- Two NA-14 tables are simple aggregations of stored files, each recomputed by a test: t33, numpy's quantiles of
+  the Sharpe ratios of NA-13's stored placebo books, and t35, each book's gross mean ÷ turnover from NA-13's
+  strategy table.
 - Each caption number is `{{table/key/column}}` from `artifacts/NA-14/tables/keys.json`;
   `tests/test_figures_captions.py` checks it against the table cell, and for a copied NA-12 table against NA-12's
-  CSV. NA-12's tables are copied byte for byte; NA-13's strategy table and the NA-03, NA-06, NA-07 and NA-11 figure
+  CSV. Every number in the LaTeX tables is likewise a cell of `keys.json`, listed per table in `latex.json`.
+  NA-12's tables are copied byte for byte; NA-13's strategy table and the NA-03, NA-06, NA-07 and NA-11 figure
   sources gain only a row key.
 
 ## Expected digests
@@ -80,21 +95,28 @@ The full list (inputs, outputs, figures) is `artifacts/NA-14/digests.json`. The 
 
 | File | sha256 |
 |---|---|
-| `fig1_convergence.csv` | `079d16cc523bcf75f22703fbd18efe8d764f3b3173e4f000f3913f5955467bb4` |
-| `fig2_drift_vs_move.csv` | `348440b1c041d0f5355bb703c556cdf8f81dfb5c0ce22582fb96592311f78fd7` |
-| `fig3_tournament.csv` | `c6788dfe97cba9c440f209620c1d2ccd8e3727bd14bdc431935ca23a57eebd4f` |
-| `fig4_monthly_ic.csv` | `d7eb0c3e66917162f8f1c44e95efc6958110b150cd49d14af9093bad0d7d60c5` |
-| `fig5_shapley.csv` | `1b5cd0b736710082d02f341607fe5dae145a6199826308c0695242b8bb49a827` |
-| `fig6_filters.csv` | `4b52f9bb5cca493ee95b7f59262a3a9b77efada079d70e883814ba38ab0d152c` |
-| `fig7_strategies.csv` | `37bce00569e0ceb3ab69d81305b3b93c3514d37baf3304fc4e871958f4d29022` |
-| `fig8_explain_move.csv` | `9d846917a8cacecbcfb1544fb667b3e0e57265b4bbf6a40dfe9fa37e2712dd57` |
-| `figA1_reliability.csv` | `19622216a30f2b6278083345648ab208a354770a7725cff54eb973bb46ea2e44` |
-| `figA2_encoding.csv` | `6b396f3d8a2e0ec1e6604cb07ccf23d7d782fc885a99b4e4728c7248effbd744` |
-| `figA3_identifiability.csv` | `861801546e67bb414ce59cc6d2d84ca25d2a63accd48667c3f65c5cdc0739682` |
-| `figA4_ablations.csv` | `951400bc7c3f67d66516900f6de96261621dc6ec0d574fa8aad953b1e24f20b3` |
+| `fig1_validation_test.csv` | `3d3fa11d672f538f6ffc900ec1cefee5ba48766f7dcdb33b9e3880faff1bb069` |
+| `fig2_priced_at_open.csv` | `be9a29497719fce6cd167396fcfe77716c5c41c530648bdae051fb88e4cd92aa` |
+| `fig3_convergence.csv` | `c258a042b0e8a856d29f17a253c16ba84642333966b64124ed9bbade3489c4b3` |
+| `fig4_over_under.csv` | `57cfc40e379a83ac114969a20f574ae20403ba5481c14b667055043b2a870e4f` |
+| `fig5_explaining_moves.csv` | `0144af4d4fde9cf6880a52beb7a4f9652d31e640e11427c66d8e2382ff61d695` |
+| `fig6_strategies.csv` | `ebabb993ecb618cb047751e1d1f0dbb8e214f127a558be0d41c6f9490ff23ef9` |
+| `fig7_memorisation.csv` | `fc78bcd4f1b424dce43168744864a0d09be7812f0e1b21735039f83f1754cce0` |
+| `figA10_ablations.csv` | `951400bc7c3f67d66516900f6de96261621dc6ec0d574fa8aad953b1e24f20b3` |
+| `figA11_persistence.csv` | `bb78a31208a735a1c69a952f91371a5076c2a8c98d053a0b7c5e4a39b4074576` |
+| `figA12_strategy_paths.csv` | `601fce88020a4811a4e734942efd08e27b11b27e36818c5307c5a6d3fe45b282` |
+| `figA13_probes.csv` | `4c00fca0ccfe4fbd8db0a7659f3dbc8a37ccf7e6172fe3e0983e4f0b1d76318a` |
+| `figA14_exploratory_d0.csv` | `ab7f013e97bebf90ca1e5454b62e6a0de3f3bf5b58d61d0ca806ff8f13ac62d3` |
+| `figA15_exploratory_ma_cross.csv` | `710ccdd6d83adb734a1a1b32b6137b11453657197de7e306deb4f904d19c53c9` |
+| `figA1_tournament.csv` | `8689cbdabe7fa122f75146fccb25c388d186e2cd1924c8a60151fc59bfb66e68` |
+| `figA2_filters.csv` | `4b52f9bb5cca493ee95b7f59262a3a9b77efada079d70e883814ba38ab0d152c` |
+| `figA3_encoding.csv` | `44deb913fc22da122e458af3daa041213c1b815c2381ec33596284048c37f6ae` |
+| `figA4_reliability.csv` | `19622216a30f2b6278083345648ab208a354770a7725cff54eb973bb46ea2e44` |
 | `figA5_robustness.csv` | `6e6981f45969cc9a505d42d33b585f42ee73952b060d0b64a86cbaf0027e726f` |
-| `figA6_exploratory_d0.csv` | `ab7f013e97bebf90ca1e5454b62e6a0de3f3bf5b58d61d0ca806ff8f13ac62d3` |
-| `figA7_exploratory_ma_cross.csv` | `710ccdd6d83adb734a1a1b32b6137b11453657197de7e306deb4f904d19c53c9` |
+| `figA6_monthly_ic.csv` | `afbf7054df9affe7eed7026a35c278ece0e3aab3e5d907ddee38876f58b91d8e` |
+| `figA7_convergence_detail.csv` | `e34466fb446a83d07e655b06ba9d515f05b5c61c7a7625f48c4601e22659995e` |
+| `figA8_drift_laya_fin.csv` | `9ef5f06a1f3e1f6ddb7b28dd0b8a5eed807d79b58526e6828f99c702cd77655d` |
+| `figA9_shapley.csv` | `e8cec130762f5072e50d100ca5f4100a2a209a2ec2f0e866d47c8bacb5f2fc2d` |
 
 The table CSVs:
 
@@ -120,7 +142,7 @@ The table CSVs:
 | `t1_primary.csv` | `a39e2f671ba9805c9381f28bb2db820fafc8aa83bde9192872f754ff342ae3c2` |
 | `t1b_primary_by_model.csv` | `37cf7a2c0739482d26afc019866a3a57054d25a24ec97554eb7792fcc4c6d676` |
 | `t20_strategies.csv` | `e5e999485685162a0c73a01fa8c2c44d274bc861f881befb5dc6e8eadbedd56a` |
-| `t21_release_dates.csv` | `9b7df0c5f944a650285a3c66a4366d80042dcd8f432ee97f947ecf8e79eed551` |
+| `t21_release_dates.csv` | `94eca271b36b87df12b77e2d6112cc79e3121c7ce406fd2cc97006ad1c2a05d0` |
 | `t22_spend.csv` | `5266f2595b1c54e33428cd93d8d5ad644bea26a8a45f15a96f346dee3765c007` |
 | `t23_company_identification.csv` | `37e72f312689045926f0c8330a79c2ecd61ccc41993ad278fe416ba16866cc8c` |
 | `t24_exploratory_d0_signal.csv` | `7298e8d5ddc641824f7d1ba97282a4449c6d708254a4ab0911485b905a6f82c7` |
@@ -131,6 +153,11 @@ The table CSVs:
 | `t29_encoding.csv` | `e7d8605787cb62b341d2758c7a4daf8435b99bb7eeed0cb3b784dc138f7f1855` |
 | `t2_h2_over_under.csv` | `8bcb2c11f32a8574b4c70dbd21d211c31f5bf4884c731e4c99b6dafe0fe1306a` |
 | `t30_derived.csv` | `37d0df01b47124dc6db9624b982279ad279f4f5dcfd72b191d37f86f6b37477f` |
+| `t31_market_replication.csv` | `47e320d34232bd5932908a377f84b9135d627865c2846cb91bcf5e6d6f730cb5` |
+| `t32_val_b_ic.csv` | `b2ae900683c016a071001e7285abeb2913eeb5d7db5cd4990110b350237c695a` |
+| `t33_placebo_sharpe.csv` | `23f4be70017dead01d6c839cfcdad22fc8d17569105daaf2a3c4d1f9de0dd1a9` |
+| `t34_prereg_deviations.csv` | `91cd943ce64986b0785bb92e638fec88947f5cb779cc1877c3dd7f9fd5e35fdc` |
+| `t35_break_even.csv` | `c58d8dd3a89d9fa84cc7118d8bc4aeefe38ccc2799bf0d0404b1181306922470` |
 | `t3_ic.csv` | `dae94be5f0635c9f7914619bc1bdb4541729ad29d2e6f2555b9a8ec4c544ef41` |
 | `t4_secondary.csv` | `c474f9c40628f2da101a9c92ed41aec9b53012837fed16bc7a15c81f6f5b3067` |
 | `t5_heterogeneity.csv` | `126066b207041c66d4e0b83cee5d8fec1bd6165a705e6578243e60c9562ba178` |
