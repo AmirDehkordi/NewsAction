@@ -1,0 +1,27 @@
+% t22_spend (NA-14, from ledgers/spend.jsonl, ledgers/fmp_requests.jsonl, ledgers/trials.jsonl, ledgers/test_access.jsonl, artifacts/NA-08/REPORT.md, artifacts/NA-11/REPORT.md, configs/project.yaml)
+\begin{table}[tbp]
+\centering\small
+\caption{Spend and requests of the whole project (ledgers; caps from configs/project.yaml)}\label{tab:t22_spend}
+\begin{adjustbox}{max width=\linewidth}
+\begin{tabular}{>{\raggedright\arraybackslash}p{12em}rr>{\raggedright\arraybackslash}p{12em}}
+\toprule
+item & value & cap & source \\
+\midrule
+OpenRouter spend, all chunks (USD) & $15.731$ & $30.000$ & ledgers/spend.jsonl ($\Sigma$ usd of spend lines) \\
+OpenRouter spend, NA-05 (USD) & $0.104$ & --- & ledgers/spend.jsonl \\
+OpenRouter spend, NA-06 (USD) & $3.527$ & --- & ledgers/spend.jsonl \\
+OpenRouter spend, NA-07 (USD) & $1.240$ & --- & ledgers/spend.jsonl \\
+OpenRouter spend, NA-09 (USD) & $0.039$ & --- & ledgers/spend.jsonl \\
+OpenRouter spend, NA-11 (USD) & $10.821$ & --- & ledgers/spend.jsonl \\
+spend lines in the ledger & $310587.000$ & --- & ledgers/spend.jsonl \\
+FMP requests (NA-10) & $15858.000$ & $17000.000$ & ledgers/fmp\_\allowbreak{}requests.jsonl \\
+Kaggle GPU-hours, NA-08 (training) & $23.380$ & --- & artifacts/NA-08/REPORT.md \\
+Kaggle GPU-hours, NA-11 (test inference) & $2.000$ & --- & artifacts/NA-11/REPORT.md \\
+Kaggle GPU-hours, NA-08 + NA-11 & $25.380$ & --- & the sum of the two rows above \\
+rows of the trials ledger (the DSR's N) & $545.000$ & --- & ledgers/trials.jsonl \\
+lines of the test-access ledger & $29.000$ & --- & ledgers/test\_\allowbreak{}access.jsonl \\
+\bottomrule
+\end{tabular}
+\end{adjustbox}
+\par\smallskip{\footnotesize\raggedright NA-12, NA-13 and NA-14 made no API call, Kaggle run or FMP request.\par}
+\end{table}

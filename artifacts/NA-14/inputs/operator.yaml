@@ -1,0 +1,6 @@
+# Facts the operator supplied for NA-14 that no earlier artifact records (NA-14 operator preamble, 2026-10-29).
+# `make paper` reads this file; its sha256 is in artifacts/NA-14/digests.json ("inputs").
+laya_release:
+  date: "2026-09-18"
+  name: "Convai Laya (open weights; the base of Laya-Fin and of Laya zero-shot)"
+  source: "operator, NA-14 preamble item 3"

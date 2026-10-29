@@ -1,0 +1,8 @@
+key,model,n,valid,accuracy,mean_p_true,cost,accuracy_na06_design,baseline_matched,baseline_na06_design,screen_threshold
+cloudflare:clef,cloudflare/clef,400,400,0.66,0.5851948730443387,0.01499955,0.69,0.2825,0.35875,0.4
+inception:mercury-decide,inception/mercury-decide,400,400,0.62,0.5853787299893257,0.00544068,0.6275,0.2825,0.35875,0.4
+liquid:d1-ultra,liquid/d1-ultra,400,400,0.7425,0.655911670087457,0.012280884,0.72,0.2825,0.35875,0.4
+local:laya-typed-decisions,local/laya-typed-decisions,400,400,0.32,0.26468608821523365,0.0,,0.2825,0.35875,0.4
+nace-ai:drex-v2.0,nace-ai/drex-v2.0,400,400,0.68,0.533287101297676,0.01435404,0.6675,0.2825,0.35875,0.4
+openai:gpt-6-luna-decisions,openai/gpt-6-luna-decisions,400,399,0.681704260651629,0.6376691729323308,0.0263694,0.695,0.2825,0.35875,0.4
+respan:span-02,respan/span-02,400,400,0.6625,0.62258825572995,0.00295828,0.66,0.2825,0.35875,0.4

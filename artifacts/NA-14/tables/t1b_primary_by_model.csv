@@ -1,0 +1,31 @@
+key,model,test,role,estimate,ci_low,ci_high,nw_t,p,n_days,n_obs,available,p_holm_within_model,footnote,reason
+laya_fin:H1,laya_fin,H1,primary instrument (laya-s13),0.004636846948,-0.03458968439,0.04136454479,0.2322273461,0.4085591441,138,13748,True,0.8527147285,,
+laya_fin:H1b,laya_fin,H1b,primary instrument (laya-s13),0.01046367235,-0.01437175978,0.03661843996,0.815226065,0.2131786821,138,13748,True,0.8527147285,,
+laya_fin:H2,laya_fin,H2,primary instrument (laya-s13),-0.04399294982,,,,0.6157633166,,,True,0.8527147285,,
+laya_fin:H3,laya_fin,H3,primary instrument (laya-s13),0.003796398977,-0.0007791614534,0.008467705191,1.523768961,0.05379462054,135,17044,True,0.2689731027,,
+laya_fin:H4,laya_fin,H4,primary instrument (laya-s13),0.001221015587,-0.001717066489,0.00419813866,,0.2155784422,140,13732,True,0.8527147285,,
+anchor:H1,anchor,H1,clean anchor (anchor-s13),0.003584278415,-0.02709496924,0.0341788825,0.222158824,0.4063593641,138,13748,True,1,,
+anchor:H1b,anchor,H1b,clean anchor (anchor-s13),0.002029870299,-0.01922603966,0.02238566502,0.1810228294,0.4269573043,138,13748,True,1,,
+anchor:H2,anchor,H2,clean anchor (anchor-s13),0.01502234751,,,,0.2940058194,,,True,1,,
+anchor:H3,anchor,H3,clean anchor (anchor-s13),0.001265387278,0.0001729675746,0.002424427127,2.097750126,0.01669833017,135,17044,True,0.08349165083,,
+anchor:H4,anchor,H4,clean anchor (anchor-s13),-0.0004466397511,-0.001590830138,0.0007400677804,,0.7730226977,140,13732,True,1,,
+laya_zs:H1,laya_zs,H1,Laya zero-shot (PREREG §10.5),0.05396833574,0.02310165797,0.08670811182,3.171452751,0.001299870013,138,13748,True,0.003899610039,,
+laya_zs:H1b,laya_zs,H1b,Laya zero-shot (PREREG §10.5),-0.0173081829,-0.04379534358,0.00860543688,-1.250624667,0.900409959,138,13748,True,1,,
+laya_zs:H2,laya_zs,H2,Laya zero-shot (PREREG §10.5),,,,,,,,False,,,no Call A W2 reading
+laya_zs:H3,laya_zs,H3,Laya zero-shot (PREREG §10.5),,,,,,,,False,,,"no Call A W2 / Call B readings on the fit, λ and test splits"
+laya_zs:H4,laya_zs,H4,Laya zero-shot (PREREG §10.5),-0.001292726801,-0.002328829494,-0.0001603905828,,0.9919008099,140,13732,True,1,,
+d1_ultra:H1,d1_ultra,H1,"best API comparator; screen-failing, model-specific",0.07478971753,0.04049871381,0.1088403908,4.132846713,9.9990001e-05,138,13748,True,0.000499950005,,
+d1_ultra:H1b,d1_ultra,H1b,"best API comparator; screen-failing, model-specific",-0.0007374440949,-0.0206977777,0.01975357065,-0.06834822647,0.5307469253,138,13748,True,1,,
+d1_ultra:H2,d1_ultra,H2,"best API comparator; screen-failing, model-specific",-0.07558706909,,,,0.9913329753,,,True,1,,
+d1_ultra:H3,d1_ultra,H3,"best API comparator; screen-failing, model-specific",0.0006895174661,-0.001747872212,0.003158050536,0.5175665981,0.2851714829,135,17044,True,1,,
+d1_ultra:H4,d1_ultra,H4,"best API comparator; screen-failing, model-specific",0.0004174641235,-0.001878343763,0.002773475676,,0.3543645635,140,13732,True,1,,
+span_02:H1,span_02,H1,"core comparator; screen-failing, model-specific",0.07483771886,0.03891863103,0.1102048016,4.049027235,9.9990001e-05,138,13748,True,0.000199980002,"S5 canary STOP, operator: proceed (PREREG §15, post-freeze NA-11 row)",
+span_02:H1b,span_02,H1b,"core comparator; screen-failing, model-specific",-0.000540094794,-0.02163118744,0.02048688424,-0.04766598872,0.5209479052,138,13748,True,0.5209479052,"S5 canary STOP, operator: proceed (PREREG §15, post-freeze NA-11 row)",
+span_02:H2,span_02,H2,"core comparator; screen-failing, model-specific",,,,,,,,False,,"S5 canary STOP, operator: proceed (PREREG §15, post-freeze NA-11 row)",no Call A W2 reading
+span_02:H3,span_02,H3,"core comparator; screen-failing, model-specific",,,,,,,,False,,"S5 canary STOP, operator: proceed (PREREG §15, post-freeze NA-11 row)","no Call A W2 / Call B readings on the fit, λ and test splits"
+span_02:H4,span_02,H4,"core comparator; screen-failing, model-specific",,,,,,,,False,,"S5 canary STOP, operator: proceed (PREREG §15, post-freeze NA-11 row)",no D0 readings on the fit and λ splits (the ridge protocol needs val-A and val-B)
+drex_v2:H1,drex_v2,H1,"core comparator; screen-failing, model-specific",0.07532789307,0.04359038977,0.1062011113,4.656935864,9.9990001e-05,138,13748,True,0.000199980002,,
+drex_v2:H1b,drex_v2,H1b,"core comparator; screen-failing, model-specific",0.001892313114,-0.01783926421,0.02239009536,0.1758943833,0.4263573643,138,13748,True,0.4263573643,,
+drex_v2:H2,drex_v2,H2,"core comparator; screen-failing, model-specific",,,,,,,,False,,,no Call A W2 reading
+drex_v2:H3,drex_v2,H3,"core comparator; screen-failing, model-specific",,,,,,,,False,,,"no Call A W2 / Call B readings on the fit, λ and test splits"
+drex_v2:H4,drex_v2,H4,"core comparator; screen-failing, model-specific",,,,,,,,False,,,no D0 readings on the fit and λ splits (the ridge protocol needs val-A and val-B)

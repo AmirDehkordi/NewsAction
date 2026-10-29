@@ -1,0 +1,7 @@
+key,name,date,days_after_sample_end,source
+sample_end,end of the test period (configs/splits.yaml),2026-07-31,0.0,configs/splits.yaml
+laya,Convai Laya (open weights; the base of Laya-Fin and of Laya zero-shot),2026-09-18,49.0,"operator, NA-14 preamble item 3"
+drex_v2,nace-ai/drex-v2.0,2026-10-12,73.0,artifacts/NA-05/catalog.json (created)
+d1_ultra,liquid/d1-ultra,2026-10-15,76.0,artifacts/NA-05/catalog.json (created)
+span_02,respan/span-02,2026-10-16,77.0,artifacts/NA-05/catalog.json (created)
+anchor,answerdotai/ModernBERT-large checkpoint (the anchor),2024-12,,answerdotai/ModernBERT-large Dec-2024 checkpoint (PREREG §9.2)

@@ -1,0 +1,5 @@
+key,book,benchmark,n_positions,n_benchmark,shared_share,same_side_share,corr_gross,n_days
+laya_fin:D2:close_t+5,S-CONV|laya_fin|D2|u|close_t+5|all,gap_fade|-|D2|gap|close_t+5|all,6716,6716,0.9221262656343061,0.997900855804941,0.9567317893716812,139
+laya_fin:D1:close_t,S-CONV|laya_fin|D1|u|close_t|all,gap_fade|-|D1|gap|close_t|all,5172,5172,0.8909512761020881,0.998046875,0.9330784673800971,138
+d1_ultra:D2:close_t+5,S-CONV|d1_ultra|D2|u|close_t+5|all,gap_fade|-|D2|gap|close_t+5|all,6716,6716,0.9030673019654556,0.9975267930750206,0.9413893484221948,139
+anchor:D2:close_t+5,S-CONV|anchor|D2|u|close_t+5|all,gap_fade|-|D2|gap|close_t+5|all,6716,6716,0.9597974985110185,1.0,0.9840457495894214,139

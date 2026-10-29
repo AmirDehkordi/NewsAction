@@ -1,0 +1,44 @@
+% t1b_primary_by_model (NA-14, from artifacts/NA-12/tables/t1b_primary_by_model.csv)
+\begin{table*}[tbp]
+\centering\small
+\caption{H1--H4 for every decision model (the API models screen-failing and model-specific)}\label{tab:t1b_primary_by_model}
+\begin{adjustbox}{max width=\textwidth}
+\begin{tabular}{ll>{\raggedright\arraybackslash}p{12em}rrrrrrrlr>{\raggedright\arraybackslash}p{12em}>{\raggedright\arraybackslash}p{12em}}
+\toprule
+model & test & role & estimate & CI low & CI high & NW t & p & n days & n obs & available & p Holm within model & footnote & reason \\
+\midrule
+Laya-Fin & H1 & primary instrument (laya-s13) & $0.005$ & $-0.035$ & $0.041$ & $0.232$ & $0.409$ & $138$ & $13{,}748$ & yes & $0.853$ & --- & --- \\
+Laya-Fin & H1b & primary instrument (laya-s13) & $0.010$ & $-0.014$ & $0.037$ & $0.815$ & $0.213$ & $138$ & $13{,}748$ & yes & $0.853$ & --- & --- \\
+Laya-Fin & H2 & primary instrument (laya-s13) & $-0.044$ & --- & --- & --- & $0.616$ & --- & --- & yes & $0.853$ & --- & --- \\
+Laya-Fin & H3 & primary instrument (laya-s13) & $0.004$ & $-7.79\times 10^{-4}$ & $0.008$ & $1.524$ & $0.054$ & $135$ & $17{,}044$ & yes & $0.269$ & --- & --- \\
+Laya-Fin & H4 & primary instrument (laya-s13) & $0.001$ & $-0.002$ & $0.004$ & --- & $0.216$ & $140$ & $13{,}732$ & yes & $0.853$ & --- & --- \\
+anchor (uninformative) & H1 & clean anchor (anchor-s13) & $0.004$ & $-0.027$ & $0.034$ & $0.222$ & $0.406$ & $138$ & $13{,}748$ & yes & $1.000$ & --- & --- \\
+anchor (uninformative) & H1b & clean anchor (anchor-s13) & $0.002$ & $-0.019$ & $0.022$ & $0.181$ & $0.427$ & $138$ & $13{,}748$ & yes & $1.000$ & --- & --- \\
+anchor (uninformative) & H2 & clean anchor (anchor-s13) & $0.015$ & --- & --- & --- & $0.294$ & --- & --- & yes & $1.000$ & --- & --- \\
+anchor (uninformative) & H3 & clean anchor (anchor-s13) & $0.001$ & $1.73\times 10^{-4}$ & $0.002$ & $2.098$ & $0.017$ & $135$ & $17{,}044$ & yes & $0.083$ & --- & --- \\
+anchor (uninformative) & H4 & clean anchor (anchor-s13) & $-4.47\times 10^{-4}$ & $-0.002$ & $7.40\times 10^{-4}$ & --- & $0.773$ & $140$ & $13{,}732$ & yes & $1.000$ & --- & --- \\
+Laya zero-shot & H1 & Laya zero-shot (PREREG \S{}10.5) & $0.054$ & $0.023$ & $0.087$ & $3.171$ & $0.001$ & $138$ & $13{,}748$ & yes & $0.004$ & --- & --- \\
+Laya zero-shot & H1b & Laya zero-shot (PREREG \S{}10.5) & $-0.017$ & $-0.044$ & $0.009$ & $-1.251$ & $0.900$ & $138$ & $13{,}748$ & yes & $1.000$ & --- & --- \\
+Laya zero-shot & H2 & Laya zero-shot (PREREG \S{}10.5) & --- & --- & --- & --- & --- & --- & --- & no & --- & --- & no Call A W2 reading \\
+Laya zero-shot & H3 & Laya zero-shot (PREREG \S{}10.5) & --- & --- & --- & --- & --- & --- & --- & no & --- & --- & no Call A W2 / Call B readings on the fit, $\lambda$ and test splits \\
+Laya zero-shot & H4 & Laya zero-shot (PREREG \S{}10.5) & $-0.001$ & $-0.002$ & $-1.60\times 10^{-4}$ & --- & $0.992$ & $140$ & $13{,}732$ & yes & $1.000$ & --- & --- \\
+d1-ultra & H1 & best API comparator; screen-failing, model-specific & $0.075$ & $0.040$ & $0.109$ & $4.133$ & $<0.001$ & $138$ & $13{,}748$ & yes & $<0.001$ & --- & --- \\
+d1-ultra & H1b & best API comparator; screen-failing, model-specific & $-7.37\times 10^{-4}$ & $-0.021$ & $0.020$ & $-0.068$ & $0.531$ & $138$ & $13{,}748$ & yes & $1.000$ & --- & --- \\
+d1-ultra & H2 & best API comparator; screen-failing, model-specific & $-0.076$ & --- & --- & --- & $0.991$ & --- & --- & yes & $1.000$ & --- & --- \\
+d1-ultra & H3 & best API comparator; screen-failing, model-specific & $6.90\times 10^{-4}$ & $-0.002$ & $0.003$ & $0.518$ & $0.285$ & $135$ & $17{,}044$ & yes & $1.000$ & --- & --- \\
+d1-ultra & H4 & best API comparator; screen-failing, model-specific & $4.17\times 10^{-4}$ & $-0.002$ & $0.003$ & --- & $0.354$ & $140$ & $13{,}732$ & yes & $1.000$ & --- & --- \\
+span-02\textsuperscript{\ddag} & H1 & core comparator; screen-failing, model-specific & $0.075$ & $0.039$ & $0.110$ & $4.049$ & $<0.001$ & $138$ & $13{,}748$ & yes & $<0.001$ & S5 canary STOP, operator:\allowbreak{} proceed (PREREG \S{}15, post-freeze NA-11 row) & --- \\
+span-02\textsuperscript{\ddag} & H1b & core comparator; screen-failing, model-specific & $-5.40\times 10^{-4}$ & $-0.022$ & $0.020$ & $-0.048$ & $0.521$ & $138$ & $13{,}748$ & yes & $0.521$ & S5 canary STOP, operator:\allowbreak{} proceed (PREREG \S{}15, post-freeze NA-11 row) & --- \\
+span-02\textsuperscript{\ddag} & H2 & core comparator; screen-failing, model-specific & --- & --- & --- & --- & --- & --- & --- & no & --- & S5 canary STOP, operator:\allowbreak{} proceed (PREREG \S{}15, post-freeze NA-11 row) & no Call A W2 reading \\
+span-02\textsuperscript{\ddag} & H3 & core comparator; screen-failing, model-specific & --- & --- & --- & --- & --- & --- & --- & no & --- & S5 canary STOP, operator:\allowbreak{} proceed (PREREG \S{}15, post-freeze NA-11 row) & no Call A W2 / Call B readings on the fit, $\lambda$ and test splits \\
+span-02\textsuperscript{\ddag} & H4 & core comparator; screen-failing, model-specific & --- & --- & --- & --- & --- & --- & --- & no & --- & S5 canary STOP, operator:\allowbreak{} proceed (PREREG \S{}15, post-freeze NA-11 row) & no D0 readings on the fit and $\lambda$ splits (the ridge protocol needs val-A and val-B) \\
+drex-v2.0 & H1 & core comparator; screen-failing, model-specific & $0.075$ & $0.044$ & $0.106$ & $4.657$ & $<0.001$ & $138$ & $13{,}748$ & yes & $<0.001$ & --- & --- \\
+drex-v2.0 & H1b & core comparator; screen-failing, model-specific & $0.002$ & $-0.018$ & $0.022$ & $0.176$ & $0.426$ & $138$ & $13{,}748$ & yes & $0.426$ & --- & --- \\
+drex-v2.0 & H2 & core comparator; screen-failing, model-specific & --- & --- & --- & --- & --- & --- & --- & no & --- & --- & no Call A W2 reading \\
+drex-v2.0 & H3 & core comparator; screen-failing, model-specific & --- & --- & --- & --- & --- & --- & --- & no & --- & --- & no Call A W2 / Call B readings on the fit, $\lambda$ and test splits \\
+drex-v2.0 & H4 & core comparator; screen-failing, model-specific & --- & --- & --- & --- & --- & --- & --- & no & --- & --- & no D0 readings on the fit and $\lambda$ splits (the ridge protocol needs val-A and val-B) \\
+\bottomrule
+\end{tabular}
+\end{adjustbox}
+\par\smallskip{\footnotesize\raggedright Holm within each model is descriptive; only Laya-Fin's Holm enters the headline rule. The anchor's readings are uninformative (near-constant outputs: NA-11 REPORT \S{}7.1 item 4); its rows are reported, not read as nulls. \textsuperscript{\ddag} span-02: the S5 canary fired a STOP after the freeze; the operator chose to proceed (PREREG \S{}15, the post-freeze NA-11 S5 row).\par}
+\end{table*}

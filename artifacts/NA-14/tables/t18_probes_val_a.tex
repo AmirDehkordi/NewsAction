@@ -1,0 +1,23 @@
+% t18_probes_val_a (NA-14, from artifacts/NA-12/tables/t18_probes_val_a.csv)
+\begin{table*}[tbp]
+\centering\small
+\caption{Disclosed val-A probes (NA-11; not hypotheses), next to the model comparison}\label{tab:t18_probes_val_a}
+\begin{adjustbox}{max width=\textwidth}
+\begin{tabular}{lrrrrrrrrrrrrrrrrrrrrrrrrrl>{\raggedright\arraybackslash}p{12em}llll}
+\toprule
+model & flip rate & flip pairs & flip screen & edit mean shift & flip rate all pairs & flip pairs valid & right way & edit shift t & \^{N} sd val-A & shift sd & IC masked & IC masked t & IC unmasked & IC unmasked t & unmasked minus masked & unmasked minus masked t & masked screen & IC shuffled & IC shuffled t & shuffled screen t & IC real same events & IC real same events t & real minus shuffled & real minus shuffled t & real shuffled events & kind & screen company identification & screen counterfactual flip & screen masked vs unmasked & screen shuffled news & screen all \\
+\midrule
+inception/mercury-decide & $0.562$ & $169$ & $0.700$ & $1.144$ & $0.550$ & $200$ & $0.995$ & $18.964$ & $0.819$ & $1.397$ & $0.061$ & $2.069$ & $0.045$ & $1.459$ & $-0.016$ & $-1.012$ & $0.020$ & $-0.044$ & $-1.284$ & $2$ & $0.061$ & $2.069$ & $0.106$ & $2.805$ & $1{,}000$ & api (NA-06 stage 2) & no & no & yes & yes & no \\
+respan/span-02\textsuperscript{\ddag} & $0.645$ & $169$ & $0.700$ & $1.364$ & $0.650$ & $200$ & $0.990$ & $20.801$ & $0.847$ & $1.610$ & $0.054$ & $1.214$ & $0.039$ & $1.121$ & $-0.015$ & $-0.800$ & $0.020$ & $-0.002$ & $-0.062$ & $2$ & $0.054$ & $1.214$ & $0.056$ & $0.984$ & $1{,}000$ & api (NA-06 stage 2) & no & no & yes & yes & no \\
+liquid/d1-ultra & $0.678$ & $177$ & $0.700$ & $1.093$ & $0.680$ & $200$ & $0.985$ & $21.552$ & $0.599$ & $1.826$ & $0.072$ & $1.689$ & $0.063$ & $1.532$ & $-0.009$ & $-0.426$ & $0.020$ & $0.021$ & $0.604$ & $2$ & $0.072$ & $1.689$ & $0.051$ & $1.033$ & $1{,}000$ & api (NA-06 stage 2) & no & no & yes & yes & no \\
+cloudflare/clef & $0.529$ & $155$ & $0.700$ & $0.803$ & $0.500$ & $200$ & $0.980$ & $19.729$ & $0.650$ & $1.236$ & $0.025$ & $0.711$ & $0.010$ & $0.257$ & $-0.015$ & $-1.071$ & $0.020$ & $-0.022$ & $-0.697$ & $2$ & $0.025$ & $0.711$ & $0.047$ & $1.092$ & $1{,}000$ & api (NA-06 stage 2) & no & no & yes & yes & no \\
+openai/gpt-6-luna-decisions & $0.568$ & $148$ & $0.700$ & $0.918$ & $0.610$ & $200$ & $0.950$ & $17.569$ & $0.625$ & $1.468$ & $0.076$ & $2.291$ & $0.051$ & $1.721$ & $-0.025$ & $-0.980$ & $0.020$ & $0.021$ & $0.819$ & $2$ & $0.076$ & $2.305$ & $0.056$ & $1.457$ & $997$ & api (NA-06 stage 2) & no & no & yes & yes & no \\
+nace-ai/drex-v2.0 & $0.710$ & $162$ & $0.700$ & $1.022$ & $0.650$ & $200$ & $0.985$ & $22.186$ & $0.641$ & $1.593$ & $0.065$ & $1.451$ & $0.074$ & $1.891$ & $0.008$ & $0.477$ & $0.020$ & $-2.79\times 10^{-4}$ & $-0.009$ & $2$ & $0.065$ & $1.451$ & $0.066$ & $1.162$ & $1{,}000$ & api (NA-06 stage 2) & no & yes & yes & yes & no \\
+local/laya-typed-decisions & $0.043$ & $92$ & $0.700$ & $0.134$ & $0.125$ & $200$ & $0.940$ & $11.226$ & $0.325$ & $0.413$ & $0.051$ & $1.522$ & $0.038$ & $1.112$ & $-0.013$ & $-0.506$ & $0.020$ & $0.002$ & $0.054$ & $2$ & $0.051$ & $1.522$ & $0.048$ & $1.285$ & $1{,}000$ & local zero-shot & --- & --- & --- & --- & --- \\
+Laya-Fin & $0.000$ & $8$ & $0.700$ & $0.021$ & $0.125$ & $200$ & $0.800$ & $7.349$ & $0.105$ & $0.202$ & --- & --- & --- & --- & --- & --- & --- & $0.031$ & $0.896$ & $2$ & $0.050$ & $1.597$ & $0.019$ & $0.465$ & $1{,}000$ & trained (S7) & --- & --- & --- & --- & --- \\
+anchor (uninformative) & --- & $0$ & $0.700$ & $1.17\times 10^{-6}$ & $0.000$ & $200$ & $0.435$ & $0.185$ & $0.006$ & $1.90\times 10^{-4}$ & --- & --- & --- & --- & --- & --- & --- & $0.043$ & $1.045$ & $2$ & $0.055$ & $1.444$ & $0.011$ & $0.939$ & $1{,}000$ & trained (S7) & --- & --- & --- & --- & --- \\
+\bottomrule
+\end{tabular}
+\end{adjustbox}
+\par\smallskip{\footnotesize\raggedright The anchor's readings are uninformative (near-constant outputs: NA-11 REPORT \S{}7.1 item 4); its rows are reported, not read as nulls. \textsuperscript{\ddag} span-02: the S5 canary fired a STOP after the freeze; the operator chose to proceed (PREREG \S{}15, the post-freeze NA-11 S5 row).\par}
+\end{table*}

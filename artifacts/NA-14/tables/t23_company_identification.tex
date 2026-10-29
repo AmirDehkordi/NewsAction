@@ -1,0 +1,21 @@
+% t23_company_identification (NA-14, from artifacts/NA-11/company_id_matched.csv)
+\begin{table*}[tbp]
+\centering\small
+\caption{Company identification with activity-matched distractors (NA-11; val-A, masked states)}\label{tab:t23_company_identification}
+\begin{adjustbox}{max width=\textwidth}
+\begin{tabular}{lrrrrrrrrr}
+\toprule
+model & n & valid & accuracy & mean p true & cost & accuracy na06 design & baseline matched & baseline na06 design & screen threshold \\
+\midrule
+cloudflare/clef & $400$ & $400$ & $0.660$ & $0.585$ & $0.015$ & $0.690$ & $0.282$ & $0.359$ & $0.400$ \\
+inception/mercury-decide & $400$ & $400$ & $0.620$ & $0.585$ & $0.005$ & $0.627$ & $0.282$ & $0.359$ & $0.400$ \\
+liquid/d1-ultra & $400$ & $400$ & $0.743$ & $0.656$ & $0.012$ & $0.720$ & $0.282$ & $0.359$ & $0.400$ \\
+local/laya-typed-decisions & $400$ & $400$ & $0.320$ & $0.265$ & $0.000$ & --- & $0.282$ & $0.359$ & $0.400$ \\
+nace-ai/drex-v2.0 & $400$ & $400$ & $0.680$ & $0.533$ & $0.014$ & $0.667$ & $0.282$ & $0.359$ & $0.400$ \\
+openai/gpt-6-luna-decisions & $400$ & $399$ & $0.682$ & $0.638$ & $0.026$ & $0.695$ & $0.282$ & $0.359$ & $0.400$ \\
+respan/span-02\textsuperscript{\ddag} & $400$ & $400$ & $0.662$ & $0.623$ & $0.003$ & $0.660$ & $0.282$ & $0.359$ & $0.400$ \\
+\bottomrule
+\end{tabular}
+\end{adjustbox}
+\par\smallskip{\footnotesize\raggedright \textsuperscript{\ddag} span-02: the S5 canary fired a STOP after the freeze; the operator chose to proceed (PREREG \S{}15, the post-freeze NA-11 S5 row).\par}
+\end{table*}

@@ -1,0 +1,35 @@
+% t27_tournament (NA-14, from artifacts/NA-06/fig3_data.csv)
+\begin{table*}[tbp]
+\centering\small
+\caption{NA-06 zero-shot tournament (val-A stage-1 sample): daily IC, cost per 1,000 decisions, MCS membership, \S{}8.3 screens}\label{tab:t27_tournament}
+\begin{adjustbox}{max width=\textwidth}
+\begin{tabular}{>{\raggedright\arraybackslash}p{12em}lrrrrlll}
+\toprule
+model & kind & cost per 1000 decisions & IC & CI low & CI high & MCS member & stage2 & screen \\
+\midrule
+inception/mercury-decide & api & $0.023$ & $0.099$ & $0.010$ & $0.189$ & yes & yes & fail \\
+respan/span-02\textsuperscript{\ddag} & api & $0.031$ & $0.091$ & $-0.012$ & $0.193$ & yes & yes & fail \\
+liquid/d1-ultra & api & $0.042$ & $0.085$ & $-0.016$ & $0.186$ & yes & yes & fail \\
+cloudflare/clef & api & $0.068$ & $0.082$ & $-0.001$ & $0.164$ & yes & yes & fail \\
+openai/gpt-6-luna-decisions & api & $0.114$ & $0.081$ & $-0.016$ & $0.179$ & yes & yes & fail \\
+nace-ai/drex-v2.0 & api & $0.049$ & $0.080$ & $-0.024$ & $0.183$ & yes & yes & fail \\
+perplexity/pplx-decider-v1.2 & api & $0.019$ & $0.070$ & $-0.020$ & $0.161$ & yes & no & not\_tested \\
+cloudflare/clef-omni & api & $0.180$ & $0.062$ & $-0.010$ & $0.135$ & yes & no & not\_tested \\
+microsoft/microsoft-decision-1 & api & $0.034$ & $0.062$ & $-0.015$ & $0.138$ & yes & no & not\_tested \\
+cloudflare/clef-flash & api & $0.026$ & $0.059$ & $-0.028$ & $0.147$ & yes & no & not\_tested \\
+nace-ai/drex-max & api & $0.068$ & $0.057$ & $-0.015$ & $0.130$ & yes & no & not\_tested \\
+perplexity/pplx-decider-flash-v1.2 & api & $0.029$ & $0.057$ & $-0.024$ & $0.138$ & yes & no & not\_tested \\
+liquid/d1 & api & $0.020$ & $0.054$ & $-0.037$ & $0.145$ & yes & no & not\_tested \\
+typesafe/jev-1.14 & api & $0.057$ & $0.050$ & $-0.026$ & $0.126$ & yes & no & not\_tested \\
+typesafe/jev-1.13 & api & $0.057$ & $0.043$ & $-0.035$ & $0.121$ & yes & no & not\_tested \\
+local/laya-base & local & $0.000$ & $0.042$ & $-0.018$ & $0.101$ & yes & no & not\_tested \\
+local/laya-typed-decisions & local & $0.000$ & $0.037$ & $-0.047$ & $0.121$ & yes & no & not\_tested \\
+togethercomputer/tev1-4b-experimental & api & $0.116$ & $0.034$ & $-0.069$ & $0.137$ & yes & no & not\_tested \\
+jaredpalmer/kev-4b & api & $0.034$ & $0.034$ & $-0.065$ & $0.133$ & yes & no & not\_tested \\
+nace-ai/drex-v1.5 & api & $0.033$ & $0.021$ & $-0.085$ & $0.127$ & yes & no & not\_tested \\
+scaledown/classify-1 & api & $0.138$ & $0.014$ & $-0.049$ & $0.076$ & yes & no & not\_tested \\
+\bottomrule
+\end{tabular}
+\end{adjustbox}
+\par\smallskip{\footnotesize\raggedright \textsuperscript{\ddag} span-02: the S5 canary fired a STOP after the freeze; the operator chose to proceed (PREREG \S{}15, the post-freeze NA-11 S5 row).\par}
+\end{table*}
