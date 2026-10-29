@@ -1,6 +1,6 @@
 # Research plan: Paper 2, the companion to "The Market Reads the News First"
 
-*Written 2026-10-29, after NA-12 to NA-14 (the 2026 test is unblinded and analysed). Status: plan only; nothing is run yet.*
+*Written 2026-10-29, after NA-12 to NA-14; updated after NA-13b's merge (F6–F7 added). Status: plan only; no forward data yet.*
 *Repository: `/Users/amir/Research/NewsAction`. Paper 1 is written in NA-16 (prompt in the session notes).*
 
 ---
@@ -46,8 +46,9 @@ finance-ML researchers. arXiv: cs.LG or cs.AI primary, with q-fin.ST and cs.CL.
 | Validation-to-test decay | Laya-Fin IC 0.055 (val-A) → 0.065 (val-B, t 3.6) → 0.020 (test, t 1.7); API models about halved | NA-12 |
 | Memorisation signal | API models identify masked firms 62–74% vs a 28% matched baseline; Laya zero-shot 32% | NA-11 |
 | Overconfidence | API models' ECE 0.21–0.36 (stated 70% calls right ~35%); Laya-Fin ECE 0.06 | NA-12/14 (appendix reliability) |
-| Selective prediction (exploratory) | Signal concentrated in the top 10% of conviction: d1-ultra signed z_cc 0.80 / 0.75 / 0.59 (val-A / val-B / test), the bottom 50% ≈ 0 | operator's assistant, NA-13b |
-| Over-updating (exploratory) | Revisions after the first 30-minute bar have IC ≤ 0 on val-B and test (−0.027 / −0.036 Laya-Fin; −0.043 / −0.011 d1-ultra) | operator's assistant, NA-13b |
+| Selective prediction (exploratory) | Signal concentrated in the top 10% of conviction, mostly in the overnight gap: d1-ultra signed z_on 1.52 / 1.16 / 0.93 (val-A / val-B / test) against 0.22 / 0.26 / 0.21 for all events; after the open (z_id) no test interval excludes zero | NA-13b (verified) |
+| Over-updating (exploratory) | Revisions after the first 30-minute bar have IC ≤ 0 on val-B and test (−0.027 / −0.036 Laya-Fin; −0.043 / −0.011 d1-ultra) | NA-13b (verified) |
+| Validation selection collapses (exploratory) | 8 of 75 (model, condition) pairs passed a strict two-period validation rule (pooled t 2.3–3.5; val-B gross Sharpe up to 6.8); on test 5 reversed, every BH q ≥ 0.79, every book net-negative at 10 bp | NA-13b (verified) |
 | Gating helps gross, not net | The confidence gate lifts gross Sharpe (Laya-Fin 0.35 → 1.18; d1-ultra 0.10 → 1.15); still negative net at 10 bp | NA-13 |
 | Silent model updates | The canary STOP on span-02 (judged noise); the rule's design flaw is documented | NA-11 |
 | Cost vs accuracy | 19 commercial decision models in the tournament; cheap models as good as expensive ones (val-A) | NA-06 / NA-14 A1 |
@@ -57,8 +58,9 @@ finance-ML researchers. arXiv: cs.LG or cs.AI primary, with q-fin.ST and cs.CL.
 
 ## 4. Hypotheses to pre-register BEFORE any forward data is exported
 
-> **Critical:** write these into `docs/PREREG.md` §15 as one operator row **before** the news after 2026-10-21 is
-> exported to `Data/`. Otherwise the forward test is not clean. (Proposed to be added at the NA-14 merge.)
+> **Done:** F1–F5 are in `docs/PREREG.md` §15 (operator row, c3351ed, at the NA-14 merge), and F6–F7 in a second
+> operator row (6719c59, at the NA-13b merge), both before any news after 2026-10-21 was exported. The §15 rows, not
+> this summary, are the binding text.
 
 **F1, memorisation via the forward drop (primary).** For each commercial model *m*, compare the daily IC of N̂ with
 z_cc on the forward window against the 2026 test, net of the same change for the clean baselines (price-only, bge-ridge):
@@ -87,6 +89,14 @@ The threshold is fixed now from val-A. It must not be changed.
 
 **F5, over-updating.** The IC of the revision z(N̂_D1) − z(N̂_D0) with y1 is ≤ 0 (one-sided test of > 0 rejected,
 or a two-sided estimate reported).
+
+**F6, overconfidence (from NA-13b).** Each production API model's ECE (§11.2, top-label, 15 bins, against e5) exceeds
+Laya-Fin's on forward D0 events. One-sided; Holm across d1-ultra, span-02 and drex-v2.0.
+
+**F7, conviction concentration (from NA-13b).** The mean signed overnight move sign(N̂)·z_on of events at or above the
+model's val-A 90th percentile of |N̂| (F3's thresholds: Laya-Fin 0.1326, d1-ultra 1.0791, span-02 1.4415, drex-v2.0
+1.1534) exceeds the mean over all events. One-sided; Holm across the four models; z_cc and z_id reported
+descriptively.
 
 **Decision rules:**
 - Report every hypothesis, including nulls.
@@ -137,7 +147,7 @@ text.
 
 | Chunk | What | When |
 |---|---|---|
-| (now) §15 row | Pre-register F1–F5, the window rule, the 90th-percentile threshold and the power statement | At the NA-14 merge, before any forward export |
+| §15 rows (done) | F1–F5 (c3351ed) and F6–F7 (6719c59), the window rule and the 90th-percentile thresholds | Done before any forward export; NA-15 states the power before reading any forward target |
 | NA-15 | The frozen forward test (PRD prompt) plus F1–F5 | After the forward export (≈ late Feb 2027) |
 | NA-17 | Paper-2 analyses: the all-model probe (val-A anytime; forward after NA-15); forward-versus-test comparisons; calibration, selective prediction and over-updating across all models; package the tool | After NA-15 |
 | NA-18 | Write paper 2 (same rules as NA-16: traceable numbers, verified references, ASCII and pdflatex-safe source, nothing hidden) | After NA-17 |
