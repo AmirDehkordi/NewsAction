@@ -13,7 +13,7 @@ mercury-decide & 0.56 & 0.99 & 1.40 & 0.061 & 0.045 & 0.061 & -0.044 \\
 span-02$^{\ddagger}$ & 0.64 & 0.99 & 1.61 & 0.054 & 0.039 & 0.054 & -0.002 \\
 d1-ultra & 0.68 & 0.98 & 1.83 & 0.072 & 0.063 & 0.072 & 0.021 \\
 clef & 0.53 & 0.98 & 1.24 & 0.025 & 0.010 & 0.025 & -0.022 \\
-gpt-6-luna-decisions & 0.57 & 0.95 & 1.47 & 0.076 & 0.051 & 0.076 & 0.021 \\
+gpt-6-luna & 0.57 & 0.95 & 1.47 & 0.076 & 0.051 & 0.076 & 0.021 \\
 drex-v2.0 & 0.71 & 0.98 & 1.59 & 0.065 & 0.074 & 0.065 & -0.000 \\
 Laya zero-shot & 0.04 & 0.94 & 0.41 & 0.051 & 0.038 & 0.051 & 0.002 \\
 Laya-Fin & 0.00 & 0.80 & 0.20 & {---} & {---} & 0.050 & 0.031 \\
@@ -21,6 +21,7 @@ anchor & {---} & 0.43 & 0.00 & {---} & {---} & 0.055 & 0.043 \\
 \bottomrule
 \end{tabular}
 \begin{tablenotes}[flushleft]\footnotesize
+\item ---: the probe was not run for that model.
 \item Exploratory: the probes' descriptive columns (NA-11), not hypotheses.
 \item The anchor's readings are uninformative (near-constant outputs after one epoch); its rows are reported, not read as nulls.
 \item $^{\ddagger}$span-02: the S5 canary fired a STOP after the freeze; the operator chose to proceed (PREREG \S15, post-freeze NA-11 row).

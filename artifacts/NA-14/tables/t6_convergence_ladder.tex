@@ -1,7 +1,7 @@
 % t6_convergence_ladder: tab:a-convergence-ladder (NA-14 figures.latex, from artifacts/NA-14/tables/t6_convergence_ladder.csv)
 \begingroup
 \footnotesize
-\begin{longtable}{@{}lS[table-format=-1.3]S[table-format=2.3, table-space-text-pre=(, table-space-text-post=)]S[table-format=<1.3]S[table-format=<1.3]S[table-format=5.0]@{}}
+\begin{longtable}{@{}lS[table-format=-1.3]S[table-format=2.3, table-space-text-pre=(, table-space-text-post=)]S[table-format=1.3, table-space-text-pre={$<$}]S[table-format=1.3, table-space-text-pre={$<$}]S[table-format=5.0]@{}}
 \caption{The convergence ladder $\kappa_h$ in every variant.}\label{tab:a-convergence-ladder} \\
 \toprule
 Model, variant, rung & {$\kappa_h$} & {SE} & {$p$} & {$p$ DK} & {Events} \\
@@ -17,34 +17,34 @@ Model, variant, rung & {$\kappa_h$} & {SE} & {$p$} & {$p$ DK} & {Events} \\
 \endfoot
 \bottomrule
 \endlastfoot
-Laya-Fin, ladder, $O_t$ & 0.241 & {(}0.070{)} & <0.001 & <0.001 & 13439 \\
-Laya-Fin, ladder, 10:00 & 0.273 & {(}0.080{)} & <0.001 & <0.001 & 13287 \\
-Laya-Fin, ladder, $C_t$ & 0.359 & {(}0.090{)} & <0.001 & <0.001 & 13748 \\
-Laya-Fin, ladder, $t{+}1$ & 0.362 & {(}0.097{)} & <0.001 & <0.001 & 13615 \\
-Laya-Fin, ladder, $t{+}2$ & 0.376 & {(}0.112{)} & <0.001 & <0.001 & 13439 \\
+Laya-Fin, ladder, $O_t$ & 0.241 & {(}0.070{)} & {$<$}0.001 & {$<$}0.001 & 13439 \\
+Laya-Fin, ladder, 10:00 & 0.273 & {(}0.080{)} & {$<$}0.001 & {$<$}0.001 & 13287 \\
+Laya-Fin, ladder, $C_t$ & 0.359 & {(}0.090{)} & {$<$}0.001 & {$<$}0.001 & 13748 \\
+Laya-Fin, ladder, $t{+}1$ & 0.362 & {(}0.097{)} & {$<$}0.001 & {$<$}0.001 & 13615 \\
+Laya-Fin, ladder, $t{+}2$ & 0.376 & {(}0.112{)} & {$<$}0.001 & {$<$}0.001 & 13439 \\
 Laya-Fin, ladder, $t{+}5$ & 0.263 & {(}0.137{)} & 0.029 & 0.026 & 12850 \\
 Laya-Fin, ladder, $t{+}10$ & 0.208 & {(}0.177{)} & 0.121 & 0.124 & 11993 \\
 Laya-Fin, ladder, $t{+}20$ & 0.259 & {(}0.230{)} & 0.131 & 0.136 & 11201 \\
-Laya-Fin, ladder, O t $\to$ C t+20 & 0.018 & {---} & 0.467 & {---} & {---} \\
-Laya-Fin, ladder clean, $O_t$ & 0.241 & {(}0.070{)} & <0.001 & <0.001 & 13439 \\
-Laya-Fin, ladder clean, 10:00 & 0.273 & {(}0.080{)} & <0.001 & <0.001 & 13287 \\
-Laya-Fin, ladder clean, $C_t$ & 0.359 & {(}0.090{)} & <0.001 & <0.001 & 13748 \\
-Laya-Fin, ladder clean, $t{+}1$ & 0.325 & {(}0.166{)} & 0.026 & 0.024 & 7705 \\
-Laya-Fin, ladder clean, $t{+}2$ & 0.538 & {(}0.279{)} & 0.028 & 0.033 & 5130 \\
-Laya-Fin, ladder clean, $t{+}5$ & 0.114 & {(}0.346{)} & 0.371 & 0.383 & 2091 \\
-Laya-Fin, ladder clean, $t{+}10$ & 0.338 & {(}1.005{)} & 0.369 & 0.358 & 853 \\
-Laya-Fin, ladder clean, $t{+}20$ & -0.715 & {(}4.653{)} & 0.561 & 0.555 & 205 \\
-Laya-Fin, ladder clean, O t $\to$ C t+20 & -0.955 & {---} & 0.550 & {---} & {---} \\
-Laya-Fin, ladder h10, $O_t$ & 0.241 & {(}0.070{)} & <0.001 & <0.001 & 13439 \\
-Laya-Fin, ladder h10, 10:00 & 0.273 & {(}0.080{)} & <0.001 & <0.001 & 13287 \\
-Laya-Fin, ladder h10, $C_t$ & 0.359 & {(}0.090{)} & <0.001 & <0.001 & 13748 \\
-Laya-Fin, ladder h10, $t{+}1$ & 0.362 & {(}0.097{)} & <0.001 & <0.001 & 13615 \\
-Laya-Fin, ladder h10, $t{+}2$ & 0.376 & {(}0.112{)} & <0.001 & <0.001 & 13439 \\
-Laya-Fin, ladder h10, $t{+}5$ & 0.263 & {(}0.137{)} & 0.029 & 0.026 & 12850 \\
-Laya-Fin, ladder h10, $t{+}10$ & 0.208 & {(}0.177{)} & 0.121 & 0.124 & 11993 \\
-Laya-Fin, ladder h10, $t{+}20$ & 0.259 & {(}0.230{)} & 0.131 & 0.136 & 11201 \\
-Laya-Fin, ladder h10, O t $\to$ C t+10 & -0.033 & {---} & 0.581 & {---} & {---} \\
-Laya-Fin, ladder plateau, plateau, $t{+}16$ to $t{+}20$ & 0.273 & {(}0.218{)} & 0.106 & 0.112 & 11201 \\
+Laya-Fin, ladder, $O_t$ to $t{+}20$ & 0.018 & {---} & 0.467 & {---} & {---} \\
+Laya-Fin, ladder, clean windows, $O_t$ & 0.241 & {(}0.070{)} & {$<$}0.001 & {$<$}0.001 & 13439 \\
+Laya-Fin, ladder, clean windows, 10:00 & 0.273 & {(}0.080{)} & {$<$}0.001 & {$<$}0.001 & 13287 \\
+Laya-Fin, ladder, clean windows, $C_t$ & 0.359 & {(}0.090{)} & {$<$}0.001 & {$<$}0.001 & 13748 \\
+Laya-Fin, ladder, clean windows, $t{+}1$ & 0.325 & {(}0.166{)} & 0.026 & 0.024 & 7705 \\
+Laya-Fin, ladder, clean windows, $t{+}2$ & 0.538 & {(}0.279{)} & 0.028 & 0.033 & 5130 \\
+Laya-Fin, ladder, clean windows, $t{+}5$ & 0.114 & {(}0.346{)} & 0.371 & 0.383 & 2091 \\
+Laya-Fin, ladder, clean windows, $t{+}10$ & 0.338 & {(}1.005{)} & 0.369 & 0.358 & 853 \\
+Laya-Fin, ladder, clean windows, $t{+}20$ & -0.715 & {(}4.653{)} & 0.561 & 0.555 & 205 \\
+Laya-Fin, ladder, clean windows, $O_t$ to $t{+}20$ & -0.955 & {---} & 0.550 & {---} & {---} \\
+Laya-Fin, ladder, $h^{*} = t{+}10$, $O_t$ & 0.241 & {(}0.070{)} & {$<$}0.001 & {$<$}0.001 & 13439 \\
+Laya-Fin, ladder, $h^{*} = t{+}10$, 10:00 & 0.273 & {(}0.080{)} & {$<$}0.001 & {$<$}0.001 & 13287 \\
+Laya-Fin, ladder, $h^{*} = t{+}10$, $C_t$ & 0.359 & {(}0.090{)} & {$<$}0.001 & {$<$}0.001 & 13748 \\
+Laya-Fin, ladder, $h^{*} = t{+}10$, $t{+}1$ & 0.362 & {(}0.097{)} & {$<$}0.001 & {$<$}0.001 & 13615 \\
+Laya-Fin, ladder, $h^{*} = t{+}10$, $t{+}2$ & 0.376 & {(}0.112{)} & {$<$}0.001 & {$<$}0.001 & 13439 \\
+Laya-Fin, ladder, $h^{*} = t{+}10$, $t{+}5$ & 0.263 & {(}0.137{)} & 0.029 & 0.026 & 12850 \\
+Laya-Fin, ladder, $h^{*} = t{+}10$, $t{+}10$ & 0.208 & {(}0.177{)} & 0.121 & 0.124 & 11993 \\
+Laya-Fin, ladder, $h^{*} = t{+}10$, $t{+}20$ & 0.259 & {(}0.230{)} & 0.131 & 0.136 & 11201 \\
+Laya-Fin, ladder, $h^{*} = t{+}10$, $O_t$ to $t{+}10$ & -0.033 & {---} & 0.581 & {---} & {---} \\
+Laya-Fin, ladder, plateau, $t{+}16$ to $t{+}20$ & 0.273 & {(}0.218{)} & 0.106 & 0.112 & 11201 \\
 anchor, ladder, $O_t$ & 0.083 & {(}0.075{)} & 0.136 & 0.150 & 13439 \\
 anchor, ladder, 10:00 & -0.022 & {(}0.077{)} & 0.612 & 0.608 & 13287 \\
 anchor, ladder, $C_t$ & -0.042 & {(}0.074{)} & 0.712 & 0.699 & 13748 \\
@@ -53,58 +53,59 @@ anchor, ladder, $t{+}2$ & -0.029 & {(}0.092{)} & 0.625 & 0.636 & 13439 \\
 anchor, ladder, $t{+}5$ & -0.056 & {(}0.103{)} & 0.707 & 0.699 & 12850 \\
 anchor, ladder, $t{+}10$ & -0.030 & {(}0.114{)} & 0.604 & 0.602 & 11993 \\
 anchor, ladder, $t{+}20$ & 0.080 & {(}0.157{)} & 0.307 & 0.340 & 11201 \\
-anchor, ladder, O t $\to$ C t+20 & -0.003 & {---} & 0.514 & {---} & {---} \\
-anchor, ladder clean, $O_t$ & 0.083 & {(}0.075{)} & 0.136 & 0.150 & 13439 \\
-anchor, ladder clean, 10:00 & -0.022 & {(}0.077{)} & 0.612 & 0.608 & 13287 \\
-anchor, ladder clean, $C_t$ & -0.042 & {(}0.074{)} & 0.712 & 0.699 & 13748 \\
-anchor, ladder clean, $t{+}1$ & 0.316 & {(}0.179{)} & 0.039 & 0.033 & 7705 \\
-anchor, ladder clean, $t{+}2$ & 0.806 & {(}0.167{)} & <0.001 & <0.001 & 5130 \\
-anchor, ladder clean, $t{+}5$ & 0.567 & {(}0.298{)} & 0.030 & 0.021 & 2091 \\
-anchor, ladder clean, $t{+}10$ & 0.234 & {(}1.573{)} & 0.441 & 0.432 & 853 \\
-anchor, ladder clean, $t{+}20$ & 7.068 & {(}13.111{)} & 0.296 & 0.308 & 205 \\
-anchor, ladder clean, O t $\to$ C t+20 & 6.985 & {---} & 0.212 & {---} & {---} \\
-anchor, ladder h10, $O_t$ & 0.083 & {(}0.075{)} & 0.136 & 0.150 & 13439 \\
-anchor, ladder h10, 10:00 & -0.022 & {(}0.077{)} & 0.612 & 0.608 & 13287 \\
-anchor, ladder h10, $C_t$ & -0.042 & {(}0.074{)} & 0.712 & 0.699 & 13748 \\
-anchor, ladder h10, $t{+}1$ & -0.039 & {(}0.086{)} & 0.673 & 0.668 & 13615 \\
-anchor, ladder h10, $t{+}2$ & -0.029 & {(}0.092{)} & 0.625 & 0.636 & 13439 \\
-anchor, ladder h10, $t{+}5$ & -0.056 & {(}0.103{)} & 0.707 & 0.699 & 12850 \\
-anchor, ladder h10, $t{+}10$ & -0.030 & {(}0.114{)} & 0.604 & 0.602 & 11993 \\
-anchor, ladder h10, $t{+}20$ & 0.080 & {(}0.157{)} & 0.307 & 0.340 & 11201 \\
-anchor, ladder h10, O t $\to$ C t+10 & -0.113 & {---} & 0.838 & {---} & {---} \\
-anchor, ladder plateau, plateau, $t{+}16$ to $t{+}20$ & 0.077 & {(}0.149{)} & 0.302 & 0.326 & 11201 \\
-d1-ultra, ladder, $O_t$ & 0.545 & {(}0.079{)} & <0.001 & <0.001 & 13439 \\
-d1-ultra, ladder, 10:00 & 0.610 & {(}0.086{)} & <0.001 & <0.001 & 13287 \\
-d1-ultra, ladder, $C_t$ & 0.586 & {(}0.077{)} & <0.001 & <0.001 & 13748 \\
-d1-ultra, ladder, $t{+}1$ & 0.538 & {(}0.088{)} & <0.001 & <0.001 & 13615 \\
-d1-ultra, ladder, $t{+}2$ & 0.468 & {(}0.113{)} & <0.001 & <0.001 & 13439 \\
+anchor, ladder, $O_t$ to $t{+}20$ & -0.003 & {---} & 0.514 & {---} & {---} \\
+anchor, ladder, clean windows, $O_t$ & 0.083 & {(}0.075{)} & 0.136 & 0.150 & 13439 \\
+anchor, ladder, clean windows, 10:00 & -0.022 & {(}0.077{)} & 0.612 & 0.608 & 13287 \\
+anchor, ladder, clean windows, $C_t$ & -0.042 & {(}0.074{)} & 0.712 & 0.699 & 13748 \\
+anchor, ladder, clean windows, $t{+}1$ & 0.316 & {(}0.179{)} & 0.039 & 0.033 & 7705 \\
+anchor, ladder, clean windows, $t{+}2$ & 0.806 & {(}0.167{)} & {$<$}0.001 & {$<$}0.001 & 5130 \\
+anchor, ladder, clean windows, $t{+}5$ & 0.567 & {(}0.298{)} & 0.030 & 0.021 & 2091 \\
+anchor, ladder, clean windows, $t{+}10$ & 0.234 & {(}1.573{)} & 0.441 & 0.432 & 853 \\
+anchor, ladder, clean windows, $t{+}20$ & 7.068 & {(}13.111{)} & 0.296 & 0.308 & 205 \\
+anchor, ladder, clean windows, $O_t$ to $t{+}20$ & 6.985 & {---} & 0.212 & {---} & {---} \\
+anchor, ladder, $h^{*} = t{+}10$, $O_t$ & 0.083 & {(}0.075{)} & 0.136 & 0.150 & 13439 \\
+anchor, ladder, $h^{*} = t{+}10$, 10:00 & -0.022 & {(}0.077{)} & 0.612 & 0.608 & 13287 \\
+anchor, ladder, $h^{*} = t{+}10$, $C_t$ & -0.042 & {(}0.074{)} & 0.712 & 0.699 & 13748 \\
+anchor, ladder, $h^{*} = t{+}10$, $t{+}1$ & -0.039 & {(}0.086{)} & 0.673 & 0.668 & 13615 \\
+anchor, ladder, $h^{*} = t{+}10$, $t{+}2$ & -0.029 & {(}0.092{)} & 0.625 & 0.636 & 13439 \\
+anchor, ladder, $h^{*} = t{+}10$, $t{+}5$ & -0.056 & {(}0.103{)} & 0.707 & 0.699 & 12850 \\
+anchor, ladder, $h^{*} = t{+}10$, $t{+}10$ & -0.030 & {(}0.114{)} & 0.604 & 0.602 & 11993 \\
+anchor, ladder, $h^{*} = t{+}10$, $t{+}20$ & 0.080 & {(}0.157{)} & 0.307 & 0.340 & 11201 \\
+anchor, ladder, $h^{*} = t{+}10$, $O_t$ to $t{+}10$ & -0.113 & {---} & 0.838 & {---} & {---} \\
+anchor, ladder, plateau, $t{+}16$ to $t{+}20$ & 0.077 & {(}0.149{)} & 0.302 & 0.326 & 11201 \\
+d1-ultra, ladder, $O_t$ & 0.545 & {(}0.079{)} & {$<$}0.001 & {$<$}0.001 & 13439 \\
+d1-ultra, ladder, 10:00 & 0.610 & {(}0.086{)} & {$<$}0.001 & {$<$}0.001 & 13287 \\
+d1-ultra, ladder, $C_t$ & 0.586 & {(}0.077{)} & {$<$}0.001 & {$<$}0.001 & 13748 \\
+d1-ultra, ladder, $t{+}1$ & 0.538 & {(}0.088{)} & {$<$}0.001 & {$<$}0.001 & 13615 \\
+d1-ultra, ladder, $t{+}2$ & 0.468 & {(}0.113{)} & {$<$}0.001 & {$<$}0.001 & 13439 \\
 d1-ultra, ladder, $t{+}5$ & 0.355 & {(}0.125{)} & 0.003 & 0.011 & 12850 \\
 d1-ultra, ladder, $t{+}10$ & 0.249 & {(}0.153{)} & 0.054 & 0.077 & 11993 \\
 d1-ultra, ladder, $t{+}20$ & 0.365 & {(}0.215{)} & 0.046 & 0.044 & 11201 \\
-d1-ultra, ladder, O t $\to$ C t+20 & -0.181 & {---} & 0.834 & {---} & {---} \\
-d1-ultra, ladder clean, $O_t$ & 0.545 & {(}0.079{)} & <0.001 & <0.001 & 13439 \\
-d1-ultra, ladder clean, 10:00 & 0.610 & {(}0.086{)} & <0.001 & <0.001 & 13287 \\
-d1-ultra, ladder clean, $C_t$ & 0.586 & {(}0.077{)} & <0.001 & <0.001 & 13748 \\
-d1-ultra, ladder clean, $t{+}1$ & 0.175 & {(}0.094{)} & 0.032 & 0.064 & 7705 \\
-d1-ultra, ladder clean, $t{+}2$ & 0.164 & {(}0.123{)} & 0.093 & 0.131 & 5130 \\
-d1-ultra, ladder clean, $t{+}5$ & -0.107 & {(}0.280{)} & 0.649 & 0.641 & 2091 \\
-d1-ultra, ladder clean, $t{+}10$ & 0.360 & {(}0.751{)} & 0.317 & 0.312 & 853 \\
-d1-ultra, ladder clean, $t{+}20$ & -1.225 & {(}2.251{)} & 0.706 & 0.697 & 205 \\
-d1-ultra, ladder clean, O t $\to$ C t+20 & -1.770 & {---} & 0.875 & {---} & {---} \\
-d1-ultra, ladder h10, $O_t$ & 0.545 & {(}0.079{)} & <0.001 & <0.001 & 13439 \\
-d1-ultra, ladder h10, 10:00 & 0.610 & {(}0.086{)} & <0.001 & <0.001 & 13287 \\
-d1-ultra, ladder h10, $C_t$ & 0.586 & {(}0.077{)} & <0.001 & <0.001 & 13748 \\
-d1-ultra, ladder h10, $t{+}1$ & 0.538 & {(}0.088{)} & <0.001 & <0.001 & 13615 \\
-d1-ultra, ladder h10, $t{+}2$ & 0.468 & {(}0.113{)} & <0.001 & <0.001 & 13439 \\
-d1-ultra, ladder h10, $t{+}5$ & 0.355 & {(}0.125{)} & 0.003 & 0.011 & 12850 \\
-d1-ultra, ladder h10, $t{+}10$ & 0.249 & {(}0.153{)} & 0.054 & 0.077 & 11993 \\
-d1-ultra, ladder h10, $t{+}20$ & 0.365 & {(}0.215{)} & 0.046 & 0.044 & 11201 \\
-d1-ultra, ladder h10, O t $\to$ C t+10 & -0.296 & {---} & 0.983 & {---} & {---} \\
-d1-ultra, ladder plateau, plateau, $t{+}16$ to $t{+}20$ & 0.367 & {(}0.206{)} & 0.039 & 0.043 & 11201 \\
+d1-ultra, ladder, $O_t$ to $t{+}20$ & -0.181 & {---} & 0.834 & {---} & {---} \\
+d1-ultra, ladder, clean windows, $O_t$ & 0.545 & {(}0.079{)} & {$<$}0.001 & {$<$}0.001 & 13439 \\
+d1-ultra, ladder, clean windows, 10:00 & 0.610 & {(}0.086{)} & {$<$}0.001 & {$<$}0.001 & 13287 \\
+d1-ultra, ladder, clean windows, $C_t$ & 0.586 & {(}0.077{)} & {$<$}0.001 & {$<$}0.001 & 13748 \\
+d1-ultra, ladder, clean windows, $t{+}1$ & 0.175 & {(}0.094{)} & 0.032 & 0.064 & 7705 \\
+d1-ultra, ladder, clean windows, $t{+}2$ & 0.164 & {(}0.123{)} & 0.093 & 0.131 & 5130 \\
+d1-ultra, ladder, clean windows, $t{+}5$ & -0.107 & {(}0.280{)} & 0.649 & 0.641 & 2091 \\
+d1-ultra, ladder, clean windows, $t{+}10$ & 0.360 & {(}0.751{)} & 0.317 & 0.312 & 853 \\
+d1-ultra, ladder, clean windows, $t{+}20$ & -1.225 & {(}2.251{)} & 0.706 & 0.697 & 205 \\
+d1-ultra, ladder, clean windows, $O_t$ to $t{+}20$ & -1.770 & {---} & 0.875 & {---} & {---} \\
+d1-ultra, ladder, $h^{*} = t{+}10$, $O_t$ & 0.545 & {(}0.079{)} & {$<$}0.001 & {$<$}0.001 & 13439 \\
+d1-ultra, ladder, $h^{*} = t{+}10$, 10:00 & 0.610 & {(}0.086{)} & {$<$}0.001 & {$<$}0.001 & 13287 \\
+d1-ultra, ladder, $h^{*} = t{+}10$, $C_t$ & 0.586 & {(}0.077{)} & {$<$}0.001 & {$<$}0.001 & 13748 \\
+d1-ultra, ladder, $h^{*} = t{+}10$, $t{+}1$ & 0.538 & {(}0.088{)} & {$<$}0.001 & {$<$}0.001 & 13615 \\
+d1-ultra, ladder, $h^{*} = t{+}10$, $t{+}2$ & 0.468 & {(}0.113{)} & {$<$}0.001 & {$<$}0.001 & 13439 \\
+d1-ultra, ladder, $h^{*} = t{+}10$, $t{+}5$ & 0.355 & {(}0.125{)} & 0.003 & 0.011 & 12850 \\
+d1-ultra, ladder, $h^{*} = t{+}10$, $t{+}10$ & 0.249 & {(}0.153{)} & 0.054 & 0.077 & 11993 \\
+d1-ultra, ladder, $h^{*} = t{+}10$, $t{+}20$ & 0.365 & {(}0.215{)} & 0.046 & 0.044 & 11201 \\
+d1-ultra, ladder, $h^{*} = t{+}10$, $O_t$ to $t{+}10$ & -0.296 & {---} & 0.983 & {---} & {---} \\
+d1-ultra, ladder, plateau, $t{+}16$ to $t{+}20$ & 0.367 & {(}0.206{)} & 0.039 & 0.043 & 11201 \\
 \end{longtable}
 \endgroup
 \vspace{-0.5\baselineskip}
 {\footnotesize\raggedright
+---: the source table has no value for the row; the statistic does not apply to it or was not computed.\par
 Variants: the ladder; clean windows (no other selected event in the window); $h^{*} = t{+}10$; the plateau.\par
 The anchor's readings are uninformative (near-constant outputs after one epoch); its rows are reported, not read as nulls.\par
 The API models fail the \S8.3 contamination screens, so their results are model-specific (\S1.3).\par

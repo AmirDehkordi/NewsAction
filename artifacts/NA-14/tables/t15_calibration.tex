@@ -10,29 +10,30 @@ Model, target & {ECE} & {Log-loss skill} & {Brier skill} & {AUC} & {$T$} & {ECE 
 \midrule
 Laya-Fin, $e_5$ & 0.057 & 0.001 & -0.000 & {---} & {---} & {---} & {---} \\
 Laya-Fin, $z_{cc}$ & 0.033 & 0.010 & 0.010 & {---} & {---} & {---} & {---} \\
-Laya-Fin, $|$z cc$|$ $>$= 1 & {---} & {---} & {---} & 0.60 & {---} & {---} & {---} \\
+Laya-Fin, $|z_{cc}| \geq 1$ & {---} & {---} & {---} & 0.60 & {---} & {---} & {---} \\
 Laya-Fin, $e_5$ & {---} & {---} & {---} & {---} & 1.00 & 0.058 & 0.057 \\
 anchor, $e_5$ & 0.048 & 0.002 & 0.001 & {---} & {---} & {---} & {---} \\
 anchor, $z_{cc}$ & 0.016 & 0.015 & 0.015 & {---} & {---} & {---} & {---} \\
-anchor, $|$z cc$|$ $>$= 1 & {---} & {---} & {---} & 0.58 & {---} & {---} & {---} \\
+anchor, $|z_{cc}| \geq 1$ & {---} & {---} & {---} & 0.58 & {---} & {---} & {---} \\
 anchor, $e_5$ & {---} & {---} & {---} & {---} & 0.97 & 0.011 & 0.048 \\
 Laya zero-shot, $e_5$ & 0.176 & -0.156 & -0.110 & {---} & {---} & {---} & {---} \\
 Laya zero-shot, $z_{cc}$ & 0.179 & -0.177 & -0.120 & {---} & {---} & {---} & {---} \\
-Laya zero-shot, $|$z cc$|$ $>$= 1 & {---} & {---} & {---} & 0.52 & {---} & {---} & {---} \\
+Laya zero-shot, $|z_{cc}| \geq 1$ & {---} & {---} & {---} & 0.52 & {---} & {---} & {---} \\
 Laya zero-shot, $e_5$ & {---} & {---} & {---} & {---} & 6.33 & 0.176 & 0.110 \\
 d1-ultra, $e_5$ & 0.260 & -0.194 & -0.194 & {---} & {---} & {---} & {---} \\
 d1-ultra, $z_{cc}$ & 0.249 & -0.166 & -0.165 & {---} & {---} & {---} & {---} \\
-d1-ultra, $|$z cc$|$ $>$= 1 & {---} & {---} & {---} & 0.58 & {---} & {---} & {---} \\
+d1-ultra, $|z_{cc}| \geq 1$ & {---} & {---} & {---} & 0.58 & {---} & {---} & {---} \\
 d1-ultra, $e_5$ & {---} & {---} & {---} & {---} & 1.95 & 0.260 & 0.155 \\
 span-02$^{\ddagger}$, $e_5$ & 0.361 & -0.460 & -0.361 & {---} & {---} & {---} & {---} \\
 span-02$^{\ddagger}$, $z_{cc}$ & 0.342 & -0.410 & -0.315 & {---} & {---} & {---} & {---} \\
-span-02$^{\ddagger}$, $|$z cc$|$ $>$= 1 & {---} & {---} & {---} & 0.56 & {---} & {---} & {---} \\
+span-02$^{\ddagger}$, $|z_{cc}| \geq 1$ & {---} & {---} & {---} & 0.56 & {---} & {---} & {---} \\
 drex-v2.0, $e_5$ & 0.209 & -0.135 & -0.138 & {---} & {---} & {---} & {---} \\
 drex-v2.0, $z_{cc}$ & 0.204 & -0.119 & -0.120 & {---} & {---} & {---} & {---} \\
-drex-v2.0, $|$z cc$|$ $>$= 1 & {---} & {---} & {---} & 0.57 & {---} & {---} & {---} \\
+drex-v2.0, $|z_{cc}| \geq 1$ & {---} & {---} & {---} & 0.57 & {---} & {---} & {---} \\
 \bottomrule
 \end{tabular}
 \begin{tablenotes}[flushleft]\footnotesize
+\item ---: the source table has no value for the row; the statistic does not apply to it or was not computed.
 \item Q1's three classes against the targets; skill against val-A climatology; $T$ the temperature fit on val-A.
 \item The anchor's readings are uninformative (near-constant outputs after one epoch); its rows are reported, not read as nulls.
 \item $^{\ddagger}$span-02: the S5 canary fired a STOP after the freeze; the operator chose to proceed (PREREG \S15, post-freeze NA-11 row).

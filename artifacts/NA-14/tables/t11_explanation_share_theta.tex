@@ -8,37 +8,38 @@
 \toprule
 Item & {Value} & {Share of events} & {SE} & {$p$} & {Events} \\
 \midrule
-share, all & 0.410 & 0.156 & {---} & {---} & 18291 \\
-share, tier, mid & 0.421 & {---} & {---} & {---} & {---} \\
-share, tier, rest & 0.401 & {---} & {---} & {---} & {---} \\
-share, tier, top100 & 0.413 & {---} & {---} & {---} & {---} \\
-share, reason, analyst action & 0.342 & {---} & {---} & {---} & 3269 \\
-share, reason, capital returns financing & 0.278 & {---} & {---} & {---} & 410 \\
-share, reason, deal ma partnership & 0.336 & {---} & {---} & {---} & 1192 \\
-share, reason, earnings results & 0.536 & {---} & {---} & {---} & 4592 \\
-share, reason, guidance outlook & 0.500 & {---} & {---} & {---} & 622 \\
-share, reason, legal regulatory & 0.313 & {---} & {---} & {---} & 423 \\
-share, reason, management governance & 0.071 & {---} & {---} & {---} & 263 \\
-share, reason, market or sector move & 0.036 & {---} & {---} & {---} & 2113 \\
-share, reason, no identifiable news & 0.021 & {---} & {---} & {---} & 4387 \\
-share, reason, product operations & 0.338 & {---} & {---} & {---} & 782 \\
-share, reason, sector or macro & 0.622 & {---} & {---} & {---} & 238 \\
-theta, d2 & -0.062 & {---} & {(}0.038{)} & 0.946 & 17188 \\
-theta, d1 & -0.040 & {---} & {(}0.036{)} & 0.868 & 13203 \\
-persistence, analyst action & 0.001 & {---} & {---} & 0.491 & 3159 \\
-persistence, capital returns financing & -0.121 & {---} & {---} & 0.960 & 392 \\
-persistence, deal ma partnership & -0.016 & {---} & {---} & 0.646 & 1136 \\
-persistence, earnings results & -0.028 & {---} & {---} & 0.842 & 4204 \\
-persistence, guidance outlook & -0.125 & {---} & {---} & 0.976 & 572 \\
-persistence, legal regulatory & -0.125 & {---} & {---} & 0.956 & 408 \\
-persistence, management governance & -0.083 & {---} & {---} & 0.877 & 254 \\
-persistence, market or sector move & -0.002 & {---} & {---} & 0.540 & 1986 \\
-persistence, no identifiable news & 0.023 & {---} & {---} & 0.260 & 4091 \\
-persistence, product operations & 0.058 & {---} & {---} & 0.168 & 758 \\
-persistence, sector or macro & -0.173 & {---} & {---} & 0.945 & 228 \\
+explained share (all) & 0.410 & 0.156 & {---} & {---} & 18291 \\
+explained share (101 to 250) & 0.421 & {---} & {---} & {---} & {---} \\
+explained share (251 to 500) & 0.401 & {---} & {---} & {---} & {---} \\
+explained share (Top 100) & 0.413 & {---} & {---} & {---} & {---} \\
+explained share (analyst action) & 0.342 & {---} & {---} & {---} & 3269 \\
+explained share (capital returns, financing) & 0.278 & {---} & {---} & {---} & 410 \\
+explained share (deal, M\&A, partnership) & 0.336 & {---} & {---} & {---} & 1192 \\
+explained share (earnings results) & 0.536 & {---} & {---} & {---} & 4592 \\
+explained share (guidance, outlook) & 0.500 & {---} & {---} & {---} & 622 \\
+explained share (legal, regulatory) & 0.313 & {---} & {---} & {---} & 423 \\
+explained share (management, governance) & 0.071 & {---} & {---} & {---} & 263 \\
+explained share (market or sector move) & 0.036 & {---} & {---} & {---} & 2113 \\
+explained share (no identifiable news) & 0.021 & {---} & {---} & {---} & 4387 \\
+explained share (product, operations) & 0.338 & {---} & {---} & {---} & 782 \\
+explained share (sector or macro) & 0.622 & {---} & {---} & {---} & 238 \\
+$\theta$ at D2 & -0.062 & {---} & {(}0.038{)} & 0.946 & 17188 \\
+$\theta$ at D1 & -0.040 & {---} & {(}0.036{)} & 0.868 & 13203 \\
+persistence (analyst action) & 0.001 & {---} & {---} & 0.491 & 3159 \\
+persistence (capital returns, financing) & -0.121 & {---} & {---} & 0.960 & 392 \\
+persistence (deal, M\&A, partnership) & -0.016 & {---} & {---} & 0.646 & 1136 \\
+persistence (earnings results) & -0.028 & {---} & {---} & 0.842 & 4204 \\
+persistence (guidance, outlook) & -0.125 & {---} & {---} & 0.976 & 572 \\
+persistence (legal, regulatory) & -0.125 & {---} & {---} & 0.956 & 408 \\
+persistence (management, governance) & -0.083 & {---} & {---} & 0.877 & 254 \\
+persistence (market or sector move) & -0.002 & {---} & {---} & 0.540 & 1986 \\
+persistence (no identifiable news) & 0.023 & {---} & {---} & 0.260 & 4091 \\
+persistence (product, operations) & 0.058 & {---} & {---} & 0.168 & 758 \\
+persistence (sector or macro) & -0.173 & {---} & {---} & 0.945 & 228 \\
 \bottomrule
 \end{tabular}
 \begin{tablenotes}[flushleft]\footnotesize
+\item ---: the source table has no value for the row; the statistic does not apply to it or was not computed.
 \item The exploratory A3.5 market-level replication is in Table~\ref{tab:a-market-replication}.
 \item The API models fail the \S8.3 contamination screens, so their results are model-specific (\S1.3).
 \end{tablenotes}

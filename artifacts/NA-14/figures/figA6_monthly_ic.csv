@@ -25,8 +25,3 @@ a,d1_ultra,test,monthly_ic,2026-04,,0.026960579067211873,-0.003426581022224224,0
 a,d1_ultra,test,monthly_ic,2026-05,,0.07733393787526863,0.05305020331514261,0.10161767243539464,se1,artifacts/NA-14/tables/t24_exploratory_d0_signal.csv,monthly:d1_ultra:test:months:4,ic,,,,se
 a,d1_ultra,test,monthly_ic,2026-06,,0.003020057702030178,-0.03717121624534077,0.04321133164940112,se1,artifacts/NA-14/tables/t24_exploratory_d0_signal.csv,monthly:d1_ultra:test:months:5,ic,,,,se
 a,d1_ultra,test,monthly_ic,2026-07,,0.007973772661643626,-0.018750460150305664,0.03469800547359292,se1,artifacts/NA-14/tables/t24_exploratory_d0_signal.csv,monthly:d1_ultra:test:months:6,ic,,,,se
-a,sample_end,end of the test period (configs/splits.yaml),release,2026-07-31,,0.0,,,,artifacts/NA-14/tables/t21_release_dates.csv,sample_end,days_after_sample_end,,,,
-a,laya,Convai Laya (open weights; the base of Laya-Fin and of Laya zero-shot),release,2026-09-18,,49.0,,,,artifacts/NA-14/tables/t21_release_dates.csv,laya,days_after_sample_end,,,,
-a,drex_v2,nace-ai/drex-v2.0,release,2026-10-12,,73.0,,,,artifacts/NA-14/tables/t21_release_dates.csv,drex_v2,days_after_sample_end,,,,
-a,d1_ultra,liquid/d1-ultra,release,2026-10-15,,76.0,,,,artifacts/NA-14/tables/t21_release_dates.csv,d1_ultra,days_after_sample_end,,,,
-a,span_02,respan/span-02,release,2026-10-16,,77.0,,,,artifacts/NA-14/tables/t21_release_dates.csv,span_02,days_after_sample_end,,,,

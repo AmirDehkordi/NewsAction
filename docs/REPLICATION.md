@@ -59,15 +59,18 @@ uv run --locked python -m newsaction.figures.render fig3_convergence   # one fig
 1. checks the sha256 of each of its 37 inputs against `artifacts/NA-14/digests.json` and stops if one differs;
 2. writes the tables (`artifacts/NA-14/tables`: CSV, `keys.json`, `index.json`), their LaTeX (six main tables
    `tab1` … `tab6` and an appendix table per CSV, with `latex.json` listing every cell each one prints), the 22
-   figure CSVs, the 22 figures (PDF and 300-dpi PNG), `captions.md` after checking that every number in a caption
+   figure CSVs, the 22 figures (PDF and 300-dpi PNG; a figure in which a label touches a line, a marker, a bar, a
+   spine or another label is refused), `captions.md` after checking that every number in a caption
    equals its table cell, and `paper_preview.tex`;
 3. compares the sha256 of its 110 text outputs (CSV, LaTeX, JSON, Markdown) with the committed digests and fails on
    any difference; the 44 PDF and PNG digests are compared and reported, not enforced;
 4. fails if any `ledgers/*.jsonl` changed during the run.
 
 `make paper-preview` (`newsaction.figures.preview --compile`) compiles the preview with tectonic in deterministic
-mode and fails on a TeX error, an overfull box wider than 1 pt or a font that is not embedded; it copies the PDF to
-`artifacts/NA-14/paper_preview.pdf` and reports its sha256 (not enforced: tectonic's bundle decides the bytes).
+mode (`--keep-logs`) and fails on a TeX error, any overfull box, a float taller than the page, an undefined
+reference or a font that is not embedded; it copies the PDF to `artifacts/NA-14/paper_preview.pdf` and the log to
+`artifacts/NA-14/paper_preview.log` (not committed: it names the temporary build directory), and reports the PDF's
+sha256 (not enforced: tectonic's bundle decides the bytes).
 
 The author's steps after a deliberate change: `python -m newsaction.figures.paper --write-digests`, then
 `python -m newsaction.figures.contract` (registers every NA-14 file in `work/MANIFEST.json`, drops the entries of
@@ -99,7 +102,7 @@ The full list (inputs, outputs, figures) is `artifacts/NA-14/digests.json`. The 
 | `fig2_priced_at_open.csv` | `be9a29497719fce6cd167396fcfe77716c5c41c530648bdae051fb88e4cd92aa` |
 | `fig3_convergence.csv` | `c258a042b0e8a856d29f17a253c16ba84642333966b64124ed9bbade3489c4b3` |
 | `fig4_over_under.csv` | `57cfc40e379a83ac114969a20f574ae20403ba5481c14b667055043b2a870e4f` |
-| `fig5_explaining_moves.csv` | `0144af4d4fde9cf6880a52beb7a4f9652d31e640e11427c66d8e2382ff61d695` |
+| `fig5_explaining_moves.csv` | `5efe9ce25a2ae7395425a44042d0cba0f796837907403043ae1e6b2a849ecb8a` |
 | `fig6_strategies.csv` | `ebabb993ecb618cb047751e1d1f0dbb8e214f127a558be0d41c6f9490ff23ef9` |
 | `fig7_memorisation.csv` | `fc78bcd4f1b424dce43168744864a0d09be7812f0e1b21735039f83f1754cce0` |
 | `figA10_ablations.csv` | `951400bc7c3f67d66516900f6de96261621dc6ec0d574fa8aad953b1e24f20b3` |
@@ -113,10 +116,10 @@ The full list (inputs, outputs, figures) is `artifacts/NA-14/digests.json`. The 
 | `figA3_encoding.csv` | `44deb913fc22da122e458af3daa041213c1b815c2381ec33596284048c37f6ae` |
 | `figA4_reliability.csv` | `19622216a30f2b6278083345648ab208a354770a7725cff54eb973bb46ea2e44` |
 | `figA5_robustness.csv` | `6e6981f45969cc9a505d42d33b585f42ee73952b060d0b64a86cbaf0027e726f` |
-| `figA6_monthly_ic.csv` | `afbf7054df9affe7eed7026a35c278ece0e3aab3e5d907ddee38876f58b91d8e` |
+| `figA6_monthly_ic.csv` | `9043d02e29b677b38bb322af39a09acdb942193545b6de77eb839f1e6d6fe32b` |
 | `figA7_convergence_detail.csv` | `e34466fb446a83d07e655b06ba9d515f05b5c61c7a7625f48c4601e22659995e` |
 | `figA8_drift_laya_fin.csv` | `9ef5f06a1f3e1f6ddb7b28dd0b8a5eed807d79b58526e6828f99c702cd77655d` |
-| `figA9_shapley.csv` | `e8cec130762f5072e50d100ca5f4100a2a209a2ec2f0e866d47c8bacb5f2fc2d` |
+| `figA9_shapley.csv` | `1b5cd0b736710082d02f341607fe5dae145a6199826308c0695242b8bb49a827` |
 
 The table CSVs:
 
