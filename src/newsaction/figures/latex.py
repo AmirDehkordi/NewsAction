@@ -374,6 +374,15 @@ class Table:
     colsep: str = ""  # a \tabcolsep for a dense table
 
 
+def unsigned_zero(s: str) -> str:
+    """A number that rounds to zero prints without a sign ("-0.000" shows a sign the value does not have)."""
+    return s[1:] if s.startswith("-") and float(s) == 0 else s
+
+
+# a negative zero in a rendered cell ("-0", "-0.00"), not a date or a longer number such as -0.004
+NEGATIVE_ZERO: Final = re.compile(r"(?<![\w.])-0(?:\.0+)?(?![\d.])")
+
+
 class Cells:
     """The keyed cells (``keys.json``), formatted for LaTeX, with every cited key recorded."""
 
@@ -408,15 +417,15 @@ class Cells:
         if f == "int":
             return f"{round(x):d}"
         if f.startswith("pct"):
-            return f"{100 * x:.{int(f[3:])}f}"
+            return unsigned_zero(f"{100 * x:.{int(f[3:])}f}")
         if f.startswith("se"):
-            return "{(}" + f"{x:.{int(f[2:])}f}" + "{)}"
+            return "{(}" + unsigned_zero(f"{x:.{int(f[2:])}f}") + "{)}"
         if f == "t2":
-            return f"{x:.2f}"
+            return unsigned_zero(f"{x:.2f}")
         if f == "bp1":
-            return f"{x:.1f}"
+            return unsigned_zero(f"{x:.1f}")
         if f.startswith("f"):
-            return f"{x:.{int(f[1:])}f}"
+            return unsigned_zero(f"{x:.{int(f[1:])}f}")
         raise ValueError(f"unknown format {f!r}")
 
     def ci(self, c: CI) -> str:
@@ -425,7 +434,7 @@ class Cells:
             return DASH
 
         def m(v: Any) -> str:
-            return f"${float(v):.{c.decimals}f}$"
+            return "$" + unsigned_zero(f"{float(v):.{c.decimals}f}") + "$"
 
         return f"[{m(lo)}, {m(hi)}]"
 
@@ -522,6 +531,10 @@ def render(t: Table, keys: Mapping[str, Any]) -> tuple[str, list[str]]:
         DASH in n for n in t.notes
     ):
         raise ValueError(f"{t.name}: a cell shows {DASH} but no note says what it means")
+    for line in body:
+        for c in line[1:]:
+            if NEGATIVE_ZERO.search(c):
+                raise ValueError(f"{t.name}: the row {line[0]!r} shows a negative zero ({c!r})")
     shown = "\n".join([*rows, *t.head, *(c.head for c in t.columns)])
     for mark in (r"\dagger", r"\ddagger"):
         used = re.compile(re.escape(mark) + r"(?![A-Za-z])")

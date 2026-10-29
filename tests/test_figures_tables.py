@@ -267,6 +267,29 @@ def test_a_mark_needs_its_note_and_a_label_appears_once_in_a_panel() -> None:
                 assert mark in notes, (t["name"], mark)
 
 
+def test_a_value_that_rounds_to_zero_shows_no_sign() -> None:
+    cells = latex.Cells({"t/k/tiny": -0.00004, "t/k/neg": -0.0016, "t/k/hi": 0.1})
+    assert cells.num(latex.Num("t", "k", "tiny", "f3")) == "0.000"
+    assert cells.num(latex.Num("t", "k", "tiny", "se3")) == "{(}0.000{)}"
+    assert cells.num(latex.Num("t", "k", "tiny", "pct1")) == "0.0"
+    assert cells.num(latex.Num("t", "k", "neg", "f3")) == "-0.002"  # not zero once rounded: keeps its sign
+    assert cells.ci(latex.CI("t", "k", "tiny", "hi", 3)) == "[$0.000$, $0.100$]"
+    toy = latex.Table(
+        "toy",
+        "tab:toy",
+        latex.APPENDIX,
+        "A toy.",
+        (latex.Col("Row", "l"), latex.Col("Value")),
+        (latex.Panel("", (("a", (latex.Txt("-0.00"),)),)),),
+        ("A note.",),
+    )
+    with pytest.raises(ValueError, match="negative zero"):
+        latex.render(toy, {})
+    for t in _latex():  # and none in the committed LaTeX
+        table = (T / str(t["file"])).read_text(encoding="utf-8").partition(r"\begin{tablenotes}")[0]
+        assert not latex.NEGATIVE_ZERO.search(table), (t["name"], latex.NEGATIVE_ZERO.findall(table))
+
+
 def test_the_reverification_fixes() -> None:
     keys = kz.load(T / "keys.json")
 

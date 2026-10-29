@@ -13,7 +13,7 @@ API call, no Kaggle run, no FMP request; nothing reads `newsaction.lock`).
   63 pre-registration deviations.
 - **`artifacts/NA-14/paper_preview.tex`** sets every figure and table in outline order with its caption;
   `make paper-preview` compiles it with tectonic: no error, no overfull box, every font embedded, 82 pages
-  (`artifacts/NA-14/paper_preview.pdf`, sha256 `552ec45a2113bd5ded84203e323fe20981ab60e28fb19a407b4517a19791f59b`,
+  (`artifacts/NA-14/paper_preview.pdf`, sha256 `e09b89df0c24812ae93ba99583abe68ac03fc4b7514d26374416b257c065cb15`,
   reported, not enforced; §12).
 - **Every plotted value traces to its upstream cell** (`tests/test_figures_trace.py`, all 22 figure CSVs); the two
   aggregations of stored files (placebo Sharpe quantiles, break-even costs) and the Wilson intervals are recomputed
@@ -371,7 +371,7 @@ AC1–AC4 hold as before. Decisions 39–44 in `docs/decisions/NA-14.md`.
 | Check | Result |
 |---|---|
 | `make paper` | "outputs": "all equal" (110), "figures": "all equal" (44), 37 inputs, "ledgers_unchanged": true, "forbidden_imports": [] |
-| `make paper-preview` | 82 pages; `paper_preview.log`: 0 Overfull, 0 Underfull, 0 undefined references, 0 errors, 0 LaTeX warnings; 65 fonts, all embedded; PDF sha256 `552ec45a2113bd5ded84203e323fe20981ab60e28fb19a407b4517a19791f59b` (reported, not enforced) |
+| `make paper-preview` | 82 pages; `paper_preview.log`: 0 Overfull, 0 Underfull, 0 undefined references, 0 errors, 0 LaTeX warnings; 65 fonts, all embedded; PDF sha256 `e09b89df0c24812ae93ba99583abe68ac03fc4b7514d26374416b257c065cb15` (reported, not enforced) |
 | each changed table on its own | the 13 tables compiled with the preview's preamble, `tectonic --keep-logs`: 0 overfull; each rendered and looked at |
 | captions, guard | `python -m newsaction.figures.captions`: 0 problems; `figures.guard`: no violation |
 | `make verify` | exit 0, with no other NewsAction pytest running: ruff check and format (302 files), mypy --strict (168 files), pytest 2134 passed, 3 skipped, 2 xfailed in 248 s, manifest OK (444 artifacts), ledgers OK (test_access 29, trials 545); peak RSS 8.0 GB |
@@ -386,3 +386,20 @@ AC1–AC4 hold as before. Decisions 39–44 in `docs/decisions/NA-14.md`.
   - code `figures/latex.py`, `tables.py`, `guard.py`;
   - tests `test_figures_tables.py`, `test_figures_exploratory.py`;
   - docs `paper_outline.md`, `decisions/NA-14.md`, `DATA_CONTRACT.md` (NA-14 section regenerated).
+
+## 13. Negative zeros (operator, 2026-10-29, after the re-check of 54bee19)
+
+The re-check of 54bee19 passed scope, the guard and the gates, and found one item of check 5 open: 17 cells in nine
+appendix tables (t10, t13, t15, t16, t17, t18, t19, t20, t33) printed a value that rounds to zero with a minus sign
+("−0.000"). The main tables had none.
+
+- `latex.unsigned_zero` drops the sign of any formatted number that rounds to zero, in every fixed-point format and
+  in confidence intervals. A value that does not round to zero keeps its sign (−0.0016 prints as −0.002).
+- `latex.render` refuses a cell that still shows a negative zero (`latex.NEGATIVE_ZERO`).
+- `tests/test_figures_tables.py::test_a_value_that_rounds_to_zero_shows_no_sign` covers the formats, the render
+  guard and the committed LaTeX. It fails on 54bee19's LaTeX.
+- The rebuild changed the LaTeX of those nine tables only. Every changed line differs only by the dropped sign (17
+  cells). No CSV, `keys.json` value, figure or caption changed. `digests.json`, the preview (82 pages, sha256
+  `e09b89df…`) and the data contract are regenerated.
+- t12 still does not print the CIs it holds for horizon validity and H4 width. They are in its CSV. Placing them
+  would need a new column in a landscape table, so the paper cites them in its text instead (operator decision).
