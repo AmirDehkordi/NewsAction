@@ -136,14 +136,14 @@ input; the 7 pt floor is off; the vendor-label note is dropped from the LaTeX.
 
 ## 9. `make verify`
 
-Run after the last code change, with no other NewsAction pytest running and 50% of memory free; exit 0:
+Run on the final commit (53c2fee), with no other NewsAction pytest running and 71% of memory free; exit 0:
 
 ```
 ruff check src tests scripts       All checks passed!
 ruff format --check                298 files already formatted
 mypy --strict src/                 Success: no issues found in 166 source files
-pytest -q -m "not network"         2076 passed, 3 skipped, 2 xfailed in 256.22s
+pytest -q -m "not network"         2076 passed, 3 skipped, 2 xfailed in 373.79s
 manifest                           406 artifacts, 10 inputs checked (size+mtime): OK
 ledgers                            OK (fmp_requests 31,716, spend 624,248, test_access 29, trials 545 lines)
-peak RSS                           9.6 GB
+peak RSS                           6.5 GB (9.6 GB in an earlier run of the same suite)
 ```
