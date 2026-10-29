@@ -124,7 +124,13 @@ def test_na13b_captions_say_how_the_study_ran(name: str) -> None:
     cap = " ".join(str(entry["caption"]).split())
     assert str(entry["title"]).startswith("Exploratory (post hoc)")
     assert cap.startswith("Exploratory (post hoc): NA-13b")
-    assert "come from val-A" in cap and "the test was evaluated once" in cap
+    assert "come from val-A" in cap or name == "figA17_watch_open"
+    if name in ("figA16_selective_coverage", "figA17_watch_open"):  # the operator's earlier looks shaped them
+        assert "The operator's assistant" in cap and "the test was evaluated once" not in cap
+    else:
+        assert "the test was evaluated once" in cap
+    if name == "figA17_watch_open":
+        assert "expected by chance" in cap  # the prompt's multiple-comparison caveat
     if name == "figA18_conditioning_map":
         assert "None held on the test" in cap and "{{t38_conditioning/" in cap
         assert "produced retrospectively, possibly look-ahead-contaminated" in cap

@@ -5,7 +5,8 @@
     uv run python -m newsaction.selective.run trials      # log every evaluated variant (kind "exploratory")
     uv run python -m newsaction.selective.run dsr         # the books' deflated Sharpe at the final N
 
-``validation`` reads no test row (the study frame is cut to val-A and val-B first) and writes the selection;
+``validation`` uses no test row (the study frame is cut to val-A and val-B before any statistic) and writes
+the selection;
 ``test`` refuses to run unless that selection is committed and unchanged, recomputes the val-A cut points and
 refuses if they differ from the committed ones, then evaluates every pair on the test once, the books, the
 coverage curves, the output distributions, the band disclosure and the D1 statistics.
@@ -140,7 +141,7 @@ def validation(layout: Layout | None = None) -> dict[str, Any]:
     chosen = flagged(sel, "selected")
     out = {
         "exploratory": True,
-        "stage": "validation (val-A and val-B only; no test row read)",
+        "stage": "validation (val-A and val-B only; test rows dropped before any statistic)",
         "written_at": utc_now_iso(),
         "git_sha": git_sha(lay.root),
         "rule": {"each": cg.T_EACH, "pooled": cg.T_POOLED, "val_b_only": cg.T_VAL_B_ONLY,

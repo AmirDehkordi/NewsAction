@@ -151,7 +151,7 @@ The table CSVs:
 | `t1b_primary_by_model.csv` | `37cf7a2c0739482d26afc019866a3a57054d25a24ec97554eb7792fcc4c6d676` |
 | `t20_strategies.csv` | `e5e999485685162a0c73a01fa8c2c44d274bc861f881befb5dc6e8eadbedd56a` |
 | `t21_release_dates.csv` | `94eca271b36b87df12b77e2d6112cc79e3121c7ce406fd2cc97006ad1c2a05d0` |
-| `t22_spend.csv` | `ea09676c4445bb855d328923d194365ba49f1b9378af8bfb3cca566427a6b48e` |
+| `t22_spend.csv` | `b15734e76493b6922610eff48b9da70360f26169b613654fc7e1a80ef505d5d8` |
 | `t23_company_identification.csv` | `37e72f312689045926f0c8330a79c2ecd61ccc41993ad278fe416ba16866cc8c` |
 | `t24_exploratory_d0_signal.csv` | `7298e8d5ddc641824f7d1ba97282a4449c6d708254a4ab0911485b905a6f82c7` |
 | `t25_ma_cross.csv` | `94b0e2993279bec1040f1bb65c3ad5024249e667d6ca6167ad3aa4858b9d0cca` |

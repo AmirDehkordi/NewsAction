@@ -1338,7 +1338,9 @@ VIEWS: Final[tuple[View, ...]] = (
             "Spend in USD and GPU-hours to two decimals; counts are whole numbers. "
             "Kaggle GPU-hours from the NA-08 and NA-11 reports (Kaggle keeps no ledger here). "
             "NA-12, "
-            "NA-13 and NA-14 made no API call, Kaggle run or FMP request.",
+            "NA-13, NA-13b and NA-14 made no API call, Kaggle run or FMP request. NA-13's deflated Sharpe "
+            "ratios used the {{t20_strategies/test|S-CONV|laya_fin|D2|u|close_t+5|all/n_trials@int}} rows "
+            "the trials ledger held when NA-13 ran.",
         ),
     ),
     View(
@@ -1994,6 +1996,15 @@ NOTE_NA13B: Final = (
     "medians from val-A, the conditions selected on val-A and val-B by a rule fixed before the test, the "
     "test evaluated once."
 )
+# The coverage curves, the D1 statistics and the band check: the operator's assistant computed their first
+# versions on every split, the test included, before NA-13b (the operator's prompt discloses them).
+NOTE_NA13B_DISCLOSED: Final = (
+    "NA-13b, the operator's study of when the D0 signal works (PREREG \\S15, NA-13b row): thresholds from "
+    "val-A. The operator's assistant computed the first of these statistics on all three splits, the test "
+    "included, before NA-13b (the band check of Table~\\ref{tab:a-band-disclosure} and the first four ICs "
+    "of Table~\\ref{tab:a-watch-open}); they shaped the study, they are reproduced exactly here, and no "
+    "threshold is chosen from them."
+)
 # The conditions as Figure A18 names them, in LaTeX (one source, so the figure and the tables never differ)
 CONDITION: Final = {k: tex(v) for k, v in FIGURE_CONDITION.items()}
 COVERAGE_ROWS: Final = (1.0, 0.3, 0.1)
@@ -2061,11 +2072,12 @@ def selective_coverage_table(df: pd.DataFrame) -> Table:
         (Col("Model, coverage", "l"), *(Col(WORDS[t]) for _ in SPLITS for t in TARGETS)),
         tuple(panels),
         (
-            NOTE_EXPLORATORY + " " + NOTE_NA13B,
+            NOTE_EXPLORATORY + " " + NOTE_NA13B_DISCLOSED,
             "Coverage: the D0 events whose conviction $|\\hat N|$ is at or above its val-A quantile at one "
             "minus the coverage (100\\%: every event); events outside the embargo; moves in typical daily "
-            "moves. The 95\\% intervals (stationary block bootstrap), the daily IC, every coverage, the "
-            "other models and the ranking by the stated confidence are in the table's CSV and Figure A16.",
+            "moves. The 95\\% intervals (stationary block bootstrap), every coverage, the other models and "
+            "the ranking by the stated confidence are in the table's CSV and Figure A16; the daily IC inside "
+            "the covered set is in the CSV only.",
             NOTE_API,
         ),
         (
@@ -2116,7 +2128,9 @@ def watch_open_table(df: pd.DataFrame) -> Table:
             Panel("Panel B: pre-registered D1 results (NA-12, NA-13; test, for reference)", tuple(b)),
         ),
         (
-            NOTE_EXPLORATORY + " " + NOTE_NA13B,
+            NOTE_EXPLORATORY + " " + NOTE_NA13B_DISCLOSED,
+            r"Multiple comparisons: Panel A holds 36 statistics (six for each model and split; the first bar "
+            r"is the same for both models), so about two with $|t| > 2$ are expected by chance.",
             r"Panel A: the daily IC with $y_1$, the move from 10:00 to the close (PREREG \S5.6), of the "
             r"pre-open reading $\hat N_{\mathrm{D0}}$, of the 10:00 reading $\hat N_{\mathrm{D1}}$ (Call B "
             r"at D1), of the revision $z(\hat N_{\mathrm{D1}}) - z(\hat N_{\mathrm{D0}})$ and of the first "
@@ -2345,7 +2359,7 @@ def band_table(df: pd.DataFrame) -> Table:
         ),
         tuple(panels),
         (
-            NOTE_EXPLORATORY + " " + NOTE_NA13B,
+            NOTE_EXPLORATORY + " " + NOTE_NA13B_DISCLOSED,
             r"The operator's assistant's first look, disclosed with the operator's prompt and reproduced: "
             r"bands of the conviction $|\hat N|$ at its val-A 50th, 70th and 90th percentiles; the hit rate "
             r"against $z_{cc}$ and the mean signed $z_{cc}$, $z_{on}$ and $z_{id}$ (typical daily moves), "

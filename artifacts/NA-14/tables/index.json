@@ -839,7 +839,7 @@
   ],
   "rows": 13,
   "notes": [
-   "NA-12, NA-13 and NA-14 made no API call, Kaggle run or FMP request."
+   "NA-12, NA-13, NA-13b and NA-14 made no API call, Kaggle run or FMP request."
   ],
   "sources": [
    "ledgers/spend.jsonl",

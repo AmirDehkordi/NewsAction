@@ -31383,7 +31383,7 @@
  "t22_spend/test_access/item": "lines of the test-access ledger",
  "t22_spend/test_access/source": "ledgers/test_access.jsonl",
  "t22_spend/test_access/value": 29.0,
- "t22_spend/trials/item": "rows of the trials ledger (the DSR's N)",
+ "t22_spend/trials/item": "rows of the trials ledger",
  "t22_spend/trials/source": "ledgers/trials.jsonl",
  "t22_spend/trials/value": 1620.0,
  "t23_company_identification/cloudflare:clef/accuracy": 0.66,

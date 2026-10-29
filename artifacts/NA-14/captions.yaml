@@ -391,14 +391,15 @@ figA16_selective_coverage:
   section: appendix
   title: "Exploratory (post hoc): risk-coverage curves of the pre-open reading"
   caption: >-
-    Exploratory (post hoc): NA-13b, requested after unblinding; no hypothesis, no claim. Its thresholds and medians
-    come from val-A, and the test was evaluated once. Each model's D0 events are ranked by its conviction $|\hat N|$
-    (solid lines) or, for Laya-Fin and d1-ultra, by its stated confidence (thin lines, hollow dots); a coverage keeps
-    the events at or above the val-A quantile of the ranking. Rows: (a) the mean signed overnight move
-    $\mathrm{sign}(\hat N)\,z_{on}$, (b) the mean signed move after the open $\mathrm{sign}(\hat N)\,z_{id}$, (c) the
-    hit rate against $z_{cc}$; columns val-A, val-B and test; bands are 95% bootstrap intervals; the dashed line is
-    the frozen confidence gates' coverage (their val-A [[70th]] percentile). Conviction concentrates the overnight
-    move, which the open prices: d1-ultra's surest [[10%]] carry
+    Exploratory (post hoc): NA-13b, requested after unblinding; no hypothesis, no claim. Its thresholds come from
+    val-A. The operator's assistant's first look by band of conviction, which used the test, came before this figure
+    and shaped it (the band-check table in the appendix); no threshold is chosen from the curves. Each model's D0
+    events are ranked by its conviction $|\hat N|$ (solid lines) or, for Laya-Fin and d1-ultra, by its stated
+    confidence (thin lines, hollow dots); a coverage keeps the events at or above the val-A quantile of the ranking.
+    Rows: (a) the mean signed overnight move $\mathrm{sign}(\hat N)\,z_{on}$, (b) the mean signed move after the open
+    $\mathrm{sign}(\hat N)\,z_{id}$, (c) the hit rate against $z_{cc}$; columns val-A, val-B and test; bands are 95%
+    bootstrap intervals; the dashed line is the frozen confidence gates' coverage (their val-A [[70th]] percentile).
+    Conviction concentrates the overnight move, which the open prices: d1-ultra's surest [[10%]] carry
     {{t36_selective_coverage/d1_ultra|conviction|0.1|test|z_on/signed@f2}} typical moves on the test against
     {{t36_selective_coverage/d1_ultra|conviction|1.0|test|z_on/signed@f2}} for all its events. After the open little
     is left: {{t36_selective_coverage/d1_ultra|conviction|0.1|test|z_id/signed@f2}} (95% interval
@@ -413,37 +414,36 @@ figA17_watch_open:
   section: appendix
   title: "Exploratory (post hoc): the 10:00 reading against the pre-open one"
   caption: >-
-    Exploratory (post hoc): NA-13b, requested after unblinding; no hypothesis, no claim. Its thresholds and medians
-    come from val-A, and the test was evaluated once. The daily IC with $y_1$, the move from 10:00 to the close, of
-    the pre-open reading $\hat N_{\mathrm{D0}}$ (circles), of the 10:00 reading $\hat N_{\mathrm{D1}}$ (Call B at D1;
-    squares) and of their revision $z(\hat N_{\mathrm{D1}}) - z(\hat N_{\mathrm{D0}})$ (diamonds) for (a) Laya-Fin and
-    (b) d1-ultra on val-A, val-B and the test, with 95% intervals ($\pm$[[1.96]] Newey–West SE). Watching the open
-    adds nothing: on val-B and the test the 10:00 reading's IC is negative for both models (test: Laya-Fin
-    {{t37_watch_open/laya_fin|test|ic_ten/value@f3}}, d1-ultra {{t37_watch_open/d1_ultra|test|ic_ten/value@f3}}), and
-    so is the revision's (Laya-Fin on test {{t37_watch_open/laya_fin|test|ic_revision/value@f3}}, t
-    {{t37_watch_open/laya_fin|test|ic_revision/t@f2}}); only Laya-Fin's pre-open reading keeps a positive test IC
-    ({{t37_watch_open/laya_fin|test|ic_pre_open/value@f3}}, t {{t37_watch_open/laya_fin|test|ic_pre_open/t@f2}}). The
-    first bar, the moves after it and the pre-registered D1 results are in the appendix table on watching the open.
-    d1-ultra is model-specific (§1.3).
+    Exploratory (post hoc): NA-13b, requested after unblinding; no hypothesis, no claim. The operator's assistant
+    computed the four ICs on all three splits before NA-13b; they are reproduced exactly. The daily IC with $y_1$, the
+    move from 10:00 to the close, of the pre-open reading $\hat N_{\mathrm{D0}}$ (circles), of the 10:00 reading $\hat
+    N_{\mathrm{D1}}$ (Call B at D1; squares) and of their revision $z(\hat N_{\mathrm{D1}}) - z(\hat N_{\mathrm{D0}})$
+    (diamonds) for (a) Laya-Fin and (b) d1-ultra on val-A, val-B and the test, with 95% intervals ($\pm$[[1.96]]
+    Newey–West SE). Watching the open adds nothing: on val-B and the test the 10:00 reading's IC is negative for both
+    models (test: Laya-Fin {{t37_watch_open/laya_fin|test|ic_ten/value@f3}}, d1-ultra
+    {{t37_watch_open/d1_ultra|test|ic_ten/value@f3}}), and so is the revision's (Laya-Fin on test
+    {{t37_watch_open/laya_fin|test|ic_revision/value@f3}}, t {{t37_watch_open/laya_fin|test|ic_revision/t@f2}}); only
+    Laya-Fin's pre-open reading keeps a positive test IC ({{t37_watch_open/laya_fin|test|ic_pre_open/value@f3}}, t
+    {{t37_watch_open/laya_fin|test|ic_pre_open/t@f2}}). The first bar, the moves after it and the pre-registered D1
+    results are in the appendix table on watching the open. With [[36]] statistics in that table, about two with $|t|
+    > [[2]]$ are expected by chance. d1-ultra is model-specific (§1.3).
 
 figA18_conditioning_map:
   section: appendix
   title: "Exploratory (post hoc): the conditioning study, validation against test"
   caption: >-
-    Exploratory (post hoc): NA-13b, requested after unblinding; no hypothesis, no claim. Every condition is binary,
-    its thresholds and medians come from val-A, the selection used val-A and val-B only, by the operator's rule fixed
-    before the test, and the test was evaluated once. Each row: the difference inside minus outside of the primary
-    outcome, the tradable move after the open $\mathrm{sign}(\hat N)\,z_{id}$, for (a) Laya-Fin and (b) d1-ultra on
-    val-A (hollow circles), val-B (hollow squares) and the test (filled), with 95% intervals ($\pm$[[1.96]]
-    $|$difference$/t|$). Shaded rows were selected on validation ($t \geq [[1]]$ in val-A and in val-B, pooled
-    $t \geq [[2]]$). None held on the test: their test differences run from
-    {{t38_conditioning/laya_fin|e9_division/diff@signed2}} (Laya-Fin's E9, the strongest on validation, pooled t
-    {{t38_conditioning/laya_fin|e9_division/t_pooled_val@f2}}) to {{t38_conditioning/d1_ultra|e7_agree/diff@signed2}}
-    (d1-ultra's E7 agreement, t {{t38_conditioning/d1_ultra|e7_agree/diff_t@f2}}), every Benjamini–Hochberg q of the family is at least
-    {{t38_conditioning/d1_ultra|e4_vix/bh_q@f2}}, and no pair is confirmed. (seen): shown by the test before the
-    study, never selected. $\dagger$ E1's vendor fields are labels produced retrospectively, possibly
-    look-ahead-contaminated. E7's three-model agreement has no val-A run; E9 is Laya-Fin's alone. d1-ultra is
-    model-specific (§1.3).
+    Exploratory (post hoc): NA-13b, requested after unblinding; no hypothesis, no claim. Thresholds and medians come from val-A; the
+    selection used val-A and val-B only, by the operator's rule fixed before the test; the test was evaluated once. Each row: the
+    difference inside minus outside of the primary outcome $\mathrm{sign}(\hat N)\,z_{id}$ (the move after the open) for (a) Laya-Fin
+    and (b) d1-ultra on val-A (hollow circles), val-B (hollow squares) and the test (filled), with 95% intervals ($\pm$[[1.96]]
+    $|$difference$/t|$). Shaded rows were selected on validation ($t \geq [[1]]$ in val-A and in val-B, pooled $t \geq [[2]]$). None
+    held on the test: their test differences run from {{t38_conditioning/laya_fin|e9_division/diff@signed2}} (Laya-Fin's E9, the
+    strongest on validation, pooled t {{t38_conditioning/laya_fin|e9_division/t_pooled_val@f2}}) to
+    {{t38_conditioning/d1_ultra|e7_agree/diff@signed2}} (d1-ultra's E7 agreement, t {{t38_conditioning/d1_ultra|e7_agree/diff_t@f2}}),
+    every Benjamini–Hochberg q of the family is at least {{t38_conditioning/d1_ultra|e4_vix/bh_q@f2}}, and no pair is confirmed.
+    (seen): seen on the test before the study, never selected. $\dagger$ Vendor labels produced retrospectively, possibly
+    look-ahead-contaminated. E7's three-model agreement has no val-A run; its rank average is the ensemble's sign against the model's
+    own on the same events; E9 is Laya-Fin's alone. d1-ultra is model-specific (§1.3).
 
 figA19_output_histograms:
   section: appendix

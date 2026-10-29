@@ -2654,7 +2654,7 @@ sha256 on a rerun (labels and export were run twice: 8 of 8 files identical).
 - **Key:** one file
 - **Rows / coverage:** the paper preview; `make paper-preview` compiles it with tectonic (the PDF's digest is reported, not registered)
 - **Availability:** after NA-12, NA-13 and NA-13b (test-period results are their stored outputs; nothing here reads the lock)
-- **sha256:** `708c6d6e345b144a96414883a7e07183337c37ca37e701bcede37739755526d6`
+- **sha256:** `b4fb19ba25acedf0f7538f123c75c5465cb5f3b98ac87ccb7c48947916ebfa22`
 
 ### `artifacts/NA-14/captions.yaml`
 - **Producer:** NA-14 (author)
@@ -2663,7 +2663,7 @@ sha256 on a rerun (labels and export were run twice: 8 of 8 files identical).
 - **Key:** one entry per figure
 - **Rows / coverage:** the caption templates; `python -m newsaction.figures.captions` checks every number
 - **Availability:** after NA-12, NA-13 and NA-13b (test-period results are their stored outputs; nothing here reads the lock)
-- **sha256:** `55e727a7bdd4adce4f728a986d873fcdbc4e556d566a9fd712bea38631cd8334`
+- **sha256:** `afe2479f8251a05b357cf8a471ed18666a271db3ebbfea69d83fe75dcb2202da`
 
 ### `artifacts/NA-14/captions.md`
 - **Producer:** `newsaction.figures.captions`
@@ -2672,7 +2672,7 @@ sha256 on a rerun (labels and export were run twice: 8 of 8 files identical).
 - **Key:** one file
 - **Rows / coverage:** the rendered captions
 - **Availability:** after NA-12, NA-13 and NA-13b (test-period results are their stored outputs; nothing here reads the lock)
-- **sha256:** `0229d7d029d45093bec3bccc23b9dcd883621c31cd431b11150c6888388c6505`
+- **sha256:** `454f46c6c32121717140b161c56a489fe0d16f026a9b80459c36ce801ea3e8f2`
 
 ### `artifacts/NA-14/digests.json`
 - **Producer:** `newsaction.figures.paper --write-digests`
@@ -2681,7 +2681,7 @@ sha256 on a rerun (labels and export were run twice: 8 of 8 files identical).
 - **Key:** one file
 - **Rows / coverage:** what `make paper` must reproduce
 - **Availability:** after NA-12, NA-13 and NA-13b (test-period results are their stored outputs; nothing here reads the lock)
-- **sha256:** `64bc6ca3958789bb7bcd3dbed11ec157886c29948171775a61cca5c74c1f24de`
+- **sha256:** `5d3700783fd1c45bcb5d3410454da6595a3fce08c380322ff411822013971960`
 
 ### `artifacts/NA-14/figures/fig1_validation_test.csv`
 - **Producer:** `newsaction.figures.data` (`fig1`)
@@ -3590,7 +3590,7 @@ sha256 on a rerun (labels and export were run twice: 8 of 8 files identical).
 - **Key:** `key` unique
 - **Rows / coverage:** 13 rows: Spend and requests of the whole project (ledgers; caps from configs/project.yaml)
 - **Availability:** after NA-12, NA-13 and NA-13b (test-period results are their stored outputs; nothing here reads the lock)
-- **sha256:** `ea09676c4445bb855d328923d194365ba49f1b9378af8bfb3cca566427a6b48e`
+- **sha256:** `b15734e76493b6922610eff48b9da70360f26169b613654fc7e1a80ef505d5d8`
 
 ### `artifacts/NA-14/tables/t23_company_identification.csv`
 - **Producer:** `newsaction.figures.tables`
@@ -3930,9 +3930,9 @@ sha256 on a rerun (labels and export were run twice: 8 of 8 files identical).
 - **Inputs:** `artifacts/NA-14/tables/t22_spend.csv` (the cells of `keys.json`)
 - **Schema:** LaTeX: booktabs, threeparttable(x) notes, siunitx S columns; a float or a longtable
 - **Key:** one file
-- **Rows / coverage:** appendix table tab:a-spend (15 cited cells)
+- **Rows / coverage:** appendix table tab:a-spend (16 cited cells)
 - **Availability:** after NA-12, NA-13 and NA-13b (test-period results are their stored outputs; nothing here reads the lock)
-- **sha256:** `39eb9d1e54a04c766ee1a6db857584046c2029c28c26920d1fa047b498c6d356`
+- **sha256:** `dd4f67bff9f4853f33d2df12e2f19a32a70789c23a1ee744b3f12bc97bbf2ab9`
 
 ### `artifacts/NA-14/tables/t28_filter_frontier.tex`
 - **Producer:** `newsaction.figures.latex`
@@ -4211,7 +4211,7 @@ sha256 on a rerun (labels and export were run twice: 8 of 8 files identical).
 - **Key:** one file
 - **Rows / coverage:** appendix table tab:a-selective-coverage (108 cited cells)
 - **Availability:** after NA-12, NA-13 and NA-13b (test-period results are their stored outputs; nothing here reads the lock)
-- **sha256:** `ff337b98e0435c499548409725233fb6a7083115e7c1f91c1e3ce38223f575a6`
+- **sha256:** `2f612a028f55eb9b5ac82f33702cba35a6bdaeaf9ec146f262af6ec826ecb29c`
 
 ### `artifacts/NA-14/tables/t37_watch_open.tex`
 - **Producer:** `newsaction.figures.latex`
@@ -4220,7 +4220,7 @@ sha256 on a rerun (labels and export were run twice: 8 of 8 files identical).
 - **Key:** one file
 - **Rows / coverage:** appendix table tab:a-watch-open (84 cited cells)
 - **Availability:** after NA-12, NA-13 and NA-13b (test-period results are their stored outputs; nothing here reads the lock)
-- **sha256:** `d241c09cf3d26a2277c53ce6d9a5d593dd8c5d8c851031a4997ea1b693abe17c`
+- **sha256:** `4bad5ecac97d3069007c53890527d50cbd8efd96f6955457a3a242ba8ba8320c`
 
 ### `artifacts/NA-14/tables/t38_conditioning.tex`
 - **Producer:** `newsaction.figures.latex`
@@ -4247,7 +4247,7 @@ sha256 on a rerun (labels and export were run twice: 8 of 8 files identical).
 - **Key:** one file
 - **Rows / coverage:** appendix table tab:a-band-disclosure (120 cited cells)
 - **Availability:** after NA-12, NA-13 and NA-13b (test-period results are their stored outputs; nothing here reads the lock)
-- **sha256:** `77115de260c5a880584de9ec67052d083b3cd844f2ab996812b736426cbcdaea`
+- **sha256:** `a6d649724d9ca790148c46033fd840e3d6f9a86f94e0d39fb9c18fddedcb469e`
 
 ### `artifacts/NA-14/tables/latex.json`
 - **Producer:** `newsaction.figures.latex`
@@ -4256,7 +4256,7 @@ sha256 on a rerun (labels and export were run twice: 8 of 8 files identical).
 - **Key:** one entry per LaTeX table
 - **Rows / coverage:** which cells each LaTeX table prints
 - **Availability:** after NA-12, NA-13 and NA-13b (test-period results are their stored outputs; nothing here reads the lock)
-- **sha256:** `44f464486984b4181b26d5c07cf03209d97b27bd7883807516d5f66e788ceb32`
+- **sha256:** `f8771428e4546bbafce9bda4ab22779a713f84c794778911f5900a5638852071`
 
 ### `artifacts/NA-14/tables/keys.json`
 - **Producer:** `newsaction.figures.tables`
@@ -4265,7 +4265,7 @@ sha256 on a rerun (labels and export were run twice: 8 of 8 files identical).
 - **Key:** one file
 - **Rows / coverage:** the cells the captions cite
 - **Availability:** after NA-12, NA-13 and NA-13b (test-period results are their stored outputs; nothing here reads the lock)
-- **sha256:** `a1fae032e92f332ecc28f1eb549242af361d4c6c449b0d87215e9be04fd30bab`
+- **sha256:** `5e6634dcd43a04fb60fe3137c4bd8d137440989933d0ee28a05bee7ebc1200b8`
 
 ### `artifacts/NA-14/tables/index.json`
 - **Producer:** `newsaction.figures.tables`
@@ -4274,17 +4274,26 @@ sha256 on a rerun (labels and export were run twice: 8 of 8 files identical).
 - **Key:** one file
 - **Rows / coverage:** the table index
 - **Availability:** after NA-12, NA-13 and NA-13b (test-period results are their stored outputs; nothing here reads the lock)
-- **sha256:** `59bc4931ee968ac882399e505d86f5f0cbc07bb84eecbbcb51f79f13fb9f9ceb`
+- **sha256:** `7f59fede860aae634795e28d95f0dec790095c96f2f17270f50ac65d453d11fd`
 
 ## NA-13b — when does the signal work? (`newsaction.selective`, exploratory)
 
+### `artifacts/NA-13b/inputs/payrolls.yaml`
+- **Producer:** the operator's decision in the NA-13b session; two independent checks against bls.gov
+- **Inputs:** the BLS Employment Situation news releases and the BLS table of release dates revised by the 2025 and 2026 lapses in appropriations
+- **Schema:** `source`, `checked`, `releases` (`date`, `reference_month`, `source`, `note`), `not_published`
+- **Key:** `releases.date` unique
+- **Rows / coverage:** the 12 payroll release days from val-A's start to the test's end (E4's macro day)
+- **Availability:** exploratory (post hoc); a published calendar, known before each session
+- **sha256:** `afa2045c1bbbdda337043d8e89accd688aa4ab5e6199f893693e05bfa9ee401c`
+
 ### `artifacts/NA-13b/results/selection_validation.json`
 - **Producer:** `newsaction.selective.run` `validation`
-- **Inputs:** `work/analysis/frame_d0_{laya_fin,d1_ultra}.parquet`, NA-11's span-02 / drex-v2.0 production readings, `work/states/context_market.parquet`, `work/strategy/market_public.parquet`, `work/panel/panel_public.parquet`
+- **Inputs:** `work/analysis/frame_d0_{laya_fin,d1_ultra}.parquet` and `work/analysis/targets_test.parquet` (z_o0_c1), NA-11's span-02 / drex-v2.0 production readings and NA-06's `work/dm/tournament/stage2.parquet`, `work/panel/panel_public.parquet`, `work/states/context_market.parquet` (FOMC and CPI days), `artifacts/NA-13b/inputs/payrolls.yaml` (the BLS payroll days), `work/market/market_prices.parquet` (the ^VIX close of t−1, 2026 included: the operator's decision), NA-13's `work/strategy/market_{public,test}.parquet` (SPY's overnight move); every test row is dropped before a statistic
 - **Schema:** the selection rule, the selected (model, condition) pairs, the val-A cut points, each condition's definition, the sha256 of the two validation tables, git sha
 - **Key:** one object
 - **Rows / coverage:** the validation selection, committed before the test stage ran
-- **Availability:** exploratory (post hoc); val-A and val-B only (no test row read)
+- **Availability:** exploratory (post hoc); val-A and val-B only (test rows dropped before any statistic); the payroll file was written before this run and committed with its result (e451062)
 - **sha256:** `f058695c3180ee2f2574ad87326af851a1821382ed67e3ee673faf3cfb570e11`
 
 ### `artifacts/NA-13b/tables/cuts.csv`
@@ -4311,7 +4320,7 @@ sha256 on a rerun (labels and export were run twice: 8 of 8 files identical).
 - **Schema:** `key`, `model`, `condition`, `group`, `label`, `level`, `seen_on_test`, `vendor`, `outcome`, `role`, `split`, `n_in`, `n_out`, `days_in`, `days_out`, `df`, `inside`, `inside_t`, `outside`, `outside_t`, `diff`, `diff_t`, `diff_p`, `diff_days`
 - **Key:** `key` = model|condition|outcome|split unique
 - **Rows / coverage:** every pair × outcome (z_id, z_o0_c1, z_on) × split (val-A, val-B, pooled validation, test)
-- **Availability:** exploratory (post hoc); test-period outcomes from NA-12's frames and `work/analysis/targets_test.parquet`, test market returns from NA-13's `work/strategy/market_test.parquet` (no lock read)
+- **Availability:** exploratory (post hoc); test-period outcomes from NA-12's frames and `work/analysis/targets_test.parquet`, test market returns (and SPY's overnight move) from NA-13's `work/strategy/market_test.parquet`, and the ^VIX closes up to t−1 from NA-00's `work/market/market_prices.parquet` (the operator's decision, PREREG §15 row 65); no lock read
 - **sha256:** `5d8e9174eb1ff609d25b0cec422d6a03be9dea35afac138c574263dc82231afc`
 
 ### `artifacts/NA-13b/tables/selection.csv`
@@ -4320,16 +4329,16 @@ sha256 on a rerun (labels and export were run twice: 8 of 8 files identical).
 - **Schema:** the test rows of the primary outcome, `bh_q` (Benjamini–Hochberg over the family), `selected`, `same_sign`, `confirmed`, the test book's gross Sharpe and placebo 90th percentile, `eligible`, `t_pooled_val`, `candidate`
 - **Key:** `key` = model|condition unique
 - **Rows / coverage:** every pair of the family on the test
-- **Availability:** exploratory (post hoc); test-period outcomes from NA-12's frames and `work/analysis/targets_test.parquet`, test market returns from NA-13's `work/strategy/market_test.parquet` (no lock read)
+- **Availability:** exploratory (post hoc); test-period outcomes from NA-12's frames and `work/analysis/targets_test.parquet`, test market returns (and SPY's overnight move) from NA-13's `work/strategy/market_test.parquet`, and the ^VIX closes up to t−1 from NA-00's `work/market/market_prices.parquet` (the operator's decision, PREREG §15 row 65); no lock read
 - **sha256:** `a3734abb257babb3f0968c104d3d4384482d9083f332026cc564d5893b5c78c4`
 
 ### `artifacts/NA-13b/tables/books.csv`
 - **Producer:** `newsaction.selective.run` `test`, then `dsr`
-- **Inputs:** the conditions, NA-13's market files, `configs/frozen.yaml` (V maps), `ledgers/trials.jsonl` (DSR)
+- **Inputs:** as the selection, NA-13's market files, `work/panel/tiers_monthly.parquet`, `configs/frozen.yaml` (V maps), `ledgers/trials.jsonl` (DSR)
 - **Schema:** `key`, `book_key`, `book`, `model`, `condition`, `split`, `exit`, `holding`, NA-13's counts and `portfolios.summary` columns, `n_positions`, `names_long`, `names_short`, `break_even_bp`, placebo percentiles and quantiles, capacity, `dsr_prob_net_{5,10}`, `dsr_sr0_net_{5,10}`, `n_trials`
 - **Key:** `key` = book|exit|split unique
 - **Rows / coverage:** the tradable versions (the selected pairs, E8, E9) on val-B (in-sample) and the test
-- **Availability:** exploratory (post hoc); test-period outcomes from NA-12's frames and `work/analysis/targets_test.parquet`, test market returns from NA-13's `work/strategy/market_test.parquet` (no lock read)
+- **Availability:** exploratory (post hoc); test-period outcomes from NA-12's frames and `work/analysis/targets_test.parquet`, test market returns (and SPY's overnight move) from NA-13's `work/strategy/market_test.parquet`, and the ^VIX closes up to t−1 from NA-00's `work/market/market_prices.parquet` (the operator's decision, PREREG §15 row 65); no lock read
 - **sha256:** `98674a442ec7f0fa3c3eb4e715c6156ce15a10f0c52bd7f7789f3bb3620c3854`
 
 ### `work/selective/books_daily.parquet`
@@ -4338,7 +4347,7 @@ sha256 on a rerun (labels and export were run twice: 8 of 8 files identical).
 - **Schema:** `session`, `gross`, `turnover`, `active`, `net_5`, `net_10`, `book`, `model`, `condition`, `split`, `exit`
 - **Key:** (`book`, `split`, `exit`, `session`) unique
 - **Rows / coverage:** every book's daily series over its window
-- **Availability:** exploratory (post hoc); test-period outcomes from NA-12's frames and `work/analysis/targets_test.parquet`, test market returns from NA-13's `work/strategy/market_test.parquet` (no lock read)
+- **Availability:** exploratory (post hoc); test-period outcomes from NA-12's frames and `work/analysis/targets_test.parquet`, test market returns (and SPY's overnight move) from NA-13's `work/strategy/market_test.parquet`, and the ^VIX closes up to t−1 from NA-00's `work/market/market_prices.parquet` (the operator's decision, PREREG §15 row 65); no lock read
 - **sha256:** `7b7e5d7571061d6dea6ce3cc7e07179ceb921510757c9d01f3d6058ed8b4dbe6`
 
 ### `artifacts/NA-13b/tables/coverage.csv`
@@ -4347,7 +4356,7 @@ sha256 on a rerun (labels and export were run twice: 8 of 8 files identical).
 - **Schema:** `key`, `model`, `ranking`, `coverage`, `split`, `target`, `threshold`, `sample`, `n`, `n_days`, `hit`, `hit_ci_low`, `hit_ci_high`, `signed`, `signed_ci_low`, `signed_ci_high`, `ic`, `ic_t`, `ic_ci_low`, `ic_ci_high`, `ic_days`
 - **Key:** `key` = model|ranking|coverage|split|target unique
 - **Rows / coverage:** the risk–coverage curves: 5 models × 2 rankings × 11 coverages × 3 splits × 3 targets
-- **Availability:** exploratory (post hoc); test-period outcomes from NA-12's frames and `work/analysis/targets_test.parquet`, test market returns from NA-13's `work/strategy/market_test.parquet` (no lock read)
+- **Availability:** exploratory (post hoc); test-period outcomes from NA-12's frames and `work/analysis/targets_test.parquet`, test market returns (and SPY's overnight move) from NA-13's `work/strategy/market_test.parquet`, and the ^VIX closes up to t−1 from NA-00's `work/market/market_prices.parquet` (the operator's decision, PREREG §15 row 65); no lock read
 - **sha256:** `16154cc72359b8d414061f7ebb2e22f04c03ba298d85bee274bd6bf445448a27`
 
 ### `artifacts/NA-13b/tables/histograms.csv`
@@ -4356,7 +4365,7 @@ sha256 on a rerun (labels and export were run twice: 8 of 8 files identical).
 - **Schema:** `key`, `bin`, `lo`, `hi`, `mid`, `n`, `share`, `model`, `measure`, `split`
 - **Key:** `key` = model|measure|split|bin unique
 - **Rows / coverage:** 40-bin histograms of N̂ and of the stated confidence per model and split
-- **Availability:** exploratory (post hoc); test-period outcomes from NA-12's frames and `work/analysis/targets_test.parquet`, test market returns from NA-13's `work/strategy/market_test.parquet` (no lock read)
+- **Availability:** exploratory (post hoc); test-period outcomes from NA-12's frames and `work/analysis/targets_test.parquet`, test market returns (and SPY's overnight move) from NA-13's `work/strategy/market_test.parquet`, and the ^VIX closes up to t−1 from NA-00's `work/market/market_prices.parquet` (the operator's decision, PREREG §15 row 65); no lock read
 - **sha256:** `6317987a9ebb8ffb65e0015a85929c5d3b5daa5b737394d1cf134a5f0fa779df`
 
 ### `artifacts/NA-13b/tables/output_summary.csv`
@@ -4365,7 +4374,7 @@ sha256 on a rerun (labels and export were run twice: 8 of 8 files identical).
 - **Schema:** `key`, `model`, `measure`, `split`, `sample`, `n`, `mean`, `sd`, `clipped_low`, `clipped_high`, `q05`, `q25`, `q50`, `q75`, `q95`, `share_positive`
 - **Key:** `key` = model|measure|split unique
 - **Rows / coverage:** the outputs' moments and quantiles
-- **Availability:** exploratory (post hoc); test-period outcomes from NA-12's frames and `work/analysis/targets_test.parquet`, test market returns from NA-13's `work/strategy/market_test.parquet` (no lock read)
+- **Availability:** exploratory (post hoc); test-period outcomes from NA-12's frames and `work/analysis/targets_test.parquet`, test market returns (and SPY's overnight move) from NA-13's `work/strategy/market_test.parquet`, and the ^VIX closes up to t−1 from NA-00's `work/market/market_prices.parquet` (the operator's decision, PREREG §15 row 65); no lock read
 - **sha256:** `a186b3713f04c6882579a2f67b69277442a667f388f5ddaade0cc87a08fc63c7`
 
 ### `artifacts/NA-13b/tables/bands.csv`
@@ -4374,7 +4383,7 @@ sha256 on a rerun (labels and export were run twice: 8 of 8 files identical).
 - **Schema:** `key`, `split`, `band`, `n`, `hit_cc`, `cc`, `on`, `id`, `model`, `cut_50`, `cut_70`, `cut_90`
 - **Key:** `key` = model|split|band unique
 - **Rows / coverage:** the operator's assistant's band check, reproduced (disclosure)
-- **Availability:** exploratory (post hoc); test-period outcomes from NA-12's frames and `work/analysis/targets_test.parquet`, test market returns from NA-13's `work/strategy/market_test.parquet` (no lock read)
+- **Availability:** exploratory (post hoc); test-period outcomes from NA-12's frames and `work/analysis/targets_test.parquet`, test market returns (and SPY's overnight move) from NA-13's `work/strategy/market_test.parquet`, and the ^VIX closes up to t−1 from NA-00's `work/market/market_prices.parquet` (the operator's decision, PREREG §15 row 65); no lock read
 - **sha256:** `ce108532ca82e063a29424137a518bd2bcd898657480546bc1326ea7c1b59d33`
 
 ### `artifacts/NA-13b/tables/watch_open.csv`
@@ -4383,7 +4392,7 @@ sha256 on a rerun (labels and export were run twice: 8 of 8 files identical).
 - **Schema:** `key`, `model`, `split`, `statistic`, `kind`, `value`, `t`, `ci_low`, `ci_high`, `n_days`, `n_obs`
 - **Key:** `key` = model|split|statistic unique
 - **Rows / coverage:** the D1 (10:00) against D0 statistics: four daily ICs with y1 and two conditional means
-- **Availability:** exploratory (post hoc); test-period outcomes from NA-12's frames and `work/analysis/targets_test.parquet`, test market returns from NA-13's `work/strategy/market_test.parquet` (no lock read)
+- **Availability:** exploratory (post hoc); test-period outcomes from NA-12's frames and `work/analysis/targets_test.parquet`, test market returns (and SPY's overnight move) from NA-13's `work/strategy/market_test.parquet`, and the ^VIX closes up to t−1 from NA-00's `work/market/market_prices.parquet` (the operator's decision, PREREG §15 row 65); no lock read
 - **sha256:** `9839242fef8e8a86c9d43ae5f3fbc7dea2b991776f8181aeccb7c3be75899729`
 
 ### `artifacts/NA-13b/results/test_run.json`
@@ -4392,7 +4401,7 @@ sha256 on a rerun (labels and export were run twice: 8 of 8 files identical).
 - **Schema:** the selected pairs, the books, the forward-test candidates, git sha, lock reads (0)
 - **Key:** one object
 - **Rows / coverage:** the record of the one test run
-- **Availability:** exploratory (post hoc); test-period outcomes from NA-12's frames and `work/analysis/targets_test.parquet`, test market returns from NA-13's `work/strategy/market_test.parquet` (no lock read)
+- **Availability:** exploratory (post hoc); test-period outcomes from NA-12's frames and `work/analysis/targets_test.parquet`, test market returns (and SPY's overnight move) from NA-13's `work/strategy/market_test.parquet`, and the ^VIX closes up to t−1 from NA-00's `work/market/market_prices.parquet` (the operator's decision, PREREG §15 row 65); no lock read
 - **sha256:** `3942cf94a8496349e2d70c4a8e185fb489e96aa7a7d6147c35a4532f2aaf21b8`
 
 ### `artifacts/NA-13b/results/dsr.json`

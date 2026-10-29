@@ -20,8 +20,15 @@ RUN: Final = "`newsaction.selective.run`"
 FRAMES: Final = "`work/analysis/frame_d0_{laya_fin,d1_ultra}.parquet`"
 EXPLORATORY: Final = "exploratory (post hoc); "
 TEST_NOTE: Final = (
-    f"{EXPLORATORY}test-period outcomes from NA-12's frames and `work/analysis/targets_test.parquet`, test "
-    "market returns from NA-13's `work/strategy/market_test.parquet` (no lock read)"
+    f"{EXPLORATORY}test-period outcomes from NA-12's frames and `work/analysis/targets_test.parquet`, "
+    "test market returns (and SPY's overnight move) from NA-13's `work/strategy/market_test.parquet`, and "
+    "the ^VIX closes up to t−1 from NA-00's `work/market/market_prices.parquet` (the operator's decision, "
+    "PREREG §15 row 65); no lock read"
+)
+SESSION_INPUTS: Final = (
+    "`work/states/context_market.parquet` (FOMC and CPI days), `artifacts/NA-13b/inputs/payrolls.yaml` "
+    "(the BLS payroll days), `work/market/market_prices.parquet` (the ^VIX close of t−1, 2026 included: "
+    "the operator's decision), NA-13's `work/strategy/market_{public,test}.parquet` (SPY's overnight move)"
 )
 
 
@@ -42,15 +49,27 @@ def _t(name: str) -> str:
 
 ENTRIES: Final = (
     Entry(
+        "artifacts/NA-13b/inputs/payrolls.yaml",
+        "the operator's decision in the NA-13b session; two independent checks against bls.gov",
+        "the BLS Employment Situation news releases and the BLS table of release dates revised by the 2025 "
+        "and 2026 lapses in appropriations",
+        "`source`, `checked`, `releases` (`date`, `reference_month`, `source`, `note`), `not_published`",
+        "`releases.date` unique",
+        "the 12 payroll release days from val-A's start to the test's end (E4's macro day)",
+        f"{EXPLORATORY}a published calendar, known before each session",
+    ),
+    Entry(
         run.SELECTION_JSON,
         f"{RUN} `validation`",
-        f"{FRAMES}, NA-11's span-02 / drex-v2.0 production readings, `work/states/context_market.parquet`, "
-        "`work/strategy/market_public.parquet`, `work/panel/panel_public.parquet`",
+        f"{FRAMES} and `work/analysis/targets_test.parquet` (z_o0_c1), NA-11's span-02 / drex-v2.0 "
+        "production readings and NA-06's `work/dm/tournament/stage2.parquet`, "
+        f"`work/panel/panel_public.parquet`, {SESSION_INPUTS}; every test row is dropped before a statistic",
         "the selection rule, the selected (model, condition) pairs, the val-A cut points, each condition's "
         "definition, the sha256 of the two validation tables, git sha",
         "one object",
         "the validation selection, committed before the test stage ran",
-        f"{EXPLORATORY}val-A and val-B only (no test row read)",
+        f"{EXPLORATORY}val-A and val-B only (test rows dropped before any statistic); the payroll file was "
+        "written before this run and committed with its result (e451062)",
     ),
     Entry(
         _t("cuts"),
@@ -96,7 +115,8 @@ ENTRIES: Final = (
     Entry(
         _t("books"),
         f"{RUN} `test`, then `dsr`",
-        "the conditions, NA-13's market files, `configs/frozen.yaml` (V maps), `ledgers/trials.jsonl` (DSR)",
+        "as the selection, NA-13's market files, `work/panel/tiers_monthly.parquet`, `configs/frozen.yaml` "
+        "(V maps), `ledgers/trials.jsonl` (DSR)",
         "`key`, `book_key`, `book`, `model`, `condition`, `split`, `exit`, `holding`, NA-13's counts and "
         "`portfolios.summary` columns, `n_positions`, `names_long`, `names_short`, `break_even_bp`, placebo "
         "percentiles and quantiles, capacity, `dsr_prob_net_{5,10}`, `dsr_sr0_net_{5,10}`, `n_trials`",

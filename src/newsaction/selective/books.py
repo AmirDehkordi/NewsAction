@@ -21,7 +21,8 @@ per side**: the mean over cohorts holding positions of the long and of the short
 latest W0 article, the tier ranking session, the risk window (close of t−1), the val-A cut points (close of
 val-A's last session), a frozen map (E8: the model's calibration instant) and the session-level inputs
 (the D0 event and earnings counts at 09:15, VIX at the close of t−1, the macro calendar; SPY's overnight move
-only at the open, which therefore cannot pass). On the test the validation selection, which read val-B
+only at the open, which therefore cannot pass, and the vendor labels kept for selection only, which have no
+instant at all). On the test the validation selection, which read val-B
 outcomes, must also precede the decision; the val-B books are in-sample for the selection (reference only).
 
 The market inputs are NA-13's ``work/strategy/market_{public,test}.parquet`` (the 2026 file came from NA-13's
@@ -56,6 +57,9 @@ ALL: Final = "all"
 TIERS_MONTHLY: Final = "panel/tiers_monthly.parquet"
 E5_HORIZON: Final = 4  # the frozen V map reads e5 through C_{t+4} (PREREG A1.3)
 FAMILY: Final = "exploratory"
+# Vendor labels the PIT registry marks ``selection_only`` (configs/availability.yaml: produced
+# retrospectively, CLAUDE.md A6): a book may not condition on them, so their condition has no instant.
+SELECTION_ONLY: Final = ("e1_vendor_quantified", "e1_press_wire")
 
 
 @dataclass(frozen=True)
@@ -115,8 +119,11 @@ def tier_instants(sessions: pd.Series, layout: Layout | None = None) -> pd.Serie
 
 
 def condition_utc(rows: pd.DataFrame, book: Book, frozen: Mapping[str, Any]) -> pd.Series:
-    """When the condition's own inputs became known (the latest of them), per event."""
+    """When the condition's own inputs became known (the latest of them), per event; no instant (refused by
+    the timing guard) for an input the PIT registry keeps for selection only."""
     cond = cd.BY_KEY[book.condition]
+    if book.condition in SELECTION_ONLY:
+        return pd.Series(pd.NaT, index=rows.index, dtype="datetime64[ns, UTC]")
     parts = [pd.Series(_close_of(load_splits().splits["val_a"].end), index=rows.index)]
     days = rows["session"]
     if cond.level == "day":

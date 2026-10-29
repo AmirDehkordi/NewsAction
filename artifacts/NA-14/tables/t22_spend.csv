@@ -10,5 +10,5 @@ fmp_requests,FMP requests (NA-10),15858.0,17000.0,ledgers/fmp_requests.jsonl
 kaggle_na08_gpu_hours,"Kaggle GPU-hours, NA-08 (training)",23.38,,artifacts/NA-08/REPORT.md
 kaggle_na11_gpu_hours,"Kaggle GPU-hours, NA-11 (test inference)",2.0,,artifacts/NA-11/REPORT.md
 kaggle_total_gpu_hours,"Kaggle GPU-hours, NA-08 + NA-11",25.38,,the sum of the two rows above
-trials,rows of the trials ledger (the DSR's N),1620.0,,ledgers/trials.jsonl
+trials,rows of the trials ledger,1620.0,,ledgers/trials.jsonl
 test_access,lines of the test-access ledger,29.0,,ledgers/test_access.jsonl

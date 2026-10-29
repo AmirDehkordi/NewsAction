@@ -620,6 +620,7 @@
    "artifacts/NA-14/tables/t22_spend.csv"
   ],
   "cells": [
+   "t20_strategies/test|S-CONV|laya_fin|D2|u|close_t+5|all/n_trials",
    "t22_spend/fmp_requests/cap",
    "t22_spend/fmp_requests/value",
    "t22_spend/kaggle_na08_gpu_hours/value",

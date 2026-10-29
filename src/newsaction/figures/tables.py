@@ -527,7 +527,7 @@ def spend(root: Path, ledgers: Path) -> PaperTable:
         },
         {
             "key": "trials",
-            "item": "rows of the trials ledger (the DSR's N)",
+            "item": "rows of the trials ledger",
             "value": float(_count(ledgers / "trials.jsonl")),
             "source": "ledgers/trials.jsonl",
         },
@@ -542,7 +542,7 @@ def spend(root: Path, ledgers: Path) -> PaperTable:
         "t22_spend",
         "Spend and requests of the whole project (ledgers; caps from configs/project.yaml)",
         _frame(rows),
-        ("NA-12, NA-13 and NA-14 made no API call, Kaggle run or FMP request.",),
+        ("NA-12, NA-13, NA-13b and NA-14 made no API call, Kaggle run or FMP request.",),
         (
             "ledgers/spend.jsonl",
             "ledgers/fmp_requests.jsonl",

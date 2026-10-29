@@ -90,3 +90,39 @@ def test_the_placebo_flips_coins_with_seeds_after_the_strategy_seed() -> None:
     b = bk.run_book(ev, market(), SESSIONS, "close_t", "val_b", seeds=20)["summary"]
     assert a["placebo_pct_gross"] == b["placebo_pct_gross"]  # deterministic
     assert 0.0 <= a["placebo_pct_gross"] <= 100.0 and np.isfinite(a["placebo_q90_gross"])
+
+
+def _instant(book: bk.Book, d: date, frozen: dict[str, object] | None = None) -> pd.Timestamp:
+    rows = pd.DataFrame({"session": [d]})
+    return pd.Timestamp(bk.condition_utc(rows, book, frozen or {}).iloc[0])
+
+
+def test_each_condition_is_dated_when_its_input_is_known() -> None:
+    d = date(2025, 10, 6)  # a val-B session, after the val-A cut points
+    before = calendar.close_utc(calendar.prev_session(d))
+    assert _instant(bk.Book("laya_fin", "e4_spy_gap"), d) == calendar.open_utc(d)
+    for k in ("e4_busy_day", "e4_earnings_season"):
+        assert _instant(bk.Book("laya_fin", k), d) == calendar.d0_cutoff_utc(d)
+    for k in ("e4_vix", "e4_friday", "e4_macro"):
+        assert _instant(bk.Book("laya_fin", k), d) == before
+    val_a_end = calendar.close_utc(bk.load_splits().splits["val_a"].end)
+    for k in ("e2_numbers", "e4_spy_gap", "e4_vix", "e9_division"):  # on val-A, the cut points bind
+        assert _instant(bk.Book("laya_fin", k), date(2025, 7, 10)) == val_a_end
+    for k in bk.SELECTION_ONLY:
+        assert pd.isna(_instant(bk.Book("laya_fin", k), d))
+
+
+def test_the_cost_rule_waits_for_the_frozen_map() -> None:
+    frozen = {"calibration": {"laya_fin": {"a0": {"fit_range": ["2025-07-09", "2025-10-03"]}}}}
+    got = _instant(bk.Book("laya_fin", "e8_cost"), date(2025, 10, 6), frozen)
+    assert got == calendar.close_utc(
+        pf.session_after(date(2025, 10, 3), bk.E5_HORIZON)
+    )  # the map read e5 to t+4
+
+
+def test_books_on_the_spy_gap_or_a_vendor_label_are_refused() -> None:
+    for k in ("e4_spy_gap", *bk.SELECTION_ONLY):
+        ev = events({T0: {1: 1, 4: -1}})
+        ev["condition_utc"] = bk.condition_utc(ev, bk.Book("laya_fin", k), {})
+        with pytest.raises(pf.TimingError):
+            bk.run_book(ev, market(), SESSIONS, "close_t", "val_b", seeds=3)
