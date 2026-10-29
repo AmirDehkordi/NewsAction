@@ -229,3 +229,95 @@ still apply and replaced the figures, the LaTeX and the captions.
   `tables/keys.json`, `tables/t21_release_dates.csv` and every remaining `tables/t*.tex` (29 files).
 - **Figures (30 → 44):** every PDF and PNG is new or redrawn; `figA5_robustness.{pdf,png}` changed in place.
 - **Not enforced:** `paper_preview.pdf` (sha256 above).
+
+## 11. Polish pass (operator, 2026-10-29, on top of 49a2fbe)
+
+Three charts the operator liked at 5cccde1 are back in their layout and the new style; panels that show one quantity
+on one scale share their axis; no label touches a mark; the tables are polished. No API call, no Kaggle run,
+nothing touches `newsaction.lock`; the ledgers are byte-identical; no new analysis (every figure row traces to its
+upstream cell, every caption and table number is a cell of `tables/keys.json`). Decisions 29–38 in
+`docs/decisions/NA-14.md`.
+
+### 11.1 The restored charts
+
+- **Figure 5, explaining moves.** (a) is the old Figure 8 (a): d1-ultra's out-of-sample $R^2$ of $z_{cc}$ as stacked
+  bars for all days, event days, Top 100, 101–250 and 251–500, the steps ex-ante news (D0), + same-day news and
+  + explanation stacked in the legend's order, in the muted component palette, each total (15.8, 37.5, 19.9, 15.6,
+  14.0) above its bootstrap whisker. No text over the bars: the news steps, a point or two tall, have their values
+  beside the bar after a swatch of their colour, and Roll's market and sector $R^2$ (25.3%) is in the caption.
+  (b) is the former (a), the news steps of Laya-Fin and d1-ultra on their own scale. The former (b) is dropped.
+- **Figure 7, memorisation.** The old A3 (a): sorted horizontal bars of the share of masked states whose company was
+  identified, the value ("74%") at each bar's end past its Wilson whisker, a solid line at the 28% matched baseline
+  and a dashed one at the 40% screening threshold (renamed from "screen bar"), both labelled above the axis; the
+  production comparators d1-ultra, span-02‡ and drex-v2.0 in the comparator colour, the other API models and Laya
+  zero-shot in grey.
+- **Appendix A9, Shapley.** The old six panels (a)–(f): rows out-of-sample $R^2$ and IC, columns Laya-Fin, d1-ultra
+  and "anchor, uninformative"; grouped $R$, $N$, $J$ bars for all, Top 100, 101–250 and 251–500 with the total
+  $R + N + J$ as a diamond; values in units of $10^{-3}$; one y-axis per row, so the zero lines line up; the muted
+  component palette (no saturated green) and one legend at the top. The caption now says that every $R^2$ total is
+  negative in every tier and that the IC totals have both signs (−0.029 to 0.013).
+- **The muted component palette** (new): the reference hues of slots 7, 5 and 4 at chroma 0.11 and lightness
+  0.46 / 0.64 / 0.76; the validator passes them on all pairs against white (CVD ΔE 15.5, normal vision 18.5).
+
+### 11.2 Axes, alignment and details
+
+- **Shared axes:** A12 (a, b) and (d)–(f), with (c) on its own scale (the caption says so); A7 (a, b); A9 by row;
+  A13 (a, b); A5 (a) and (d), both H1; Figure 2 (a, b) on one IC range. Constrained layout aligns zero lines, panel
+  tops and bottoms across a row and the x-axes down a column (checked on the axes' positions). Where panels of one
+  quantity keep their own scales the caption says so: Figure 5 (b), Figure 6 (b), A5 (b, c), A14 (a, b), A15 (a, b).
+- **A7:** every rung labelled as in Figure 3; the three panels in one row could not hold the labels, so (c) moved to
+  a row of its own.
+- **A6:** the y-range is the data's with a margin; the after-sample area is gone and the release dates are in the
+  caption; every label is horizontal.
+- **Figure 6:** (b) runs to −15.5, so S-D1's placebo range (from −14.04) is not clipped; one legend above the
+  panels replaces (c)'s, which sat on d1-ultra's path.
+- **Figure 4 (a):** Under, Fair and Over in d1-ultra's re-stepped ramp (normal-vision ΔE 19.2 between neighbours,
+  was 7.7 between Under and Fair), and the dashed mean-$V$ lines dotted, short-dashed and long-dashed.
+- **A2:** F6 mid-grey beside F5 black. **A14:** a small legend under each panel.
+- **No label on a mark:** `style.overlaps`, enforced by `render.check`, finds no text or legend touching a line, a
+  whisker, a marker, a bar, a spine, another label or a gridline without a knockout, in any of the 22 figures (2 s
+  for all). It caught Figure 3's "$\kappa_h = 1$" and top "mean $V$" labels on their dashed lines, now moved clear,
+  and Figure 6 (c)'s legend. Labels inside a plot and legends sit on a knockout of the surface.
+
+### 11.3 Tables
+
+- **Table 2:** the API models' val-B $z_{on}$ and $z_{id}$ cells (and their $t$ rows) show "—", as the note says.
+- **Table 5:** "<0.001" sits on the decimal column with no space after "<"; the share knowable before the open sits
+  in the $R^2$ columns with their two decimals (53.17, 34.78, 35.63), aligned with the rows above.
+- **Every table:** an empty cell shows "—" and the notes say what it means (`latex.render` refuses a table
+  otherwise); one decimal convention per column, or the reason in the notes (Tables 1, 2, 4, 5); t22's counts are
+  whole numbers; text in S columns is in braces, the "<" of a bound included; raw keys left the appendix row labels
+  (t16's robustness variants now carry Figure A5's names), and gpt-6-luna is named as in the figures; t9 is
+  portrait, since its 36 rows overflowed a landscape page.
+- **Each table on its own:** a standalone article with the preview's preamble, `tectonic --keep-logs`, then
+  `sips -s format png` (and a 3× QuickLook render to check the alignment): 40 tables, no error, no overfull box, no
+  float taller than the page; each looked at.
+
+### 11.4 Checks
+
+| Check | Result |
+|---|---|
+| `make paper` | "outputs": "all equal" (110), "figures": "all equal" (44), 37 inputs, "ledgers_unchanged": true, "forbidden_imports": [] |
+| captions | `python -m newsaction.figures.captions`: 0 problems |
+| trace, 5e guard | `tests/test_figures_trace.py` (22 figure CSVs) and `tests/test_figures_exploratory.py` pass; `figures.guard`: no violation |
+| new tests | the overlap guard on every figure and a planted overlap; the palette's derivation; the restored layouts and shared axes; empty cells, dash notes and a planted undocumented dash; "<" against its number; Table 5's share; the preview's float and undefined-reference checks |
+| `make paper-preview` | `tectonic --keep-logs`; `paper_preview.log`: 0 Overfull, 0 Underfull, 0 undefined references, 0 errors, 0 LaTeX warnings; 81 pages; 65 fonts, all embedded; PDF sha256 `0e6a1f493d26f6bda44a9f562f45ccb5e040c5409f0319d326751d77b7eb5d49` (reported, not enforced) |
+| `make verify` | exit 0, with no other NewsAction pytest running: ruff check and format (302 files), mypy --strict (168 files), pytest 2130 passed, 3 skipped, 2 xfailed in 243 s, manifest OK (444 artifacts), ledgers OK (test_access 29, trials 545); peak RSS 9.6 GB. An earlier run failed `test_calendar`'s no-clock-literal guard on a "09:30" label key in `latex.py`; the cutoff labels are now derived by pattern (the LaTeX is byte-identical) |
+
+### 11.5 Files whose digest changed (against 49a2fbe's `digests.json`)
+
+- **Inputs (37):** `captions.yaml`.
+- **Text outputs (110, none added or removed; 33 changed):** `captions.md`, `paper_preview.tex`; the figure CSVs
+  `fig5_explaining_moves.csv`, `figA6_monthly_ic.csv`, `figA9_shapley.csv`; the LaTeX of the six main tables
+  `tab1` … `tab6` and of t1b, t2, t3, t4, t5, t6, t7, t9, t10, t11, t12, t13, t14, t15, t16, t18, t20, t21, t22,
+  t23, t25 and t27. No table CSV, `keys.json` or `index.json` changed.
+- **Figures (44, reported; 37 changed):** every PDF and PNG except `fig1_validation_test.png`, `figA3_encoding.png`,
+  `figA4_reliability.png`, `figA10_ablations.png`, `figA11_persistence.{pdf,png}` and
+  `figA15_exploratory_ma_cross.png` (the PDFs of fig1, A3, A4, A10 and A15 differ only by the knockouts, white on
+  white).
+- **Not enforced:** `paper_preview.pdf` (sha256 above).
+- **Other files:** code `figures/style.py`, `data.py`, `render.py`, `fig2_priced_at_open.py` …
+  `fig7_memorisation.py`, `appendix.py`, `latex.py`, `preview.py`, `contract.py`; tests `test_figures_style.py`,
+  `test_figures_tables.py`, `test_figures_preview.py`; docs `REPLICATION.md` (the three CSV digests, the preview
+  checks), `paper_outline.md`, `decisions/NA-14.md`, `DATA_CONTRACT.md` (NA-14 section regenerated, 158 entries);
+  `.gitignore` (the preview log).

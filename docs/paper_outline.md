@@ -51,12 +51,14 @@ under-reaction once part of the move is visible?
   news-strength tercile (terciles of $|V|$, NA-12's split). No small-move underreaction; large moves reverse slightly.
 - **Table 3** (`tab3_over_under`): the over/under regression, b and c with SEs by decision point.
 - **Table 4** (`tab4_convergence`): $\kappa_h$ by rung, $\lambda_h$ and the half-life.
-- Appendix: Figures A7 (every decile, the anchor's $\kappa_h$), A8 (Figure 4 b for Laya-Fin), A9 (Shapley), A10
-  (Call B ablations); tables t2, t4, t5, t6, t7, t8, t9, t13, t30.
+- Appendix: Figures A7 (every decile, the anchor's $\kappa_h$), A8 (Figure 4 b for Laya-Fin), A9 (Shapley by
+  instrument and tier), A10 (Call B ablations); tables t2, t4, t5, t6, t7, t8, t9, t13, t30.
 
 ## 5. Explaining realized moves (A3, H5)
 
-- **Figure 5** (`fig5_explaining_moves`): the news steps on their own scale, and the explanation step by cut.
+- **Figure 5** (`fig5_explaining_moves`): d1-ultra's $R^2$ by cut, stacked by step (ex-ante news, same-day news,
+  the explanation), with each total and its interval; then the news steps on their own scale, for Laya-Fin and
+  d1-ultra.
 - **Table 5** (`tab5_explaining_moves`): the ladder's increments and H5, the only secondary test that survives BH.
 - Appendix: Figure A11 (persistence by move reason, $\theta$); tables t10, t11, t12.
 
@@ -69,8 +71,8 @@ under-reaction once part of the move is visible?
 
 ## 7. Memorisation and validation-to-test decay
 
-- **Figure 7** (`fig7_memorisation`, half width): company identification on masked states against the matched
-  baseline, with Wilson intervals; every release after the sample.
+- **Figure 7** (`fig7_memorisation`, half width): company identification on masked states, sorted bars with
+  Wilson intervals, against the matched baseline and the screening threshold; every release after the sample.
 - Appendix: Figure A13 (the probes, exploratory); tables t21, t23, t18.
 
 ## 8. Limitations
@@ -89,7 +91,7 @@ The appendix figures and tables, in the order of the sections above; exploratory
 
 - A1 the tournament; A2 the filters; A3 the encodings; A4 reliability; A5 robustness; A6 the monthly IC
   (exploratory: ±1 implied SE of a month's mean, NA-12 §13); A7 convergence in detail and the anchor; A8 the drift
-  for Laya-Fin; A9 Shapley; A10 Call B ablations; A11 persistence by move reason; A12 the other books and S-CONV
+  for Laya-Fin; A9 Shapley by instrument and tier; A10 Call B ablations; A11 persistence by move reason; A12 the other books and S-CONV
   by tier; A13 the probes' descriptive columns (exploratory); A14 where the D0 signal lives (exploratory, post
   hoc, with the month-effect test); A15 news and a moving-average cross (exploratory, post hoc).
 - Exploratory tables: t17 (sectors), t24 (NA-12 §13), t25 (NA-13 §9), t31 (the A3.5 market replication,
@@ -111,7 +113,7 @@ The appendix figures and tables, in the order of the sections above; exploratory
 | A3 | `figA3_encoding` | appendix (2) | NA-07 |
 | A4 | `figA4_reliability` | appendix (3) | NA-12 figure data, t15 |
 | A5 | `figA5_robustness` | appendix (3) | t16, t1b, t3 |
-| A6 | `figA6_monthly_ic` | appendix (3), exploratory | t24 (NA-12 §13), t21 |
+| A6 | `figA6_monthly_ic` | appendix (3), exploratory | t24 (NA-12 §13); the release dates (t21) in its caption |
 | A7 | `figA7_convergence_detail` | appendix (4) | NA-12 figure data, t6, t7 |
 | A8 | `figA8_drift_laya_fin` | appendix (4) | NA-12 figure data |
 | A9 | `figA9_shapley` | appendix (4) | t13 |
