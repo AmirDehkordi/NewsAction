@@ -3,7 +3,7 @@ UV ?= $(shell command -v uv 2>/dev/null || echo $(HOME)/.local/bin/uv)
 RUN := $(UV) run --locked
 PY_DIRS := src tests scripts
 
-.PHONY: sync lint format type test manifest manifest-deep ledgers verify
+.PHONY: sync lint format type test manifest manifest-deep ledgers verify paper
 
 sync:            ## install the locked environment
 	$(UV) sync --locked
@@ -32,3 +32,6 @@ ledgers:         ## verify the hash chain of every ledgers/*.jsonl
 	$(RUN) python -m newsaction.ledger check
 
 verify: lint type test manifest ledgers
+
+paper:           ## NA-14: rebuild every paper table, figure CSV, figure and caption offline; check the committed digests
+	$(RUN) python -m newsaction.figures.paper
