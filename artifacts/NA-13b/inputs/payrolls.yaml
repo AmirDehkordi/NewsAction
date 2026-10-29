@@ -1,0 +1,21 @@
+# BLS Employment Situation (nonfarm payrolls) release days, 08:30 ET, 2025-07-01 .. 2026-07-31 (NA-13b E4).
+# Operator decision of 2026-10-29 (the NA-13b session): Data/market/fred_releases.pkl holds CPI only, so the
+# payroll days were added by hand. Two independent checks against bls.gov (each release's archived news
+# release and the BLS revised-release-dates table) agreed on every date and reference month.
+# Kept outside configs/ (the freeze hash covers configs/*.yaml) and src/ (no test-period date literals).
+source: https://www.bls.gov/bls/news-release/empsit.htm
+checked: 2026-10-29
+releases:
+  - {date: 2025-07-03, reference_month: "2025-06", source: "https://www.bls.gov/news.release/archives/empsit_07032025.htm", note: "Thursday: scheduled before the July 4 holiday"}
+  - {date: 2025-08-01, reference_month: "2025-07", source: "https://www.bls.gov/news.release/archives/empsit_08012025.htm"}
+  - {date: 2025-09-05, reference_month: "2025-08", source: "https://www.bls.gov/news.release/archives/empsit_09052025.htm"}
+  - {date: 2025-11-20, reference_month: "2025-09", source: "https://www.bls.gov/news.release/archives/empsit_11202025.htm", note: "moved by the 2025 lapse in appropriations (bls.gov/bls/2025-lapse-revised-release-dates.htm)"}
+  - {date: 2025-12-16, reference_month: "2025-10/2025-11", source: "https://www.bls.gov/news.release/archives/empsit_12162025.htm", note: "moved by the 2025 lapse in appropriations (bls.gov/bls/2025-lapse-revised-release-dates.htm); October (payrolls only) and November data"}
+  - {date: 2026-01-09, reference_month: "2025-12", source: "https://www.bls.gov/news.release/archives/empsit_01092026.htm"}
+  - {date: 2026-02-11, reference_month: "2026-01", source: "https://www.bls.gov/news.release/archives/empsit_02112026.htm", note: "moved from Feb 6 by the 2026 lapse in appropriations (same BLS table)"}
+  - {date: 2026-03-06, reference_month: "2026-02", source: "https://www.bls.gov/news.release/archives/empsit_03062026.htm"}
+  - {date: 2026-04-03, reference_month: "2026-03", source: "https://www.bls.gov/news.release/archives/empsit_04032026.htm"}
+  - {date: 2026-05-08, reference_month: "2026-04", source: "https://www.bls.gov/news.release/archives/empsit_05082026.htm"}
+  - {date: 2026-06-05, reference_month: "2026-05", source: "https://www.bls.gov/news.release/archives/empsit_06052026.htm"}
+  - {date: 2026-07-02, reference_month: "2026-06", source: "https://www.bls.gov/news.release/archives/empsit_07022026.htm"}
+not_published: ['2025-10 household survey (CPS) data: not collected during the 2025 lapse; October 2025 payrolls came with the 2025-12-16 release']
