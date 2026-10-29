@@ -1,0 +1,40 @@
+% tab4_convergence: tab:convergence (NA-14 figures.latex, from artifacts/NA-12/tables/t6_convergence_ladder.csv, artifacts/NA-12/tables/t7_gap_closure.csv)
+\begin{table}[htbp]
+\centering
+\small
+\setlength{\tabcolsep}{4pt}
+\begin{threeparttable}
+\caption{Convergence to the news-implied value $V$: prices reach part of $V$ on day $t$, then partly fade; the gap's half-life is not reached within $t{+}20$.}\label{tab:convergence}
+\begin{tabular}{@{}lS[table-format=1.2, table-space-text-pre=(, table-space-text-post=)]S[table-format=-1.2, table-space-text-pre=(, table-space-text-post=)]S[table-format=-1.3, table-space-text-pre=(, table-space-text-post=)]S[table-format=-1.3, table-space-text-pre=(, table-space-text-post=)]S[table-format=-1.2, table-space-text-pre=(, table-space-text-post=)]S[table-format=-1.3, table-space-text-pre=(, table-space-text-post=)]S[table-format=-1.2, table-space-text-pre=(, table-space-text-post=)]S[table-format=-1.3, table-space-text-pre=(, table-space-text-post=)]S[table-format=1.0]@{}}
+\toprule
+ & {$O_t$} & {10:00} & {$C_t$} & {$t{+}1$} & {$t{+}2$} & {$t{+}5$} & {$t{+}10$} & {$t{+}20$} & {Half-life} \\
+\midrule
+\multicolumn{10}{@{}l}{\textit{Panel A: convergence ladder $\kappa_h$ (D0 events)}} \\
+Laya-Fin & 0.24 & 0.27 & 0.36 & 0.36 & 0.38 & 0.26 & 0.21 & 0.26 & {} \\
+ & {(}0.07{)} & {(}0.08{)} & {(}0.09{)} & {(}0.10{)} & {(}0.11{)} & {(}0.14{)} & {(}0.18{)} & {(}0.23{)} & {} \\
+d1-ultra & 0.55 & 0.61 & 0.59 & 0.54 & 0.47 & 0.36 & 0.25 & 0.36 & {} \\
+ & {(}0.08{)} & {(}0.09{)} & {(}0.08{)} & {(}0.09{)} & {(}0.11{)} & {(}0.13{)} & {(}0.15{)} & {(}0.22{)} & {} \\
+anchor & 0.08 & -0.02 & -0.04 & -0.04 & -0.03 & -0.06 & -0.03 & 0.08 & {} \\
+ & {(}0.08{)} & {(}0.08{)} & {(}0.07{)} & {(}0.09{)} & {(}0.09{)} & {(}0.10{)} & {(}0.11{)} & {(}0.16{)} & {} \\
+\addlinespace
+\multicolumn{10}{@{}l}{\textit{Panel B: gap closure $\lambda_h$ and the half-life}} \\
+Laya-Fin, D2 & {} & {} & {} & -0.007 & {} & 0.026 & {} & 0.050 & {$\infty$} \\
+ & {} & {} & {} & {(}0.012{)} & {} & {(}0.026{)} & {} & {(}0.051{)} & {} \\
+Laya-Fin, D1 & {} & {} & -0.011 & -0.024 & {} & -0.002 & {} & -0.013 & {$\infty$} \\
+ & {} & {} & {(}0.013{)} & {(}0.020{)} & {} & {(}0.034{)} & {} & {(}0.062{)} & {} \\
+d1-ultra, D2 & {} & {} & {} & -0.009 & {} & 0.022 & {} & 0.049 & {$\infty$} \\
+ & {} & {} & {} & {(}0.012{)} & {} & {(}0.026{)} & {} & {(}0.051{)} & {} \\
+d1-ultra, D1 & {} & {} & -0.013 & -0.028 & {} & -0.012 & {} & -0.020 & {$\infty$} \\
+ & {} & {} & {(}0.013{)} & {(}0.020{)} & {} & {(}0.034{)} & {} & {(}0.062{)} & {} \\
+anchor, D2 & {} & {} & {} & -0.007 & {} & 0.027 & {} & 0.052 & {$\infty$} \\
+ & {} & {} & {} & {(}0.012{)} & {} & {(}0.027{)} & {} & {(}0.051{)} & {} \\
+anchor, D1 & {} & {} & -0.012 & -0.025 & {} & -0.003 & {} & -0.013 & {$\infty$} \\
+ & {} & {} & {(}0.013{)} & {(}0.020{)} & {} & {(}0.034{)} & {} & {(}0.062{)} & {} \\
+\bottomrule
+\end{tabular}
+\begin{tablenotes}[flushleft]\footnotesize
+\item Panel A: $\kappa_h$ is the slope of $\mathrm{CAR}^{\mathrm{lvl}}_h$, the abnormal return from the previous close to rung $h$ in typical daily moves, on $V$ with day $\times$ tier fixed effects; $\kappa_h = 1$ is full convergence. Panel B: $\lambda_h$ is the share of the gap $U = V - G^{\mathrm{lvl}}$ closed by rung $h$, at D2 (from the close) and D1 (from 10:00); the half-life is the first rung with $\lambda_h \geq 0.5$ ($\infty$: not reached within $t{+}20$). Two-way clustered standard errors in parentheses; $t{+}k$ is the close of session $t+k$.
+\item The anchor's readings are uninformative (near-constant outputs after one epoch); its rows are reported, not read as nulls. The API models fail the \S8.3 contamination screens, so their results are model-specific (\S1.3).
+\end{tablenotes}
+\end{threeparttable}
+\end{table}

@@ -1,32 +1,38 @@
-% t3_ic (NA-14, from artifacts/NA-12/tables/t3_ic.csv)
-\begin{table*}[tbp]
-\centering\small
-\caption{Daily IC of \^{N}\_W0 with z\_cc, z\_on and z\_id, and quintile spreads (\S{}11.1)}\label{tab:t3_ic}
-\begin{adjustbox}{max width=\textwidth}
-\begin{tabular}{llrrrrrrrrr}
+% t3_ic: tab:a-ic (NA-14 figures.latex, from artifacts/NA-14/tables/t3_ic.csv)
+\begin{table}[htbp]
+\centering
+\small
+\begin{threeparttable}
+\caption{Daily IC by target on the test period, with the quintile spread.}\label{tab:a-ic}
+\begin{tabular}{@{}lS[table-format=-1.3]cS[table-format=-1.2]S[table-format=5.0]S[table-format=-1.3]S[table-format=<1.3]@{}}
 \toprule
-model & target & IC & IC t & IC CI low & IC CI high & n days & n obs & qspread & qspread t & qspread p \\
+Model, target & {IC} & 95\% CI & {$t$} & {Events} & {Quintile spread} & {$p$} \\
 \midrule
-Laya-Fin & z\_cc & $0.020$ & $1.671$ & $-0.003$ & $0.042$ & $140$ & $13{,}748$ & $0.127$ & $1.918$ & $0.024$ \\
-Laya-Fin & z\_on & $0.015$ & $1.079$ & $-0.011$ & $0.041$ & $138$ & $13{,}439$ & $0.174$ & $1.679$ & $0.044$ \\
-Laya-Fin & z\_id & $0.010$ & $0.815$ & $-0.015$ & $0.036$ & $138$ & $13{,}439$ & $0.050$ & $0.845$ & $0.201$ \\
-anchor (uninformative) & z\_cc & $0.008$ & $0.826$ & $-0.011$ & $0.026$ & $140$ & $13{,}748$ & $-0.001$ & $-0.017$ & $0.500$ \\
-anchor (uninformative) & z\_on & $0.006$ & $0.498$ & $-0.016$ & $0.027$ & $138$ & $13{,}439$ & $-0.011$ & $-0.105$ & $0.544$ \\
-anchor (uninformative) & z\_id & $0.002$ & $0.181$ & $-0.020$ & $0.022$ & $138$ & $13{,}439$ & $0.002$ & $0.033$ & $0.495$ \\
-Laya zero-shot & z\_cc & $0.005$ & $0.369$ & $-0.023$ & $0.032$ & $140$ & $13{,}748$ & $0.056$ & $0.712$ & $0.236$ \\
-Laya zero-shot & z\_on & $0.037$ & $3.222$ & $0.015$ & $0.058$ & $138$ & $13{,}439$ & $0.281$ & $3.334$ & $<0.001$ \\
-Laya zero-shot & z\_id & $-0.017$ & $-1.251$ & $-0.043$ & $0.008$ & $138$ & $13{,}439$ & $-0.102$ & $-1.561$ & $0.953$ \\
-d1-ultra & z\_cc & $0.039$ & $3.229$ & $0.015$ & $0.062$ & $140$ & $13{,}748$ & $0.410$ & $5.091$ & $<0.001$ \\
-d1-ultra & z\_on & $0.074$ & $4.739$ & $0.043$ & $0.104$ & $138$ & $13{,}439$ & $0.812$ & $5.602$ & $<0.001$ \\
-d1-ultra & z\_id & $-7.37\times 10^{-4}$ & $-0.068$ & $-0.021$ & $0.020$ & $138$ & $13{,}439$ & $-0.006$ & $-0.127$ & $0.547$ \\
-span-02\textsuperscript{\ddag} & z\_cc & $0.041$ & $3.098$ & $0.015$ & $0.064$ & $140$ & $13{,}748$ & $0.406$ & $4.969$ & $<0.001$ \\
-span-02\textsuperscript{\ddag} & z\_on & $0.074$ & $4.487$ & $0.040$ & $0.106$ & $138$ & $13{,}439$ & $0.803$ & $6.003$ & $<0.001$ \\
-span-02\textsuperscript{\ddag} & z\_id & $-5.40\times 10^{-4}$ & $-0.048$ & $-0.021$ & $0.020$ & $138$ & $13{,}439$ & $-0.008$ & $-0.163$ & $0.566$ \\
-drex-v2.0 & z\_cc & $0.044$ & $3.696$ & $0.021$ & $0.067$ & $140$ & $13{,}748$ & $0.384$ & $5.032$ & $<0.001$ \\
-drex-v2.0 & z\_on & $0.077$ & $5.340$ & $0.048$ & $0.105$ & $138$ & $13{,}439$ & $0.760$ & $6.216$ & $<0.001$ \\
-drex-v2.0 & z\_id & $0.002$ & $0.176$ & $-0.018$ & $0.023$ & $138$ & $13{,}439$ & $-0.005$ & $-0.103$ & $0.541$ \\
+Laya-Fin, $z_{cc}$ & 0.020 & [$-0.003$, $0.042$] & 1.67 & 13748 & 0.127 & 0.024 \\
+Laya-Fin, $z_{on}$ & 0.015 & [$-0.011$, $0.041$] & 1.08 & 13439 & 0.174 & 0.044 \\
+Laya-Fin, $z_{id}$ & 0.010 & [$-0.015$, $0.036$] & 0.82 & 13439 & 0.050 & 0.201 \\
+anchor, $z_{cc}$ & 0.008 & [$-0.011$, $0.026$] & 0.83 & 13748 & -0.001 & 0.500 \\
+anchor, $z_{on}$ & 0.006 & [$-0.016$, $0.027$] & 0.50 & 13439 & -0.011 & 0.544 \\
+anchor, $z_{id}$ & 0.002 & [$-0.020$, $0.022$] & 0.18 & 13439 & 0.002 & 0.495 \\
+Laya zero-shot, $z_{cc}$ & 0.005 & [$-0.023$, $0.032$] & 0.37 & 13748 & 0.056 & 0.236 \\
+Laya zero-shot, $z_{on}$ & 0.037 & [$0.015$, $0.058$] & 3.22 & 13439 & 0.281 & <0.001 \\
+Laya zero-shot, $z_{id}$ & -0.017 & [$-0.043$, $0.008$] & -1.25 & 13439 & -0.102 & 0.953 \\
+d1-ultra, $z_{cc}$ & 0.039 & [$0.015$, $0.062$] & 3.23 & 13748 & 0.410 & <0.001 \\
+d1-ultra, $z_{on}$ & 0.074 & [$0.043$, $0.104$] & 4.74 & 13439 & 0.812 & <0.001 \\
+d1-ultra, $z_{id}$ & -0.001 & [$-0.021$, $0.020$] & -0.07 & 13439 & -0.006 & 0.547 \\
+span-02$^{\ddagger}$, $z_{cc}$ & 0.041 & [$0.015$, $0.064$] & 3.10 & 13748 & 0.406 & <0.001 \\
+span-02$^{\ddagger}$, $z_{on}$ & 0.074 & [$0.040$, $0.106$] & 4.49 & 13439 & 0.803 & <0.001 \\
+span-02$^{\ddagger}$, $z_{id}$ & -0.001 & [$-0.021$, $0.020$] & -0.05 & 13439 & -0.008 & 0.566 \\
+drex-v2.0, $z_{cc}$ & 0.044 & [$0.021$, $0.067$] & 3.70 & 13748 & 0.384 & <0.001 \\
+drex-v2.0, $z_{on}$ & 0.077 & [$0.048$, $0.105$] & 5.34 & 13439 & 0.760 & <0.001 \\
+drex-v2.0, $z_{id}$ & 0.002 & [$-0.018$, $0.023$] & 0.18 & 13439 & -0.005 & 0.541 \\
 \bottomrule
 \end{tabular}
-\end{adjustbox}
-\par\smallskip{\footnotesize\raggedright The anchor's readings are uninformative (near-constant outputs: NA-11 REPORT \S{}7.1 item 4); its rows are reported, not read as nulls. \textsuperscript{\ddag} span-02: the S5 canary fired a STOP after the freeze; the operator chose to proceed (PREREG \S{}15, the post-freeze NA-11 S5 row).\par}
-\end{table*}
+\begin{tablenotes}[flushleft]\footnotesize
+\item Quintile spread of the target between the top and bottom quintile of $\hat N$, in typical daily moves.
+\item The anchor's readings are uninformative (near-constant outputs after one epoch); its rows are reported, not read as nulls.
+\item The API models fail the \S8.3 contamination screens, so their results are model-specific (\S1.3).
+\item $^{\ddagger}$span-02: the S5 canary fired a STOP after the freeze; the operator chose to proceed (PREREG \S15, post-freeze NA-11 row).
+\end{tablenotes}
+\end{threeparttable}
+\end{table}

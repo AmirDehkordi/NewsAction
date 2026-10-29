@@ -1,38 +1,43 @@
-% t8_tracking_error (NA-14, from artifacts/NA-12/tables/t8_tracking_error.csv)
-\begin{table*}[tbp]
-\centering\small
-\caption{A1 tracking error RMSE(CAR\textasciicircum{}lvl\_h $-$ V) relative to the naive 0 and to the price-only V}\label{tab:t8_tracking_error}
-\begin{adjustbox}{max width=\textwidth}
-\begin{tabular}{llrrrrrrrrrr}
+% t8_tracking_error: tab:a-tracking-error (NA-14 figures.latex, from artifacts/NA-14/tables/t8_tracking_error.csv)
+\begin{table}[htbp]
+\centering
+\small
+\begin{threeparttable}
+\caption{Tracking error of $V$: no better than a naive zero.}\label{tab:a-tracking-error}
+\begin{tabular}{@{}lS[table-format=1.3]S[table-format=1.3]S[table-format=1.3]S[table-format=1.3]S[table-format=1.3]S[table-format=5.0]@{}}
 \toprule
-model & rung & rmse & nobs & naive ratio & naive CI low & naive CI high & naive p & price only ratio & price only CI low & price only CI high & price only p \\
+Model, rung & {RMSE} & {Ratio to naive} & {$p$} & {Ratio to price-only} & {$p$} & {Events} \\
 \midrule
-Laya-Fin & O\_t & $1.381$ & $13{,}439$ & $1.019$ & $1.010$ & $1.029$ & $1.000$ & $1.014$ & $1.004$ & $1.024$ & $0.996$ \\
-Laya-Fin & 10:00 & $1.661$ & $13{,}287$ & $1.012$ & $1.005$ & $1.018$ & $0.999$ & $1.007$ & $1.000$ & $1.014$ & $0.978$ \\
-Laya-Fin & C\_t & $2.019$ & $13{,}748$ & $1.005$ & $0.999$ & $1.012$ & $0.949$ & $1.003$ & $0.996$ & $1.009$ & $0.800$ \\
-Laya-Fin & C\_t+1 & $2.708$ & $13{,}615$ & $1.003$ & $0.999$ & $1.006$ & $0.952$ & $1.002$ & $0.998$ & $1.005$ & $0.848$ \\
-Laya-Fin & C\_t+2 & $3.218$ & $13{,}439$ & $1.002$ & $0.999$ & $1.005$ & $0.896$ & $1.001$ & $0.998$ & $1.004$ & $0.699$ \\
-Laya-Fin & C\_t+5 & $4.279$ & $12{,}850$ & $1.002$ & $1.000$ & $1.004$ & $0.967$ & $1.001$ & $0.999$ & $1.004$ & $0.839$ \\
-Laya-Fin & C\_t+10 & $5.454$ & $11{,}993$ & $1.001$ & $1.000$ & $1.003$ & $0.950$ & $1.001$ & $0.999$ & $1.003$ & $0.788$ \\
-Laya-Fin & C\_t+20 & $7.047$ & $11{,}201$ & $1.001$ & $0.999$ & $1.002$ & $0.867$ & $1.000$ & $0.999$ & $1.002$ & $0.625$ \\
-anchor (uninformative) & O\_t & $1.427$ & $13{,}439$ & $1.053$ & $1.026$ & $1.081$ & $1.000$ & $1.047$ & $1.018$ & $1.076$ & $1.000$ \\
-anchor (uninformative) & 10:00 & $1.715$ & $13{,}287$ & $1.044$ & $1.023$ & $1.067$ & $1.000$ & $1.040$ & $1.018$ & $1.063$ & $1.000$ \\
-anchor (uninformative) & C\_t & $2.073$ & $13{,}748$ & $1.033$ & $1.018$ & $1.047$ & $1.000$ & $1.030$ & $1.015$ & $1.045$ & $1.000$ \\
-anchor (uninformative) & C\_t+1 & $2.747$ & $13{,}615$ & $1.018$ & $1.009$ & $1.026$ & $1.000$ & $1.016$ & $1.008$ & $1.025$ & $1.000$ \\
-anchor (uninformative) & C\_t+2 & $3.252$ & $13{,}439$ & $1.012$ & $1.006$ & $1.017$ & $1.000$ & $1.011$ & $1.005$ & $1.017$ & $1.000$ \\
-anchor (uninformative) & C\_t+5 & $4.302$ & $12{,}850$ & $1.007$ & $1.003$ & $1.010$ & $1.000$ & $1.007$ & $1.003$ & $1.010$ & $1.000$ \\
-anchor (uninformative) & C\_t+10 & $5.471$ & $11{,}993$ & $1.004$ & $1.002$ & $1.006$ & $1.000$ & $1.004$ & $1.001$ & $1.006$ & $1.000$ \\
-anchor (uninformative) & C\_t+20 & $7.056$ & $11{,}201$ & $1.002$ & $1.000$ & $1.004$ & $0.992$ & $1.002$ & $1.000$ & $1.003$ & $0.969$ \\
-d1-ultra & O\_t & $1.350$ & $13{,}439$ & $0.997$ & $0.988$ & $1.012$ & $0.290$ & $0.991$ & $0.983$ & $1.005$ & $0.032$ \\
-d1-ultra & 10:00 & $1.633$ & $13{,}287$ & $0.995$ & $0.987$ & $1.006$ & $0.094$ & $0.990$ & $0.982$ & $1.002$ & $0.011$ \\
-d1-ultra & C\_t & $2.002$ & $13{,}748$ & $0.997$ & $0.991$ & $1.005$ & $0.164$ & $0.994$ & $0.988$ & $1.002$ & $0.034$ \\
-d1-ultra & C\_t+1 & $2.699$ & $13{,}615$ & $1.000$ & $0.996$ & $1.005$ & $0.402$ & $0.998$ & $0.994$ & $1.004$ & $0.232$ \\
-d1-ultra & C\_t+2 & $3.216$ & $13{,}439$ & $1.001$ & $0.998$ & $1.006$ & $0.657$ & $1.000$ & $0.996$ & $1.005$ & $0.483$ \\
-d1-ultra & C\_t+5 & $4.278$ & $12{,}850$ & $1.002$ & $1.000$ & $1.004$ & $0.910$ & $1.001$ & $0.999$ & $1.004$ & $0.772$ \\
-d1-ultra & C\_t+10 & $5.455$ & $11{,}993$ & $1.001$ & $1.000$ & $1.004$ & $0.927$ & $1.001$ & $0.999$ & $1.003$ & $0.794$ \\
-d1-ultra & C\_t+20 & $7.045$ & $11{,}201$ & $1.000$ & $0.999$ & $1.002$ & $0.781$ & $1.000$ & $0.999$ & $1.001$ & $0.508$ \\
+Laya-Fin, $O_t$ & 1.381 & 1.019 & 1.000 & 1.014 & 0.996 & 13439 \\
+Laya-Fin, 10:00 & 1.661 & 1.012 & 0.999 & 1.007 & 0.978 & 13287 \\
+Laya-Fin, $C_t$ & 2.019 & 1.005 & 0.949 & 1.003 & 0.800 & 13748 \\
+Laya-Fin, $t{+}1$ & 2.708 & 1.003 & 0.952 & 1.002 & 0.848 & 13615 \\
+Laya-Fin, $t{+}2$ & 3.218 & 1.002 & 0.896 & 1.001 & 0.699 & 13439 \\
+Laya-Fin, $t{+}5$ & 4.279 & 1.002 & 0.967 & 1.001 & 0.839 & 12850 \\
+Laya-Fin, $t{+}10$ & 5.454 & 1.001 & 0.950 & 1.001 & 0.788 & 11993 \\
+Laya-Fin, $t{+}20$ & 7.047 & 1.001 & 0.867 & 1.000 & 0.625 & 11201 \\
+anchor, $O_t$ & 1.427 & 1.053 & 1.000 & 1.047 & 1.000 & 13439 \\
+anchor, 10:00 & 1.715 & 1.044 & 1.000 & 1.040 & 1.000 & 13287 \\
+anchor, $C_t$ & 2.073 & 1.033 & 1.000 & 1.030 & 1.000 & 13748 \\
+anchor, $t{+}1$ & 2.747 & 1.018 & 1.000 & 1.016 & 1.000 & 13615 \\
+anchor, $t{+}2$ & 3.252 & 1.012 & 1.000 & 1.011 & 1.000 & 13439 \\
+anchor, $t{+}5$ & 4.302 & 1.007 & 1.000 & 1.007 & 1.000 & 12850 \\
+anchor, $t{+}10$ & 5.471 & 1.004 & 1.000 & 1.004 & 1.000 & 11993 \\
+anchor, $t{+}20$ & 7.056 & 1.002 & 0.992 & 1.002 & 0.969 & 11201 \\
+d1-ultra, $O_t$ & 1.350 & 0.997 & 0.290 & 0.991 & 0.032 & 13439 \\
+d1-ultra, 10:00 & 1.633 & 0.995 & 0.094 & 0.990 & 0.011 & 13287 \\
+d1-ultra, $C_t$ & 2.002 & 0.997 & 0.164 & 0.994 & 0.034 & 13748 \\
+d1-ultra, $t{+}1$ & 2.699 & 1.000 & 0.402 & 0.998 & 0.232 & 13615 \\
+d1-ultra, $t{+}2$ & 3.216 & 1.001 & 0.657 & 1.000 & 0.483 & 13439 \\
+d1-ultra, $t{+}5$ & 4.278 & 1.002 & 0.910 & 1.001 & 0.772 & 12850 \\
+d1-ultra, $t{+}10$ & 5.455 & 1.001 & 0.927 & 1.001 & 0.794 & 11993 \\
+d1-ultra, $t{+}20$ & 7.045 & 1.000 & 0.781 & 1.000 & 0.508 & 11201 \\
 \bottomrule
 \end{tabular}
-\end{adjustbox}
-\par\smallskip{\footnotesize\raggedright The anchor's readings are uninformative (near-constant outputs: NA-11 REPORT \S{}7.1 item 4); its rows are reported, not read as nulls.\par}
-\end{table*}
+\begin{tablenotes}[flushleft]\footnotesize
+\item RMSE of $\mathrm{CAR}^{\mathrm{lvl}}_h - V$ relative to a naive 0 and to the price-only $V$.
+\item The anchor's readings are uninformative (near-constant outputs after one epoch); its rows are reported, not read as nulls.
+\item The API models fail the \S8.3 contamination screens, so their results are model-specific (\S1.3).
+\end{tablenotes}
+\end{threeparttable}
+\end{table}

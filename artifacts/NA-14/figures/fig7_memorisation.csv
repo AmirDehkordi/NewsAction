@@ -1,0 +1,10 @@
+panel,series,label,role,x,xv,y,lo,hi,ci,source,key,y_col,x_col,lo_col,hi_col,se_col
+a,cloudflare/clef,,accuracy,cloudflare/clef,,0.66,0.6122516850900368,0.7047043807229885,wilson,artifacts/NA-11/company_id_matched.csv,cloudflare/clef,accuracy,,,,valid
+a,inception/mercury-decide,,accuracy,inception/mercury-decide,,0.62,0.5715045437377642,0.6662125056220047,wilson,artifacts/NA-11/company_id_matched.csv,inception/mercury-decide,accuracy,,,,valid
+a,liquid/d1-ultra,,accuracy,liquid/d1-ultra,,0.7425,0.697484812382584,0.7829017248652822,wilson,artifacts/NA-11/company_id_matched.csv,liquid/d1-ultra,accuracy,,,,valid
+a,local/laya-typed-decisions,,accuracy,local/laya-typed-decisions,,0.32,0.2761841236239046,0.36724030233644217,wilson,artifacts/NA-11/company_id_matched.csv,local/laya-typed-decisions,accuracy,,,,valid
+a,nace-ai/drex-v2.0,,accuracy,nace-ai/drex-v2.0,,0.68,0.632759697663558,0.7238158763760955,wilson,artifacts/NA-11/company_id_matched.csv,nace-ai/drex-v2.0,accuracy,,,,valid
+a,openai/gpt-6-luna-decisions,,accuracy,openai/gpt-6-luna-decisions,,0.681704260651629,0.6344508093113277,0.7254922820092204,wilson,artifacts/NA-11/company_id_matched.csv,openai/gpt-6-luna-decisions,accuracy,,,,valid
+a,respan/span-02,,accuracy,respan/span-02,,0.6625,0.6148101420626579,0.7070983622786957,wilson,artifacts/NA-11/company_id_matched.csv,respan/span-02,accuracy,,,,valid
+a,reference,,baseline,baseline,,0.2825,,,,artifacts/NA-11/company_id_matched.csv,liquid/d1-ultra,baseline_matched,,,,
+a,reference,,screen,screen,,0.4,,,,artifacts/NA-11/company_id_matched.csv,liquid/d1-ultra,screen_threshold,,,,

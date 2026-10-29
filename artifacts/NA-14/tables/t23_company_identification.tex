@@ -1,21 +1,25 @@
-% t23_company_identification (NA-14, from artifacts/NA-11/company_id_matched.csv)
-\begin{table*}[tbp]
-\centering\small
-\caption{Company identification with activity-matched distractors (NA-11; val-A, masked states)}\label{tab:t23_company_identification}
-\begin{adjustbox}{max width=\textwidth}
-\begin{tabular}{lrrrrrrrrr}
+% t23_company_identification: tab:a-company-identification (NA-14 figures.latex, from artifacts/NA-14/tables/t23_company_identification.csv)
+\begin{table}[htbp]
+\centering
+\small
+\begin{threeparttable}
+\caption{Company identification on masked states: the API models name the company far above the matched baseline.}\label{tab:a-company-identification}
+\begin{tabular}{@{}lS[table-format=1.3]S[table-format=3.0]S[table-format=1.3]S[table-format=1.2]@{}}
 \toprule
-model & n & valid & accuracy & mean p true & cost & accuracy na06 design & baseline matched & baseline na06 design & screen threshold \\
+Model & {Identified} & {States} & {Matched baseline} & {Screen bar} \\
 \midrule
-cloudflare/clef & $400$ & $400$ & $0.660$ & $0.585$ & $0.015$ & $0.690$ & $0.282$ & $0.359$ & $0.400$ \\
-inception/mercury-decide & $400$ & $400$ & $0.620$ & $0.585$ & $0.005$ & $0.627$ & $0.282$ & $0.359$ & $0.400$ \\
-liquid/d1-ultra & $400$ & $400$ & $0.743$ & $0.656$ & $0.012$ & $0.720$ & $0.282$ & $0.359$ & $0.400$ \\
-local/laya-typed-decisions & $400$ & $400$ & $0.320$ & $0.265$ & $0.000$ & --- & $0.282$ & $0.359$ & $0.400$ \\
-nace-ai/drex-v2.0 & $400$ & $400$ & $0.680$ & $0.533$ & $0.014$ & $0.667$ & $0.282$ & $0.359$ & $0.400$ \\
-openai/gpt-6-luna-decisions & $400$ & $399$ & $0.682$ & $0.638$ & $0.026$ & $0.695$ & $0.282$ & $0.359$ & $0.400$ \\
-respan/span-02\textsuperscript{\ddag} & $400$ & $400$ & $0.662$ & $0.623$ & $0.003$ & $0.660$ & $0.282$ & $0.359$ & $0.400$ \\
+clef & 0.660 & 400 & 0.282 & 0.40 \\
+mercury-decide & 0.620 & 400 & 0.282 & 0.40 \\
+d1-ultra & 0.743 & 400 & 0.282 & 0.40 \\
+Laya zero-shot & 0.320 & 400 & 0.282 & 0.40 \\
+drex-v2.0 & 0.680 & 400 & 0.282 & 0.40 \\
+gpt-6-luna-decisions & 0.682 & 399 & 0.282 & 0.40 \\
+span-02$^{\ddagger}$ & 0.662 & 400 & 0.282 & 0.40 \\
 \bottomrule
 \end{tabular}
-\end{adjustbox}
-\par\smallskip{\footnotesize\raggedright \textsuperscript{\ddag} span-02: the S5 canary fired a STOP after the freeze; the operator chose to proceed (PREREG \S{}15, the post-freeze NA-11 S5 row).\par}
-\end{table*}
+\begin{tablenotes}[flushleft]\footnotesize
+\item NA-06's val-A events with activity-matched distractors (NA-11); States: the valid answers.
+\item $^{\ddagger}$span-02: the S5 canary fired a STOP after the freeze; the operator chose to proceed (PREREG \S15, post-freeze NA-11 row).
+\end{tablenotes}
+\end{threeparttable}
+\end{table}

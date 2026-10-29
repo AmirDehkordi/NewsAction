@@ -1,0 +1,33 @@
+% tab3_over_under: tab:over-under (NA-14 figures.latex, from artifacts/NA-12/tables/t2_h2_over_under.csv)
+\begin{table}[htbp]
+\centering
+\small
+\begin{threeparttable}
+\caption{The over/under regression: the reversal coefficient $c$ has the predicted sign but is not significant, and the news coefficient $b$ is not positive at the close.}\label{tab:over-under}
+\begin{tabular}{@{}lS[table-format=-1.3]S[table-format=1.3, table-space-text-pre=(, table-space-text-post=)]S[table-format=1.3]S[table-format=-1.3]S[table-format=1.3, table-space-text-pre=(, table-space-text-post=)]S[table-format=1.3]S[table-format=5.0]@{}}
+\toprule
+Decision point & {$b$} & {SE} & {$p_b$} & {$c$} & {SE} & {$p_c$} & {Events} \\
+\midrule
+\multicolumn{8}{@{}l}{\textit{Laya-Fin (primary)}} \\
+D2, close (H2) & -0.044 & {(}0.149{)} & 0.616 & -0.015 & {(}0.012{)} & 0.110 & 17188 \\
+D1, 10:00 & 0.229 & {(}0.148{)} & 0.062 & 0.013 & {(}0.012{)} & 0.861 & 13203 \\
+D0, open & 0.278 & {(}0.212{)} & 0.096 & {---} & {---} & {---} & 13439 \\
+\addlinespace
+\multicolumn{8}{@{}l}{\textit{Anchor (uninformative)}} \\
+D2, close (H2) & 0.748 & {(}1.377{)} & 0.294 & -0.015 & {(}0.012{)} & 0.111 & 17188 \\
+D1, 10:00 & 1.964 & {(}2.482{)} & 0.215 & 0.014 & {(}0.012{)} & 0.874 & 13203 \\
+D0, open & -4.510 & {(}3.236{)} & 0.917 & {---} & {---} & {---} & 13439 \\
+\addlinespace
+\multicolumn{8}{@{}l}{\textit{d1-ultra (model-specific)}} \\
+D2, close (H2) & -0.076 & {(}0.031{)} & 0.991 & -0.011 & {(}0.012{)} & 0.171 & 17188 \\
+D1, 10:00 & -0.018 & {(}0.032{)} & 0.711 & 0.015 & {(}0.012{)} & 0.884 & 13203 \\
+D0, open & 0.022 & {(}0.037{)} & 0.277 & {---} & {---} & {---} & 13439 \\
+\bottomrule
+\end{tabular}
+\begin{tablenotes}[flushleft]\footnotesize
+\item $y = a + b\,\hat N + c\,G$ with day $\times$ tier fixed effects, on the test period: at D2 $y = y_2$ (next open to $t{+}5$), $\hat N$ from the day's news and $G$ the day's move; at D1 the move after 10:00 on $\hat N$ from the pre-open news and the move to 10:00; at D0 $y = z_{id}$ and there is no $G$. Two-way clustered (session, firm) standard errors in parentheses; $p_b$ tests $b > 0$ and $p_c$ tests $c < 0$, one-sided. H2 is the D2 row of Laya-Fin.
+\item The anchor's readings are uninformative (near-constant outputs after one epoch); its rows are reported, not read as nulls. The API models fail the \S8.3 contamination screens, so their results are model-specific (\S1.3).
+\item Significance: no stars are used; $p$ is one-sided unless stated.
+\end{tablenotes}
+\end{threeparttable}
+\end{table}

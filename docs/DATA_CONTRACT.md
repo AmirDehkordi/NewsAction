@@ -2636,7 +2636,25 @@ sha256 on a rerun (labels and export were run twice: 8 of 8 files identical).
 - **Key:** one file
 - **Rows / coverage:** facts no earlier artifact records (Laya's release date)
 - **Availability:** after NA-12 and NA-13 (test-period results are their stored outputs; nothing here reads the lock)
-- **sha256:** `40b243194c9e71e53b857bd0e626512af93560de2da8b351554b1b8e3fc889ad`
+- **sha256:** `b094fec1f71c7a2648acb069ae371d8cc4490240d6875d2ec7157ac885e05f43`
+
+### `artifacts/NA-14/inputs/prereg_deviations.yaml`
+- **Producer:** NA-14 (author; the operator's revision pass)
+- **Inputs:** `docs/PREREG.md` §15
+- **Schema:** YAML: rows → {row, date, chunk, change, reason}
+- **Key:** one entry per row of PREREG §15
+- **Rows / coverage:** the one-line summaries of the deviations (t34 checks each against its row)
+- **Availability:** after NA-12 and NA-13 (test-period results are their stored outputs; nothing here reads the lock)
+- **sha256:** `5b8e97940f765c40fa64e391f72dcf41969758154f5d70fef20247c2d94eb64a`
+
+### `artifacts/NA-14/paper_preview.tex`
+- **Producer:** `newsaction.figures.preview` (make paper)
+- **Inputs:** the figures, the LaTeX tables and `captions.yaml`
+- **Schema:** LaTeX article (11 pt, US letter, 1-inch margins): every main figure and table in outline order, then the appendix
+- **Key:** one file
+- **Rows / coverage:** the paper preview; `make paper-preview` compiles it with tectonic (the PDF's digest is reported, not registered)
+- **Availability:** after NA-12 and NA-13 (test-period results are their stored outputs; nothing here reads the lock)
+- **sha256:** `46cc1be41985354888185de84650a00ffa4be2de61ff60b01be6b5574d89397c`
 
 ### `artifacts/NA-14/captions.yaml`
 - **Producer:** NA-14 (author)
@@ -2645,7 +2663,7 @@ sha256 on a rerun (labels and export were run twice: 8 of 8 files identical).
 - **Key:** one entry per figure
 - **Rows / coverage:** the caption templates; `python -m newsaction.figures.captions` checks every number
 - **Availability:** after NA-12 and NA-13 (test-period results are their stored outputs; nothing here reads the lock)
-- **sha256:** `80146ee6a7de1d0d5906bf5dbb52341e120846883165201650b37e94bd509d51`
+- **sha256:** `3088a1c5e37c2876bea8aaf867a9ec9bf0c162ae837858a54168b1b156f01fb7`
 
 ### `artifacts/NA-14/captions.md`
 - **Producer:** `newsaction.figures.captions`
@@ -2654,7 +2672,7 @@ sha256 on a rerun (labels and export were run twice: 8 of 8 files identical).
 - **Key:** one file
 - **Rows / coverage:** the rendered captions
 - **Availability:** after NA-12 and NA-13 (test-period results are their stored outputs; nothing here reads the lock)
-- **sha256:** `ac5fb79e09d37d918917b839a2d35b56ee08f4398a776e9c4665498bd0ba942b`
+- **sha256:** `fc045c14e94c70d8fe52f8a218359f03c6ed4686b53ccca42487c24848f2a3a9`
 
 ### `artifacts/NA-14/digests.json`
 - **Producer:** `newsaction.figures.paper --write-digests`
@@ -2663,338 +2681,311 @@ sha256 on a rerun (labels and export were run twice: 8 of 8 files identical).
 - **Key:** one file
 - **Rows / coverage:** what `make paper` must reproduce
 - **Availability:** after NA-12 and NA-13 (test-period results are their stored outputs; nothing here reads the lock)
-- **sha256:** `da83e342fd4b532a4a5697d6f460ca38116bd6ca986625d17be2d710584dca52`
+- **sha256:** `81e438bd6bca46be0c0f03d28da718e3b773f6c98282bc933a319148ad713682`
 
-### `artifacts/NA-14/figures/fig1_convergence.csv`
+### `artifacts/NA-14/figures/fig1_validation_test.csv`
 - **Producer:** `newsaction.figures.data` (`fig1`)
-- **Inputs:** `artifacts/NA-12/figure_data/fig1_rg_class_paths.csv`, `artifacts/NA-12/figure_data/fig1_v_decile_paths.csv`, `artifacts/NA-12/tables/t6_convergence_ladder.csv`, `artifacts/NA-12/tables/t7_gap_closure.csv`
+- **Inputs:** `artifacts/NA-12/tables/t14_model_comparison.csv`
 - **Schema:** `panel`, `series`, `label`, `role`, `x`, `xv`, `y`, `lo`, `hi`, `ci`, `source`, `key`, `y_col`, `x_col`, `lo_col`, `hi_col`, `se_col`
 - **Key:** one row per plotted value; (`source`, `key`, `y_col`) name its upstream cell
-- **Rows / coverage:** Figure 1, convergence: V-decile paths with their mean V (a, b), the κ ladder (c), the signed RG-class     paths (d) and the half-lives of the gap (annotation).
+- **Rows / coverage:** Figure 1: the daily IC of N̂_W0 with z_cc on val-B and on test for each instrument and baseline, with     95% intervals from the Newey–West t (NA-12 t14).
 - **Availability:** after NA-12 and NA-13 (test-period results are their stored outputs; nothing here reads the lock)
-- **sha256:** `079d16cc523bcf75f22703fbd18efe8d764f3b3173e4f000f3913f5955467bb4`
+- **sha256:** `3d3fa11d672f538f6ffc900ec1cefee5ba48766f7dcdb33b9e3880faff1bb069`
 
-### `artifacts/NA-14/figures/fig1_convergence.pdf`
-- **Producer:** `newsaction.figures.render` (`newsaction.figures.fig1_hero_car`)
-- **Inputs:** `artifacts/NA-14/figures/fig1_convergence.csv` only
+### `artifacts/NA-14/figures/fig1_validation_test.pdf`
+- **Producer:** `newsaction.figures.render` (`newsaction.figures.fig1_validation_test`)
+- **Inputs:** `artifacts/NA-14/figures/fig1_validation_test.csv` only
 - **Schema:** vector PDF (TrueType fonts embedded)
 - **Key:** one file
-- **Rows / coverage:** the figure fig1_convergence at print size
+- **Rows / coverage:** the figure fig1_validation_test at print size
 - **Availability:** after NA-12 and NA-13 (test-period results are their stored outputs; nothing here reads the lock)
-- **sha256:** `bb53c84749bbeae70a6d0210e441724faaccf6091453ed4ebb474ce37a9b4405`
+- **sha256:** `73d5ebb7de769920c97fcaca602d42167652410c7ec7e7236969b8e4d8e86b2b`
 
-### `artifacts/NA-14/figures/fig1_convergence.png`
-- **Producer:** `newsaction.figures.render` (`newsaction.figures.fig1_hero_car`)
-- **Inputs:** `artifacts/NA-14/figures/fig1_convergence.csv` only
+### `artifacts/NA-14/figures/fig1_validation_test.png`
+- **Producer:** `newsaction.figures.render` (`newsaction.figures.fig1_validation_test`)
+- **Inputs:** `artifacts/NA-14/figures/fig1_validation_test.csv` only
 - **Schema:** PNG, 300 dpi
 - **Key:** one file
-- **Rows / coverage:** the figure fig1_convergence at print size
+- **Rows / coverage:** the figure fig1_validation_test at print size
 - **Availability:** after NA-12 and NA-13 (test-period results are their stored outputs; nothing here reads the lock)
-- **sha256:** `bfb55f08f84154b6400d7e0b8241025b27bc0ad6bc9ac4a4b0a2a1a0838e8a7f`
+- **sha256:** `ec85c112e7617f3b711fe507fa2ea0dd58a392a88d7052ed6ec190698ecd26f3`
 
-### `artifacts/NA-14/figures/fig2_drift_vs_move.csv`
+### `artifacts/NA-14/figures/fig2_priced_at_open.csv`
 - **Producer:** `newsaction.figures.data` (`fig2`)
-- **Inputs:** `artifacts/NA-12/figure_data/fig2_drift_vs_g.csv`
+- **Inputs:** `artifacts/NA-12/tables/t1b_primary_by_model.csv`, `artifacts/NA-12/tables/t3_ic.csv`
 - **Schema:** `panel`, `series`, `label`, `role`, `x`, `xv`, `y`, `lo`, `hi`, `ci`, `source`, `key`, `y_col`, `x_col`, `lo_col`, `hi_col`, `se_col`
 - **Key:** one row per plotted value; (`source`, `key`, `y_col`) name its upstream cell
-- **Rows / coverage:** Figure 2: mean sign(G)·y2 (drift after D2) by |G| bin, one panel per tercile of news strength     |V_W2|.
+- **Rows / coverage:** Figure 2: (a) the daily IC of N̂_W0 with the overnight move z_on and with the move after the open z_id     (NA-12 t3, 95% bootstrap intervals); (b) H1, their difference (t1b, 95% bootstrap interval).
 - **Availability:** after NA-12 and NA-13 (test-period results are their stored outputs; nothing here reads the lock)
-- **sha256:** `348440b1c041d0f5355bb703c556cdf8f81dfb5c0ce22582fb96592311f78fd7`
+- **sha256:** `be9a29497719fce6cd167396fcfe77716c5c41c530648bdae051fb88e4cd92aa`
 
-### `artifacts/NA-14/figures/fig2_drift_vs_move.pdf`
-- **Producer:** `newsaction.figures.render` (`newsaction.figures.fig2_drift_vs_move`)
-- **Inputs:** `artifacts/NA-14/figures/fig2_drift_vs_move.csv` only
+### `artifacts/NA-14/figures/fig2_priced_at_open.pdf`
+- **Producer:** `newsaction.figures.render` (`newsaction.figures.fig2_priced_at_open`)
+- **Inputs:** `artifacts/NA-14/figures/fig2_priced_at_open.csv` only
 - **Schema:** vector PDF (TrueType fonts embedded)
 - **Key:** one file
-- **Rows / coverage:** the figure fig2_drift_vs_move at print size
+- **Rows / coverage:** the figure fig2_priced_at_open at print size
 - **Availability:** after NA-12 and NA-13 (test-period results are their stored outputs; nothing here reads the lock)
-- **sha256:** `fd5fe8b91ec33fc15b69d2787335adc3d560e1307495a67e9d9b8f86a72d50c5`
+- **sha256:** `ab5795f76bd9062da3abc667a0e84fac2e641098de9b3fcb3cdc732431e66e9c`
 
-### `artifacts/NA-14/figures/fig2_drift_vs_move.png`
-- **Producer:** `newsaction.figures.render` (`newsaction.figures.fig2_drift_vs_move`)
-- **Inputs:** `artifacts/NA-14/figures/fig2_drift_vs_move.csv` only
+### `artifacts/NA-14/figures/fig2_priced_at_open.png`
+- **Producer:** `newsaction.figures.render` (`newsaction.figures.fig2_priced_at_open`)
+- **Inputs:** `artifacts/NA-14/figures/fig2_priced_at_open.csv` only
 - **Schema:** PNG, 300 dpi
 - **Key:** one file
-- **Rows / coverage:** the figure fig2_drift_vs_move at print size
+- **Rows / coverage:** the figure fig2_priced_at_open at print size
 - **Availability:** after NA-12 and NA-13 (test-period results are their stored outputs; nothing here reads the lock)
-- **sha256:** `b5570524cff743ef339782c9e4bf7d3c6de9c236518a736df64233cf162b63f5`
+- **sha256:** `c2aca62fdfdea3b0a92b4ff35bc99bb85d48064ceec73228b2b96c21c6c21e18`
 
-### `artifacts/NA-14/figures/fig3_tournament.csv`
+### `artifacts/NA-14/figures/fig3_convergence.csv`
 - **Producer:** `newsaction.figures.data` (`fig3`)
-- **Inputs:** `artifacts/NA-06/fig3_data.csv`, `artifacts/NA-12/tables/t14_model_comparison.csv`
+- **Inputs:** `artifacts/NA-12/figure_data/fig1_v_decile_paths.csv`, `artifacts/NA-12/tables/t6_convergence_ladder.csv`, `artifacts/NA-12/tables/t7_gap_closure.csv`
 - **Schema:** `panel`, `series`, `label`, `role`, `x`, `xv`, `y`, `lo`, `hi`, `ci`, `source`, `key`, `y_col`, `x_col`, `lo_col`, `hi_col`, `se_col`
 - **Key:** one row per plotted value; (`source`, `key`, `y_col`) name its upstream cell
-- **Rows / coverage:** Figure 3: (a) the NA-06 tournament's daily IC (95% bootstrap CI) against the cost per 1,000 decisions,     with MCS membership and the stage-2 screens; (b) val-B and test ICs of the final instruments and baselines     (95% CIs from the Newey–West t), with their cost per 1,000 decisions.
+- **Rows / coverage:** Figure 3: (a) d1-ultra's top and bottom V deciles, CAR^lvl from the previous close with ±1.96     event-level SE bands, against each decile's mean V (NA-12 figure data); (b) the convergence ladder κ_h of     Laya-Fin and d1-ultra with 95% intervals (t6) and the gap's half-life (t7).
 - **Availability:** after NA-12 and NA-13 (test-period results are their stored outputs; nothing here reads the lock)
-- **sha256:** `c6788dfe97cba9c440f209620c1d2ccd8e3727bd14bdc431935ca23a57eebd4f`
+- **sha256:** `c258a042b0e8a856d29f17a253c16ba84642333966b64124ed9bbade3489c4b3`
 
-### `artifacts/NA-14/figures/fig3_tournament.pdf`
-- **Producer:** `newsaction.figures.render` (`newsaction.figures.fig3_tournament`)
-- **Inputs:** `artifacts/NA-14/figures/fig3_tournament.csv` only
+### `artifacts/NA-14/figures/fig3_convergence.pdf`
+- **Producer:** `newsaction.figures.render` (`newsaction.figures.fig3_convergence`)
+- **Inputs:** `artifacts/NA-14/figures/fig3_convergence.csv` only
 - **Schema:** vector PDF (TrueType fonts embedded)
 - **Key:** one file
-- **Rows / coverage:** the figure fig3_tournament at print size
+- **Rows / coverage:** the figure fig3_convergence at print size
 - **Availability:** after NA-12 and NA-13 (test-period results are their stored outputs; nothing here reads the lock)
-- **sha256:** `a5570f7099699c0539374298d0f59363e607cb9a42fc073957187ce9b89b4c84`
+- **sha256:** `d514fe0ce1043743d25d3ee46c3ae932301126290ded90cea471d37b7cf651bc`
 
-### `artifacts/NA-14/figures/fig3_tournament.png`
-- **Producer:** `newsaction.figures.render` (`newsaction.figures.fig3_tournament`)
-- **Inputs:** `artifacts/NA-14/figures/fig3_tournament.csv` only
+### `artifacts/NA-14/figures/fig3_convergence.png`
+- **Producer:** `newsaction.figures.render` (`newsaction.figures.fig3_convergence`)
+- **Inputs:** `artifacts/NA-14/figures/fig3_convergence.csv` only
 - **Schema:** PNG, 300 dpi
 - **Key:** one file
-- **Rows / coverage:** the figure fig3_tournament at print size
+- **Rows / coverage:** the figure fig3_convergence at print size
 - **Availability:** after NA-12 and NA-13 (test-period results are their stored outputs; nothing here reads the lock)
-- **sha256:** `4b3acf308872bd5ca4c3d7e1a58a6740019425de6f5e631de7ea8db883f0e0bb`
+- **sha256:** `acb877707e19fa83f341cb0d5cce70f43c3b75c5f9d9fe219d8d8ab761c63f7a`
 
-### `artifacts/NA-14/figures/fig4_monthly_ic.csv`
+### `artifacts/NA-14/figures/fig4_over_under.csv`
 - **Producer:** `newsaction.figures.data` (`fig4`)
-- **Inputs:** `artifacts/NA-12/figure_data/fig4_monthly_ic.csv`, `artifacts/NA-14/tables/t21_release_dates.csv`
+- **Inputs:** `artifacts/NA-12/figure_data/fig1_rg_class_paths.csv`, `artifacts/NA-12/figure_data/fig2_drift_vs_g.csv`
 - **Schema:** `panel`, `series`, `label`, `role`, `x`, `xv`, `y`, `lo`, `hi`, `ci`, `source`, `key`, `y_col`, `x_col`, `lo_col`, `hi_col`, `se_col`
 - **Key:** one row per plotted value; (`source`, `key`, `y_col`) name its upstream cell
-- **Rows / coverage:** Figure 4: monthly mean daily IC of N̂_W0 with z_cc over val-A, val-B and test, and the release dates.
+- **Rows / coverage:** Figure 4: (a) d1-ultra's D2 events by RG class (Under, Fair, Over), sign(N̂)·CAR^lvl with ±1.96 SE     bands, against each class's mean signed V; (b) d1-ultra's drift sign(G)·y2 by |G| bin within terciles of     news strength |V| (NA-12 figure data).
 - **Availability:** after NA-12 and NA-13 (test-period results are their stored outputs; nothing here reads the lock)
-- **sha256:** `d7eb0c3e66917162f8f1c44e95efc6958110b150cd49d14af9093bad0d7d60c5`
+- **sha256:** `57cfc40e379a83ac114969a20f574ae20403ba5481c14b667055043b2a870e4f`
 
-### `artifacts/NA-14/figures/fig4_monthly_ic.pdf`
-- **Producer:** `newsaction.figures.render` (`newsaction.figures.fig4_monthly_ic`)
-- **Inputs:** `artifacts/NA-14/figures/fig4_monthly_ic.csv` only
+### `artifacts/NA-14/figures/fig4_over_under.pdf`
+- **Producer:** `newsaction.figures.render` (`newsaction.figures.fig4_over_under`)
+- **Inputs:** `artifacts/NA-14/figures/fig4_over_under.csv` only
 - **Schema:** vector PDF (TrueType fonts embedded)
 - **Key:** one file
-- **Rows / coverage:** the figure fig4_monthly_ic at print size
+- **Rows / coverage:** the figure fig4_over_under at print size
 - **Availability:** after NA-12 and NA-13 (test-period results are their stored outputs; nothing here reads the lock)
-- **sha256:** `9e8b37aade9fb146202cd65cd1980d6bc6efcd5fe1783c7d3ea6274b5cf4aa4f`
+- **sha256:** `fe22f508ff521ce0d7e01d393d7f0b2c2e3c7ed67181cffcdebe0d5de0729203`
 
-### `artifacts/NA-14/figures/fig4_monthly_ic.png`
-- **Producer:** `newsaction.figures.render` (`newsaction.figures.fig4_monthly_ic`)
-- **Inputs:** `artifacts/NA-14/figures/fig4_monthly_ic.csv` only
+### `artifacts/NA-14/figures/fig4_over_under.png`
+- **Producer:** `newsaction.figures.render` (`newsaction.figures.fig4_over_under`)
+- **Inputs:** `artifacts/NA-14/figures/fig4_over_under.csv` only
 - **Schema:** PNG, 300 dpi
 - **Key:** one file
-- **Rows / coverage:** the figure fig4_monthly_ic at print size
+- **Rows / coverage:** the figure fig4_over_under at print size
 - **Availability:** after NA-12 and NA-13 (test-period results are their stored outputs; nothing here reads the lock)
-- **sha256:** `043f7ba1f6b930c3a1c5d318b3c4e62411d04478c0a625bc59a707dfb9e1a396`
+- **sha256:** `f8b47d7e1c4dc26c01f2a6538b99f21d6320fc93bab6b88ced460a9122232b3c`
 
-### `artifacts/NA-14/figures/fig5_shapley.csv`
+### `artifacts/NA-14/figures/fig5_explaining_moves.csv`
 - **Producer:** `newsaction.figures.data` (`fig5`)
-- **Inputs:** `artifacts/NA-12/tables/t13_shapley.csv`
+- **Inputs:** `artifacts/NA-12/tables/t10_explanation_ladder.csv`
 - **Schema:** `panel`, `series`, `label`, `role`, `x`, `xv`, `y`, `lo`, `hi`, `ci`, `source`, `key`, `y_col`, `x_col`, `lo_col`, `hi_col`, `se_col`
 - **Key:** one row per plotted value; (`source`, `key`, `y_col`) name its upstream cell
-- **Rows / coverage:** Figure 5: Shapley values of the out-of-sample R² and IC of y2 at D2 over the groups R, N, J, by tier,     with the full model's total (t13). The shares are not drawn: their totals are about zero.
+- **Rows / coverage:** Figure 5 (PREREG A3): (a) the news steps of the explanation ladder, the out-of-sample R² of z_cc after     the ex-ante (D0) and the ex-post (same-day) news, for Laya-Fin and d1-ultra; (b) d1-ultra's R² after the     explanation step (Call B sees the move), by cut (NA-12 t10, 95% bootstrap intervals).
 - **Availability:** after NA-12 and NA-13 (test-period results are their stored outputs; nothing here reads the lock)
-- **sha256:** `1b5cd0b736710082d02f341607fe5dae145a6199826308c0695242b8bb49a827`
+- **sha256:** `0144af4d4fde9cf6880a52beb7a4f9652d31e640e11427c66d8e2382ff61d695`
 
-### `artifacts/NA-14/figures/fig5_shapley.pdf`
-- **Producer:** `newsaction.figures.render` (`newsaction.figures.fig5_shapley`)
-- **Inputs:** `artifacts/NA-14/figures/fig5_shapley.csv` only
+### `artifacts/NA-14/figures/fig5_explaining_moves.pdf`
+- **Producer:** `newsaction.figures.render` (`newsaction.figures.fig5_explaining_moves`)
+- **Inputs:** `artifacts/NA-14/figures/fig5_explaining_moves.csv` only
 - **Schema:** vector PDF (TrueType fonts embedded)
 - **Key:** one file
-- **Rows / coverage:** the figure fig5_shapley at print size
+- **Rows / coverage:** the figure fig5_explaining_moves at print size
 - **Availability:** after NA-12 and NA-13 (test-period results are their stored outputs; nothing here reads the lock)
-- **sha256:** `86f676ac6199ded09cc758286ca99104e57d6635179a5f596e4324fa9089d3f1`
+- **sha256:** `569d9a7d7bc02497548b742477fb1360775a094849073f89439e61372c36b6fa`
 
-### `artifacts/NA-14/figures/fig5_shapley.png`
-- **Producer:** `newsaction.figures.render` (`newsaction.figures.fig5_shapley`)
-- **Inputs:** `artifacts/NA-14/figures/fig5_shapley.csv` only
+### `artifacts/NA-14/figures/fig5_explaining_moves.png`
+- **Producer:** `newsaction.figures.render` (`newsaction.figures.fig5_explaining_moves`)
+- **Inputs:** `artifacts/NA-14/figures/fig5_explaining_moves.csv` only
 - **Schema:** PNG, 300 dpi
 - **Key:** one file
-- **Rows / coverage:** the figure fig5_shapley at print size
+- **Rows / coverage:** the figure fig5_explaining_moves at print size
 - **Availability:** after NA-12 and NA-13 (test-period results are their stored outputs; nothing here reads the lock)
-- **sha256:** `d6d36683b513fd0f81f8dda61fba6c87fa9db399107a794ce5bb9f96085bf6c2`
+- **sha256:** `7a88a2efff1361d1cedf00020b6ddb100d45f3014a0228888db05e1cc1bddfdd`
 
-### `artifacts/NA-14/figures/fig6_filters.csv`
+### `artifacts/NA-14/figures/fig6_strategies.csv`
 - **Producer:** `newsaction.figures.data` (`fig6`)
+- **Inputs:** `artifacts/NA-13/fig7_data.csv`, `artifacts/NA-13/strategy_table.csv`, `artifacts/NA-14/tables/t33_placebo_sharpe.csv`
+- **Schema:** `panel`, `series`, `label`, `role`, `x`, `xv`, `y`, `lo`, `hi`, `ci`, `source`, `key`, `y_col`, `x_col`, `lo_col`, `hi_col`, `se_col`
+- **Key:** one row per plotted value; (`source`, `key`, `y_col`) name its upstream cell
+- **Rows / coverage:** Figure 6: (a, b) the annualized gross and net (10 bp per side) Sharpe ratio of each main book of     Laya-Fin and d1-ultra and of the gap fade, test period (NA-13 strategy table), against the 5th–95th     percentile of its 100 random-signal books (t33); (c) S-CONV's cumulative net return at 10 bp against the     gap fade, with the placebo's 5th–95th percentile band (NA-13 Figure 7 data).
+- **Availability:** after NA-12 and NA-13 (test-period results are their stored outputs; nothing here reads the lock)
+- **sha256:** `ebabb993ecb618cb047751e1d1f0dbb8e214f127a558be0d41c6f9490ff23ef9`
+
+### `artifacts/NA-14/figures/fig6_strategies.pdf`
+- **Producer:** `newsaction.figures.render` (`newsaction.figures.fig6_strategies`)
+- **Inputs:** `artifacts/NA-14/figures/fig6_strategies.csv` only
+- **Schema:** vector PDF (TrueType fonts embedded)
+- **Key:** one file
+- **Rows / coverage:** the figure fig6_strategies at print size
+- **Availability:** after NA-12 and NA-13 (test-period results are their stored outputs; nothing here reads the lock)
+- **sha256:** `320ef73c41464ac120590dc18d75f8fdaee832ac1c81babca049dd8aa7480616`
+
+### `artifacts/NA-14/figures/fig6_strategies.png`
+- **Producer:** `newsaction.figures.render` (`newsaction.figures.fig6_strategies`)
+- **Inputs:** `artifacts/NA-14/figures/fig6_strategies.csv` only
+- **Schema:** PNG, 300 dpi
+- **Key:** one file
+- **Rows / coverage:** the figure fig6_strategies at print size
+- **Availability:** after NA-12 and NA-13 (test-period results are their stored outputs; nothing here reads the lock)
+- **sha256:** `fbce1840c8a685fa7dfb3f23ec4aed1e7d6e23f7abf615d926af00a421500383`
+
+### `artifacts/NA-14/figures/fig7_memorisation.csv`
+- **Producer:** `newsaction.figures.data` (`fig7`)
+- **Inputs:** `artifacts/NA-11/company_id_matched.csv`
+- **Schema:** `panel`, `series`, `label`, `role`, `x`, `xv`, `y`, `lo`, `hi`, `ci`, `source`, `key`, `y_col`, `x_col`, `lo_col`, `hi_col`, `se_col`
+- **Key:** one row per plotted value; (`source`, `key`, `y_col`) name its upstream cell
+- **Rows / coverage:** Figure 7: company identification on masked val-A states with activity-matched distractors (NA-11): each     model's share of correct identifications with its Wilson 95% interval (from the share and the valid     answers), the matched baseline and the §8.3 screen bar.
+- **Availability:** after NA-12 and NA-13 (test-period results are their stored outputs; nothing here reads the lock)
+- **sha256:** `fc78bcd4f1b424dce43168744864a0d09be7812f0e1b21735039f83f1754cce0`
+
+### `artifacts/NA-14/figures/fig7_memorisation.pdf`
+- **Producer:** `newsaction.figures.render` (`newsaction.figures.fig7_memorisation`)
+- **Inputs:** `artifacts/NA-14/figures/fig7_memorisation.csv` only
+- **Schema:** vector PDF (TrueType fonts embedded)
+- **Key:** one file
+- **Rows / coverage:** the figure fig7_memorisation at print size
+- **Availability:** after NA-12 and NA-13 (test-period results are their stored outputs; nothing here reads the lock)
+- **sha256:** `4e6f69a421d64f19fc78e00f67782ad6e496d8b04599ccb3d7012403a6a1dd62`
+
+### `artifacts/NA-14/figures/fig7_memorisation.png`
+- **Producer:** `newsaction.figures.render` (`newsaction.figures.fig7_memorisation`)
+- **Inputs:** `artifacts/NA-14/figures/fig7_memorisation.csv` only
+- **Schema:** PNG, 300 dpi
+- **Key:** one file
+- **Rows / coverage:** the figure fig7_memorisation at print size
+- **Availability:** after NA-12 and NA-13 (test-period results are their stored outputs; nothing here reads the lock)
+- **sha256:** `14f11bb41823bd05eb339cfb76c1ab59401894c5992e39f03973388c83b9780f`
+
+### `artifacts/NA-14/figures/figA1_tournament.csv`
+- **Producer:** `newsaction.figures.data` (`figa1`)
+- **Inputs:** `artifacts/NA-06/fig3_data.csv`
+- **Schema:** `panel`, `series`, `label`, `role`, `x`, `xv`, `y`, `lo`, `hi`, `ci`, `source`, `key`, `y_col`, `x_col`, `lo_col`, `hi_col`, `se_col`
+- **Key:** one row per plotted value; (`source`, `key`, `y_col`) name its upstream cell
+- **Rows / coverage:** Appendix A1: the zero-shot tournament on NA-06's val-A stage-1 sample: daily IC of Call A's N̂ with z_cc     (95% bootstrap interval) against the cost per 1,000 decisions, with membership of the model confidence set     and the stage-2 screens.
+- **Availability:** after NA-12 and NA-13 (test-period results are their stored outputs; nothing here reads the lock)
+- **sha256:** `8689cbdabe7fa122f75146fccb25c388d186e2cd1924c8a60151fc59bfb66e68`
+
+### `artifacts/NA-14/figures/figA1_tournament.pdf`
+- **Producer:** `newsaction.figures.render` (`newsaction.figures.appendix:tournament`)
+- **Inputs:** `artifacts/NA-14/figures/figA1_tournament.csv` only
+- **Schema:** vector PDF (TrueType fonts embedded)
+- **Key:** one file
+- **Rows / coverage:** the figure figA1_tournament at print size
+- **Availability:** after NA-12 and NA-13 (test-period results are their stored outputs; nothing here reads the lock)
+- **sha256:** `cee358ada76a71eee54ef3c70fbce942179b006083f52e0725bcc064637cfc0c`
+
+### `artifacts/NA-14/figures/figA1_tournament.png`
+- **Producer:** `newsaction.figures.render` (`newsaction.figures.appendix:tournament`)
+- **Inputs:** `artifacts/NA-14/figures/figA1_tournament.csv` only
+- **Schema:** PNG, 300 dpi
+- **Key:** one file
+- **Rows / coverage:** the figure figA1_tournament at print size
+- **Availability:** after NA-12 and NA-13 (test-period results are their stored outputs; nothing here reads the lock)
+- **sha256:** `05cffe9f5d8c7ce86345d23c7f636263641f83e7dfd897b977677788436f332d`
+
+### `artifacts/NA-14/figures/figA2_filters.csv`
+- **Producer:** `newsaction.figures.data` (`figa2`)
 - **Inputs:** `artifacts/NA-03/frontier.csv`
 - **Schema:** `panel`, `series`, `label`, `role`, `x`, `xv`, `y`, `lo`, `hi`, `ci`, `source`, `key`, `y_col`, `x_col`, `lo_col`, `hi_col`, `se_col`
 - **Key:** one row per plotted value; (`source`, `key`, `y_col`) name its upstream cell
-- **Rows / coverage:** Figure 6: material recall against the share of days selected, per filter (NA-03 frontier on val-A),     with     the frozen filter at its budget (NA-03 summary).
+- **Rows / coverage:** Appendix A2: material recall against the share of days selected, per importance filter (NA-03 frontier     on val-A), with the frozen filter at its budget (NA-03 summary).
 - **Availability:** after NA-12 and NA-13 (test-period results are their stored outputs; nothing here reads the lock)
 - **sha256:** `4b52f9bb5cca493ee95b7f59262a3a9b77efada079d70e883814ba38ab0d152c`
 
-### `artifacts/NA-14/figures/fig6_filters.pdf`
-- **Producer:** `newsaction.figures.render` (`newsaction.figures.fig6_filters`)
-- **Inputs:** `artifacts/NA-14/figures/fig6_filters.csv` only
+### `artifacts/NA-14/figures/figA2_filters.pdf`
+- **Producer:** `newsaction.figures.render` (`newsaction.figures.appendix:filters`)
+- **Inputs:** `artifacts/NA-14/figures/figA2_filters.csv` only
 - **Schema:** vector PDF (TrueType fonts embedded)
 - **Key:** one file
-- **Rows / coverage:** the figure fig6_filters at print size
+- **Rows / coverage:** the figure figA2_filters at print size
 - **Availability:** after NA-12 and NA-13 (test-period results are their stored outputs; nothing here reads the lock)
-- **sha256:** `a974eba868ed68706ab7ad96e621ee63cb3c1fe1f39598d62d54682a7ed2cebf`
+- **sha256:** `fc395621ea3b3320929fb5fb6c73bbe1d039435758b816d3b18cf53604968b8e`
 
-### `artifacts/NA-14/figures/fig6_filters.png`
-- **Producer:** `newsaction.figures.render` (`newsaction.figures.fig6_filters`)
-- **Inputs:** `artifacts/NA-14/figures/fig6_filters.csv` only
+### `artifacts/NA-14/figures/figA2_filters.png`
+- **Producer:** `newsaction.figures.render` (`newsaction.figures.appendix:filters`)
+- **Inputs:** `artifacts/NA-14/figures/figA2_filters.csv` only
 - **Schema:** PNG, 300 dpi
 - **Key:** one file
-- **Rows / coverage:** the figure fig6_filters at print size
+- **Rows / coverage:** the figure figA2_filters at print size
 - **Availability:** after NA-12 and NA-13 (test-period results are their stored outputs; nothing here reads the lock)
-- **sha256:** `f27ad6c470f9f5f826668611d5f3f25b37ced2727bc1c2636b76ba7e938734d1`
+- **sha256:** `2bd317938c403ac2f58da123229ed5aa0ccb1290f7c44a2e154694ab7eca63b8`
 
-### `artifacts/NA-14/figures/fig7_strategies.csv`
-- **Producer:** `newsaction.figures.data` (`fig7`)
-- **Inputs:** `artifacts/NA-13/fig7_data.csv`
-- **Schema:** `panel`, `series`, `label`, `role`, `x`, `xv`, `y`, `lo`, `hi`, `ci`, `source`, `key`, `y_col`, `x_col`, `lo_col`, `hi_col`, `se_col`
-- **Key:** one row per plotted value; (`source`, `key`, `y_col`) name its upstream cell
-- **Rows / coverage:** Figure 7: cumulative net returns at 10 bp per side (test), S-CONV first, the benchmarks, the placebo's     5th–95th percentile band of the primary instrument's universe (a–d) and the S-CONV book by tier (e–g).
-- **Availability:** after NA-12 and NA-13 (test-period results are their stored outputs; nothing here reads the lock)
-- **sha256:** `37bce00569e0ceb3ab69d81305b3b93c3514d37baf3304fc4e871958f4d29022`
-
-### `artifacts/NA-14/figures/fig7_strategies.pdf`
-- **Producer:** `newsaction.figures.render` (`newsaction.figures.fig7_strategies`)
-- **Inputs:** `artifacts/NA-14/figures/fig7_strategies.csv` only
-- **Schema:** vector PDF (TrueType fonts embedded)
-- **Key:** one file
-- **Rows / coverage:** the figure fig7_strategies at print size
-- **Availability:** after NA-12 and NA-13 (test-period results are their stored outputs; nothing here reads the lock)
-- **sha256:** `a05bad9db43cad1dcce055c03e43cc0b4dc17be3f84617864973b12456abe1aa`
-
-### `artifacts/NA-14/figures/fig7_strategies.png`
-- **Producer:** `newsaction.figures.render` (`newsaction.figures.fig7_strategies`)
-- **Inputs:** `artifacts/NA-14/figures/fig7_strategies.csv` only
-- **Schema:** PNG, 300 dpi
-- **Key:** one file
-- **Rows / coverage:** the figure fig7_strategies at print size
-- **Availability:** after NA-12 and NA-13 (test-period results are their stored outputs; nothing here reads the lock)
-- **sha256:** `c34faaf1c87b8dddc5f451f574ca324647796cc0779a2a6d8b7432166bd2535c`
-
-### `artifacts/NA-14/figures/fig8_explain_move.csv`
-- **Producer:** `newsaction.figures.data` (`fig8`)
-- **Inputs:** `artifacts/NA-12/tables/t10_explanation_ladder.csv`, `artifacts/NA-12/tables/t11_explanation_share_theta.csv`
-- **Schema:** `panel`, `series`, `label`, `role`, `x`, `xv`, `y`, `lo`, `hi`, `ci`, `source`, `key`, `y_col`, `x_col`, `lo_col`, `hi_col`, `se_col`
-- **Key:** one row per plotted value; (`source`, `key`, `y_col`) name its upstream cell
-- **Rows / coverage:** Figure 8 (PREREG A3): (a) d1-ultra's out-of-sample R² of z_cc by step, stacked from the increments, by     cut; (b) the news-only steps (cumulative R², 95% bootstrap CI) of the three instruments by tier;     (c) persistence (mean sign(G)·y2, 95% CI) by the model's move_reason, with θ at D2.
-- **Availability:** after NA-12 and NA-13 (test-period results are their stored outputs; nothing here reads the lock)
-- **sha256:** `9d846917a8cacecbcfb1544fb667b3e0e57265b4bbf6a40dfe9fa37e2712dd57`
-
-### `artifacts/NA-14/figures/fig8_explain_move.pdf`
-- **Producer:** `newsaction.figures.render` (`newsaction.figures.fig8_explain_move`)
-- **Inputs:** `artifacts/NA-14/figures/fig8_explain_move.csv` only
-- **Schema:** vector PDF (TrueType fonts embedded)
-- **Key:** one file
-- **Rows / coverage:** the figure fig8_explain_move at print size
-- **Availability:** after NA-12 and NA-13 (test-period results are their stored outputs; nothing here reads the lock)
-- **sha256:** `974f36214720219f265ea5299a77102e35c48846535c1385ca708d4a013481d1`
-
-### `artifacts/NA-14/figures/fig8_explain_move.png`
-- **Producer:** `newsaction.figures.render` (`newsaction.figures.fig8_explain_move`)
-- **Inputs:** `artifacts/NA-14/figures/fig8_explain_move.csv` only
-- **Schema:** PNG, 300 dpi
-- **Key:** one file
-- **Rows / coverage:** the figure fig8_explain_move at print size
-- **Availability:** after NA-12 and NA-13 (test-period results are their stored outputs; nothing here reads the lock)
-- **sha256:** `7d4cdacadd82816b05f8db507f499a11f07689393e90db93a2c9887c665b6970`
-
-### `artifacts/NA-14/figures/figA1_reliability.csv`
-- **Producer:** `newsaction.figures.data` (`figa1`)
-- **Inputs:** `artifacts/NA-12/figure_data/appendix_reliability.csv`, `artifacts/NA-12/tables/t15_calibration.csv`
-- **Schema:** `panel`, `series`, `label`, `role`, `x`, `xv`, `y`, `lo`, `hi`, `ci`, `source`, `key`, `y_col`, `x_col`, `lo_col`, `hi_col`, `se_col`
-- **Key:** one row per plotted value; (`source`, `key`, `y_col`) name its upstream cell
-- **Rows / coverage:** Appendix A1: reliability of Q1's three classes against e5 (15 bins; NA-12), with each model's ECE     (t15).
-- **Availability:** after NA-12 and NA-13 (test-period results are their stored outputs; nothing here reads the lock)
-- **sha256:** `19622216a30f2b6278083345648ab208a354770a7725cff54eb973bb46ea2e44`
-
-### `artifacts/NA-14/figures/figA1_reliability.pdf`
-- **Producer:** `newsaction.figures.render` (`newsaction.figures.appendix:reliability`)
-- **Inputs:** `artifacts/NA-14/figures/figA1_reliability.csv` only
-- **Schema:** vector PDF (TrueType fonts embedded)
-- **Key:** one file
-- **Rows / coverage:** the figure figA1_reliability at print size
-- **Availability:** after NA-12 and NA-13 (test-period results are their stored outputs; nothing here reads the lock)
-- **sha256:** `10b51ea8c5bf5baddd2ff54e5060e57605335e5af352b09b97d3725727145d4f`
-
-### `artifacts/NA-14/figures/figA1_reliability.png`
-- **Producer:** `newsaction.figures.render` (`newsaction.figures.appendix:reliability`)
-- **Inputs:** `artifacts/NA-14/figures/figA1_reliability.csv` only
-- **Schema:** PNG, 300 dpi
-- **Key:** one file
-- **Rows / coverage:** the figure figA1_reliability at print size
-- **Availability:** after NA-12 and NA-13 (test-period results are their stored outputs; nothing here reads the lock)
-- **sha256:** `ca27692d4f6cef92a7f0873eec682ce31bfc8841795f967584b686c1b682b2d5`
-
-### `artifacts/NA-14/figures/figA2_encoding.csv`
-- **Producer:** `newsaction.figures.data` (`figa2`)
+### `artifacts/NA-14/figures/figA3_encoding.csv`
+- **Producer:** `newsaction.figures.data` (`figa3`)
 - **Inputs:** `artifacts/NA-07/encoding_ic.csv`
 - **Schema:** `panel`, `series`, `label`, `role`, `x`, `xv`, `y`, `lo`, `hi`, `ci`, `source`, `key`, `y_col`, `x_col`, `lo_col`, `hi_col`, `se_col`
 - **Key:** one row per plotted value; (`source`, `key`, `y_col`) name its upstream cell
-- **Rows / coverage:** Appendix A2: the encoding study (NA-07): daily IC by encoding on val-A (search) and val-B     (confirmation).
+- **Rows / coverage:** Appendix A3: the encodings of numbers in states (NA-07): daily IC by encoding on val-A (search) and the     val-B confirmation (95% bootstrap intervals), with the chosen encoding.
 - **Availability:** after NA-12 and NA-13 (test-period results are their stored outputs; nothing here reads the lock)
-- **sha256:** `6b396f3d8a2e0ec1e6604cb07ccf23d7d782fc885a99b4e4728c7248effbd744`
+- **sha256:** `44deb913fc22da122e458af3daa041213c1b815c2381ec33596284048c37f6ae`
 
-### `artifacts/NA-14/figures/figA2_encoding.pdf`
+### `artifacts/NA-14/figures/figA3_encoding.pdf`
 - **Producer:** `newsaction.figures.render` (`newsaction.figures.appendix:encoding`)
-- **Inputs:** `artifacts/NA-14/figures/figA2_encoding.csv` only
+- **Inputs:** `artifacts/NA-14/figures/figA3_encoding.csv` only
 - **Schema:** vector PDF (TrueType fonts embedded)
 - **Key:** one file
-- **Rows / coverage:** the figure figA2_encoding at print size
+- **Rows / coverage:** the figure figA3_encoding at print size
 - **Availability:** after NA-12 and NA-13 (test-period results are their stored outputs; nothing here reads the lock)
-- **sha256:** `4fc8eeae0cd041c986b6e36d9758b4d03987737f369af86fb6824aa54bc555ec`
+- **sha256:** `e7d001ab4fbdc526e0b328bb564aecbb87ee7114ed0d677e16517d80abb2889e`
 
-### `artifacts/NA-14/figures/figA2_encoding.png`
+### `artifacts/NA-14/figures/figA3_encoding.png`
 - **Producer:** `newsaction.figures.render` (`newsaction.figures.appendix:encoding`)
-- **Inputs:** `artifacts/NA-14/figures/figA2_encoding.csv` only
+- **Inputs:** `artifacts/NA-14/figures/figA3_encoding.csv` only
 - **Schema:** PNG, 300 dpi
 - **Key:** one file
-- **Rows / coverage:** the figure figA2_encoding at print size
+- **Rows / coverage:** the figure figA3_encoding at print size
 - **Availability:** after NA-12 and NA-13 (test-period results are their stored outputs; nothing here reads the lock)
-- **sha256:** `225e57cc77d27ffd2e17d5169f918b702cfdfc9ba83795051c10064f5bcc1211`
+- **sha256:** `dad5ea0a7e184ea8e3add36d3d968a2c805ad33d1f6badfcb28b52edda4f8178`
 
-### `artifacts/NA-14/figures/figA3_identifiability.csv`
-- **Producer:** `newsaction.figures.data` (`figa3`)
-- **Inputs:** `artifacts/NA-11/company_id_matched.csv`, `artifacts/NA-11/probes_val_a.csv`
-- **Schema:** `panel`, `series`, `label`, `role`, `x`, `xv`, `y`, `lo`, `hi`, `ci`, `source`, `key`, `y_col`, `x_col`, `lo_col`, `hi_col`, `se_col`
-- **Key:** one row per plotted value; (`source`, `key`, `y_col`) name its upstream cell
-- **Rows / coverage:** Appendix A3: masking and identifiability (NA-11): company identification with activity-matched     distractors     against the matched baseline and the §8.3 bar; the probes' masked vs unmasked and real vs shuffled ICs.
-- **Availability:** after NA-12 and NA-13 (test-period results are their stored outputs; nothing here reads the lock)
-- **sha256:** `861801546e67bb414ce59cc6d2d84ca25d2a63accd48667c3f65c5cdc0739682`
-
-### `artifacts/NA-14/figures/figA3_identifiability.pdf`
-- **Producer:** `newsaction.figures.render` (`newsaction.figures.appendix:identifiability`)
-- **Inputs:** `artifacts/NA-14/figures/figA3_identifiability.csv` only
-- **Schema:** vector PDF (TrueType fonts embedded)
-- **Key:** one file
-- **Rows / coverage:** the figure figA3_identifiability at print size
-- **Availability:** after NA-12 and NA-13 (test-period results are their stored outputs; nothing here reads the lock)
-- **sha256:** `4018808982b3ea06cda4fa216f85458a8ab87a19c31cdfec36064a2f4061c05a`
-
-### `artifacts/NA-14/figures/figA3_identifiability.png`
-- **Producer:** `newsaction.figures.render` (`newsaction.figures.appendix:identifiability`)
-- **Inputs:** `artifacts/NA-14/figures/figA3_identifiability.csv` only
-- **Schema:** PNG, 300 dpi
-- **Key:** one file
-- **Rows / coverage:** the figure figA3_identifiability at print size
-- **Availability:** after NA-12 and NA-13 (test-period results are their stored outputs; nothing here reads the lock)
-- **sha256:** `b619886802949cc220b6fa87bdb9b6e36b110599dd8b70717a75297cf35dbc9b`
-
-### `artifacts/NA-14/figures/figA4_ablations.csv`
+### `artifacts/NA-14/figures/figA4_reliability.csv`
 - **Producer:** `newsaction.figures.data` (`figa4`)
-- **Inputs:** `artifacts/NA-12/tables/t16_robustness.csv`
+- **Inputs:** `artifacts/NA-12/figure_data/appendix_reliability.csv`, `artifacts/NA-12/tables/t15_calibration.csv`
 - **Schema:** `panel`, `series`, `label`, `role`, `x`, `xv`, `y`, `lo`, `hi`, `ci`, `source`, `key`, `y_col`, `x_col`, `lo_col`, `hi_col`, `se_col`
 - **Key:** one row per plotted value; (`source`, `key`, `y_col`) name its upstream cell
-- **Rows / coverage:** Appendix A4: d1-ultra's Call B with the news removed and with shuffled news (S8 ablations; t16): IC of     J, C and N̂ with y2, real against ablated on the same events (95% CI from the Newey–West t).
+- **Rows / coverage:** Appendix A4: reliability of Q1's three classes against e5 (15 bins; NA-12 figure data), with each     model's ECE (t15).
 - **Availability:** after NA-12 and NA-13 (test-period results are their stored outputs; nothing here reads the lock)
-- **sha256:** `951400bc7c3f67d66516900f6de96261621dc6ec0d574fa8aad953b1e24f20b3`
+- **sha256:** `19622216a30f2b6278083345648ab208a354770a7725cff54eb973bb46ea2e44`
 
-### `artifacts/NA-14/figures/figA4_ablations.pdf`
-- **Producer:** `newsaction.figures.render` (`newsaction.figures.appendix:ablations`)
-- **Inputs:** `artifacts/NA-14/figures/figA4_ablations.csv` only
+### `artifacts/NA-14/figures/figA4_reliability.pdf`
+- **Producer:** `newsaction.figures.render` (`newsaction.figures.appendix:reliability`)
+- **Inputs:** `artifacts/NA-14/figures/figA4_reliability.csv` only
 - **Schema:** vector PDF (TrueType fonts embedded)
 - **Key:** one file
-- **Rows / coverage:** the figure figA4_ablations at print size
+- **Rows / coverage:** the figure figA4_reliability at print size
 - **Availability:** after NA-12 and NA-13 (test-period results are their stored outputs; nothing here reads the lock)
-- **sha256:** `5e4be7d11bed6fa6b3bfa5da9dfb644e3a7e224004a5dc9f63019e90acbfda2f`
+- **sha256:** `326ddef0764a933a8f55099cdb1782b672dbe365b665d85b623e8018cbeaa7dc`
 
-### `artifacts/NA-14/figures/figA4_ablations.png`
-- **Producer:** `newsaction.figures.render` (`newsaction.figures.appendix:ablations`)
-- **Inputs:** `artifacts/NA-14/figures/figA4_ablations.csv` only
+### `artifacts/NA-14/figures/figA4_reliability.png`
+- **Producer:** `newsaction.figures.render` (`newsaction.figures.appendix:reliability`)
+- **Inputs:** `artifacts/NA-14/figures/figA4_reliability.csv` only
 - **Schema:** PNG, 300 dpi
 - **Key:** one file
-- **Rows / coverage:** the figure figA4_ablations at print size
+- **Rows / coverage:** the figure figA4_reliability at print size
 - **Availability:** after NA-12 and NA-13 (test-period results are their stored outputs; nothing here reads the lock)
-- **sha256:** `95e89e6c0bf1729afac19a88a071852759ddc0ee7ff871b2590c5a12ca97bda1`
+- **sha256:** `afcebf07d7fb4e2ddad16dd2160b286813fb22d129f48c674630585fd0d75bbc`
 
 ### `artifacts/NA-14/figures/figA5_robustness.csv`
 - **Producer:** `newsaction.figures.data` (`figa5`)
 - **Inputs:** `artifacts/NA-12/tables/t16_robustness.csv`, `artifacts/NA-12/tables/t1b_primary_by_model.csv`, `artifacts/NA-12/tables/t3_ic.csv`
 - **Schema:** `panel`, `series`, `label`, `role`, `x`, `xv`, `y`, `lo`, `hi`, `ci`, `source`, `key`, `y_col`, `x_col`, `lo_col`, `hi_col`, `se_col`
 - **Key:** one row per plotted value; (`source`, `key`, `y_col`) name its upstream cell
-- **Rows / coverage:** Appendix A5: robustness forest (§11.6; t16): the D0 estimates by variant, raw (filled) and placebo-     adjusted (hollow), with the main estimate on top (t1b; IC from t3) and 95% intervals.
+- **Rows / coverage:** Appendix A5: robustness of the D0 results (§11.6; t16): each variant raw and placebo-adjusted with 95%     intervals from the Newey–West t, below the main estimate (t1b; the IC from t3) and its bootstrap     interval.
 - **Availability:** after NA-12 and NA-13 (test-period results are their stored outputs; nothing here reads the lock)
 - **sha256:** `6e6981f45969cc9a505d42d33b585f42ee73952b060d0b64a86cbaf0027e726f`
 
@@ -3005,7 +2996,7 @@ sha256 on a rerun (labels and export were run twice: 8 of 8 files identical).
 - **Key:** one file
 - **Rows / coverage:** the figure figA5_robustness at print size
 - **Availability:** after NA-12 and NA-13 (test-period results are their stored outputs; nothing here reads the lock)
-- **sha256:** `191ccfb32cc31cbf3b61f302ec41a2c708e12290ca240f3cb099160e7bdaf26b`
+- **sha256:** `3df64eff88ae534a894ac39fa29860e677e2f02b5a713bf0b52b43215359a353`
 
 ### `artifacts/NA-14/figures/figA5_robustness.png`
 - **Producer:** `newsaction.figures.render` (`newsaction.figures.appendix:robustness`)
@@ -3014,61 +3005,277 @@ sha256 on a rerun (labels and export were run twice: 8 of 8 files identical).
 - **Key:** one file
 - **Rows / coverage:** the figure figA5_robustness at print size
 - **Availability:** after NA-12 and NA-13 (test-period results are their stored outputs; nothing here reads the lock)
-- **sha256:** `55cf65aef6543a939b43b6e05b4698b51653758f00f76f7463a8b539ee7ac9b2`
+- **sha256:** `52ec20afa79ded5a9311eb0c1b1025c7f8faf7c9528ad88442302a1dceb280e2`
 
-### `artifacts/NA-14/figures/figA6_exploratory_d0.csv`
+### `artifacts/NA-14/figures/figA6_monthly_ic.csv`
 - **Producer:** `newsaction.figures.data` (`figa6`)
+- **Inputs:** `artifacts/NA-14/tables/t21_release_dates.csv`, `artifacts/NA-14/tables/t24_exploratory_d0_signal.csv`
+- **Schema:** `panel`, `series`, `label`, `role`, `x`, `xv`, `y`, `lo`, `hi`, `ci`, `source`, `key`, `y_col`, `x_col`, `lo_col`, `hi_col`, `se_col`
+- **Key:** one row per plotted value; (`source`, `key`, `y_col`) name its upstream cell
+- **Rows / coverage:** Appendix A6, exploratory: the monthly mean of the daily IC of N̂_W0 with z_cc over val-A, val-B and     test,     with ±1 implied standard error of a month's mean (NA-12 §13.3 via t24, exploratory), and the release     dates (t21).
+- **Availability:** after NA-12 and NA-13 (test-period results are their stored outputs; nothing here reads the lock)
+- **sha256:** `afbf7054df9affe7eed7026a35c278ece0e3aab3e5d907ddee38876f58b91d8e`
+
+### `artifacts/NA-14/figures/figA6_monthly_ic.pdf`
+- **Producer:** `newsaction.figures.render` (`newsaction.figures.appendix:monthly_ic`)
+- **Inputs:** `artifacts/NA-14/figures/figA6_monthly_ic.csv` only
+- **Schema:** vector PDF (TrueType fonts embedded)
+- **Key:** one file
+- **Rows / coverage:** the figure figA6_monthly_ic at print size
+- **Availability:** after NA-12 and NA-13 (test-period results are their stored outputs; nothing here reads the lock)
+- **sha256:** `dd774d07f4b66fce6123ac38328ea4000eddabc0969e3f0d22ff1e610594589c`
+
+### `artifacts/NA-14/figures/figA6_monthly_ic.png`
+- **Producer:** `newsaction.figures.render` (`newsaction.figures.appendix:monthly_ic`)
+- **Inputs:** `artifacts/NA-14/figures/figA6_monthly_ic.csv` only
+- **Schema:** PNG, 300 dpi
+- **Key:** one file
+- **Rows / coverage:** the figure figA6_monthly_ic at print size
+- **Availability:** after NA-12 and NA-13 (test-period results are their stored outputs; nothing here reads the lock)
+- **sha256:** `d33308adad24575805aab7a6c49c7642549ca951bc0d93845d91c9cfe109c32f`
+
+### `artifacts/NA-14/figures/figA7_convergence_detail.csv`
+- **Producer:** `newsaction.figures.data` (`figa7`)
+- **Inputs:** `artifacts/NA-12/figure_data/fig1_v_decile_paths.csv`, `artifacts/NA-12/tables/t6_convergence_ladder.csv`, `artifacts/NA-12/tables/t7_gap_closure.csv`
+- **Schema:** `panel`, `series`, `label`, `role`, `x`, `xv`, `y`, `lo`, `hi`, `ci`, `source`, `key`, `y_col`, `x_col`, `lo_col`, `hi_col`, `se_col`
+- **Key:** one row per plotted value; (`source`, `key`, `y_col`) name its upstream cell
+- **Rows / coverage:** Appendix A7: convergence in detail: (a) Laya-Fin's and (b) d1-ultra's ten V deciles, CAR^lvl from the     previous close (±1.96 SE bands on the extreme deciles) against their mean V (NA-12 figure data); (c) the     ladder κ_h of the three trained and API instruments, the anchor included (t6), with the half-lives     (t7).
+- **Availability:** after NA-12 and NA-13 (test-period results are their stored outputs; nothing here reads the lock)
+- **sha256:** `e34466fb446a83d07e655b06ba9d515f05b5c61c7a7625f48c4601e22659995e`
+
+### `artifacts/NA-14/figures/figA7_convergence_detail.pdf`
+- **Producer:** `newsaction.figures.render` (`newsaction.figures.appendix:convergence_detail`)
+- **Inputs:** `artifacts/NA-14/figures/figA7_convergence_detail.csv` only
+- **Schema:** vector PDF (TrueType fonts embedded)
+- **Key:** one file
+- **Rows / coverage:** the figure figA7_convergence_detail at print size
+- **Availability:** after NA-12 and NA-13 (test-period results are their stored outputs; nothing here reads the lock)
+- **sha256:** `6b19611d6c4c0183423cc9520d21186a33d98188e8ec2ff772fe62d3693f987a`
+
+### `artifacts/NA-14/figures/figA7_convergence_detail.png`
+- **Producer:** `newsaction.figures.render` (`newsaction.figures.appendix:convergence_detail`)
+- **Inputs:** `artifacts/NA-14/figures/figA7_convergence_detail.csv` only
+- **Schema:** PNG, 300 dpi
+- **Key:** one file
+- **Rows / coverage:** the figure figA7_convergence_detail at print size
+- **Availability:** after NA-12 and NA-13 (test-period results are their stored outputs; nothing here reads the lock)
+- **sha256:** `bfa8a746daaf3f7cdc9491cd7fba03466389c3113154dd02caa30be10aef1de6`
+
+### `artifacts/NA-14/figures/figA8_drift_laya_fin.csv`
+- **Producer:** `newsaction.figures.data` (`figa8`)
+- **Inputs:** `artifacts/NA-12/figure_data/fig2_drift_vs_g.csv`
+- **Schema:** `panel`, `series`, `label`, `role`, `x`, `xv`, `y`, `lo`, `hi`, `ci`, `source`, `key`, `y_col`, `x_col`, `lo_col`, `hi_col`, `se_col`
+- **Key:** one row per plotted value; (`source`, `key`, `y_col`) name its upstream cell
+- **Rows / coverage:** Appendix A8: Laya-Fin's drift sign(G)·y2 by |G| bin within terciles of news strength |V| (Figure 4 (b)     for the primary instrument; NA-12 figure data).
+- **Availability:** after NA-12 and NA-13 (test-period results are their stored outputs; nothing here reads the lock)
+- **sha256:** `9ef5f06a1f3e1f6ddb7b28dd0b8a5eed807d79b58526e6828f99c702cd77655d`
+
+### `artifacts/NA-14/figures/figA8_drift_laya_fin.pdf`
+- **Producer:** `newsaction.figures.render` (`newsaction.figures.appendix:drift_laya_fin`)
+- **Inputs:** `artifacts/NA-14/figures/figA8_drift_laya_fin.csv` only
+- **Schema:** vector PDF (TrueType fonts embedded)
+- **Key:** one file
+- **Rows / coverage:** the figure figA8_drift_laya_fin at print size
+- **Availability:** after NA-12 and NA-13 (test-period results are their stored outputs; nothing here reads the lock)
+- **sha256:** `09f65d573e8704c090004bd55834d3965471e81ae47053fa2d6df86bdd05116f`
+
+### `artifacts/NA-14/figures/figA8_drift_laya_fin.png`
+- **Producer:** `newsaction.figures.render` (`newsaction.figures.appendix:drift_laya_fin`)
+- **Inputs:** `artifacts/NA-14/figures/figA8_drift_laya_fin.csv` only
+- **Schema:** PNG, 300 dpi
+- **Key:** one file
+- **Rows / coverage:** the figure figA8_drift_laya_fin at print size
+- **Availability:** after NA-12 and NA-13 (test-period results are their stored outputs; nothing here reads the lock)
+- **sha256:** `219a6625413c3a63fa87977a9d897e729dadec54f722e9f6b0060f0269a29a32`
+
+### `artifacts/NA-14/figures/figA9_shapley.csv`
+- **Producer:** `newsaction.figures.data` (`figa9`)
+- **Inputs:** `artifacts/NA-12/tables/t13_shapley.csv`
+- **Schema:** `panel`, `series`, `label`, `role`, `x`, `xv`, `y`, `lo`, `hi`, `ci`, `source`, `key`, `y_col`, `x_col`, `lo_col`, `hi_col`, `se_col`
+- **Key:** one row per plotted value; (`source`, `key`, `y_col`) name its upstream cell
+- **Rows / coverage:** Appendix A9: exact Shapley values of the out-of-sample R² and of the mean daily IC of y2 at D2 over the     feature groups R, N and J, with the full model's total, pooled over tiers (t13).
+- **Availability:** after NA-12 and NA-13 (test-period results are their stored outputs; nothing here reads the lock)
+- **sha256:** `e8cec130762f5072e50d100ca5f4100a2a209a2ec2f0e866d47c8bacb5f2fc2d`
+
+### `artifacts/NA-14/figures/figA9_shapley.pdf`
+- **Producer:** `newsaction.figures.render` (`newsaction.figures.appendix:shapley`)
+- **Inputs:** `artifacts/NA-14/figures/figA9_shapley.csv` only
+- **Schema:** vector PDF (TrueType fonts embedded)
+- **Key:** one file
+- **Rows / coverage:** the figure figA9_shapley at print size
+- **Availability:** after NA-12 and NA-13 (test-period results are their stored outputs; nothing here reads the lock)
+- **sha256:** `4262f5dfb54b01e732831013b877fa180903f3d48685749ae9bb05ffad9cc02f`
+
+### `artifacts/NA-14/figures/figA9_shapley.png`
+- **Producer:** `newsaction.figures.render` (`newsaction.figures.appendix:shapley`)
+- **Inputs:** `artifacts/NA-14/figures/figA9_shapley.csv` only
+- **Schema:** PNG, 300 dpi
+- **Key:** one file
+- **Rows / coverage:** the figure figA9_shapley at print size
+- **Availability:** after NA-12 and NA-13 (test-period results are their stored outputs; nothing here reads the lock)
+- **sha256:** `f64a9c0ca8c54ba1f49ceba79b2308ea0912a5df869755fd55433e431eb029c9`
+
+### `artifacts/NA-14/figures/figA10_ablations.csv`
+- **Producer:** `newsaction.figures.data` (`figa10`)
+- **Inputs:** `artifacts/NA-12/tables/t16_robustness.csv`
+- **Schema:** `panel`, `series`, `label`, `role`, `x`, `xv`, `y`, `lo`, `hi`, `ci`, `source`, `key`, `y_col`, `x_col`, `lo_col`, `hi_col`, `se_col`
+- **Key:** one row per plotted value; (`source`, `key`, `y_col`) name its upstream cell
+- **Rows / coverage:** Appendix A10: d1-ultra's Call B with the news removed and with shuffled news (S8; t16): IC of J, C     and N̂     with y2, real against ablated on the same events (95% intervals from the Newey–West t).
+- **Availability:** after NA-12 and NA-13 (test-period results are their stored outputs; nothing here reads the lock)
+- **sha256:** `951400bc7c3f67d66516900f6de96261621dc6ec0d574fa8aad953b1e24f20b3`
+
+### `artifacts/NA-14/figures/figA10_ablations.pdf`
+- **Producer:** `newsaction.figures.render` (`newsaction.figures.appendix:ablations`)
+- **Inputs:** `artifacts/NA-14/figures/figA10_ablations.csv` only
+- **Schema:** vector PDF (TrueType fonts embedded)
+- **Key:** one file
+- **Rows / coverage:** the figure figA10_ablations at print size
+- **Availability:** after NA-12 and NA-13 (test-period results are their stored outputs; nothing here reads the lock)
+- **sha256:** `802a3dcd7af21fdacb2ea9df8bdd2fc0ec732dd84ec87c6129000b2c82f900f6`
+
+### `artifacts/NA-14/figures/figA10_ablations.png`
+- **Producer:** `newsaction.figures.render` (`newsaction.figures.appendix:ablations`)
+- **Inputs:** `artifacts/NA-14/figures/figA10_ablations.csv` only
+- **Schema:** PNG, 300 dpi
+- **Key:** one file
+- **Rows / coverage:** the figure figA10_ablations at print size
+- **Availability:** after NA-12 and NA-13 (test-period results are their stored outputs; nothing here reads the lock)
+- **sha256:** `9069a55bb3d374895fe59aef9021fee771f7a1a23f3f0375edf20c9d3bd4c377`
+
+### `artifacts/NA-14/figures/figA11_persistence.csv`
+- **Producer:** `newsaction.figures.data` (`figa11`)
+- **Inputs:** `artifacts/NA-12/tables/t11_explanation_share_theta.csv`
+- **Schema:** `panel`, `series`, `label`, `role`, `x`, `xv`, `y`, `lo`, `hi`, `ci`, `source`, `key`, `y_col`, `x_col`, `lo_col`, `hi_col`, `se_col`
+- **Key:** one row per plotted value; (`source`, `key`, `y_col`) name its upstream cell
+- **Rows / coverage:** Appendix A11: persistence after D2, mean sign(G)·y2 by d1-ultra's move_reason (95% intervals), and θ,     the D2 regression of persistence on being explained (t11).
+- **Availability:** after NA-12 and NA-13 (test-period results are their stored outputs; nothing here reads the lock)
+- **sha256:** `bb78a31208a735a1c69a952f91371a5076c2a8c98d053a0b7c5e4a39b4074576`
+
+### `artifacts/NA-14/figures/figA11_persistence.pdf`
+- **Producer:** `newsaction.figures.render` (`newsaction.figures.appendix:persistence`)
+- **Inputs:** `artifacts/NA-14/figures/figA11_persistence.csv` only
+- **Schema:** vector PDF (TrueType fonts embedded)
+- **Key:** one file
+- **Rows / coverage:** the figure figA11_persistence at print size
+- **Availability:** after NA-12 and NA-13 (test-period results are their stored outputs; nothing here reads the lock)
+- **sha256:** `a437d277998063764f1778f90a2e06e7aefefc3305951cd7a131bcfe8103a6be`
+
+### `artifacts/NA-14/figures/figA11_persistence.png`
+- **Producer:** `newsaction.figures.render` (`newsaction.figures.appendix:persistence`)
+- **Inputs:** `artifacts/NA-14/figures/figA11_persistence.csv` only
+- **Schema:** PNG, 300 dpi
+- **Key:** one file
+- **Rows / coverage:** the figure figA11_persistence at print size
+- **Availability:** after NA-12 and NA-13 (test-period results are their stored outputs; nothing here reads the lock)
+- **sha256:** `6b6446d123f6d2b8f182baac11afd2bb3d3a5ab85e8e668ca1eacc5fa34d7a42`
+
+### `artifacts/NA-14/figures/figA12_strategy_paths.csv`
+- **Producer:** `newsaction.figures.data` (`figa12`)
+- **Inputs:** `artifacts/NA-13/fig7_data.csv`
+- **Schema:** `panel`, `series`, `label`, `role`, `x`, `xv`, `y`, `lo`, `hi`, `ci`, `source`, `key`, `y_col`, `x_col`, `lo_col`, `hi_col`, `se_col`
+- **Key:** one row per plotted value; (`source`, `key`, `y_col`) name its upstream cell
+- **Rows / coverage:** Appendix A12: cumulative net returns at 10 bp per side on test (NA-13 Figure 7 data): (a) S-D0, (b)     S-D1     J and (c) S-D2 J with their benchmarks and the placebo's 5th–95th percentile band of Laya-Fin's universe;     (d–f) Laya-Fin's S-CONV and the gap fade by tier (descriptive sub-books).
+- **Availability:** after NA-12 and NA-13 (test-period results are their stored outputs; nothing here reads the lock)
+- **sha256:** `601fce88020a4811a4e734942efd08e27b11b27e36818c5307c5a6d3fe45b282`
+
+### `artifacts/NA-14/figures/figA12_strategy_paths.pdf`
+- **Producer:** `newsaction.figures.render` (`newsaction.figures.appendix:strategy_paths`)
+- **Inputs:** `artifacts/NA-14/figures/figA12_strategy_paths.csv` only
+- **Schema:** vector PDF (TrueType fonts embedded)
+- **Key:** one file
+- **Rows / coverage:** the figure figA12_strategy_paths at print size
+- **Availability:** after NA-12 and NA-13 (test-period results are their stored outputs; nothing here reads the lock)
+- **sha256:** `e3f6a4d9f2131d32e47d2ce3203eefc14c0d49c879aea9942efd969ca170d80f`
+
+### `artifacts/NA-14/figures/figA12_strategy_paths.png`
+- **Producer:** `newsaction.figures.render` (`newsaction.figures.appendix:strategy_paths`)
+- **Inputs:** `artifacts/NA-14/figures/figA12_strategy_paths.csv` only
+- **Schema:** PNG, 300 dpi
+- **Key:** one file
+- **Rows / coverage:** the figure figA12_strategy_paths at print size
+- **Availability:** after NA-12 and NA-13 (test-period results are their stored outputs; nothing here reads the lock)
+- **sha256:** `4a6e70943918115f34b913b4b346a40f23e8fd00456003f13c37705076807678`
+
+### `artifacts/NA-14/figures/figA13_probes.csv`
+- **Producer:** `newsaction.figures.data` (`figa13`)
+- **Inputs:** `artifacts/NA-11/probes_val_a.csv`
+- **Schema:** `panel`, `series`, `label`, `role`, `x`, `xv`, `y`, `lo`, `hi`, `ci`, `source`, `key`, `y_col`, `x_col`, `lo_col`, `hi_col`, `se_col`
+- **Key:** one row per plotted value; (`source`, `key`, `y_col`) name its upstream cell
+- **Rows / coverage:** Appendix A13, exploratory: the probes' descriptive columns (NA-11, val-A): (a) ICs on masked and     unmasked     states; (b) ICs on real and shuffled news on the same events (95% intervals from the Newey–West t).
+- **Availability:** after NA-12 and NA-13 (test-period results are their stored outputs; nothing here reads the lock)
+- **sha256:** `4c00fca0ccfe4fbd8db0a7659f3dbc8a37ccf7e6172fe3e0983e4f0b1d76318a`
+
+### `artifacts/NA-14/figures/figA13_probes.pdf`
+- **Producer:** `newsaction.figures.render` (`newsaction.figures.appendix:probes`)
+- **Inputs:** `artifacts/NA-14/figures/figA13_probes.csv` only
+- **Schema:** vector PDF (TrueType fonts embedded)
+- **Key:** one file
+- **Rows / coverage:** the figure figA13_probes at print size
+- **Availability:** after NA-12 and NA-13 (test-period results are their stored outputs; nothing here reads the lock)
+- **sha256:** `5e75fc8dcd5a746a01c7608dc3ed2667de6cbe316705f7cb69f39ca73f1611e5`
+
+### `artifacts/NA-14/figures/figA13_probes.png`
+- **Producer:** `newsaction.figures.render` (`newsaction.figures.appendix:probes`)
+- **Inputs:** `artifacts/NA-14/figures/figA13_probes.csv` only
+- **Schema:** PNG, 300 dpi
+- **Key:** one file
+- **Rows / coverage:** the figure figA13_probes at print size
+- **Availability:** after NA-12 and NA-13 (test-period results are their stored outputs; nothing here reads the lock)
+- **sha256:** `9ab709233765d1287f818b4affa9c8f405fedab90a0b15f773c8115b9d45fe78`
+
+### `artifacts/NA-14/figures/figA14_exploratory_d0.csv`
+- **Producer:** `newsaction.figures.data` (`figa14`)
 - **Inputs:** `artifacts/NA-14/tables/t24_exploratory_d0_signal.csv`
 - **Schema:** `panel`, `series`, `label`, `role`, `x`, `xv`, `y`, `lo`, `hi`, `ci`, `source`, `key`, `y_col`, `x_col`, `lo_col`, `hi_col`, `se_col`
 - **Key:** one row per plotted value; (`source`, `key`, `y_col`) name its upstream cell
-- **Rows / coverage:** Appendix A6, exploratory (post hoc; NA-12 §13 via t24): where the D0 signal lives: earnings-day events     against the rest, the size tiers, and the per-company spread against its within-company shuffle null.
+- **Rows / coverage:** Appendix A14, exploratory (post hoc; NA-12 §13 via t24): where the D0 signal lives: earnings-day events     against the rest, the size tiers, and the per-company spread against its within-company shuffle null.
 - **Availability:** after NA-12 and NA-13 (test-period results are their stored outputs; nothing here reads the lock)
 - **sha256:** `ab7f013e97bebf90ca1e5454b62e6a0de3f3bf5b58d61d0ca806ff8f13ac62d3`
 
-### `artifacts/NA-14/figures/figA6_exploratory_d0.pdf`
+### `artifacts/NA-14/figures/figA14_exploratory_d0.pdf`
 - **Producer:** `newsaction.figures.render` (`newsaction.figures.appendix:exploratory_d0`)
-- **Inputs:** `artifacts/NA-14/figures/figA6_exploratory_d0.csv` only
+- **Inputs:** `artifacts/NA-14/figures/figA14_exploratory_d0.csv` only
 - **Schema:** vector PDF (TrueType fonts embedded)
 - **Key:** one file
-- **Rows / coverage:** the figure figA6_exploratory_d0 at print size
+- **Rows / coverage:** the figure figA14_exploratory_d0 at print size
 - **Availability:** after NA-12 and NA-13 (test-period results are their stored outputs; nothing here reads the lock)
-- **sha256:** `b9ffe718ce82c8b2c1839918004147b5a229fc9415acf4b0179c9548b8bddfe9`
+- **sha256:** `07ed9a0dc4c1c0687c80d6996bcbbef8151c15d0b688e489d5dc3acfafbc738a`
 
-### `artifacts/NA-14/figures/figA6_exploratory_d0.png`
+### `artifacts/NA-14/figures/figA14_exploratory_d0.png`
 - **Producer:** `newsaction.figures.render` (`newsaction.figures.appendix:exploratory_d0`)
-- **Inputs:** `artifacts/NA-14/figures/figA6_exploratory_d0.csv` only
+- **Inputs:** `artifacts/NA-14/figures/figA14_exploratory_d0.csv` only
 - **Schema:** PNG, 300 dpi
 - **Key:** one file
-- **Rows / coverage:** the figure figA6_exploratory_d0 at print size
+- **Rows / coverage:** the figure figA14_exploratory_d0 at print size
 - **Availability:** after NA-12 and NA-13 (test-period results are their stored outputs; nothing here reads the lock)
-- **sha256:** `c073a57da82df0f44b194746326ba7065c4038365f9c8673e39f060518b25e22`
+- **sha256:** `f07dae7e80a6a154c9b10bca5f013c1ca88c0ec7bcb5ffd41297fd747f79a1ee`
 
-### `artifacts/NA-14/figures/figA7_exploratory_ma_cross.csv`
-- **Producer:** `newsaction.figures.data` (`figa7`)
+### `artifacts/NA-14/figures/figA15_exploratory_ma_cross.csv`
+- **Producer:** `newsaction.figures.data` (`figa15`)
 - **Inputs:** `artifacts/NA-13/fig7_data.csv`, `artifacts/NA-14/tables/t25_ma_cross.csv`
 - **Schema:** `panel`, `series`, `label`, `role`, `x`, `xv`, `y`, `lo`, `hi`, `ci`, `source`, `key`, `y_col`, `x_col`, `lo_col`, `hi_col`, `se_col`
 - **Key:** one row per plotted value; (`source`, `key`, `y_col`) name its upstream cell
-- **Rows / coverage:** Appendix A7, exploratory (post hoc; NA-13 §9 via t25): the MA20/MA50-cross group means at 5 and 20     days,     validation against test (95% CI from the Newey–West t), and the tradable no-news fade on test (Figure 7     data, cumulative net at 10 bp).
+- **Rows / coverage:** Appendix A15, exploratory (post hoc; NA-13 §9 via t25): the MA20/MA50-cross group means at 5 and 20     days, validation against test (95% intervals from the Newey–West t), and the tradable no-news fade on test     (NA-13 Figure 7 data, cumulative net at 10 bp).
 - **Availability:** after NA-12 and NA-13 (test-period results are their stored outputs; nothing here reads the lock)
 - **sha256:** `710ccdd6d83adb734a1a1b32b6137b11453657197de7e306deb4f904d19c53c9`
 
-### `artifacts/NA-14/figures/figA7_exploratory_ma_cross.pdf`
+### `artifacts/NA-14/figures/figA15_exploratory_ma_cross.pdf`
 - **Producer:** `newsaction.figures.render` (`newsaction.figures.appendix:exploratory_ma_cross`)
-- **Inputs:** `artifacts/NA-14/figures/figA7_exploratory_ma_cross.csv` only
+- **Inputs:** `artifacts/NA-14/figures/figA15_exploratory_ma_cross.csv` only
 - **Schema:** vector PDF (TrueType fonts embedded)
 - **Key:** one file
-- **Rows / coverage:** the figure figA7_exploratory_ma_cross at print size
+- **Rows / coverage:** the figure figA15_exploratory_ma_cross at print size
 - **Availability:** after NA-12 and NA-13 (test-period results are their stored outputs; nothing here reads the lock)
-- **sha256:** `7eca617583196f7acd04083ab13396aacb8c165e9057ccf60ea2bc249461e84c`
+- **sha256:** `f1953c311104cfff3417da0705a99fe249e42a6976fa0488ae2d97296a8f34a4`
 
-### `artifacts/NA-14/figures/figA7_exploratory_ma_cross.png`
+### `artifacts/NA-14/figures/figA15_exploratory_ma_cross.png`
 - **Producer:** `newsaction.figures.render` (`newsaction.figures.appendix:exploratory_ma_cross`)
-- **Inputs:** `artifacts/NA-14/figures/figA7_exploratory_ma_cross.csv` only
+- **Inputs:** `artifacts/NA-14/figures/figA15_exploratory_ma_cross.csv` only
 - **Schema:** PNG, 300 dpi
 - **Key:** one file
-- **Rows / coverage:** the figure figA7_exploratory_ma_cross at print size
+- **Rows / coverage:** the figure figA15_exploratory_ma_cross at print size
 - **Availability:** after NA-12 and NA-13 (test-period results are their stored outputs; nothing here reads the lock)
-- **sha256:** `56cf8475bf2dd7a5c699bc3f9430db0d787ca8347112a1bbc28a0822ae312692`
+- **sha256:** `bb5cd324cff82ba97b0839b6707487498f7177d9e9304bbf54e72395578dd794`
 
 ### `artifacts/NA-14/tables/t1_primary.csv`
 - **Producer:** `newsaction.figures.tables`
@@ -3079,15 +3286,6 @@ sha256 on a rerun (labels and export were run twice: 8 of 8 files identical).
 - **Availability:** after NA-12 and NA-13 (test-period results are their stored outputs; nothing here reads the lock)
 - **sha256:** `a39e2f671ba9805c9381f28bb2db820fafc8aa83bde9192872f754ff342ae3c2`
 
-### `artifacts/NA-14/tables/t1_primary.tex`
-- **Producer:** `newsaction.figures.tables`
-- **Inputs:** `artifacts/NA-14/tables/t1_primary.csv`
-- **Schema:** booktabs float or longtable; the operator's labels as notes
-- **Key:** one file
-- **Rows / coverage:** the LaTeX view of t1_primary
-- **Availability:** after NA-12 and NA-13 (test-period results are their stored outputs; nothing here reads the lock)
-- **sha256:** `011769dd26db4f8717839293b512925faceea63cec0a5bafc728ca329fcc8792`
-
 ### `artifacts/NA-14/tables/t1b_primary_by_model.csv`
 - **Producer:** `newsaction.figures.tables`
 - **Inputs:** byte copy of `artifacts/NA-12/tables/t1b_primary_by_model.csv`
@@ -3096,15 +3294,6 @@ sha256 on a rerun (labels and export were run twice: 8 of 8 files identical).
 - **Rows / coverage:** 30 rows: H1–H4 for every decision model (the API models screen-failing and model-specific)
 - **Availability:** after NA-12 and NA-13 (test-period results are their stored outputs; nothing here reads the lock)
 - **sha256:** `37cf7a2c0739482d26afc019866a3a57054d25a24ec97554eb7792fcc4c6d676`
-
-### `artifacts/NA-14/tables/t1b_primary_by_model.tex`
-- **Producer:** `newsaction.figures.tables`
-- **Inputs:** `artifacts/NA-14/tables/t1b_primary_by_model.csv`
-- **Schema:** booktabs float or longtable; the operator's labels as notes
-- **Key:** one file
-- **Rows / coverage:** the LaTeX view of t1b_primary_by_model
-- **Availability:** after NA-12 and NA-13 (test-period results are their stored outputs; nothing here reads the lock)
-- **sha256:** `9a8a12d2c1a2f8af1ad905be04f6027fbd2a981751926b206192cd8c4a761d8f`
 
 ### `artifacts/NA-14/tables/t2_h2_over_under.csv`
 - **Producer:** `newsaction.figures.tables`
@@ -3115,15 +3304,6 @@ sha256 on a rerun (labels and export were run twice: 8 of 8 files identical).
 - **Availability:** after NA-12 and NA-13 (test-period results are their stored outputs; nothing here reads the lock)
 - **sha256:** `8bcb2c11f32a8574b4c70dbd21d211c31f5bf4884c731e4c99b6dafe0fe1306a`
 
-### `artifacts/NA-14/tables/t2_h2_over_under.tex`
-- **Producer:** `newsaction.figures.tables`
-- **Inputs:** `artifacts/NA-14/tables/t2_h2_over_under.csv`
-- **Schema:** booktabs float or longtable; the operator's labels as notes
-- **Key:** one file
-- **Rows / coverage:** the LaTeX view of t2_h2_over_under
-- **Availability:** after NA-12 and NA-13 (test-period results are their stored outputs; nothing here reads the lock)
-- **sha256:** `0777e93ef57e2363c90b22538eb6b932247935ca836cfd60e4b52638fac8c295`
-
 ### `artifacts/NA-14/tables/t3_ic.csv`
 - **Producer:** `newsaction.figures.tables`
 - **Inputs:** byte copy of `artifacts/NA-12/tables/t3_ic.csv`
@@ -3132,15 +3312,6 @@ sha256 on a rerun (labels and export were run twice: 8 of 8 files identical).
 - **Rows / coverage:** 18 rows: Daily IC of N̂_W0 with z_cc, z_on and z_id, and quintile spreads (§11.1)
 - **Availability:** after NA-12 and NA-13 (test-period results are their stored outputs; nothing here reads the lock)
 - **sha256:** `dae94be5f0635c9f7914619bc1bdb4541729ad29d2e6f2555b9a8ec4c544ef41`
-
-### `artifacts/NA-14/tables/t3_ic.tex`
-- **Producer:** `newsaction.figures.tables`
-- **Inputs:** `artifacts/NA-14/tables/t3_ic.csv`
-- **Schema:** booktabs float or longtable; the operator's labels as notes
-- **Key:** one file
-- **Rows / coverage:** the LaTeX view of t3_ic
-- **Availability:** after NA-12 and NA-13 (test-period results are their stored outputs; nothing here reads the lock)
-- **sha256:** `e3b9b32e43ecf5a25382f51cce60af8ef5b0d966a175de79991441a42ab25fd8`
 
 ### `artifacts/NA-14/tables/t4_secondary.csv`
 - **Producer:** `newsaction.figures.tables`
@@ -3151,15 +3322,6 @@ sha256 on a rerun (labels and export were run twice: 8 of 8 files identical).
 - **Availability:** after NA-12 and NA-13 (test-period results are their stored outputs; nothing here reads the lock)
 - **sha256:** `c474f9c40628f2da101a9c92ed41aec9b53012837fed16bc7a15c81f6f5b3067`
 
-### `artifacts/NA-14/tables/t4_secondary.tex`
-- **Producer:** `newsaction.figures.tables`
-- **Inputs:** `artifacts/NA-14/tables/t4_secondary.csv`
-- **Schema:** booktabs float or longtable; the operator's labels as notes
-- **Key:** one file
-- **Rows / coverage:** the LaTeX view of t4_secondary
-- **Availability:** after NA-12 and NA-13 (test-period results are their stored outputs; nothing here reads the lock)
-- **sha256:** `9d2ffcadb1a7d3c077aaec72deffa001160026bfa711a2e61c081b9a081c6f73`
-
 ### `artifacts/NA-14/tables/t5_heterogeneity.csv`
 - **Producer:** `newsaction.figures.tables`
 - **Inputs:** byte copy of `artifacts/NA-12/tables/t5_heterogeneity.csv`
@@ -3168,15 +3330,6 @@ sha256 on a rerun (labels and export were run twice: 8 of 8 files identical).
 - **Rows / coverage:** 24 rows: Heterogeneity cuts on H2 at D2: Wald test of N̂·1[cut] and G·1[cut], BH over each model's eight cuts
 - **Availability:** after NA-12 and NA-13 (test-period results are their stored outputs; nothing here reads the lock)
 - **sha256:** `126066b207041c66d4e0b83cee5d8fec1bd6165a705e6578243e60c9562ba178`
-
-### `artifacts/NA-14/tables/t5_heterogeneity.tex`
-- **Producer:** `newsaction.figures.tables`
-- **Inputs:** `artifacts/NA-14/tables/t5_heterogeneity.csv`
-- **Schema:** booktabs float or longtable; the operator's labels as notes
-- **Key:** one file
-- **Rows / coverage:** the LaTeX view of t5_heterogeneity
-- **Availability:** after NA-12 and NA-13 (test-period results are their stored outputs; nothing here reads the lock)
-- **sha256:** `18777a4eae9a968cee63b7ba5a63a1f2a4b734e121386c11690aee3453fc4c14`
 
 ### `artifacts/NA-14/tables/t6_convergence_ladder.csv`
 - **Producer:** `newsaction.figures.tables`
@@ -3187,15 +3340,6 @@ sha256 on a rerun (labels and export were run twice: 8 of 8 files identical).
 - **Availability:** after NA-12 and NA-13 (test-period results are their stored outputs; nothing here reads the lock)
 - **sha256:** `e2b1ff300300b610b187c12c5ea019d89e9fd13c69600306979245b296db7901`
 
-### `artifacts/NA-14/tables/t6_convergence_ladder.tex`
-- **Producer:** `newsaction.figures.tables`
-- **Inputs:** `artifacts/NA-14/tables/t6_convergence_ladder.csv`
-- **Schema:** booktabs float or longtable; the operator's labels as notes
-- **Key:** one file
-- **Rows / coverage:** the LaTeX view of t6_convergence_ladder
-- **Availability:** after NA-12 and NA-13 (test-period results are their stored outputs; nothing here reads the lock)
-- **sha256:** `6c981b9d9dfdb8a338679623a7d05f897344fea9f003f15e5a2aafc7d18d2d7f`
-
 ### `artifacts/NA-14/tables/t7_gap_closure.csv`
 - **Producer:** `newsaction.figures.tables`
 - **Inputs:** byte copy of `artifacts/NA-12/tables/t7_gap_closure.csv`
@@ -3204,15 +3348,6 @@ sha256 on a rerun (labels and export were run twice: 8 of 8 files identical).
 - **Rows / coverage:** 48 rows: A1 gap closure AR(τ→h)/σ = a + λ_h·U_τ + ψ_h·V (+ FE) at D2 and D1; half-life (first λ_h >= 0.5)
 - **Availability:** after NA-12 and NA-13 (test-period results are their stored outputs; nothing here reads the lock)
 - **sha256:** `33062977043288242b154d2ab05d7097f9211457fe7ecb6465b426daa09a8d48`
-
-### `artifacts/NA-14/tables/t7_gap_closure.tex`
-- **Producer:** `newsaction.figures.tables`
-- **Inputs:** `artifacts/NA-14/tables/t7_gap_closure.csv`
-- **Schema:** booktabs float or longtable; the operator's labels as notes
-- **Key:** one file
-- **Rows / coverage:** the LaTeX view of t7_gap_closure
-- **Availability:** after NA-12 and NA-13 (test-period results are their stored outputs; nothing here reads the lock)
-- **sha256:** `f22705383d6f6b6103bb42b84440ddfa94672de633c06b8772266bbb3e719ff1`
 
 ### `artifacts/NA-14/tables/t8_tracking_error.csv`
 - **Producer:** `newsaction.figures.tables`
@@ -3223,15 +3358,6 @@ sha256 on a rerun (labels and export were run twice: 8 of 8 files identical).
 - **Availability:** after NA-12 and NA-13 (test-period results are their stored outputs; nothing here reads the lock)
 - **sha256:** `43ea9867777802a24d0d7d1ca4331f39c99e210428b1242ceef463bae84ef80b`
 
-### `artifacts/NA-14/tables/t8_tracking_error.tex`
-- **Producer:** `newsaction.figures.tables`
-- **Inputs:** `artifacts/NA-14/tables/t8_tracking_error.csv`
-- **Schema:** booktabs float or longtable; the operator's labels as notes
-- **Key:** one file
-- **Rows / coverage:** the LaTeX view of t8_tracking_error
-- **Availability:** after NA-12 and NA-13 (test-period results are their stored outputs; nothing here reads the lock)
-- **sha256:** `a636d5e5183001746af924e24358900777a7d077de96f1300ffddbdf9dd51720`
-
 ### `artifacts/NA-14/tables/t9_convergence_cuts.csv`
 - **Producer:** `newsaction.figures.tables`
 - **Inputs:** byte copy of `artifacts/NA-12/tables/t9_convergence_cuts.csv`
@@ -3240,15 +3366,6 @@ sha256 on a rerun (labels and export were run twice: 8 of 8 files identical).
 - **Rows / coverage:** 35 rows: A1 by tier, quantified vs story (vendor; d1-ultra's own label) and |G| bin
 - **Availability:** after NA-12 and NA-13 (test-period results are their stored outputs; nothing here reads the lock)
 - **sha256:** `a644adda42c8717329bdefe50f5b302895c6729ad119ddda3811e4dc5fbaa354`
-
-### `artifacts/NA-14/tables/t9_convergence_cuts.tex`
-- **Producer:** `newsaction.figures.tables`
-- **Inputs:** `artifacts/NA-14/tables/t9_convergence_cuts.csv`
-- **Schema:** booktabs float or longtable; the operator's labels as notes
-- **Key:** one file
-- **Rows / coverage:** the LaTeX view of t9_convergence_cuts
-- **Availability:** after NA-12 and NA-13 (test-period results are their stored outputs; nothing here reads the lock)
-- **sha256:** `791c650796896a871c08dd9abd56767eee6f880393b652f02ca762db102ba88c`
 
 ### `artifacts/NA-14/tables/t10_explanation_ladder.csv`
 - **Producer:** `newsaction.figures.tables`
@@ -3259,15 +3376,6 @@ sha256 on a rerun (labels and export were run twice: 8 of 8 files identical).
 - **Availability:** after NA-12 and NA-13 (test-period results are their stored outputs; nothing here reads the lock)
 - **sha256:** `d58de25f8b3bc8d38cd0722904e8afb121cb38be769cdcd268f44e1c80fe51e2`
 
-### `artifacts/NA-14/tables/t10_explanation_ladder.tex`
-- **Producer:** `newsaction.figures.tables`
-- **Inputs:** `artifacts/NA-14/tables/t10_explanation_ladder.csv`
-- **Schema:** booktabs float or longtable; the operator's labels as notes
-- **Key:** one file
-- **Rows / coverage:** the LaTeX view of t10_explanation_ladder
-- **Availability:** after NA-12 and NA-13 (test-period results are their stored outputs; nothing here reads the lock)
-- **sha256:** `f055876b6ed752ff782f1bfc64d72521ca3b3df71fa5ac217a6db206c34a3529`
-
 ### `artifacts/NA-14/tables/t11_explanation_share_theta.csv`
 - **Producer:** `newsaction.figures.tables`
 - **Inputs:** byte copy of `artifacts/NA-12/tables/t11_explanation_share_theta.csv`
@@ -3276,15 +3384,6 @@ sha256 on a rerun (labels and export were run twice: 8 of 8 files identical).
 - **Rows / coverage:** 29 rows: A3.3–A3.5 (d1-ultra, model-specific): explained share, θ, persistence by reason, the market
 - **Availability:** after NA-12 and NA-13 (test-period results are their stored outputs; nothing here reads the lock)
 - **sha256:** `4ad3c9e9feff9fcd6fc0657ee34cb92b6f1c383b27e07577936555506498978e`
-
-### `artifacts/NA-14/tables/t11_explanation_share_theta.tex`
-- **Producer:** `newsaction.figures.tables`
-- **Inputs:** `artifacts/NA-14/tables/t11_explanation_share_theta.csv`
-- **Schema:** booktabs float or longtable; the operator's labels as notes
-- **Key:** one file
-- **Rows / coverage:** the LaTeX view of t11_explanation_share_theta
-- **Availability:** after NA-12 and NA-13 (test-period results are their stored outputs; nothing here reads the lock)
-- **sha256:** `3e112b31336c194e4aaa0674de4120da2ad7ba4df2dd17696af6e42232b3f494`
 
 ### `artifacts/NA-14/tables/t12_question_battery.csv`
 - **Producer:** `newsaction.figures.tables`
@@ -3295,15 +3394,6 @@ sha256 on a rerun (labels and export were run twice: 8 of 8 files identical).
 - **Availability:** after NA-12 and NA-13 (test-period results are their stored outputs; nothing here reads the lock)
 - **sha256:** `5b29c92473bae8d038757d10f92c134adbac4618c1baad4a0efe86e29bd48fbc`
 
-### `artifacts/NA-14/tables/t12_question_battery.tex`
-- **Producer:** `newsaction.figures.tables`
-- **Inputs:** `artifacts/NA-14/tables/t12_question_battery.csv`
-- **Schema:** booktabs float or longtable; the operator's labels as notes
-- **Key:** one file
-- **Rows / coverage:** the LaTeX view of t12_question_battery
-- **Availability:** after NA-12 and NA-13 (test-period results are their stored outputs; nothing here reads the lock)
-- **sha256:** `057baa63e782f846a6ea8ef38f358e20b827fb859e7e9bbc8fc381b7b4b4be61`
-
 ### `artifacts/NA-14/tables/t13_shapley.csv`
 - **Producer:** `newsaction.figures.tables`
 - **Inputs:** byte copy of `artifacts/NA-12/tables/t13_shapley.csv`
@@ -3312,15 +3402,6 @@ sha256 on a rerun (labels and export were run twice: 8 of 8 files identical).
 - **Rows / coverage:** 96 rows: §11.5 Shapley decomposition of the test OOS R² and mean daily IC over {R, N, J}, pooled and by tier
 - **Availability:** after NA-12 and NA-13 (test-period results are their stored outputs; nothing here reads the lock)
 - **sha256:** `a4fec4309891b7241386a7ce95059e736c2d4b87e7aa58cf6a5ccb0b43bb2992`
-
-### `artifacts/NA-14/tables/t13_shapley.tex`
-- **Producer:** `newsaction.figures.tables`
-- **Inputs:** `artifacts/NA-14/tables/t13_shapley.csv`
-- **Schema:** booktabs float or longtable; the operator's labels as notes
-- **Key:** one file
-- **Rows / coverage:** the LaTeX view of t13_shapley
-- **Availability:** after NA-12 and NA-13 (test-period results are their stored outputs; nothing here reads the lock)
-- **sha256:** `c482a8b5f20437c04bf5a31569a0d4c9a288a99f2fb4498998bb108d21e0b893`
 
 ### `artifacts/NA-14/tables/t14_model_comparison.csv`
 - **Producer:** `newsaction.figures.tables`
@@ -3331,15 +3412,6 @@ sha256 on a rerun (labels and export were run twice: 8 of 8 files identical).
 - **Availability:** after NA-12 and NA-13 (test-period results are their stored outputs; nothing here reads the lock)
 - **sha256:** `1f09db3d94b5046e4ab761cd55bd32dccef063534d8ed4d2d0d2935adf63c0dd`
 
-### `artifacts/NA-14/tables/t14_model_comparison.tex`
-- **Producer:** `newsaction.figures.tables`
-- **Inputs:** `artifacts/NA-14/tables/t14_model_comparison.csv`
-- **Schema:** booktabs float or longtable; the operator's labels as notes
-- **Key:** one file
-- **Rows / coverage:** the LaTeX view of t14_model_comparison
-- **Availability:** after NA-12 and NA-13 (test-period results are their stored outputs; nothing here reads the lock)
-- **sha256:** `d7f7a26efee9f33b2d9bd352b0726c2daf951618661a8ed8889b89435d177104`
-
 ### `artifacts/NA-14/tables/t15_calibration.csv`
 - **Producer:** `newsaction.figures.tables`
 - **Inputs:** byte copy of `artifacts/NA-12/tables/t15_calibration.csv`
@@ -3348,15 +3420,6 @@ sha256 on a rerun (labels and export were run twice: 8 of 8 files identical).
 - **Rows / coverage:** 22 rows: §11.2 calibration of Q1's three classes (ECE; log-loss and Brier skill vs val-A climatology); H7
 - **Availability:** after NA-12 and NA-13 (test-period results are their stored outputs; nothing here reads the lock)
 - **sha256:** `c7fa83ab91049a6a328f397ebff93fe19fa9aa892b81ae08af04cebf55acefdc`
-
-### `artifacts/NA-14/tables/t15_calibration.tex`
-- **Producer:** `newsaction.figures.tables`
-- **Inputs:** `artifacts/NA-14/tables/t15_calibration.csv`
-- **Schema:** booktabs float or longtable; the operator's labels as notes
-- **Key:** one file
-- **Rows / coverage:** the LaTeX view of t15_calibration
-- **Availability:** after NA-12 and NA-13 (test-period results are their stored outputs; nothing here reads the lock)
-- **sha256:** `aa1abcfb629a4eaa5eb835e9595d3492298f1bfefb2cad12cc96601b0f8ff262`
 
 ### `artifacts/NA-14/tables/t16_robustness.csv`
 - **Producer:** `newsaction.figures.tables`
@@ -3367,15 +3430,6 @@ sha256 on a rerun (labels and export were run twice: 8 of 8 files identical).
 - **Availability:** after NA-12 and NA-13 (test-period results are their stored outputs; nothing here reads the lock)
 - **sha256:** `5f2017bd953fc130ea3fb542f57612ab4c2fd6a4d7192612b42c0e0853ca8485`
 
-### `artifacts/NA-14/tables/t16_robustness.tex`
-- **Producer:** `newsaction.figures.tables`
-- **Inputs:** `artifacts/NA-14/tables/t16_robustness.csv`
-- **Schema:** booktabs float or longtable; the operator's labels as notes
-- **Key:** one file
-- **Rows / coverage:** the LaTeX view of t16_robustness
-- **Availability:** after NA-12 and NA-13 (test-period results are their stored outputs; nothing here reads the lock)
-- **sha256:** `457329b589db4d6751a447ccba0bd166ad7938659b191d19a1ef0c1034ee514a`
-
 ### `artifacts/NA-14/tables/t17_sector_exploratory.csv`
 - **Producer:** `newsaction.figures.tables`
 - **Inputs:** byte copy of `artifacts/NA-12/tables/t17_sector_exploratory.csv`
@@ -3384,15 +3438,6 @@ sha256 on a rerun (labels and export were run twice: 8 of 8 files identical).
 - **Rows / coverage:** 66 rows: Exploratory (outside every family, no claim): IC of N̂_W0 by GICS sector and leave-one-sector-out
 - **Availability:** after NA-12 and NA-13 (test-period results are their stored outputs; nothing here reads the lock)
 - **sha256:** `97dd083818aeb747ad3c16923b867b0ed6d0f0b616d0599ccc181c5b45c73d75`
-
-### `artifacts/NA-14/tables/t17_sector_exploratory.tex`
-- **Producer:** `newsaction.figures.tables`
-- **Inputs:** `artifacts/NA-14/tables/t17_sector_exploratory.csv`
-- **Schema:** booktabs float or longtable; the operator's labels as notes
-- **Key:** one file
-- **Rows / coverage:** the LaTeX view of t17_sector_exploratory
-- **Availability:** after NA-12 and NA-13 (test-period results are their stored outputs; nothing here reads the lock)
-- **sha256:** `bd1dea2159df3c8117664507dcdd539110286faa283a847af202522295c28dbb`
 
 ### `artifacts/NA-14/tables/t18_probes_val_a.csv`
 - **Producer:** `newsaction.figures.tables`
@@ -3403,15 +3448,6 @@ sha256 on a rerun (labels and export were run twice: 8 of 8 files identical).
 - **Availability:** after NA-12 and NA-13 (test-period results are their stored outputs; nothing here reads the lock)
 - **sha256:** `114b88a202d89e4916eecbfd12cb19c667f99c181e6d600addef7201484f4fd9`
 
-### `artifacts/NA-14/tables/t18_probes_val_a.tex`
-- **Producer:** `newsaction.figures.tables`
-- **Inputs:** `artifacts/NA-14/tables/t18_probes_val_a.csv`
-- **Schema:** booktabs float or longtable; the operator's labels as notes
-- **Key:** one file
-- **Rows / coverage:** the LaTeX view of t18_probes_val_a
-- **Availability:** after NA-12 and NA-13 (test-period results are their stored outputs; nothing here reads the lock)
-- **sha256:** `de5581f3db91b01d1c1905a533ab875485b40c978f87a64dfb7afd8afac2fb22`
-
 ### `artifacts/NA-14/tables/t19_monthly_ic.csv`
 - **Producer:** `newsaction.figures.tables`
 - **Inputs:** byte copy of `artifacts/NA-12/tables/t19_monthly_ic.csv`
@@ -3421,32 +3457,14 @@ sha256 on a rerun (labels and export were run twice: 8 of 8 files identical).
 - **Availability:** after NA-12 and NA-13 (test-period results are their stored outputs; nothing here reads the lock)
 - **sha256:** `6ee63d6d4ac06908411d75fddb3170bcdb6855de2b44889db48d9264bb68046f`
 
-### `artifacts/NA-14/tables/t19_monthly_ic.tex`
-- **Producer:** `newsaction.figures.tables`
-- **Inputs:** `artifacts/NA-14/tables/t19_monthly_ic.csv`
-- **Schema:** booktabs float or longtable; the operator's labels as notes
-- **Key:** one file
-- **Rows / coverage:** the LaTeX view of t19_monthly_ic
-- **Availability:** after NA-12 and NA-13 (test-period results are their stored outputs; nothing here reads the lock)
-- **sha256:** `2c6f4064d251779396c25322ceb607a9fc5f38cb7823c82c4201ba625d7e0bbd`
-
 ### `artifacts/NA-14/tables/t20_strategies.csv`
 - **Producer:** `newsaction.figures.tables`
 - **Inputs:** `artifacts/NA-13/strategy_table.csv`
 - **Schema:** `key`, `order`, `split`, `family`, `model`, `point`, `signal`, `exit`, `gated`, `role`, `rule`, `universe`, `events`, `n_days`, `n_positions`, `mean_names_per_side`, `sharpe_gross`, `sharpe_net_5`, `sharpe_net_10`, `sharpe_net_20`, `ann_return_gross`, `ann_return_net_10`, `vol`, `max_dd_net_10`, `turnover_daily`, `hit_rate_net_10`, `placebo_pct_gross`, `placebo_pct_net_5`, `placebo_pct_net_10`, `placebo_pct_net_20`, `placebo_pct_mean_net_10`, `capacity_median_usd`, `capacity_p10_usd`, `dsr_prob_net_5`, `dsr_stat_net_5`, `dsr_sr0_net_5`, `sharpe_daily_net_5`, `dsr_prob_net_10`, `dsr_stat_net_10`, `dsr_sr0_net_10`, `sharpe_daily_net_10`, `dsr_prob_net_20`, `dsr_stat_net_20`, `dsr_sr0_net_20`, `sharpe_daily_net_20`, `note`, `n_trials`
 - **Key:** `key` unique
-- **Rows / coverage:** 194 rows: NA-13 strategies, test and val-B (reference): every pre-registered book, S-CONV first, the benchmarks and the exploratory MA-cross fade
+- **Rows / coverage:** 194 rows: NA-13 strategies, test and val-B (reference): every pre-registered book, S-CONV first, and the benchmarks
 - **Availability:** after NA-12 and NA-13 (test-period results are their stored outputs; nothing here reads the lock)
 - **sha256:** `e5e999485685162a0c73a01fa8c2c44d274bc861f881befb5dc6e8eadbedd56a`
-
-### `artifacts/NA-14/tables/t20_strategies.tex`
-- **Producer:** `newsaction.figures.tables`
-- **Inputs:** `artifacts/NA-14/tables/t20_strategies.csv`
-- **Schema:** booktabs float or longtable; the operator's labels as notes
-- **Key:** one file
-- **Rows / coverage:** the LaTeX view of t20_strategies
-- **Availability:** after NA-12 and NA-13 (test-period results are their stored outputs; nothing here reads the lock)
-- **sha256:** `fe58ef371a7c457f649deac50a7e74e4adb73e80ec4882dc66a22cb4669dcfb5`
 
 ### `artifacts/NA-14/tables/t21_release_dates.csv`
 - **Producer:** `newsaction.figures.tables`
@@ -3455,16 +3473,7 @@ sha256 on a rerun (labels and export were run twice: 8 of 8 files identical).
 - **Key:** `key` unique
 - **Rows / coverage:** 6 rows: Release dates of the decision models against the sample (test period ends at sample_end)
 - **Availability:** after NA-12 and NA-13 (test-period results are their stored outputs; nothing here reads the lock)
-- **sha256:** `9b7df0c5f944a650285a3c66a4366d80042dcd8f432ee97f947ecf8e79eed551`
-
-### `artifacts/NA-14/tables/t21_release_dates.tex`
-- **Producer:** `newsaction.figures.tables`
-- **Inputs:** `artifacts/NA-14/tables/t21_release_dates.csv`
-- **Schema:** booktabs float or longtable; the operator's labels as notes
-- **Key:** one file
-- **Rows / coverage:** the LaTeX view of t21_release_dates
-- **Availability:** after NA-12 and NA-13 (test-period results are their stored outputs; nothing here reads the lock)
-- **sha256:** `d5a8b5063234312521e6c57355c1af35d28b1fbe45cb7c452eef907cc090c20c`
+- **sha256:** `94eca271b36b87df12b77e2d6112cc79e3121c7ce406fd2cc97006ad1c2a05d0`
 
 ### `artifacts/NA-14/tables/t22_spend.csv`
 - **Producer:** `newsaction.figures.tables`
@@ -3475,15 +3484,6 @@ sha256 on a rerun (labels and export were run twice: 8 of 8 files identical).
 - **Availability:** after NA-12 and NA-13 (test-period results are their stored outputs; nothing here reads the lock)
 - **sha256:** `5266f2595b1c54e33428cd93d8d5ad644bea26a8a45f15a96f346dee3765c007`
 
-### `artifacts/NA-14/tables/t22_spend.tex`
-- **Producer:** `newsaction.figures.tables`
-- **Inputs:** `artifacts/NA-14/tables/t22_spend.csv`
-- **Schema:** booktabs float or longtable; the operator's labels as notes
-- **Key:** one file
-- **Rows / coverage:** the LaTeX view of t22_spend
-- **Availability:** after NA-12 and NA-13 (test-period results are their stored outputs; nothing here reads the lock)
-- **sha256:** `af6351d513d2e81bd2e9b76d14b85ace06a10830ccb5df1b2fda1e96f4d2ddf2`
-
 ### `artifacts/NA-14/tables/t23_company_identification.csv`
 - **Producer:** `newsaction.figures.tables`
 - **Inputs:** `artifacts/NA-11/company_id_matched.csv`
@@ -3492,15 +3492,6 @@ sha256 on a rerun (labels and export were run twice: 8 of 8 files identical).
 - **Rows / coverage:** 7 rows: Company identification with activity-matched distractors (NA-11; val-A, masked states)
 - **Availability:** after NA-12 and NA-13 (test-period results are their stored outputs; nothing here reads the lock)
 - **sha256:** `37e72f312689045926f0c8330a79c2ecd61ccc41993ad278fe416ba16866cc8c`
-
-### `artifacts/NA-14/tables/t23_company_identification.tex`
-- **Producer:** `newsaction.figures.tables`
-- **Inputs:** `artifacts/NA-14/tables/t23_company_identification.csv`
-- **Schema:** booktabs float or longtable; the operator's labels as notes
-- **Key:** one file
-- **Rows / coverage:** the LaTeX view of t23_company_identification
-- **Availability:** after NA-12 and NA-13 (test-period results are their stored outputs; nothing here reads the lock)
-- **sha256:** `5f3738e3af6bd75bebce377577937353611f82626b7d08bc10a13218e8885e61`
 
 ### `artifacts/NA-14/tables/t24_exploratory_d0_signal.csv`
 - **Producer:** `newsaction.figures.tables`
@@ -3520,15 +3511,6 @@ sha256 on a rerun (labels and export were run twice: 8 of 8 files identical).
 - **Availability:** after NA-12 and NA-13 (test-period results are their stored outputs; nothing here reads the lock)
 - **sha256:** `94b0e2993279bec1040f1bb65c3ad5024249e667d6ca6167ad3aa4858b9d0cca`
 
-### `artifacts/NA-14/tables/t25_ma_cross.tex`
-- **Producer:** `newsaction.figures.tables`
-- **Inputs:** `artifacts/NA-14/tables/t25_ma_cross.csv`
-- **Schema:** booktabs float or longtable; the operator's labels as notes
-- **Key:** one file
-- **Rows / coverage:** the LaTeX view of t25_ma_cross
-- **Availability:** after NA-12 and NA-13 (test-period results are their stored outputs; nothing here reads the lock)
-- **sha256:** `b35d5b4d52be92f7411434da723ff613426ec4daa1b51c1354146ddbdb8088fe`
-
 ### `artifacts/NA-14/tables/t26_sconv_overlap.csv`
 - **Producer:** `newsaction.figures.tables`
 - **Inputs:** `work/strategy/positions_test.parquet`, `work/strategy/books_test.parquet`
@@ -3537,15 +3519,6 @@ sha256 on a rerun (labels and export were run twice: 8 of 8 files identical).
 - **Rows / coverage:** 4 rows: S-CONV against the price-only gap fade on test: shared positions, same side, daily-return correlation
 - **Availability:** after NA-12 and NA-13 (test-period results are their stored outputs; nothing here reads the lock)
 - **sha256:** `7b38605a14f00a72c356131dd4af5301799a0bee1d67067006d53f333b3f6d62`
-
-### `artifacts/NA-14/tables/t26_sconv_overlap.tex`
-- **Producer:** `newsaction.figures.tables`
-- **Inputs:** `artifacts/NA-14/tables/t26_sconv_overlap.csv`
-- **Schema:** booktabs float or longtable; the operator's labels as notes
-- **Key:** one file
-- **Rows / coverage:** the LaTeX view of t26_sconv_overlap
-- **Availability:** after NA-12 and NA-13 (test-period results are their stored outputs; nothing here reads the lock)
-- **sha256:** `04fd598dd13e68b4db6512c6bdde52ea24b00d858ad1ccd37004c1f0165d0424`
 
 ### `artifacts/NA-14/tables/t27_tournament.csv`
 - **Producer:** `newsaction.figures.tables`
@@ -3556,15 +3529,6 @@ sha256 on a rerun (labels and export were run twice: 8 of 8 files identical).
 - **Availability:** after NA-12 and NA-13 (test-period results are their stored outputs; nothing here reads the lock)
 - **sha256:** `0baff402fdc594dbfa2ea6333ce2684c536637771b3a90697f7b389b50545560`
 
-### `artifacts/NA-14/tables/t27_tournament.tex`
-- **Producer:** `newsaction.figures.tables`
-- **Inputs:** `artifacts/NA-14/tables/t27_tournament.csv`
-- **Schema:** booktabs float or longtable; the operator's labels as notes
-- **Key:** one file
-- **Rows / coverage:** the LaTeX view of t27_tournament
-- **Availability:** after NA-12 and NA-13 (test-period results are their stored outputs; nothing here reads the lock)
-- **sha256:** `f7c22f20522d118bcaff511ba2ce3cc686c2542ccc9dd551b46e72d33d467d6d`
-
 ### `artifacts/NA-14/tables/t28_filter_frontier.csv`
 - **Producer:** `newsaction.figures.tables`
 - **Inputs:** `artifacts/NA-03/frontier.csv`
@@ -3573,15 +3537,6 @@ sha256 on a rerun (labels and export were run twice: 8 of 8 files identical).
 - **Rows / coverage:** 70 rows: NA-03 importance filters on val-A: selection share and recall by budget
 - **Availability:** after NA-12 and NA-13 (test-period results are their stored outputs; nothing here reads the lock)
 - **sha256:** `33533b0056ffd67eeb6573d0f158c174229210ce1899276750ae0534c6e93d59`
-
-### `artifacts/NA-14/tables/t28_filter_frontier.tex`
-- **Producer:** `newsaction.figures.tables`
-- **Inputs:** `artifacts/NA-14/tables/t28_filter_frontier.csv`
-- **Schema:** booktabs float or longtable; the operator's labels as notes
-- **Key:** one file
-- **Rows / coverage:** the LaTeX view of t28_filter_frontier
-- **Availability:** after NA-12 and NA-13 (test-period results are their stored outputs; nothing here reads the lock)
-- **sha256:** `26d8709f2c76860528a01dff9bee06a4bf41382a1970d26072eeabf9e44a87d2`
 
 ### `artifacts/NA-14/tables/t29_encoding.csv`
 - **Producer:** `newsaction.figures.tables`
@@ -3592,15 +3547,6 @@ sha256 on a rerun (labels and export were run twice: 8 of 8 files identical).
 - **Availability:** after NA-12 and NA-13 (test-period results are their stored outputs; nothing here reads the lock)
 - **sha256:** `e7d8605787cb62b341d2758c7a4daf8435b99bb7eeed0cb3b784dc138f7f1855`
 
-### `artifacts/NA-14/tables/t29_encoding.tex`
-- **Producer:** `newsaction.figures.tables`
-- **Inputs:** `artifacts/NA-14/tables/t29_encoding.csv`
-- **Schema:** booktabs float or longtable; the operator's labels as notes
-- **Key:** one file
-- **Rows / coverage:** the LaTeX view of t29_encoding
-- **Availability:** after NA-12 and NA-13 (test-period results are their stored outputs; nothing here reads the lock)
-- **sha256:** `078e1f88a8a0ee8315997f919ff4852045e5284118886d4db78927da37c36ced`
-
 ### `artifacts/NA-14/tables/t30_derived.csv`
 - **Producer:** `newsaction.figures.tables`
 - **Inputs:** `artifacts/NA-12/figure_data/fig1_rg_class_paths.csv`
@@ -3610,21 +3556,57 @@ sha256 on a rerun (labels and export were run twice: 8 of 8 files identical).
 - **Availability:** after NA-12 and NA-13 (test-period results are their stored outputs; nothing here reads the lock)
 - **sha256:** `37d0df01b47124dc6db9624b982279ad279f4f5dcfd72b191d37f86f6b37477f`
 
-### `artifacts/NA-14/tables/t30_derived.tex`
+### `artifacts/NA-14/tables/t31_market_replication.csv`
 - **Producer:** `newsaction.figures.tables`
-- **Inputs:** `artifacts/NA-14/tables/t30_derived.csv`
-- **Schema:** booktabs float or longtable; the operator's labels as notes
-- **Key:** one file
-- **Rows / coverage:** the LaTeX view of t30_derived
+- **Inputs:** `artifacts/NA-12/tables/t11_explanation_share_theta.csv`
+- **Schema:** `key`, `item`, `value`, `n`, `p`, `ci_low`, `ci_high`, `available`, `source`
+- **Key:** `key` unique
+- **Rows / coverage:** 1 rows: A3.5 market-level replication (exploratory; d1-ultra): out-of-sample R² of SPY's daily return on the model's reading of the market news
 - **Availability:** after NA-12 and NA-13 (test-period results are their stored outputs; nothing here reads the lock)
-- **sha256:** `1b5d6cfe3e0df1639cda01210f936f06a26660b9c4931d50eb8489d7ce16e502`
+- **sha256:** `47e320d34232bd5932908a377f84b9135d627865c2846cb91bcf5e6d6f730cb5`
+
+### `artifacts/NA-14/tables/t32_val_b_ic.csv`
+- **Producer:** `newsaction.figures.tables`
+- **Inputs:** `artifacts/NA-11/spec_smoke_val_b.json`
+- **Schema:** `key`, `model_id`, `split`, `signal`, `ic_z_cc`, `ic_z_cc_t`, `ic_z_cc_ci_low`, `ic_z_cc_ci_high`, `ic_z_cc_days`, `ic_z_cc_n`, `ic_z_on`, `ic_z_on_t`, `ic_z_on_ci_low`, `ic_z_on_ci_high`, `ic_z_on_days`, `ic_z_on_n`, `ic_z_id`, `ic_z_id_t`, `ic_z_id_ci_low`, `ic_z_id_ci_high`, `ic_z_id_days`, `ic_z_id_n`, `source`
+- **Key:** `key` unique
+- **Rows / coverage:** 3 rows: Val-B daily ICs of N̂_W0 with z_cc, z_on and z_id (NA-11's run of the frozen spec on val-B, before the freeze)
+- **Availability:** after NA-12 and NA-13 (test-period results are their stored outputs; nothing here reads the lock)
+- **sha256:** `b2ae900683c016a071001e7285abeb2913eeb5d7db5cd4990110b350237c695a`
+
+### `artifacts/NA-14/tables/t33_placebo_sharpe.csv`
+- **Producer:** `newsaction.figures.tables`
+- **Inputs:** `work/strategy/placebo_test.parquet`
+- **Schema:** `key`, `point`, `exit`, `n_books`, `sharpe_gross_q05`, `sharpe_gross_q50`, `sharpe_gross_q95`, `sharpe_net_5_q05`, `sharpe_net_5_q50`, `sharpe_net_5_q95`, `sharpe_net_10_q05`, `sharpe_net_10_q50`, `sharpe_net_10_q95`, `sharpe_net_20_q05`, `sharpe_net_20_q50`, `sharpe_net_20_q95`, `source`
+- **Key:** `key` unique
+- **Rows / coverage:** 45 rows: Random-signal placebo (NA-13): 5th, 50th and 95th percentile of the annualized Sharpe ratios of the 100 placebo books of each test universe, gross and net of 5, 10 and 20 bp per side
+- **Availability:** after NA-12 and NA-13 (test-period results are their stored outputs; nothing here reads the lock)
+- **sha256:** `23f4be70017dead01d6c839cfcdad22fc8d17569105daaf2a3c4d1f9de0dd1a9`
+
+### `artifacts/NA-14/tables/t34_prereg_deviations.csv`
+- **Producer:** `newsaction.figures.tables`
+- **Inputs:** `docs/PREREG.md`, `artifacts/NA-14/inputs/prereg_deviations.yaml`
+- **Schema:** `key`, `row`, `date`, `chunk`, `change`, `reason`, `freeze`
+- **Key:** `key` unique
+- **Rows / coverage:** 63 rows: Pre-registration deviations: every row of PREREG §15 in one line
+- **Availability:** after NA-12 and NA-13 (test-period results are their stored outputs; nothing here reads the lock)
+- **sha256:** `91cd943ce64986b0785bb92e638fec88947f5cb779cc1877c3dd7f9fd5e35fdc`
+
+### `artifacts/NA-14/tables/t35_break_even.csv`
+- **Producer:** `newsaction.figures.tables`
+- **Inputs:** `artifacts/NA-13/strategy_table.csv`
+- **Schema:** `key`, `ann_return_gross`, `turnover_daily`, `break_even_bp`, `formula`, `source`
+- **Key:** `key` unique
+- **Rows / coverage:** 88 rows: Break-even cost per side of each test book (NA-13): the cost at which the mean net return is zero
+- **Availability:** after NA-12 and NA-13 (test-period results are their stored outputs; nothing here reads the lock)
+- **sha256:** `c58d8dd3a89d9fa84cc7118d8bc4aeefe38ccc2799bf0d0404b1181306922470`
 
 ### `artifacts/NA-14/tables/f1_rg_class_paths.csv`
 - **Producer:** `newsaction.figures.tables`
 - **Inputs:** `artifacts/NA-12/figure_data/fig1_rg_class_paths.csv`
 - **Schema:** `key`, `model`, `figure`, `group`, `point`, `mean`, `se`, `n`, `mean_v`, `n_group`
 - **Key:** `key` unique
-- **Rows / coverage:** 312 rows: Figure 1 data (NA-12): CAR^lvl paths by RG class
+- **Rows / coverage:** 312 rows: Figure 4 data (NA-12): CAR^lvl paths by RG class
 - **Availability:** after NA-12 and NA-13 (test-period results are their stored outputs; nothing here reads the lock)
 - **sha256:** `a838f7cebc529dddae31a7ac7726e38370383daa84287af41b9e78f0f0d83ae9`
 
@@ -3633,7 +3615,7 @@ sha256 on a rerun (labels and export were run twice: 8 of 8 files identical).
 - **Inputs:** `artifacts/NA-12/figure_data/fig1_v_decile_paths.csv`
 - **Schema:** `key`, `model`, `figure`, `group`, `point`, `mean`, `se`, `n`, `mean_v`, `n_group`
 - **Key:** `key` unique
-- **Rows / coverage:** 1230 rows: Figure 1 data (NA-12): CAR^lvl paths by V decile
+- **Rows / coverage:** 1230 rows: Figure 3 data (NA-12): CAR^lvl paths by V decile
 - **Availability:** after NA-12 and NA-13 (test-period results are their stored outputs; nothing here reads the lock)
 - **sha256:** `db32683874d6ed03813810f73c9e3810786eb14bec245e73a43a0706f39ca210`
 
@@ -3642,7 +3624,7 @@ sha256 on a rerun (labels and export were run twice: 8 of 8 files identical).
 - **Inputs:** `artifacts/NA-12/figure_data/fig2_drift_vs_g.csv`
 - **Schema:** `key`, `model`, `figure`, `tercile`, `g_bin`, `mean`, `se`, `n`, `mean_abs_strength`
 - **Key:** `key` unique
-- **Rows / coverage:** 45 rows: Figure 2 data (NA-12): sign(G)·y2 by |G| bin and news-strength tercile
+- **Rows / coverage:** 45 rows: Figure 4 data (NA-12): sign(G)·y2 by |G| bin and news-strength tercile
 - **Availability:** after NA-12 and NA-13 (test-period results are their stored outputs; nothing here reads the lock)
 - **sha256:** `2d82575553eaa79ce26fe05b9859470222255a81b0f030f53aa33d31e3e0551e`
 
@@ -3651,7 +3633,7 @@ sha256 on a rerun (labels and export were run twice: 8 of 8 files identical).
 - **Inputs:** `artifacts/NA-12/figure_data/fig4_monthly_ic.csv`
 - **Schema:** `key`, `model`, `split`, `month`, `ic`, `n_days`
 - **Key:** `key` unique
-- **Rows / coverage:** 72 rows: Figure 4 data (NA-12): monthly mean daily IC
+- **Rows / coverage:** 72 rows: Appendix Figure A6 data (NA-12): monthly mean daily IC
 - **Availability:** after NA-12 and NA-13 (test-period results are their stored outputs; nothing here reads the lock)
 - **sha256:** `10f7c22cd446a169ea4481b025686612c4f904df34b8ac554110306889f50468`
 
@@ -3660,7 +3642,7 @@ sha256 on a rerun (labels and export were run twice: 8 of 8 files identical).
 - **Inputs:** `artifacts/NA-12/figure_data/fig5_shapley_shares.csv`
 - **Schema:** `key`, `model`, `tier`, `metric`, `group`, `share`, `value`, `n`
 - **Key:** `key` unique
-- **Rows / coverage:** 72 rows: Figure 5 data (NA-12): Shapley shares
+- **Rows / coverage:** 72 rows: NA-12 Shapley shares (not drawn: their totals are about zero)
 - **Availability:** after NA-12 and NA-13 (test-period results are their stored outputs; nothing here reads the lock)
 - **sha256:** `4b7114f321cf602e50d1fdb0874f65c03456d231bae8274cd3d2e6d9ac32f347`
 
@@ -3669,7 +3651,7 @@ sha256 on a rerun (labels and export were run twice: 8 of 8 files identical).
 - **Inputs:** `artifacts/NA-12/figure_data/fig8_explanation_ladder.csv`
 - **Schema:** `key`, `model`, `step`, `r2`, `ci_low`, `ci_high`, `p`
 - **Key:** `key` unique
-- **Rows / coverage:** 7 rows: Figure 8 data (NA-12): the explanation ladder
+- **Rows / coverage:** 7 rows: Figure 7 data (NA-12): the explanation ladder
 - **Availability:** after NA-12 and NA-13 (test-period results are their stored outputs; nothing here reads the lock)
 - **sha256:** `76696bf8a0f5a636b058c6e4f485b349f59cfc3eba7bdbc332b542dce9517f8b`
 
@@ -3678,9 +3660,378 @@ sha256 on a rerun (labels and export were run twice: 8 of 8 files identical).
 - **Inputs:** `artifacts/NA-12/figure_data/appendix_reliability.csv`
 - **Schema:** `key`, `model`, `target`, `bin`, `lo`, `hi`, `n`, `confidence`, `hit_rate`
 - **Key:** `key` unique
-- **Rows / coverage:** 180 rows: Appendix data (NA-12): reliability bins
+- **Rows / coverage:** 180 rows: Appendix Figure A4 data (NA-12): reliability bins
 - **Availability:** after NA-12 and NA-13 (test-period results are their stored outputs; nothing here reads the lock)
 - **sha256:** `af0ce4e245ff0c99a8b29c22e1b51325787d302135e1735ec1797c8b4f634c0c`
+
+### `artifacts/NA-14/tables/tab1_primary.tex`
+- **Producer:** `newsaction.figures.latex`
+- **Inputs:** `artifacts/NA-12/tables/t1_primary.csv` (the cells of `keys.json`)
+- **Schema:** LaTeX: booktabs, threeparttable(x) notes, siunitx S columns; a float or a longtable
+- **Key:** one file
+- **Rows / coverage:** main table tab:primary (38 cited cells)
+- **Availability:** after NA-12 and NA-13 (test-period results are their stored outputs; nothing here reads the lock)
+- **sha256:** `0416937604af2c4dc377c9d96c69396dfb42487b1095435fd099cb8c48682009`
+
+### `artifacts/NA-14/tables/tab2_ic_by_target.tex`
+- **Producer:** `newsaction.figures.latex`
+- **Inputs:** `artifacts/NA-12/tables/t3_ic.csv`, `artifacts/NA-12/tables/t14_model_comparison.csv`, `artifacts/NA-14/tables/t32_val_b_ic.csv` (the cells of `keys.json`)
+- **Schema:** LaTeX: booktabs, threeparttable(x) notes, siunitx S columns; a float or a longtable
+- **Key:** one file
+- **Rows / coverage:** main table tab:ic-target (60 cited cells)
+- **Availability:** after NA-12 and NA-13 (test-period results are their stored outputs; nothing here reads the lock)
+- **sha256:** `a33d41fbb426015714d239beef77d9594ba61c80aca2b68d50bff81fee09435f`
+
+### `artifacts/NA-14/tables/tab3_over_under.tex`
+- **Producer:** `newsaction.figures.latex`
+- **Inputs:** `artifacts/NA-12/tables/t2_h2_over_under.csv` (the cells of `keys.json`)
+- **Schema:** LaTeX: booktabs, threeparttable(x) notes, siunitx S columns; a float or a longtable
+- **Key:** one file
+- **Rows / coverage:** main table tab:over-under (54 cited cells)
+- **Availability:** after NA-12 and NA-13 (test-period results are their stored outputs; nothing here reads the lock)
+- **sha256:** `338d62f81bb574242076e08e72172c54ec5bc0d3466969b394df55c698fe6dad`
+
+### `artifacts/NA-14/tables/tab4_convergence.tex`
+- **Producer:** `newsaction.figures.latex`
+- **Inputs:** `artifacts/NA-12/tables/t6_convergence_ladder.csv`, `artifacts/NA-12/tables/t7_gap_closure.csv` (the cells of `keys.json`)
+- **Schema:** LaTeX: booktabs, threeparttable(x) notes, siunitx S columns; a float or a longtable
+- **Key:** one file
+- **Rows / coverage:** main table tab:convergence (96 cited cells)
+- **Availability:** after NA-12 and NA-13 (test-period results are their stored outputs; nothing here reads the lock)
+- **sha256:** `f17ec51aeeb1b62a965b62ec04581a49c44ab3d83d339affeaaa02378bfebda4`
+
+### `artifacts/NA-14/tables/tab5_explaining_moves.tex`
+- **Producer:** `newsaction.figures.latex`
+- **Inputs:** `artifacts/NA-12/tables/t10_explanation_ladder.csv`, `artifacts/NA-12/tables/t4_secondary.csv` (the cells of `keys.json`)
+- **Schema:** LaTeX: booktabs, threeparttable(x) notes, siunitx S columns; a float or a longtable
+- **Key:** one file
+- **Rows / coverage:** main table tab:explaining (24 cited cells)
+- **Availability:** after NA-12 and NA-13 (test-period results are their stored outputs; nothing here reads the lock)
+- **sha256:** `fc717fc431341c0277d2fdf6e77b93ca3d7058af642dac9e13a606ae90c3f972`
+
+### `artifacts/NA-14/tables/tab6_strategies.tex`
+- **Producer:** `newsaction.figures.latex`
+- **Inputs:** `artifacts/NA-14/tables/t20_strategies.csv`, `artifacts/NA-14/tables/t35_break_even.csv` (the cells of `keys.json`)
+- **Schema:** LaTeX: booktabs, threeparttable(x) notes, siunitx S columns; a float or a longtable
+- **Key:** one file
+- **Rows / coverage:** main table tab:strategies (73 cited cells)
+- **Availability:** after NA-12 and NA-13 (test-period results are their stored outputs; nothing here reads the lock)
+- **sha256:** `534ce03eedc5e9656c8fe26461557602c0bc4dadefaf4f745bca4a6d66af698d`
+
+### `artifacts/NA-14/tables/t14_model_comparison.tex`
+- **Producer:** `newsaction.figures.latex`
+- **Inputs:** `artifacts/NA-14/tables/t14_model_comparison.csv` (the cells of `keys.json`)
+- **Schema:** LaTeX: booktabs, threeparttable(x) notes, siunitx S columns; a float or a longtable
+- **Key:** one file
+- **Rows / coverage:** appendix table tab:a-model-comparison (74 cited cells)
+- **Availability:** after NA-12 and NA-13 (test-period results are their stored outputs; nothing here reads the lock)
+- **sha256:** `748e9241c2a3af7117db20cb1c3f08344f99730c21226d6e2950f6b45832462f`
+
+### `artifacts/NA-14/tables/t27_tournament.tex`
+- **Producer:** `newsaction.figures.latex`
+- **Inputs:** `artifacts/NA-14/tables/t27_tournament.csv` (the cells of `keys.json`)
+- **Schema:** LaTeX: booktabs, threeparttable(x) notes, siunitx S columns; a float or a longtable
+- **Key:** one file
+- **Rows / coverage:** appendix table tab:a-tournament (84 cited cells)
+- **Availability:** after NA-12 and NA-13 (test-period results are their stored outputs; nothing here reads the lock)
+- **sha256:** `5985691f2b11085199a2bd9d5af6cebd77a468f338114838ff5934ee1c32411e`
+
+### `artifacts/NA-14/tables/t21_release_dates.tex`
+- **Producer:** `newsaction.figures.latex`
+- **Inputs:** `artifacts/NA-14/tables/t21_release_dates.csv` (the cells of `keys.json`)
+- **Schema:** LaTeX: booktabs, threeparttable(x) notes, siunitx S columns; a float or a longtable
+- **Key:** one file
+- **Rows / coverage:** appendix table tab:a-release-dates (5 cited cells)
+- **Availability:** after NA-12 and NA-13 (test-period results are their stored outputs; nothing here reads the lock)
+- **sha256:** `12904055f269f17d265d85fcc65221082b76b5da98d96f7d8da12a6fb2fdc042`
+
+### `artifacts/NA-14/tables/t22_spend.tex`
+- **Producer:** `newsaction.figures.latex`
+- **Inputs:** `artifacts/NA-14/tables/t22_spend.csv` (the cells of `keys.json`)
+- **Schema:** LaTeX: booktabs, threeparttable(x) notes, siunitx S columns; a float or a longtable
+- **Key:** one file
+- **Rows / coverage:** appendix table tab:a-spend (15 cited cells)
+- **Availability:** after NA-12 and NA-13 (test-period results are their stored outputs; nothing here reads the lock)
+- **sha256:** `9f1acce501161ea031c2d293628463e73ffcb7eb391bcd4bc379e551e8a59f78`
+
+### `artifacts/NA-14/tables/t28_filter_frontier.tex`
+- **Producer:** `newsaction.figures.latex`
+- **Inputs:** `artifacts/NA-14/tables/t28_filter_frontier.csv` (the cells of `keys.json`)
+- **Schema:** LaTeX: booktabs, threeparttable(x) notes, siunitx S columns; a float or a longtable
+- **Key:** one file
+- **Rows / coverage:** appendix table tab:a-filter-frontier (350 cited cells)
+- **Availability:** after NA-12 and NA-13 (test-period results are their stored outputs; nothing here reads the lock)
+- **sha256:** `b85ef0ba0a0130de83da5afff8bf1f870f4a94728fa6dc2fa5450282e12eb695`
+
+### `artifacts/NA-14/tables/t29_encoding.tex`
+- **Producer:** `newsaction.figures.latex`
+- **Inputs:** `artifacts/NA-14/tables/t29_encoding.csv` (the cells of `keys.json`)
+- **Schema:** LaTeX: booktabs, threeparttable(x) notes, siunitx S columns; a float or a longtable
+- **Key:** one file
+- **Rows / coverage:** appendix table tab:a-encoding (126 cited cells)
+- **Availability:** after NA-12 and NA-13 (test-period results are their stored outputs; nothing here reads the lock)
+- **sha256:** `8dd62bf152d6a77105ef6793fe9699fa90566282ae42bc19a9586b646863797e`
+
+### `artifacts/NA-14/tables/t1b_primary_by_model.tex`
+- **Producer:** `newsaction.figures.latex`
+- **Inputs:** `artifacts/NA-14/tables/t1b_primary_by_model.csv` (the cells of `keys.json`)
+- **Schema:** LaTeX: booktabs, threeparttable(x) notes, siunitx S columns; a float or a longtable
+- **Key:** one file
+- **Rows / coverage:** appendix table tab:a-primary-by-model (138 cited cells)
+- **Availability:** after NA-12 and NA-13 (test-period results are their stored outputs; nothing here reads the lock)
+- **sha256:** `ef6ead2854d96360e5c5fe2413adeaf66ab4efe5e5a2ac0767c3b0d0eafc26e1`
+
+### `artifacts/NA-14/tables/t3_ic.tex`
+- **Producer:** `newsaction.figures.latex`
+- **Inputs:** `artifacts/NA-14/tables/t3_ic.csv` (the cells of `keys.json`)
+- **Schema:** LaTeX: booktabs, threeparttable(x) notes, siunitx S columns; a float or a longtable
+- **Key:** one file
+- **Rows / coverage:** appendix table tab:a-ic (126 cited cells)
+- **Availability:** after NA-12 and NA-13 (test-period results are their stored outputs; nothing here reads the lock)
+- **sha256:** `9af4978221b06197e182b07abc70bf02becc1ddacaa31c8d0f161a01ef139b12`
+
+### `artifacts/NA-14/tables/t32_val_b_ic.tex`
+- **Producer:** `newsaction.figures.latex`
+- **Inputs:** `artifacts/NA-14/tables/t32_val_b_ic.csv` (the cells of `keys.json`)
+- **Schema:** LaTeX: booktabs, threeparttable(x) notes, siunitx S columns; a float or a longtable
+- **Key:** one file
+- **Rows / coverage:** appendix table tab:a-val-b-ic (21 cited cells)
+- **Availability:** after NA-12 and NA-13 (test-period results are their stored outputs; nothing here reads the lock)
+- **sha256:** `d3ca3d5b24cc07657eb7e257c9610c82880df097d9a87936c70c7ad61e731a87`
+
+### `artifacts/NA-14/tables/t15_calibration.tex`
+- **Producer:** `newsaction.figures.latex`
+- **Inputs:** `artifacts/NA-14/tables/t15_calibration.csv` (the cells of `keys.json`)
+- **Schema:** LaTeX: booktabs, threeparttable(x) notes, siunitx S columns; a float or a longtable
+- **Key:** one file
+- **Rows / coverage:** appendix table tab:a-calibration (54 cited cells)
+- **Availability:** after NA-12 and NA-13 (test-period results are their stored outputs; nothing here reads the lock)
+- **sha256:** `3c7d9eafc91294bdd685457194fde5cf68a6b8bd301477544d2f94b61f61328d`
+
+### `artifacts/NA-14/tables/t16_robustness.tex`
+- **Producer:** `newsaction.figures.latex`
+- **Inputs:** `artifacts/NA-14/tables/t16_robustness.csv` (the cells of `keys.json`)
+- **Schema:** LaTeX: booktabs, threeparttable(x) notes, siunitx S columns; a float or a longtable
+- **Key:** one file
+- **Rows / coverage:** appendix table tab:a-robustness (541 cited cells)
+- **Availability:** after NA-12 and NA-13 (test-period results are their stored outputs; nothing here reads the lock)
+- **sha256:** `c30c35263257c0b642b053e58d7983a353f39504204e96bf3ff34d9f4c25a173`
+
+### `artifacts/NA-14/tables/t2_h2_over_under.tex`
+- **Producer:** `newsaction.figures.latex`
+- **Inputs:** `artifacts/NA-14/tables/t2_h2_over_under.csv` (the cells of `keys.json`)
+- **Schema:** LaTeX: booktabs, threeparttable(x) notes, siunitx S columns; a float or a longtable
+- **Key:** one file
+- **Rows / coverage:** appendix table tab:a-h2-over-under (192 cited cells)
+- **Availability:** after NA-12 and NA-13 (test-period results are their stored outputs; nothing here reads the lock)
+- **sha256:** `d96fd4dab94dfdd062d008e10a75faac1167cbbdaf8c353218eb14ac22d9b816`
+
+### `artifacts/NA-14/tables/t4_secondary.tex`
+- **Producer:** `newsaction.figures.latex`
+- **Inputs:** `artifacts/NA-14/tables/t4_secondary.csv` (the cells of `keys.json`)
+- **Schema:** LaTeX: booktabs, threeparttable(x) notes, siunitx S columns; a float or a longtable
+- **Key:** one file
+- **Rows / coverage:** appendix table tab:a-secondary (72 cited cells)
+- **Availability:** after NA-12 and NA-13 (test-period results are their stored outputs; nothing here reads the lock)
+- **sha256:** `6d4401a7737dee9e86eadd98d152dc40f7e6e99bcebdb52b7e988418795c87a5`
+
+### `artifacts/NA-14/tables/t5_heterogeneity.tex`
+- **Producer:** `newsaction.figures.latex`
+- **Inputs:** `artifacts/NA-14/tables/t5_heterogeneity.csv` (the cells of `keys.json`)
+- **Schema:** LaTeX: booktabs, threeparttable(x) notes, siunitx S columns; a float or a longtable
+- **Key:** one file
+- **Rows / coverage:** appendix table tab:a-heterogeneity (192 cited cells)
+- **Availability:** after NA-12 and NA-13 (test-period results are their stored outputs; nothing here reads the lock)
+- **sha256:** `6aa8eb836c51f2abf7fd090b3c80e10d7c9465a277cba1270adbe93b970ef1f0`
+
+### `artifacts/NA-14/tables/t6_convergence_ladder.tex`
+- **Producer:** `newsaction.figures.latex`
+- **Inputs:** `artifacts/NA-14/tables/t6_convergence_ladder.csv` (the cells of `keys.json`)
+- **Schema:** LaTeX: booktabs, threeparttable(x) notes, siunitx S columns; a float or a longtable
+- **Key:** one file
+- **Rows / coverage:** appendix table tab:a-convergence-ladder (393 cited cells)
+- **Availability:** after NA-12 and NA-13 (test-period results are their stored outputs; nothing here reads the lock)
+- **sha256:** `b0f49d5970f32a73c2cca4af892ecc9e465254192453db3696fcef0723e2a5a9`
+
+### `artifacts/NA-14/tables/t7_gap_closure.tex`
+- **Producer:** `newsaction.figures.latex`
+- **Inputs:** `artifacts/NA-14/tables/t7_gap_closure.csv` (the cells of `keys.json`)
+- **Schema:** LaTeX: booktabs, threeparttable(x) notes, siunitx S columns; a float or a longtable
+- **Key:** one file
+- **Rows / coverage:** appendix table tab:a-gap-closure (258 cited cells)
+- **Availability:** after NA-12 and NA-13 (test-period results are their stored outputs; nothing here reads the lock)
+- **sha256:** `978b107eb53f11fd3de8686d8b82bda1ea2af415977331b3174f11af0221e97c`
+
+### `artifacts/NA-14/tables/t8_tracking_error.tex`
+- **Producer:** `newsaction.figures.latex`
+- **Inputs:** `artifacts/NA-14/tables/t8_tracking_error.csv` (the cells of `keys.json`)
+- **Schema:** LaTeX: booktabs, threeparttable(x) notes, siunitx S columns; a float or a longtable
+- **Key:** one file
+- **Rows / coverage:** appendix table tab:a-tracking-error (144 cited cells)
+- **Availability:** after NA-12 and NA-13 (test-period results are their stored outputs; nothing here reads the lock)
+- **sha256:** `d7dfdbe172db4295eaf8a0006d49b3ecbc30c48aa91756715129e81049e78d49`
+
+### `artifacts/NA-14/tables/t9_convergence_cuts.tex`
+- **Producer:** `newsaction.figures.latex`
+- **Inputs:** `artifacts/NA-14/tables/t9_convergence_cuts.csv` (the cells of `keys.json`)
+- **Schema:** LaTeX: booktabs, threeparttable(x) notes, siunitx S columns; a float or a longtable
+- **Key:** one file
+- **Rows / coverage:** appendix table tab:a-convergence-cuts (155 cited cells)
+- **Availability:** after NA-12 and NA-13 (test-period results are their stored outputs; nothing here reads the lock)
+- **sha256:** `728347a2f2b9b04028b6eb4933a7bbc48ca7372134f637c7356aa6cd02af8f5f`
+
+### `artifacts/NA-14/tables/t13_shapley.tex`
+- **Producer:** `newsaction.figures.latex`
+- **Inputs:** `artifacts/NA-14/tables/t13_shapley.csv` (the cells of `keys.json`)
+- **Schema:** LaTeX: booktabs, threeparttable(x) notes, siunitx S columns; a float or a longtable
+- **Key:** one file
+- **Rows / coverage:** appendix table tab:a-shapley (264 cited cells)
+- **Availability:** after NA-12 and NA-13 (test-period results are their stored outputs; nothing here reads the lock)
+- **sha256:** `c19dc5e6f27891660e4e01f62ea42163e5c226f4a5af04f72436c4f8358fbcfa`
+
+### `artifacts/NA-14/tables/t10_explanation_ladder.tex`
+- **Producer:** `newsaction.figures.latex`
+- **Inputs:** `artifacts/NA-14/tables/t10_explanation_ladder.csv` (the cells of `keys.json`)
+- **Schema:** LaTeX: booktabs, threeparttable(x) notes, siunitx S columns; a float or a longtable
+- **Key:** one file
+- **Rows / coverage:** appendix table tab:a-explanation-ladder (472 cited cells)
+- **Availability:** after NA-12 and NA-13 (test-period results are their stored outputs; nothing here reads the lock)
+- **sha256:** `16fa7dd0b309355282fae72855d673188c29794ffcf9df0d7ef46469d9d47ebe`
+
+### `artifacts/NA-14/tables/t11_explanation_share_theta.tex`
+- **Producer:** `newsaction.figures.latex`
+- **Inputs:** `artifacts/NA-14/tables/t11_explanation_share_theta.csv` (the cells of `keys.json`)
+- **Schema:** LaTeX: booktabs, threeparttable(x) notes, siunitx S columns; a float or a longtable
+- **Key:** one file
+- **Rows / coverage:** appendix table tab:a-explanation-share-theta (69 cited cells)
+- **Availability:** after NA-12 and NA-13 (test-period results are their stored outputs; nothing here reads the lock)
+- **sha256:** `014fc04ef054ce7ae081f53f70a666ae970c8aad83cac937f853f7dde78827b3`
+
+### `artifacts/NA-14/tables/t12_question_battery.tex`
+- **Producer:** `newsaction.figures.latex`
+- **Inputs:** `artifacts/NA-14/tables/t12_question_battery.csv` (the cells of `keys.json`)
+- **Schema:** LaTeX: booktabs, threeparttable(x) notes, siunitx S columns; a float or a longtable
+- **Key:** one file
+- **Rows / coverage:** appendix table tab:a-question-battery (430 cited cells)
+- **Availability:** after NA-12 and NA-13 (test-period results are their stored outputs; nothing here reads the lock)
+- **sha256:** `f38bcad08773de814de950bf86162cc89ae20569952215a666d0fe0ff5ce92cb`
+
+### `artifacts/NA-14/tables/t20_strategies.tex`
+- **Producer:** `newsaction.figures.latex`
+- **Inputs:** `artifacts/NA-14/tables/t20_strategies.csv` (the cells of `keys.json`)
+- **Schema:** LaTeX: booktabs, threeparttable(x) notes, siunitx S columns; a float or a longtable
+- **Key:** one file
+- **Rows / coverage:** appendix table tab:a-strategies (1567 cited cells)
+- **Availability:** after NA-12 and NA-13 (test-period results are their stored outputs; nothing here reads the lock)
+- **sha256:** `6c5a4cd81ff5095aa7e277e9c98fc507120f886fbcd0af2680de66b18d644703`
+
+### `artifacts/NA-14/tables/t26_sconv_overlap.tex`
+- **Producer:** `newsaction.figures.latex`
+- **Inputs:** `artifacts/NA-14/tables/t26_sconv_overlap.csv` (the cells of `keys.json`)
+- **Schema:** LaTeX: booktabs, threeparttable(x) notes, siunitx S columns; a float or a longtable
+- **Key:** one file
+- **Rows / coverage:** appendix table tab:a-sconv-overlap (16 cited cells)
+- **Availability:** after NA-12 and NA-13 (test-period results are their stored outputs; nothing here reads the lock)
+- **sha256:** `eb38862342ba28cea2ba218e7cc64d79c7d178aa341ab745764111c79a562e8d`
+
+### `artifacts/NA-14/tables/t33_placebo_sharpe.tex`
+- **Producer:** `newsaction.figures.latex`
+- **Inputs:** `artifacts/NA-14/tables/t33_placebo_sharpe.csv` (the cells of `keys.json`)
+- **Schema:** LaTeX: booktabs, threeparttable(x) notes, siunitx S columns; a float or a longtable
+- **Key:** one file
+- **Rows / coverage:** appendix table tab:a-placebo-sharpe (315 cited cells)
+- **Availability:** after NA-12 and NA-13 (test-period results are their stored outputs; nothing here reads the lock)
+- **sha256:** `3b92a0a5cd835b2aaf91b2618dc0df51f13c73c03ea858def66db6b81b7e6a48`
+
+### `artifacts/NA-14/tables/t35_break_even.tex`
+- **Producer:** `newsaction.figures.latex`
+- **Inputs:** `artifacts/NA-14/tables/t35_break_even.csv` (the cells of `keys.json`)
+- **Schema:** LaTeX: booktabs, threeparttable(x) notes, siunitx S columns; a float or a longtable
+- **Key:** one file
+- **Rows / coverage:** appendix table tab:a-break-even (264 cited cells)
+- **Availability:** after NA-12 and NA-13 (test-period results are their stored outputs; nothing here reads the lock)
+- **sha256:** `4a918e5cd122e50d9b4623716fa684f33c479e1833d6df009e1d82ffc34aa02f`
+
+### `artifacts/NA-14/tables/t23_company_identification.tex`
+- **Producer:** `newsaction.figures.latex`
+- **Inputs:** `artifacts/NA-14/tables/t23_company_identification.csv` (the cells of `keys.json`)
+- **Schema:** LaTeX: booktabs, threeparttable(x) notes, siunitx S columns; a float or a longtable
+- **Key:** one file
+- **Rows / coverage:** appendix table tab:a-company-identification (28 cited cells)
+- **Availability:** after NA-12 and NA-13 (test-period results are their stored outputs; nothing here reads the lock)
+- **sha256:** `bfc31b2b802e5abe8723ead07f585279b8b34673f5e2f9cb3f168b70ca329c3b`
+
+### `artifacts/NA-14/tables/t18_probes_val_a.tex`
+- **Producer:** `newsaction.figures.latex`
+- **Inputs:** `artifacts/NA-14/tables/t18_probes_val_a.csv` (the cells of `keys.json`)
+- **Schema:** LaTeX: booktabs, threeparttable(x) notes, siunitx S columns; a float or a longtable
+- **Key:** one file
+- **Rows / coverage:** appendix table tab:a-probes-val-a (58 cited cells)
+- **Availability:** after NA-12 and NA-13 (test-period results are their stored outputs; nothing here reads the lock)
+- **sha256:** `e808faf5afd379a979da30e50596c3a3c2b3a2cea1be46a3dee650cb5a3aaf40`
+
+### `artifacts/NA-14/tables/t19_monthly_ic.tex`
+- **Producer:** `newsaction.figures.latex`
+- **Inputs:** `artifacts/NA-14/tables/t19_monthly_ic.csv` (the cells of `keys.json`)
+- **Schema:** LaTeX: booktabs, threeparttable(x) notes, siunitx S columns; a float or a longtable
+- **Key:** one file
+- **Rows / coverage:** appendix table tab:a-monthly-ic (144 cited cells)
+- **Availability:** after NA-12 and NA-13 (test-period results are their stored outputs; nothing here reads the lock)
+- **sha256:** `22242e1113824af7af60ad9dce56c27420193ab185106b9ae82fa949e4a9ae0f`
+
+### `artifacts/NA-14/tables/t17_sector_exploratory.tex`
+- **Producer:** `newsaction.figures.latex`
+- **Inputs:** `artifacts/NA-14/tables/t17_sector_exploratory.csv` (the cells of `keys.json`)
+- **Schema:** LaTeX: booktabs, threeparttable(x) notes, siunitx S columns; a float or a longtable
+- **Key:** one file
+- **Rows / coverage:** appendix table tab:a-sector-exploratory (330 cited cells)
+- **Availability:** after NA-12 and NA-13 (test-period results are their stored outputs; nothing here reads the lock)
+- **sha256:** `5c3de314bc357ecfd8837e028d06b400780001e081b47a0e81edff788cdf12e5`
+
+### `artifacts/NA-14/tables/t25_ma_cross.tex`
+- **Producer:** `newsaction.figures.latex`
+- **Inputs:** `artifacts/NA-14/tables/t25_ma_cross.csv` (the cells of `keys.json`)
+- **Schema:** LaTeX: booktabs, threeparttable(x) notes, siunitx S columns; a float or a longtable
+- **Key:** one file
+- **Rows / coverage:** appendix table tab:a-ma-cross (78 cited cells)
+- **Availability:** after NA-12 and NA-13 (test-period results are their stored outputs; nothing here reads the lock)
+- **sha256:** `4236d5629f1b6c6fe5973a85d4640dc2b6c729f8b18d438f62d8f8700175965d`
+
+### `artifacts/NA-14/tables/t31_market_replication.tex`
+- **Producer:** `newsaction.figures.latex`
+- **Inputs:** `artifacts/NA-14/tables/t31_market_replication.csv` (the cells of `keys.json`)
+- **Schema:** LaTeX: booktabs, threeparttable(x) notes, siunitx S columns; a float or a longtable
+- **Key:** one file
+- **Rows / coverage:** appendix table tab:a-market-replication (3 cited cells)
+- **Availability:** after NA-12 and NA-13 (test-period results are their stored outputs; nothing here reads the lock)
+- **sha256:** `cab63088537fd2fc64d7818b0b9e1b0f4d0be783511ec6c9637f2cc6360a94de`
+
+### `artifacts/NA-14/tables/t30_derived.tex`
+- **Producer:** `newsaction.figures.latex`
+- **Inputs:** `artifacts/NA-14/tables/t30_derived.csv` (the cells of `keys.json`)
+- **Schema:** LaTeX: booktabs, threeparttable(x) notes, siunitx S columns; a float or a longtable
+- **Key:** one file
+- **Rows / coverage:** appendix table tab:a-derived (1 cited cells)
+- **Availability:** after NA-12 and NA-13 (test-period results are their stored outputs; nothing here reads the lock)
+- **sha256:** `d22c744e209b3584e8f06741d5c18c10fb55a4f508938e124d441e09fac090ec`
+
+### `artifacts/NA-14/tables/t34_prereg_deviations.tex`
+- **Producer:** `newsaction.figures.latex`
+- **Inputs:** `artifacts/NA-14/tables/t34_prereg_deviations.csv` (the cells of `keys.json`)
+- **Schema:** LaTeX: booktabs, threeparttable(x) notes, siunitx S columns; a float or a longtable
+- **Key:** one file
+- **Rows / coverage:** appendix table tab:a-deviations (315 cited cells)
+- **Availability:** after NA-12 and NA-13 (test-period results are their stored outputs; nothing here reads the lock)
+- **sha256:** `d412ef1434ae25c874cd3b23aee83aa7e24d299d3c3ac1b926ed4206f66f4120`
+
+### `artifacts/NA-14/tables/latex.json`
+- **Producer:** `newsaction.figures.latex`
+- **Inputs:** the LaTeX tables
+- **Schema:** JSON list: name, label, section (main or appendix), file, sources, cells (every cited key)
+- **Key:** one entry per LaTeX table
+- **Rows / coverage:** which cells each LaTeX table prints
+- **Availability:** after NA-12 and NA-13 (test-period results are their stored outputs; nothing here reads the lock)
+- **sha256:** `b944a858afc45d079bdc7ad8e019a98d22d83aec8a1328049e9955b4c2ce83bd`
 
 ### `artifacts/NA-14/tables/keys.json`
 - **Producer:** `newsaction.figures.tables`
@@ -3689,22 +4040,13 @@ sha256 on a rerun (labels and export were run twice: 8 of 8 files identical).
 - **Key:** one file
 - **Rows / coverage:** the cells the captions cite
 - **Availability:** after NA-12 and NA-13 (test-period results are their stored outputs; nothing here reads the lock)
-- **sha256:** `7b196db2121b306704896f738341add9f09cb386bd9a1b3fb84133ad674e63d6`
+- **sha256:** `4e41e1f6fa7b981c979bc9fb0e911e99079a2b5b4ea057bf61ff249dc5dc42d7`
 
 ### `artifacts/NA-14/tables/index.json`
 - **Producer:** `newsaction.figures.tables`
 - **Inputs:** every NA-14 table
-- **Schema:** name, title, columns, rows, notes, sources, copy_of, files
+- **Schema:** name, title, section, exploratory, exploratory_rows, columns, rows, notes, sources, copy_of, files
 - **Key:** one file
 - **Rows / coverage:** the table index
 - **Availability:** after NA-12 and NA-13 (test-period results are their stored outputs; nothing here reads the lock)
-- **sha256:** `e7eb8e624c12858956d4304e59d65846d4023d226725668ea96e115518e7cf5d`
-
-### `artifacts/NA-14/tables/paper_tables.tex`
-- **Producer:** `newsaction.figures.tables`
-- **Inputs:** the `.tex` tables
-- **Schema:** a LaTeX document that inputs every table
-- **Key:** one file
-- **Rows / coverage:** compiles every table at once (checked with tectonic in NA-14)
-- **Availability:** after NA-12 and NA-13 (test-period results are their stored outputs; nothing here reads the lock)
-- **sha256:** `944d093bdb9a0ffcfd75b0876fa81f924eb0aecd22a6e3cf4734a0f923a48037`
+- **sha256:** `e550886d4664e56af2da6d89e0b95c06680e509d000cc895e5927a38c4bf1db3`

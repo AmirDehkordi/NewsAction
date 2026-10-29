@@ -1,0 +1,38 @@
+% tab6_strategies: tab:strategies (NA-14 figures.latex, from artifacts/NA-14/tables/t20_strategies.csv, artifacts/NA-14/tables/t35_break_even.csv)
+\begin{table}[htbp]
+\centering
+\small
+\setlength{\tabcolsep}{3pt}
+\begin{threeparttable}
+\caption{Strategies on the test period: no pre-registered book survives costs and the deflated Sharpe ratio.}\label{tab:strategies}
+\begin{tabular}{@{}llS[table-format=-1.2]S[table-format=-2.2]S[table-format=1.2]S[table-format=-2.1]S[table-format=2.0]S[table-format=<1.3]@{}}
+\toprule
+ & & \multicolumn{2}{c}{Sharpe ratio} & & & & \\
+\cmidrule(lr){3-4}
+Book & Holding & {Gross} & {Net} & {Turnover} & {Break-even (bp)} & {Placebo pct.} & {DSR} \\
+\midrule
+\multicolumn{8}{@{}l}{\textit{Laya-Fin (primary)}} \\
+S-CONV & D2 to $t{+}5$ & 0.61 & -1.98 & 0.90 & 2.4 & 68 & <0.001 \\
+S-D0 & open to close & 0.35 & -6.03 & 4.36 & 0.5 & 64 & <0.001 \\
+S-D0, gated & open to $t{+}1$ & 1.88 & -0.38 & 2.31 & 8.3 & 93 & <0.001 \\
+S-D1 $J$ & 10:00 to close & 0.76 & -9.70 & 4.36 & 0.7 & 71 & <0.001 \\
+S-D2 $J$ & next open to $t{+}5$ & -2.69 & -6.45 & 0.83 & -7.1 & 3 & <0.001 \\
+S-D2 RG & next open to $t{+}5$ & 1.69 & 1.50 & 0.05 & 85.1 & 92 & 0.024 \\
+\addlinespace
+\multicolumn{8}{@{}l}{\textit{d1-ultra (model-specific)}} \\
+S-CONV & D2 to $t{+}5$ & -0.09 & -2.72 & 0.90 & -0.3 & 48 & <0.001 \\
+S-D0 & open to close & 0.10 & -6.41 & 4.41 & 0.1 & 58 & <0.001 \\
+S-D1 $J$ & 10:00 to close & -0.28 & -11.35 & 4.51 & -0.3 & 40 & <0.001 \\
+S-D2 $J$ & next open to $t{+}5$ & 0.39 & -2.37 & 0.85 & 1.4 & 64 & <0.001 \\
+\addlinespace
+\multicolumn{8}{@{}l}{\textit{Benchmarks}} \\
+gap fade (price-only) & D2 to $t{+}5$ & 0.44 & -2.01 & 0.90 & 1.8 & 66 & <0.001 \\
+vendor sentiment$^{\dagger}$ & open to close & 0.27 & -6.24 & 4.36 & 0.4 & 62 & <0.001 \\
+\bottomrule
+\end{tabular}
+\begin{tablenotes}[flushleft]\footnotesize
+\item Annualized Sharpe ratios ($\sqrt{252}$), gross and net of 10 bp per side on both legs and the SPY hedge; no borrow cost. Turnover: dollars traded a day per dollar of capital. Break-even: the cost per side, in basis points, at which the mean net return is zero (gross mean $\div$ turnover). Placebo: the percentile of the gross Sharpe among 100 random-signal books on the same events. DSR: the deflated-Sharpe probability at 10 bp with the 545 trials of the trials ledger. Each family is shown at its hypothesis' horizon; every book is in Table~\ref{tab:a-strategies}. S-CONV ranks by the gap $U = V - G^{\mathrm{lvl}}$; S-D0 by $\tilde N$; S-D1 and S-D2 by the judgment $J$ signed by the move; RG books trade the cases the model calls a misreaction (one name a side).
+\item $^{\dagger}$Vendor-label baseline (vendor sentiment, tags-GBM): the labels were produced retrospectively, so its IC is a possibly look-ahead-contaminated upper bound, not the benchmark; the clean benchmarks are bge-ridge, price-only, the LLM baseline and the random-signal placebo. The API models fail the \S8.3 contamination screens, so their results are model-specific (\S1.3).
+\end{tablenotes}
+\end{threeparttable}
+\end{table}

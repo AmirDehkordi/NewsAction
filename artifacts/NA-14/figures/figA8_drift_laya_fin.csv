@@ -1,0 +1,16 @@
+panel,series,label,role,x,xv,y,lo,hi,ci,source,key,y_col,x_col,lo_col,hi_col,se_col
+a,weak,laya_fin,drift,"[0, 0.5)",0.0,0.02618730402,-0.05478230269913588,0.10715691073913587,se,artifacts/NA-12/figure_data/fig2_drift_vs_g.csv,"laya_fin|weak|[0, 0.5)",mean,,,,se
+a,weak,laya_fin,drift,"[0.5, 1)",1.0,-0.01005016279,-0.09125475298198008,0.07115442740198008,se,artifacts/NA-12/figure_data/fig2_drift_vs_g.csv,"laya_fin|weak|[0.5, 1)",mean,,,,se
+a,weak,laya_fin,drift,"[1, 2)",2.0,0.02096392066,-0.07076979673764161,0.1126976380576416,se,artifacts/NA-12/figure_data/fig2_drift_vs_g.csv,"laya_fin|weak|[1, 2)",mean,,,,se
+a,weak,laya_fin,drift,"[2, 3)",3.0,-0.02027296842,-0.14957041821216033,0.10902448137216032,se,artifacts/NA-12/figure_data/fig2_drift_vs_g.csv,"laya_fin|weak|[2, 3)",mean,,,,se
+a,weak,laya_fin,drift,"[3, inf)",4.0,-0.09807444843,-0.28014795538910503,0.08399905852910501,se,artifacts/NA-12/figure_data/fig2_drift_vs_g.csv,"laya_fin|weak|[3, inf)",mean,,,,se
+a,medium,laya_fin,drift,"[0, 0.5)",0.0,0.01442125615,-0.05226311953283191,0.08110563183283191,se,artifacts/NA-12/figure_data/fig2_drift_vs_g.csv,"laya_fin|medium|[0, 0.5)",mean,,,,se
+a,medium,laya_fin,drift,"[0.5, 1)",1.0,0.01063677522,-0.06968335282407823,0.09095690326407824,se,artifacts/NA-12/figure_data/fig2_drift_vs_g.csv,"laya_fin|medium|[0.5, 1)",mean,,,,se
+a,medium,laya_fin,drift,"[1, 2)",2.0,-0.03283505303,-0.11124725027219867,0.04557714421219867,se,artifacts/NA-12/figure_data/fig2_drift_vs_g.csv,"laya_fin|medium|[1, 2)",mean,,,,se
+a,medium,laya_fin,drift,"[2, 3)",3.0,0.02704363222,-0.11847745916306093,0.17256472360306094,se,artifacts/NA-12/figure_data/fig2_drift_vs_g.csv,"laya_fin|medium|[2, 3)",mean,,,,se
+a,medium,laya_fin,drift,"[3, inf)",4.0,-0.1830378055,-0.43158464306161104,0.06550903206161104,se,artifacts/NA-12/figure_data/fig2_drift_vs_g.csv,"laya_fin|medium|[3, inf)",mean,,,,se
+a,strong,laya_fin,drift,"[0, 0.5)",0.0,0.01792452699,-0.05964888245820445,0.09549793643820444,se,artifacts/NA-12/figure_data/fig2_drift_vs_g.csv,"laya_fin|strong|[0, 0.5)",mean,,,,se
+a,strong,laya_fin,drift,"[0.5, 1)",1.0,-0.0632553362,-0.14871170846585108,0.022201036065851082,se,artifacts/NA-12/figure_data/fig2_drift_vs_g.csv,"laya_fin|strong|[0.5, 1)",mean,,,,se
+a,strong,laya_fin,drift,"[1, 2)",2.0,-0.05474576462,-0.13750543933441195,0.028013910094411967,se,artifacts/NA-12/figure_data/fig2_drift_vs_g.csv,"laya_fin|strong|[1, 2)",mean,,,,se
+a,strong,laya_fin,drift,"[2, 3)",3.0,0.020116889,-0.11995656251336137,0.16019034051336137,se,artifacts/NA-12/figure_data/fig2_drift_vs_g.csv,"laya_fin|strong|[2, 3)",mean,,,,se
+a,strong,laya_fin,drift,"[3, inf)",4.0,-0.1468541037,-0.28757724336936963,-0.006130964030630348,se,artifacts/NA-12/figure_data/fig2_drift_vs_g.csv,"laya_fin|strong|[3, inf)",mean,,,,se

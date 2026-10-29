@@ -1,85 +1,92 @@
-% t17_sector_exploratory (NA-14, from artifacts/NA-12/tables/t17_sector_exploratory.csv)
-\begin{landscape}
-{\scriptsize\setlength{\tabcolsep}{3pt}
-\begin{longtable}{lllrrrrrrr}
-\caption{Exploratory (outside every family, no claim): IC of \^{N}\_W0 by GICS sector and leave-one-sector-out}\label{tab:t17_sector_exploratory}\\
+% t17_sector_exploratory: tab:a-sector-exploratory (NA-14 figures.latex, from artifacts/NA-14/tables/t17_sector_exploratory.csv)
+\begingroup
+\footnotesize
+\begin{longtable}{@{}lS[table-format=-1.3]S[table-format=-1.2]S[table-format=5.0]S[table-format=-1.3]S[table-format=-1.3]@{}}
+\caption{Exploratory: the IC by GICS sector.}\label{tab:a-sector-exploratory} \\
 \toprule
-model & kind & sector & IC z-cc & IC z-cc t & IC z-cc n & IC z-on & IC z-on t & IC z-id & IC z-id t \\
+Model, kind, sector & {IC $z_{cc}$} & {$t$} & {Events} & {IC $z_{on}$} & {IC $z_{id}$} \\
 \midrule
 \endfirsthead
+\multicolumn{6}{@{}l}{\textit{Table \ref{tab:a-sector-exploratory}, continued}} \\
 \toprule
-model & kind & sector & IC z-cc & IC z-cc t & IC z-cc n & IC z-on & IC z-on t & IC z-id & IC z-id t \\
+Model, kind, sector & {IC $z_{cc}$} & {$t$} & {Events} & {IC $z_{on}$} & {IC $z_{id}$} \\
 \midrule
 \endhead
-\bottomrule
+\midrule
+\multicolumn{6}{r@{}}{\textit{continued on the next page}} \\
 \endfoot
-Laya-Fin & by\_sector & Communication Services & $0.049$ & $0.702$ & $524$ & $-0.031$ & $-0.466$ & $0.035$ & $0.557$ \\
-Laya-Fin & by\_sector & Consumer Discretionary & $0.063$ & $2.216$ & $1{,}381$ & $0.032$ & $0.955$ & $0.023$ & $0.643$ \\
-Laya-Fin & by\_sector & Consumer Staples & $0.052$ & $1.181$ & $934$ & $0.070$ & $1.557$ & $-0.026$ & $-0.904$ \\
-Laya-Fin & by\_sector & Energy & $-0.046$ & $-0.851$ & $531$ & $-0.009$ & $-0.141$ & $-0.082$ & $-1.680$ \\
-Laya-Fin & by\_sector & Financials & $0.045$ & $1.468$ & $1{,}798$ & $0.012$ & $0.389$ & $0.036$ & $1.358$ \\
-Laya-Fin & by\_sector & Health Care & $0.043$ & $1.510$ & $1{,}999$ & $0.034$ & $1.189$ & $0.030$ & $1.045$ \\
-Laya-Fin & by\_sector & Industrials & $-0.030$ & $-1.247$ & $2{,}408$ & $-0.003$ & $-0.122$ & $-0.025$ & $-1.085$ \\
-Laya-Fin & by\_sector & Information Technology & $0.036$ & $1.408$ & $2{,}587$ & $-0.021$ & $-0.778$ & $0.035$ & $1.220$ \\
-Laya-Fin & by\_sector & Materials & $-0.043$ & $-0.813$ & $435$ & $-0.068$ & $-1.435$ & $-0.097$ & $-1.624$ \\
-Laya-Fin & by\_sector & Real Estate & $0.100$ & $1.198$ & $431$ & $0.043$ & $0.433$ & $0.124$ & $2.026$ \\
-Laya-Fin & by\_sector & Utilities & $-0.035$ & $-0.560$ & $720$ & $0.074$ & $1.411$ & $-0.113$ & $-1.512$ \\
-Laya-Fin & leave\_one\_out & Communication Services & $0.020$ & $1.610$ & $13{,}224$ & $0.013$ & $0.898$ & $0.012$ & $0.909$ \\
-Laya-Fin & leave\_one\_out & Consumer Discretionary & $0.022$ & $1.762$ & $12{,}367$ & $0.012$ & $0.841$ & $0.012$ & $0.900$ \\
-Laya-Fin & leave\_one\_out & Consumer Staples & $0.017$ & $1.323$ & $12{,}814$ & $0.017$ & $1.222$ & $0.007$ & $0.511$ \\
-Laya-Fin & leave\_one\_out & Energy & $0.021$ & $1.722$ & $13{,}217$ & $0.014$ & $1.004$ & $0.012$ & $0.950$ \\
-Laya-Fin & leave\_one\_out & Financials & $0.016$ & $1.129$ & $11{,}950$ & $0.010$ & $0.621$ & $0.007$ & $0.480$ \\
-Laya-Fin & leave\_one\_out & Health Care & $0.016$ & $1.321$ & $11{,}749$ & $0.009$ & $0.668$ & $0.006$ & $0.501$ \\
-Laya-Fin & leave\_one\_out & Industrials & $0.030$ & $2.322$ & $11{,}340$ & $0.016$ & $1.011$ & $0.020$ & $1.523$ \\
-Laya-Fin & leave\_one\_out & Information Technology & $0.011$ & $1.003$ & $11{,}161$ & $0.026$ & $1.901$ & $5.55\times 10^{-4}$ & $0.046$ \\
-Laya-Fin & leave\_one\_out & Materials & $0.021$ & $1.789$ & $13{,}313$ & $0.016$ & $1.094$ & $0.012$ & $0.943$ \\
-Laya-Fin & leave\_one\_out & Real Estate & $0.020$ & $1.626$ & $13{,}317$ & $0.016$ & $1.136$ & $0.010$ & $0.767$ \\
-Laya-Fin & leave\_one\_out & Utilities & $0.024$ & $1.989$ & $13{,}028$ & $0.018$ & $1.236$ & $0.014$ & $1.072$ \\
-anchor (uninformative) & by\_sector & Communication Services & $0.033$ & $0.610$ & $524$ & $-0.102$ & $-2.143$ & $0.058$ & $1.424$ \\
-anchor (uninformative) & by\_sector & Consumer Discretionary & $0.008$ & $0.217$ & $1{,}381$ & $0.060$ & $1.985$ & $-0.037$ & $-1.071$ \\
-anchor (uninformative) & by\_sector & Consumer Staples & $-0.095$ & $-2.059$ & $934$ & $-0.028$ & $-0.605$ & $-0.098$ & $-2.492$ \\
-anchor (uninformative) & by\_sector & Energy & $-0.003$ & $-0.065$ & $531$ & $-0.003$ & $-0.043$ & $-0.008$ & $-0.160$ \\
-anchor (uninformative) & by\_sector & Financials & $0.060$ & $2.295$ & $1{,}798$ & $-0.005$ & $-0.213$ & $0.081$ & $3.120$ \\
-anchor (uninformative) & by\_sector & Health Care & $0.017$ & $0.497$ & $1{,}999$ & $0.018$ & $0.606$ & $-0.003$ & $-0.075$ \\
-anchor (uninformative) & by\_sector & Industrials & $-0.018$ & $-0.580$ & $2{,}408$ & $-0.048$ & $-2.192$ & $-0.003$ & $-0.084$ \\
-anchor (uninformative) & by\_sector & Information Technology & $0.049$ & $2.484$ & $2{,}587$ & $0.021$ & $0.831$ & $0.030$ & $1.373$ \\
-anchor (uninformative) & by\_sector & Materials & $-0.061$ & $-1.172$ & $435$ & $-0.102$ & $-1.340$ & $-0.089$ & $-1.784$ \\
-anchor (uninformative) & by\_sector & Real Estate & $0.004$ & $0.074$ & $431$ & $-0.070$ & $-1.375$ & $0.067$ & $0.764$ \\
-anchor (uninformative) & by\_sector & Utilities & $-0.037$ & $-0.816$ & $720$ & $-0.128$ & $-2.600$ & $0.033$ & $1.215$ \\
-anchor (uninformative) & leave\_one\_out & Communication Services & $0.009$ & $0.986$ & $13{,}224$ & $0.002$ & $0.206$ & $0.006$ & $0.502$ \\
-anchor (uninformative) & leave\_one\_out & Consumer Discretionary & $0.009$ & $0.831$ & $12{,}367$ & $-0.002$ & $-0.194$ & $0.007$ & $0.607$ \\
-anchor (uninformative) & leave\_one\_out & Consumer Staples & $0.011$ & $1.134$ & $12{,}814$ & $0.008$ & $0.650$ & $0.006$ & $0.509$ \\
-anchor (uninformative) & leave\_one\_out & Energy & $0.012$ & $1.276$ & $13{,}217$ & $0.006$ & $0.506$ & $0.006$ & $0.553$ \\
-anchor (uninformative) & leave\_one\_out & Financials & $0.004$ & $0.426$ & $11{,}950$ & $0.006$ & $0.480$ & $-0.003$ & $-0.310$ \\
-anchor (uninformative) & leave\_one\_out & Health Care & $0.006$ & $0.601$ & $11{,}749$ & $0.002$ & $0.193$ & $0.003$ & $0.213$ \\
-anchor (uninformative) & leave\_one\_out & Industrials & $0.007$ & $0.682$ & $11{,}340$ & $0.018$ & $1.665$ & $-0.006$ & $-0.496$ \\
-anchor (uninformative) & leave\_one\_out & Information Technology & $-0.001$ & $-0.107$ & $11{,}161$ & $-5.14\times 10^{-4}$ & $-0.039$ & $-0.004$ & $-0.333$ \\
-anchor (uninformative) & leave\_one\_out & Materials & $0.008$ & $0.892$ & $13{,}313$ & $0.008$ & $0.725$ & $0.002$ & $0.200$ \\
-anchor (uninformative) & leave\_one\_out & Real Estate & $0.008$ & $0.821$ & $13{,}317$ & $0.005$ & $0.418$ & $0.003$ & $0.249$ \\
-anchor (uninformative) & leave\_one\_out & Utilities & $0.008$ & $0.785$ & $13{,}028$ & $0.009$ & $0.854$ & $-4.39\times 10^{-4}$ & $-0.038$ \\
-d1-ultra & by\_sector & Communication Services & $0.103$ & $1.786$ & $524$ & $0.091$ & $1.395$ & $0.010$ & $0.151$ \\
-d1-ultra & by\_sector & Consumer Discretionary & $0.087$ & $2.640$ & $1{,}381$ & $0.080$ & $1.807$ & $0.008$ & $0.254$ \\
-d1-ultra & by\_sector & Consumer Staples & $0.069$ & $1.898$ & $934$ & $0.057$ & $1.509$ & $0.020$ & $0.505$ \\
-d1-ultra & by\_sector & Energy & $0.120$ & $1.925$ & $531$ & $0.095$ & $1.052$ & $0.047$ & $0.933$ \\
-d1-ultra & by\_sector & Financials & $0.044$ & $1.611$ & $1{,}798$ & $0.092$ & $2.724$ & $-0.002$ & $-0.067$ \\
-d1-ultra & by\_sector & Health Care & $0.055$ & $1.736$ & $1{,}999$ & $0.082$ & $2.638$ & $0.050$ & $1.527$ \\
-d1-ultra & by\_sector & Industrials & $0.007$ & $0.282$ & $2{,}408$ & $0.049$ & $1.632$ & $-0.026$ & $-0.957$ \\
-d1-ultra & by\_sector & Information Technology & $0.034$ & $1.249$ & $2{,}587$ & $0.063$ & $2.219$ & $0.003$ & $0.133$ \\
-d1-ultra & by\_sector & Materials & $0.008$ & $0.156$ & $435$ & $0.064$ & $0.688$ & $-0.022$ & $-0.379$ \\
-d1-ultra & by\_sector & Real Estate & $0.090$ & $1.077$ & $431$ & $0.055$ & $0.516$ & $-0.009$ & $-0.062$ \\
-d1-ultra & by\_sector & Utilities & $-0.084$ & $-1.932$ & $720$ & $0.038$ & $0.649$ & $-0.124$ & $-2.913$ \\
-d1-ultra & leave\_one\_out & Communication Services & $0.040$ & $3.261$ & $13{,}224$ & $0.074$ & $4.621$ & $-8.46\times 10^{-4}$ & $-0.074$ \\
-d1-ultra & leave\_one\_out & Consumer Discretionary & $0.035$ & $2.714$ & $12{,}367$ & $0.067$ & $4.252$ & $-0.002$ & $-0.197$ \\
-d1-ultra & leave\_one\_out & Consumer Staples & $0.039$ & $3.159$ & $12{,}814$ & $0.076$ & $4.613$ & $0.001$ & $0.099$ \\
-d1-ultra & leave\_one\_out & Energy & $0.040$ & $3.200$ & $13{,}217$ & $0.075$ & $4.558$ & $-7.35\times 10^{-4}$ & $-0.066$ \\
-d1-ultra & leave\_one\_out & Financials & $0.041$ & $3.454$ & $11{,}950$ & $0.071$ & $4.544$ & $0.004$ & $0.339$ \\
-d1-ultra & leave\_one\_out & Health Care & $0.030$ & $2.200$ & $11{,}749$ & $0.067$ & $3.981$ & $-0.010$ & $-0.912$ \\
-d1-ultra & leave\_one\_out & Industrials & $0.040$ & $2.854$ & $11{,}340$ & $0.075$ & $4.583$ & $0.002$ & $0.168$ \\
-d1-ultra & leave\_one\_out & Information Technology & $0.043$ & $3.722$ & $11{,}161$ & $0.081$ & $5.346$ & $-0.002$ & $-0.198$ \\
-d1-ultra & leave\_one\_out & Materials & $0.040$ & $3.220$ & $13{,}313$ & $0.075$ & $4.573$ & $1.84\times 10^{-4}$ & $0.017$ \\
-d1-ultra & leave\_one\_out & Real Estate & $0.039$ & $3.170$ & $13{,}317$ & $0.075$ & $4.818$ & $-0.001$ & $-0.102$ \\
-d1-ultra & leave\_one\_out & Utilities & $0.043$ & $3.536$ & $13{,}028$ & $0.078$ & $4.953$ & $0.002$ & $0.164$ \\
+\bottomrule
+\endlastfoot
+Laya-Fin, by sector, Communication Services & 0.049 & 0.70 & 524 & -0.031 & 0.035 \\
+Laya-Fin, by sector, Consumer Discretionary & 0.063 & 2.22 & 1381 & 0.032 & 0.023 \\
+Laya-Fin, by sector, Consumer Staples & 0.052 & 1.18 & 934 & 0.070 & -0.026 \\
+Laya-Fin, by sector, Energy & -0.046 & -0.85 & 531 & -0.009 & -0.082 \\
+Laya-Fin, by sector, Financials & 0.045 & 1.47 & 1798 & 0.012 & 0.036 \\
+Laya-Fin, by sector, Health Care & 0.043 & 1.51 & 1999 & 0.034 & 0.030 \\
+Laya-Fin, by sector, Industrials & -0.030 & -1.25 & 2408 & -0.003 & -0.025 \\
+Laya-Fin, by sector, Information Technology & 0.036 & 1.41 & 2587 & -0.021 & 0.035 \\
+Laya-Fin, by sector, Materials & -0.043 & -0.81 & 435 & -0.068 & -0.097 \\
+Laya-Fin, by sector, Real Estate & 0.100 & 1.20 & 431 & 0.043 & 0.124 \\
+Laya-Fin, by sector, Utilities & -0.035 & -0.56 & 720 & 0.074 & -0.113 \\
+Laya-Fin, leave one out, Communication Services & 0.020 & 1.61 & 13224 & 0.013 & 0.012 \\
+Laya-Fin, leave one out, Consumer Discretionary & 0.022 & 1.76 & 12367 & 0.012 & 0.012 \\
+Laya-Fin, leave one out, Consumer Staples & 0.017 & 1.32 & 12814 & 0.017 & 0.007 \\
+Laya-Fin, leave one out, Energy & 0.021 & 1.72 & 13217 & 0.014 & 0.012 \\
+Laya-Fin, leave one out, Financials & 0.016 & 1.13 & 11950 & 0.010 & 0.007 \\
+Laya-Fin, leave one out, Health Care & 0.016 & 1.32 & 11749 & 0.009 & 0.006 \\
+Laya-Fin, leave one out, Industrials & 0.030 & 2.32 & 11340 & 0.016 & 0.020 \\
+Laya-Fin, leave one out, Information Technology & 0.011 & 1.00 & 11161 & 0.026 & 0.001 \\
+Laya-Fin, leave one out, Materials & 0.021 & 1.79 & 13313 & 0.016 & 0.012 \\
+Laya-Fin, leave one out, Real Estate & 0.020 & 1.63 & 13317 & 0.016 & 0.010 \\
+Laya-Fin, leave one out, Utilities & 0.024 & 1.99 & 13028 & 0.018 & 0.014 \\
+anchor, by sector, Communication Services & 0.033 & 0.61 & 524 & -0.102 & 0.058 \\
+anchor, by sector, Consumer Discretionary & 0.008 & 0.22 & 1381 & 0.060 & -0.037 \\
+anchor, by sector, Consumer Staples & -0.095 & -2.06 & 934 & -0.028 & -0.098 \\
+anchor, by sector, Energy & -0.003 & -0.07 & 531 & -0.003 & -0.008 \\
+anchor, by sector, Financials & 0.060 & 2.30 & 1798 & -0.005 & 0.081 \\
+anchor, by sector, Health Care & 0.017 & 0.50 & 1999 & 0.018 & -0.003 \\
+anchor, by sector, Industrials & -0.018 & -0.58 & 2408 & -0.048 & -0.003 \\
+anchor, by sector, Information Technology & 0.049 & 2.48 & 2587 & 0.021 & 0.030 \\
+anchor, by sector, Materials & -0.061 & -1.17 & 435 & -0.102 & -0.089 \\
+anchor, by sector, Real Estate & 0.004 & 0.07 & 431 & -0.070 & 0.067 \\
+anchor, by sector, Utilities & -0.037 & -0.82 & 720 & -0.128 & 0.033 \\
+anchor, leave one out, Communication Services & 0.009 & 0.99 & 13224 & 0.002 & 0.006 \\
+anchor, leave one out, Consumer Discretionary & 0.009 & 0.83 & 12367 & -0.002 & 0.007 \\
+anchor, leave one out, Consumer Staples & 0.011 & 1.13 & 12814 & 0.008 & 0.006 \\
+anchor, leave one out, Energy & 0.012 & 1.28 & 13217 & 0.006 & 0.006 \\
+anchor, leave one out, Financials & 0.004 & 0.43 & 11950 & 0.006 & -0.003 \\
+anchor, leave one out, Health Care & 0.006 & 0.60 & 11749 & 0.002 & 0.003 \\
+anchor, leave one out, Industrials & 0.007 & 0.68 & 11340 & 0.018 & -0.006 \\
+anchor, leave one out, Information Technology & -0.001 & -0.11 & 11161 & -0.001 & -0.004 \\
+anchor, leave one out, Materials & 0.008 & 0.89 & 13313 & 0.008 & 0.002 \\
+anchor, leave one out, Real Estate & 0.008 & 0.82 & 13317 & 0.005 & 0.003 \\
+anchor, leave one out, Utilities & 0.008 & 0.78 & 13028 & 0.009 & -0.000 \\
+d1-ultra, by sector, Communication Services & 0.103 & 1.79 & 524 & 0.091 & 0.010 \\
+d1-ultra, by sector, Consumer Discretionary & 0.087 & 2.64 & 1381 & 0.080 & 0.008 \\
+d1-ultra, by sector, Consumer Staples & 0.069 & 1.90 & 934 & 0.057 & 0.020 \\
+d1-ultra, by sector, Energy & 0.120 & 1.92 & 531 & 0.095 & 0.047 \\
+d1-ultra, by sector, Financials & 0.044 & 1.61 & 1798 & 0.092 & -0.002 \\
+d1-ultra, by sector, Health Care & 0.055 & 1.74 & 1999 & 0.082 & 0.050 \\
+d1-ultra, by sector, Industrials & 0.007 & 0.28 & 2408 & 0.049 & -0.026 \\
+d1-ultra, by sector, Information Technology & 0.034 & 1.25 & 2587 & 0.063 & 0.003 \\
+d1-ultra, by sector, Materials & 0.008 & 0.16 & 435 & 0.064 & -0.022 \\
+d1-ultra, by sector, Real Estate & 0.090 & 1.08 & 431 & 0.055 & -0.009 \\
+d1-ultra, by sector, Utilities & -0.084 & -1.93 & 720 & 0.038 & -0.124 \\
+d1-ultra, leave one out, Communication Services & 0.040 & 3.26 & 13224 & 0.074 & -0.001 \\
+d1-ultra, leave one out, Consumer Discretionary & 0.035 & 2.71 & 12367 & 0.067 & -0.002 \\
+d1-ultra, leave one out, Consumer Staples & 0.039 & 3.16 & 12814 & 0.076 & 0.001 \\
+d1-ultra, leave one out, Energy & 0.040 & 3.20 & 13217 & 0.075 & -0.001 \\
+d1-ultra, leave one out, Financials & 0.041 & 3.45 & 11950 & 0.071 & 0.004 \\
+d1-ultra, leave one out, Health Care & 0.030 & 2.20 & 11749 & 0.067 & -0.010 \\
+d1-ultra, leave one out, Industrials & 0.040 & 2.85 & 11340 & 0.075 & 0.002 \\
+d1-ultra, leave one out, Information Technology & 0.043 & 3.72 & 11161 & 0.081 & -0.002 \\
+d1-ultra, leave one out, Materials & 0.040 & 3.22 & 13313 & 0.075 & 0.000 \\
+d1-ultra, leave one out, Real Estate & 0.039 & 3.17 & 13317 & 0.075 & -0.001 \\
+d1-ultra, leave one out, Utilities & 0.043 & 3.54 & 13028 & 0.078 & 0.002 \\
 \end{longtable}
-\par\smallskip{\footnotesize\raggedright Exploratory (post hoc): requested after unblinding; no hypothesis, outside every family, no claim. Selected columns; every cell is in t17\_sector\_exploratory.csv. The anchor's readings are uninformative (near-constant outputs: NA-11 REPORT \S{}7.1 item 4); its rows are reported, not read as nulls.\par}
+\endgroup
+\vspace{-0.5\baselineskip}
+{\footnotesize\raggedright
+Exploratory (post hoc): requested after unblinding; no hypothesis, outside every family, no claim.\par
+The API models fail the \S8.3 contamination screens, so their results are model-specific (\S1.3).\par
 }
-\end{landscape}

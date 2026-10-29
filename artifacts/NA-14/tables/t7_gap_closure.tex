@@ -1,67 +1,75 @@
-% t7_gap_closure (NA-14, from artifacts/NA-12/tables/t7_gap_closure.csv)
-\begin{landscape}
-{\scriptsize\setlength{\tabcolsep}{3pt}
-\begin{longtable}{lllllrrrrrrrrrr}
-\caption{A1 gap closure AR($\tau$$\to$h)/$\sigma$ = a + $\lambda$\_h$\cdot$U\_$\tau$ + $\psi$\_h$\cdot$V (+ FE) at D2 and D1; half-life (first $\lambda$\_h $>$= 0.5)}\label{tab:t7_gap_closure}\\
+% t7_gap_closure: tab:a-gap-closure (NA-14 figures.latex, from artifacts/NA-14/tables/t7_gap_closure.csv)
+\begingroup
+\footnotesize
+\begin{longtable}{@{}lS[table-format=-1.3]S[table-format=1.3, table-space-text-pre=(, table-space-text-post=)]S[table-format=1.3]S[table-format=-1.3]S[table-format=1.3]S[table-format=5.0]@{}}
+\caption{Gap closure $\lambda_h$ and $\psi_h$ at D1 and D2.}\label{tab:a-gap-closure} \\
 \toprule
-model & point & variant & rung & available & lambda & lambda SE & lambda p & lambda p DK & psi & psi SE & psi p two & nobs & CI low & CI high \\
+Model, point, variant, rung & {$\lambda_h$} & {SE} & {$p$} & {$\psi_h$} & {$p$ (two-sided)} & {Events} \\
 \midrule
 \endfirsthead
+\multicolumn{7}{@{}l}{\textit{Table \ref{tab:a-gap-closure}, continued}} \\
 \toprule
-model & point & variant & rung & available & lambda & lambda SE & lambda p & lambda p DK & psi & psi SE & psi p two & nobs & CI low & CI high \\
+Model, point, variant, rung & {$\lambda_h$} & {SE} & {$p$} & {$\psi_h$} & {$p$ (two-sided)} & {Events} \\
 \midrule
 \endhead
-\bottomrule
+\midrule
+\multicolumn{7}{r@{}}{\textit{continued on the next page}} \\
 \endfoot
-Laya-Fin & D2 & all & C\_t+1 & yes & $-0.007$ & $0.012$ & $0.728$ & $0.781$ & $-0.002$ & $0.041$ & $0.962$ & $17{,}695$ & --- & --- \\
-Laya-Fin & D2 & all & C\_t+5 & yes & $0.026$ & $0.026$ & $0.159$ & $0.177$ & $-0.067$ & $0.090$ & $0.460$ & $17{,}188$ & --- & --- \\
-Laya-Fin & D2 & all & C\_t+20 & yes & $0.050$ & $0.051$ & $0.164$ & $0.172$ & $-0.243$ & $0.193$ & $0.209$ & $14{,}985$ & --- & --- \\
-Laya-Fin & D2 & clean & C\_t+1 & yes & $0.006$ & $0.016$ & $0.350$ & $0.314$ & $0.085$ & $0.058$ & $0.141$ & $10{,}266$ & --- & --- \\
-Laya-Fin & D2 & clean & C\_t+5 & yes & $0.004$ & $0.063$ & $0.473$ & $0.470$ & $-0.201$ & $0.289$ & $0.487$ & $2{,}877$ & --- & --- \\
-Laya-Fin & D2 & clean & C\_t+20 & yes & $0.358$ & $0.711$ & $0.308$ & $0.280$ & $0.639$ & $2.840$ & $0.822$ & $314$ & --- & --- \\
-Laya-Fin & D2 & all & half-life (sessions) & yes & $\infty$ & --- & --- & --- & --- & --- & --- & --- & $\infty$ & $\infty$ \\
-Laya-Fin & D1 & all & C\_t & yes & $-0.011$ & $0.013$ & $0.805$ & $0.790$ & $0.064$ & $0.038$ & $0.095$ & $13{,}287$ & --- & --- \\
-Laya-Fin & D1 & all & C\_t+1 & yes & $-0.024$ & $0.020$ & $0.885$ & $0.924$ & $0.137$ & $0.071$ & $0.058$ & $13{,}287$ & --- & --- \\
-Laya-Fin & D1 & all & C\_t+5 & yes & $-0.002$ & $0.034$ & $0.527$ & $0.524$ & $0.048$ & $0.134$ & $0.718$ & $12{,}711$ & --- & --- \\
-Laya-Fin & D1 & all & C\_t+20 & yes & $-0.013$ & $0.062$ & $0.585$ & $0.573$ & $-0.003$ & $0.243$ & $0.989$ & $11{,}087$ & --- & --- \\
-Laya-Fin & D1 & clean & C\_t & yes & $-0.011$ & $0.013$ & $0.805$ & $0.790$ & $0.064$ & $0.038$ & $0.095$ & $13{,}287$ & --- & --- \\
-Laya-Fin & D1 & clean & C\_t+1 & yes & $0.022$ & $0.030$ & $0.232$ & $0.210$ & $0.189$ & $0.109$ & $0.084$ & $7{,}554$ & --- & --- \\
-Laya-Fin & D1 & clean & C\_t+5 & yes & $-0.014$ & $0.093$ & $0.558$ & $0.559$ & $0.046$ & $0.320$ & $0.885$ & $2{,}073$ & --- & --- \\
-Laya-Fin & D1 & clean & C\_t+20 & yes & $-0.225$ & $1.025$ & $0.587$ & $0.620$ & $-0.191$ & $4.204$ & $0.964$ & $203$ & --- & --- \\
-Laya-Fin & D1 & all & half-life (sessions) & yes & $\infty$ & --- & --- & --- & --- & --- & --- & --- & $\infty$ & $\infty$ \\
-anchor (uninformative) & D2 & all & C\_t+1 & yes & $-0.007$ & $0.012$ & $0.730$ & $0.786$ & $0.049$ & $0.062$ & $0.428$ & $17{,}695$ & --- & --- \\
-anchor (uninformative) & D2 & all & C\_t+5 & yes & $0.027$ & $0.027$ & $0.156$ & $0.175$ & $-0.034$ & $0.144$ & $0.813$ & $17{,}188$ & --- & --- \\
-anchor (uninformative) & D2 & all & C\_t+20 & yes & $0.052$ & $0.051$ & $0.158$ & $0.166$ & $0.157$ & $0.222$ & $0.481$ & $14{,}985$ & --- & --- \\
-anchor (uninformative) & D2 & clean & C\_t+1 & yes & $0.005$ & $0.016$ & $0.377$ & $0.346$ & $0.292$ & $0.140$ & $0.039$ & $10{,}266$ & --- & --- \\
-anchor (uninformative) & D2 & clean & C\_t+5 & yes & $0.002$ & $0.063$ & $0.485$ & $0.484$ & $-0.621$ & $0.467$ & $0.186$ & $2{,}877$ & --- & --- \\
-anchor (uninformative) & D2 & clean & C\_t+20 & yes & $0.310$ & $0.682$ & $0.326$ & $0.302$ & $3.333$ & $4.771$ & $0.487$ & $314$ & --- & --- \\
-anchor (uninformative) & D2 & all & half-life (sessions) & yes & $\infty$ & --- & --- & --- & --- & --- & --- & --- & $\infty$ & $\infty$ \\
-anchor (uninformative) & D1 & all & C\_t & yes & $-0.012$ & $0.013$ & $0.819$ & $0.800$ & $0.010$ & $0.035$ & $0.780$ & $13{,}287$ & --- & --- \\
-anchor (uninformative) & D1 & all & C\_t+1 & yes & $-0.025$ & $0.020$ & $0.899$ & $0.934$ & $0.039$ & $0.056$ & $0.486$ & $13{,}287$ & --- & --- \\
-anchor (uninformative) & D1 & all & C\_t+5 & yes & $-0.003$ & $0.034$ & $0.533$ & $0.530$ & $-0.043$ & $0.087$ & $0.624$ & $12{,}711$ & --- & --- \\
-anchor (uninformative) & D1 & all & C\_t+20 & yes & $-0.013$ & $0.062$ & $0.582$ & $0.571$ & $0.053$ & $0.143$ & $0.711$ & $11{,}087$ & --- & --- \\
-anchor (uninformative) & D1 & clean & C\_t & yes & $-0.012$ & $0.013$ & $0.819$ & $0.800$ & $0.010$ & $0.035$ & $0.780$ & $13{,}287$ & --- & --- \\
-anchor (uninformative) & D1 & clean & C\_t+1 & yes & $0.020$ & $0.030$ & $0.255$ & $0.241$ & $0.280$ & $0.109$ & $0.011$ & $7{,}554$ & --- & --- \\
-anchor (uninformative) & D1 & clean & C\_t+5 & yes & $-0.010$ & $0.093$ & $0.542$ & $0.542$ & $0.319$ & $0.343$ & $0.354$ & $2{,}073$ & --- & --- \\
-anchor (uninformative) & D1 & clean & C\_t+20 & yes & $-0.302$ & $0.949$ & $0.625$ & $0.669$ & $9.321$ & $11.238$ & $0.410$ & $203$ & --- & --- \\
-anchor (uninformative) & D1 & all & half-life (sessions) & yes & $\infty$ & --- & --- & --- & --- & --- & --- & --- & $\infty$ & $\infty$ \\
-d1-ultra & D2 & all & C\_t+1 & yes & $-0.009$ & $0.012$ & $0.773$ & $0.838$ & $-0.041$ & $0.040$ & $0.306$ & $17{,}695$ & --- & --- \\
-d1-ultra & D2 & all & C\_t+5 & yes & $0.022$ & $0.026$ & $0.206$ & $0.218$ & $-0.160$ & $0.095$ & $0.094$ & $17{,}188$ & --- & --- \\
-d1-ultra & D2 & all & C\_t+20 & yes & $0.049$ & $0.051$ & $0.170$ & $0.175$ & $-0.134$ & $0.166$ & $0.423$ & $14{,}985$ & --- & --- \\
-d1-ultra & D2 & clean & C\_t+1 & yes & $0.003$ & $0.016$ & $0.418$ & $0.397$ & $-0.065$ & $0.048$ & $0.177$ & $10{,}266$ & --- & --- \\
-d1-ultra & D2 & clean & C\_t+5 & yes & $-0.003$ & $0.063$ & $0.521$ & $0.523$ & $-0.416$ & $0.175$ & $0.019$ & $2{,}877$ & --- & --- \\
-d1-ultra & D2 & clean & C\_t+20 & yes & $0.325$ & $0.693$ & $0.320$ & $0.289$ & $-3.506$ & $2.509$ & $0.166$ & $314$ & --- & --- \\
-d1-ultra & D2 & all & half-life (sessions) & yes & $\infty$ & --- & --- & --- & --- & --- & --- & --- & $\infty$ & $\infty$ \\
-d1-ultra & D1 & all & C\_t & yes & $-0.013$ & $0.013$ & $0.829$ & $0.820$ & $-0.003$ & $0.037$ & $0.940$ & $13{,}287$ & --- & --- \\
-d1-ultra & D1 & all & C\_t+1 & yes & $-0.028$ & $0.020$ & $0.921$ & $0.959$ & $-0.051$ & $0.051$ & $0.316$ & $13{,}287$ & --- & --- \\
-d1-ultra & D1 & all & C\_t+5 & yes & $-0.012$ & $0.034$ & $0.636$ & $0.623$ & $-0.234$ & $0.110$ & $0.036$ & $12{,}711$ & --- & --- \\
-d1-ultra & D1 & all & C\_t+20 & yes & $-0.020$ & $0.062$ & $0.624$ & $0.608$ & $-0.183$ & $0.204$ & $0.372$ & $11{,}087$ & --- & --- \\
-d1-ultra & D1 & clean & C\_t & yes & $-0.013$ & $0.013$ & $0.829$ & $0.820$ & $-0.003$ & $0.037$ & $0.940$ & $13{,}287$ & --- & --- \\
-d1-ultra & D1 & clean & C\_t+1 & yes & $0.014$ & $0.030$ & $0.317$ & $0.302$ & $-0.182$ & $0.067$ & $0.008$ & $7{,}554$ & --- & --- \\
-d1-ultra & D1 & clean & C\_t+5 & yes & $-0.029$ & $0.094$ & $0.622$ & $0.620$ & $-0.396$ & $0.273$ & $0.149$ & $2{,}073$ & --- & --- \\
-d1-ultra & D1 & clean & C\_t+20 & yes & $-0.232$ & $1.008$ & $0.591$ & $0.630$ & $-1.009$ & $2.292$ & $0.661$ & $203$ & --- & --- \\
-d1-ultra & D1 & all & half-life (sessions) & yes & $\infty$ & --- & --- & --- & --- & --- & --- & --- & $\infty$ & $\infty$ \\
+\bottomrule
+\endlastfoot
+Laya-Fin, D2, all tiers, $t{+}1$ & -0.007 & {(}0.012{)} & 0.728 & -0.002 & 0.962 & 17695 \\
+Laya-Fin, D2, all tiers, $t{+}5$ & 0.026 & {(}0.026{)} & 0.159 & -0.067 & 0.460 & 17188 \\
+Laya-Fin, D2, all tiers, $t{+}20$ & 0.050 & {(}0.051{)} & 0.164 & -0.243 & 0.209 & 14985 \\
+Laya-Fin, D2, clean, $t{+}1$ & 0.006 & {(}0.016{)} & 0.350 & 0.085 & 0.141 & 10266 \\
+Laya-Fin, D2, clean, $t{+}5$ & 0.004 & {(}0.063{)} & 0.473 & -0.201 & 0.487 & 2877 \\
+Laya-Fin, D2, clean, $t{+}20$ & 0.358 & {(}0.711{)} & 0.308 & 0.639 & 0.822 & 314 \\
+Laya-Fin, D2, all tiers, half-life (sessions) & {$\infty$} & {---} & {---} & {---} & {---} & {---} \\
+Laya-Fin, D1, all tiers, $C_t$ & -0.011 & {(}0.013{)} & 0.805 & 0.064 & 0.095 & 13287 \\
+Laya-Fin, D1, all tiers, $t{+}1$ & -0.024 & {(}0.020{)} & 0.885 & 0.137 & 0.058 & 13287 \\
+Laya-Fin, D1, all tiers, $t{+}5$ & -0.002 & {(}0.034{)} & 0.527 & 0.048 & 0.718 & 12711 \\
+Laya-Fin, D1, all tiers, $t{+}20$ & -0.013 & {(}0.062{)} & 0.585 & -0.003 & 0.989 & 11087 \\
+Laya-Fin, D1, clean, $C_t$ & -0.011 & {(}0.013{)} & 0.805 & 0.064 & 0.095 & 13287 \\
+Laya-Fin, D1, clean, $t{+}1$ & 0.022 & {(}0.030{)} & 0.232 & 0.189 & 0.084 & 7554 \\
+Laya-Fin, D1, clean, $t{+}5$ & -0.014 & {(}0.093{)} & 0.558 & 0.046 & 0.885 & 2073 \\
+Laya-Fin, D1, clean, $t{+}20$ & -0.225 & {(}1.025{)} & 0.587 & -0.191 & 0.964 & 203 \\
+Laya-Fin, D1, all tiers, half-life (sessions) & {$\infty$} & {---} & {---} & {---} & {---} & {---} \\
+anchor, D2, all tiers, $t{+}1$ & -0.007 & {(}0.012{)} & 0.730 & 0.049 & 0.428 & 17695 \\
+anchor, D2, all tiers, $t{+}5$ & 0.027 & {(}0.027{)} & 0.156 & -0.034 & 0.813 & 17188 \\
+anchor, D2, all tiers, $t{+}20$ & 0.052 & {(}0.051{)} & 0.158 & 0.157 & 0.481 & 14985 \\
+anchor, D2, clean, $t{+}1$ & 0.005 & {(}0.016{)} & 0.377 & 0.292 & 0.039 & 10266 \\
+anchor, D2, clean, $t{+}5$ & 0.002 & {(}0.063{)} & 0.485 & -0.621 & 0.186 & 2877 \\
+anchor, D2, clean, $t{+}20$ & 0.310 & {(}0.682{)} & 0.326 & 3.333 & 0.487 & 314 \\
+anchor, D2, all tiers, half-life (sessions) & {$\infty$} & {---} & {---} & {---} & {---} & {---} \\
+anchor, D1, all tiers, $C_t$ & -0.012 & {(}0.013{)} & 0.819 & 0.010 & 0.780 & 13287 \\
+anchor, D1, all tiers, $t{+}1$ & -0.025 & {(}0.020{)} & 0.899 & 0.039 & 0.486 & 13287 \\
+anchor, D1, all tiers, $t{+}5$ & -0.003 & {(}0.034{)} & 0.533 & -0.043 & 0.624 & 12711 \\
+anchor, D1, all tiers, $t{+}20$ & -0.013 & {(}0.062{)} & 0.582 & 0.053 & 0.711 & 11087 \\
+anchor, D1, clean, $C_t$ & -0.012 & {(}0.013{)} & 0.819 & 0.010 & 0.780 & 13287 \\
+anchor, D1, clean, $t{+}1$ & 0.020 & {(}0.030{)} & 0.255 & 0.280 & 0.011 & 7554 \\
+anchor, D1, clean, $t{+}5$ & -0.010 & {(}0.093{)} & 0.542 & 0.319 & 0.354 & 2073 \\
+anchor, D1, clean, $t{+}20$ & -0.302 & {(}0.949{)} & 0.625 & 9.321 & 0.410 & 203 \\
+anchor, D1, all tiers, half-life (sessions) & {$\infty$} & {---} & {---} & {---} & {---} & {---} \\
+d1-ultra, D2, all tiers, $t{+}1$ & -0.009 & {(}0.012{)} & 0.773 & -0.041 & 0.306 & 17695 \\
+d1-ultra, D2, all tiers, $t{+}5$ & 0.022 & {(}0.026{)} & 0.206 & -0.160 & 0.094 & 17188 \\
+d1-ultra, D2, all tiers, $t{+}20$ & 0.049 & {(}0.051{)} & 0.170 & -0.134 & 0.423 & 14985 \\
+d1-ultra, D2, clean, $t{+}1$ & 0.003 & {(}0.016{)} & 0.418 & -0.065 & 0.177 & 10266 \\
+d1-ultra, D2, clean, $t{+}5$ & -0.003 & {(}0.063{)} & 0.521 & -0.416 & 0.019 & 2877 \\
+d1-ultra, D2, clean, $t{+}20$ & 0.325 & {(}0.693{)} & 0.320 & -3.506 & 0.166 & 314 \\
+d1-ultra, D2, all tiers, half-life (sessions) & {$\infty$} & {---} & {---} & {---} & {---} & {---} \\
+d1-ultra, D1, all tiers, $C_t$ & -0.013 & {(}0.013{)} & 0.829 & -0.003 & 0.940 & 13287 \\
+d1-ultra, D1, all tiers, $t{+}1$ & -0.028 & {(}0.020{)} & 0.921 & -0.051 & 0.316 & 13287 \\
+d1-ultra, D1, all tiers, $t{+}5$ & -0.012 & {(}0.034{)} & 0.636 & -0.234 & 0.036 & 12711 \\
+d1-ultra, D1, all tiers, $t{+}20$ & -0.020 & {(}0.062{)} & 0.624 & -0.183 & 0.372 & 11087 \\
+d1-ultra, D1, clean, $C_t$ & -0.013 & {(}0.013{)} & 0.829 & -0.003 & 0.940 & 13287 \\
+d1-ultra, D1, clean, $t{+}1$ & 0.014 & {(}0.030{)} & 0.317 & -0.182 & 0.008 & 7554 \\
+d1-ultra, D1, clean, $t{+}5$ & -0.029 & {(}0.094{)} & 0.622 & -0.396 & 0.149 & 2073 \\
+d1-ultra, D1, clean, $t{+}20$ & -0.232 & {(}1.008{)} & 0.591 & -1.009 & 0.661 & 203 \\
+d1-ultra, D1, all tiers, half-life (sessions) & {$\infty$} & {---} & {---} & {---} & {---} & {---} \\
 \end{longtable}
-\par\smallskip{\footnotesize\raggedright $\psi$ carries its two-sided p ($\psi$\_h* = 0, outside every family); a half-life of $\infty$ is beyond t+20. The anchor's readings are uninformative (near-constant outputs: NA-11 REPORT \S{}7.1 item 4); its rows are reported, not read as nulls.\par}
+\endgroup
+\vspace{-0.5\baselineskip}
+{\footnotesize\raggedright
+The half-life rows hold the first rung with $\lambda_h \geq 0.5$ ($\infty$: not reached within $t{+}20$).\par
+The anchor's readings are uninformative (near-constant outputs after one epoch); its rows are reported, not read as nulls.\par
+The API models fail the \S8.3 contamination screens, so their results are model-specific (\S1.3).\par
 }
-\end{landscape}

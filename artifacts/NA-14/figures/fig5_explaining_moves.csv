@@ -1,0 +1,10 @@
+panel,series,label,role,x,xv,y,lo,hi,ci,source,key,y_col,x_col,lo_col,hi_col,se_col
+a,laya_fin,,ex_ante,ex_ante,0.0,0.001308096074,-0.0002207664549,0.002827097967,table,artifacts/NA-12/tables/t10_explanation_ladder.csv,laya_fin:all:ex_ante,r2,,r2_ci_low,r2_ci_high,
+a,laya_fin,,ex_post,ex_post,1.0,0.002460000057,0.0003790900351,0.004505640696,table,artifacts/NA-12/tables/t10_explanation_ladder.csv,laya_fin:all:ex_post,r2,,r2_ci_low,r2_ci_high,
+a,d1_ultra,,ex_ante,ex_ante,0.0,0.002846765105,-0.0004795074584,0.005876983185,table,artifacts/NA-12/tables/t10_explanation_ladder.csv,d1_ultra:all:ex_ante,r2,,r2_ci_low,r2_ci_high,
+a,d1_ultra,,ex_post,ex_post,1.0,0.0081845411,0.003990479448,0.01204478058,table,artifacts/NA-12/tables/t10_explanation_ladder.csv,d1_ultra:all:ex_post,r2,,r2_ci_low,r2_ci_high,
+b,d1_ultra,,explanation,all,0.0,0.1575851482,0.1270779398,0.185229459,table,artifacts/NA-12/tables/t10_explanation_ladder.csv,d1_ultra:all:explanation,r2,,r2_ci_low,r2_ci_high,
+b,d1_ultra,,explanation,event_days,1.0,0.375307704,0.3564486062,0.3923538951,table,artifacts/NA-12/tables/t10_explanation_ladder.csv,d1_ultra:event_days:explanation,r2,,r2_ci_low,r2_ci_high,
+b,d1_ultra,,explanation,tier:top100,2.0,0.1985071446,0.1652932164,0.2313805617,table,artifacts/NA-12/tables/t10_explanation_ladder.csv,d1_ultra:tier:top100:explanation,r2,,r2_ci_low,r2_ci_high,
+b,d1_ultra,,explanation,tier:mid,3.0,0.1563665737,0.1215215695,0.1897908284,table,artifacts/NA-12/tables/t10_explanation_ladder.csv,d1_ultra:tier:mid:explanation,r2,,r2_ci_low,r2_ci_high,
+b,d1_ultra,,explanation,tier:rest,4.0,0.1400653951,0.1087616355,0.1662251309,table,artifacts/NA-12/tables/t10_explanation_ladder.csv,d1_ultra:tier:rest:explanation,r2,,r2_ci_low,r2_ci_high,

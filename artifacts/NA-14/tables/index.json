@@ -2,6 +2,9 @@
  {
   "name": "t1_primary",
   "title": "Primary hypotheses (Holm over H1, H1b, H2, H3, H4; \u00a71.3 headline rule): Laya-Fin and the anchor",
+  "section": "3",
+  "exploratory": false,
+  "exploratory_rows": [],
   "columns": [
    "key",
    "hypothesis",
@@ -27,13 +30,15 @@
   ],
   "copy_of": "artifacts/NA-12/tables/t1_primary.csv",
   "files": [
-   "t1_primary.csv",
-   "t1_primary.tex"
+   "t1_primary.csv"
   ]
  },
  {
   "name": "t1b_primary_by_model",
   "title": "H1\u2013H4 for every decision model (the API models screen-failing and model-specific)",
+  "section": "3",
+  "exploratory": false,
+  "exploratory_rows": [],
   "columns": [
    "key",
    "model",
@@ -60,13 +65,15 @@
   ],
   "copy_of": "artifacts/NA-12/tables/t1b_primary_by_model.csv",
   "files": [
-   "t1b_primary_by_model.csv",
-   "t1b_primary_by_model.tex"
+   "t1b_primary_by_model.csv"
   ]
  },
  {
   "name": "t2_h2_over_under",
   "title": "Over/under regression y = a + b\u00b7N\u0302 + c\u00b7G + day \u00d7 tier FE by decision point and within |G| bins",
+  "section": "4",
+  "exploratory": false,
+  "exploratory_rows": [],
   "columns": [
    "key",
    "model",
@@ -103,13 +110,15 @@
   ],
   "copy_of": "artifacts/NA-12/tables/t2_h2_over_under.csv",
   "files": [
-   "t2_h2_over_under.csv",
-   "t2_h2_over_under.tex"
+   "t2_h2_over_under.csv"
   ]
  },
  {
   "name": "t3_ic",
   "title": "Daily IC of N\u0302_W0 with z_cc, z_on and z_id, and quintile spreads (\u00a711.1)",
+  "section": "3",
+  "exploratory": false,
+  "exploratory_rows": [],
   "columns": [
    "key",
    "model",
@@ -131,13 +140,15 @@
   ],
   "copy_of": "artifacts/NA-12/tables/t3_ic.csv",
   "files": [
-   "t3_ic.csv",
-   "t3_ic.tex"
+   "t3_ic.csv"
   ]
  },
  {
   "name": "t4_secondary",
   "title": "Secondary hypotheses (BH, q = 0.10, within each instrument; pooled sensitivity family)",
+  "section": "4",
+  "exploratory": false,
+  "exploratory_rows": [],
   "columns": [
    "key",
    "model",
@@ -164,13 +175,15 @@
   ],
   "copy_of": "artifacts/NA-12/tables/t4_secondary.csv",
   "files": [
-   "t4_secondary.csv",
-   "t4_secondary.tex"
+   "t4_secondary.csv"
   ]
  },
  {
   "name": "t5_heterogeneity",
   "title": "Heterogeneity cuts on H2 at D2: Wald test of N\u0302\u00b71[cut] and G\u00b71[cut], BH over each model's eight cuts",
+  "section": "4",
+  "exploratory": false,
+  "exploratory_rows": [],
   "columns": [
    "key",
    "model",
@@ -209,13 +222,15 @@
   ],
   "copy_of": "artifacts/NA-12/tables/t5_heterogeneity.csv",
   "files": [
-   "t5_heterogeneity.csv",
-   "t5_heterogeneity.tex"
+   "t5_heterogeneity.csv"
   ]
  },
  {
   "name": "t6_convergence_ladder",
   "title": "A1 convergence ladder: \u03ba_h of CAR^lvl_h on V (D0 events, day \u00d7 tier FE) and the shares \u03ba_h / \u03ba_h*",
+  "section": "4",
+  "exploratory": false,
+  "exploratory_rows": [],
   "columns": [
    "key",
    "model",
@@ -242,13 +257,15 @@
   ],
   "copy_of": "artifacts/NA-12/tables/t6_convergence_ladder.csv",
   "files": [
-   "t6_convergence_ladder.csv",
-   "t6_convergence_ladder.tex"
+   "t6_convergence_ladder.csv"
   ]
  },
  {
   "name": "t7_gap_closure",
   "title": "A1 gap closure AR(\u03c4\u2192h)/\u03c3 = a + \u03bb_h\u00b7U_\u03c4 + \u03c8_h\u00b7V (+ FE) at D2 and D1; half-life (first \u03bb_h >= 0.5)",
+  "section": "4",
+  "exploratory": false,
+  "exploratory_rows": [],
   "columns": [
    "key",
    "model",
@@ -276,13 +293,15 @@
   ],
   "copy_of": "artifacts/NA-12/tables/t7_gap_closure.csv",
   "files": [
-   "t7_gap_closure.csv",
-   "t7_gap_closure.tex"
+   "t7_gap_closure.csv"
   ]
  },
  {
   "name": "t8_tracking_error",
   "title": "A1 tracking error RMSE(CAR^lvl_h \u2212 V) relative to the naive 0 and to the price-only V",
+  "section": "4",
+  "exploratory": false,
+  "exploratory_rows": [],
   "columns": [
    "key",
    "model",
@@ -305,13 +324,15 @@
   ],
   "copy_of": "artifacts/NA-12/tables/t8_tracking_error.csv",
   "files": [
-   "t8_tracking_error.csv",
-   "t8_tracking_error.tex"
+   "t8_tracking_error.csv"
   ]
  },
  {
   "name": "t9_convergence_cuts",
   "title": "A1 by tier, quantified vs story (vendor; d1-ultra's own label) and |G| bin",
+  "section": "4",
+  "exploratory": false,
+  "exploratory_rows": [],
   "columns": [
    "key",
    "model",
@@ -339,13 +360,15 @@
   ],
   "copy_of": "artifacts/NA-12/tables/t9_convergence_cuts.csv",
   "files": [
-   "t9_convergence_cuts.csv",
-   "t9_convergence_cuts.tex"
+   "t9_convergence_cuts.csv"
   ]
  },
  {
   "name": "t10_explanation_ladder",
   "title": "A3.2 explanation ladder: out-of-sample share of stock-specific daily variance (z_cc) by step",
+  "section": "5",
+  "exploratory": false,
+  "exploratory_rows": [],
   "columns": [
    "key",
    "model",
@@ -369,13 +392,17 @@
   ],
   "copy_of": "artifacts/NA-12/tables/t10_explanation_ladder.csv",
   "files": [
-   "t10_explanation_ladder.csv",
-   "t10_explanation_ladder.tex"
+   "t10_explanation_ladder.csv"
   ]
  },
  {
   "name": "t11_explanation_share_theta",
   "title": "A3.3\u2013A3.5 (d1-ultra, model-specific): explained share, \u03b8, persistence by reason, the market",
+  "section": "5",
+  "exploratory": false,
+  "exploratory_rows": [
+   "market:r2"
+  ],
   "columns": [
    "key",
    "item",
@@ -396,13 +423,15 @@
   ],
   "copy_of": "artifacts/NA-12/tables/t11_explanation_share_theta.csv",
   "files": [
-   "t11_explanation_share_theta.csv",
-   "t11_explanation_share_theta.tex"
+   "t11_explanation_share_theta.csv"
   ]
  },
  {
   "name": "t12_question_battery",
   "title": "A2.5: mechanism cuts (own labels and vendor tags), horizon validity, H4 width, reading validity",
+  "section": "5",
+  "exploratory": false,
+  "exploratory_rows": [],
   "columns": [
    "key",
    "model",
@@ -431,13 +460,15 @@
   ],
   "copy_of": "artifacts/NA-12/tables/t12_question_battery.csv",
   "files": [
-   "t12_question_battery.csv",
-   "t12_question_battery.tex"
+   "t12_question_battery.csv"
   ]
  },
  {
   "name": "t13_shapley",
   "title": "\u00a711.5 Shapley decomposition of the test OOS R\u00b2 and mean daily IC over {R, N, J}, pooled and by tier",
+  "section": "4",
+  "exploratory": false,
+  "exploratory_rows": [],
   "columns": [
    "key",
    "model",
@@ -455,13 +486,15 @@
   ],
   "copy_of": "artifacts/NA-12/tables/t13_shapley.csv",
   "files": [
-   "t13_shapley.csv",
-   "t13_shapley.tex"
+   "t13_shapley.csv"
   ]
  },
  {
   "name": "t14_model_comparison",
   "title": "Model comparison: daily IC of N\u0302_W0 with z_cc (val-B, test, common test events), cost, latency",
+  "section": "1",
+  "exploratory": false,
+  "exploratory_rows": [],
   "columns": [
    "key",
    "model",
@@ -492,13 +525,15 @@
   ],
   "copy_of": "artifacts/NA-12/tables/t14_model_comparison.csv",
   "files": [
-   "t14_model_comparison.csv",
-   "t14_model_comparison.tex"
+   "t14_model_comparison.csv"
   ]
  },
  {
   "name": "t15_calibration",
   "title": "\u00a711.2 calibration of Q1's three classes (ECE; log-loss and Brier skill vs val-A climatology); H7",
+  "section": "appendix",
+  "exploratory": false,
+  "exploratory_rows": [],
   "columns": [
    "key",
    "model",
@@ -522,13 +557,15 @@
   ],
   "copy_of": "artifacts/NA-12/tables/t15_calibration.csv",
   "files": [
-   "t15_calibration.csv",
-   "t15_calibration.tex"
+   "t15_calibration.csv"
   ]
  },
  {
   "name": "t16_robustness",
   "title": "\u00a711.6 and operator rows (a)\u2013(b): every robustness variant, raw and placebo-adjusted",
+  "section": "appendix",
+  "exploratory": false,
+  "exploratory_rows": [],
   "columns": [
    "key",
    "model",
@@ -567,13 +604,15 @@
   ],
   "copy_of": "artifacts/NA-12/tables/t16_robustness.csv",
   "files": [
-   "t16_robustness.csv",
-   "t16_robustness.tex"
+   "t16_robustness.csv"
   ]
  },
  {
   "name": "t17_sector_exploratory",
   "title": "Exploratory (outside every family, no claim): IC of N\u0302_W0 by GICS sector and leave-one-sector-out",
+  "section": "appendix",
+  "exploratory": true,
+  "exploratory_rows": [],
   "columns": [
    "key",
    "model",
@@ -604,13 +643,15 @@
   ],
   "copy_of": "artifacts/NA-12/tables/t17_sector_exploratory.csv",
   "files": [
-   "t17_sector_exploratory.csv",
-   "t17_sector_exploratory.tex"
+   "t17_sector_exploratory.csv"
   ]
  },
  {
   "name": "t18_probes_val_a",
   "title": "Disclosed val-A probes (NA-11; not hypotheses), next to the model comparison",
+  "section": "appendix",
+  "exploratory": false,
+  "exploratory_rows": [],
   "columns": [
    "key",
    "model",
@@ -653,13 +694,15 @@
   ],
   "copy_of": "artifacts/NA-12/tables/t18_probes_val_a.csv",
   "files": [
-   "t18_probes_val_a.csv",
-   "t18_probes_val_a.tex"
+   "t18_probes_val_a.csv"
   ]
  },
  {
   "name": "t19_monthly_ic",
   "title": "Monthly mean daily IC of N\u0302_W0 with z_cc (val-A, val-B, test)",
+  "section": "appendix",
+  "exploratory": false,
+  "exploratory_rows": [],
   "columns": [
    "key",
    "model",
@@ -680,13 +723,18 @@
   ],
   "copy_of": "artifacts/NA-12/tables/t19_monthly_ic.csv",
   "files": [
-   "t19_monthly_ic.csv",
-   "t19_monthly_ic.tex"
+   "t19_monthly_ic.csv"
   ]
  },
  {
   "name": "t20_strategies",
-  "title": "NA-13 strategies, test and val-B (reference): every pre-registered book, S-CONV first, the benchmarks and the exploratory MA-cross fade",
+  "title": "NA-13 strategies, test and val-B (reference): every pre-registered book, S-CONV first, and the benchmarks",
+  "section": "6",
+  "exploratory": false,
+  "exploratory_rows": [
+   "test|exploratory|ma_cross|fade_no_news|close_t+5",
+   "validation|exploratory|ma_cross|fade_no_news|close_t+5"
+  ],
   "columns": [
    "key",
    "order",
@@ -738,21 +786,22 @@
   ],
   "rows": 194,
   "notes": [
-   "Sharpe ratios annualized with \u221a252; costs per side on both legs and the SPY hedge; no borrow cost. DSR with n_trials from the trials ledger. The 'exploratory' family is the MA-cross add-on.",
-   "Exploratory rows (post hoc): requested after unblinding; no hypothesis, outside every family, no claim."
+   "Sharpe ratios annualized with \u221a252; costs per side on both legs and the SPY hedge; no borrow cost. DSR with n_trials from the trials ledger."
   ],
   "sources": [
    "artifacts/NA-13/strategy_table.csv"
   ],
   "copy_of": "",
   "files": [
-   "t20_strategies.csv",
-   "t20_strategies.tex"
+   "t20_strategies.csv"
   ]
  },
  {
   "name": "t21_release_dates",
   "title": "Release dates of the decision models against the sample (test period ends at sample_end)",
+  "section": "7",
+  "exploratory": false,
+  "exploratory_rows": [],
   "columns": [
    "key",
    "name",
@@ -772,13 +821,15 @@
   ],
   "copy_of": "",
   "files": [
-   "t21_release_dates.csv",
-   "t21_release_dates.tex"
+   "t21_release_dates.csv"
   ]
  },
  {
   "name": "t22_spend",
   "title": "Spend and requests of the whole project (ledgers; caps from configs/project.yaml)",
+  "section": "2",
+  "exploratory": false,
+  "exploratory_rows": [],
   "columns": [
    "key",
    "item",
@@ -801,13 +852,15 @@
   ],
   "copy_of": "",
   "files": [
-   "t22_spend.csv",
-   "t22_spend.tex"
+   "t22_spend.csv"
   ]
  },
  {
   "name": "t23_company_identification",
   "title": "Company identification with activity-matched distractors (NA-11; val-A, masked states)",
+  "section": "7",
+  "exploratory": false,
+  "exploratory_rows": [],
   "columns": [
    "key",
    "model",
@@ -828,13 +881,15 @@
   ],
   "copy_of": "",
   "files": [
-   "t23_company_identification.csv",
-   "t23_company_identification.tex"
+   "t23_company_identification.csv"
   ]
  },
  {
   "name": "t24_exploratory_d0_signal",
   "title": "Where the D0 signal lives (NA-12 \u00a713): earnings days, size tiers, months, companies, market state",
+  "section": "appendix",
+  "exploratory": true,
+  "exploratory_rows": [],
   "columns": [
    "key",
    "laya_fin",
@@ -918,6 +973,9 @@
  {
   "name": "t25_ma_cross",
   "title": "News and an MA20/MA50 cross (NA-13 \u00a79, operator item 9): group statistics and the no-news fade",
+  "section": "appendix",
+  "exploratory": true,
+  "exploratory_rows": [],
   "columns": [
    "key",
    "n_crosses",
@@ -978,13 +1036,15 @@
   ],
   "copy_of": "",
   "files": [
-   "t25_ma_cross.csv",
-   "t25_ma_cross.tex"
+   "t25_ma_cross.csv"
   ]
  },
  {
   "name": "t26_sconv_overlap",
   "title": "S-CONV against the price-only gap fade on test: shared positions, same side, daily-return correlation",
+  "section": "6",
+  "exploratory": false,
+  "exploratory_rows": [],
   "columns": [
    "key",
    "book",
@@ -1006,13 +1066,15 @@
   ],
   "copy_of": "",
   "files": [
-   "t26_sconv_overlap.csv",
-   "t26_sconv_overlap.tex"
+   "t26_sconv_overlap.csv"
   ]
  },
  {
   "name": "t27_tournament",
   "title": "NA-06 zero-shot tournament (val-A stage-1 sample): daily IC, cost per 1,000 decisions, MCS membership, \u00a78.3 screens",
+  "section": "1",
+  "exploratory": false,
+  "exploratory_rows": [],
   "columns": [
    "key",
    "model",
@@ -1032,13 +1094,15 @@
   ],
   "copy_of": "",
   "files": [
-   "t27_tournament.csv",
-   "t27_tournament.tex"
+   "t27_tournament.csv"
   ]
  },
  {
   "name": "t28_filter_frontier",
   "title": "NA-03 importance filters on val-A: selection share and recall by budget",
+  "section": "2",
+  "exploratory": false,
+  "exploratory_rows": [],
   "columns": [
    "key",
    "filter",
@@ -1056,13 +1120,15 @@
   ],
   "copy_of": "",
   "files": [
-   "t28_filter_frontier.csv",
-   "t28_filter_frontier.tex"
+   "t28_filter_frontier.csv"
   ]
  },
  {
   "name": "t29_encoding",
   "title": "NA-07 encodings of numbers in states (val-A search, val-B confirmation)",
+  "section": "appendix",
+  "exploratory": false,
+  "exploratory_rows": [],
   "columns": [
    "key",
    "split",
@@ -1089,13 +1155,15 @@
   ],
   "copy_of": "",
   "files": [
-   "t29_encoding.csv",
-   "t29_encoding.tex"
+   "t29_encoding.csv"
   ]
  },
  {
   "name": "t30_derived",
   "title": "Sums of figure-data cells cited in captions",
+  "section": "4",
+  "exploratory": false,
+  "exploratory_rows": [],
   "columns": [
    "key",
    "value",
@@ -1109,13 +1177,178 @@
   ],
   "copy_of": "",
   "files": [
-   "t30_derived.csv",
-   "t30_derived.tex"
+   "t30_derived.csv"
+  ]
+ },
+ {
+  "name": "t31_market_replication",
+  "title": "A3.5 market-level replication (exploratory; d1-ultra): out-of-sample R\u00b2 of SPY's daily return on the model's reading of the market news",
+  "section": "appendix",
+  "exploratory": true,
+  "exploratory_rows": [],
+  "columns": [
+   "key",
+   "item",
+   "value",
+   "n",
+   "p",
+   "ci_low",
+   "ci_high",
+   "available",
+   "source"
+  ],
+  "rows": 1,
+  "notes": [
+   "Exploratory (PREREG A3.5: optional, exploratory): outside every family, no claim. The row of t11_explanation_share_theta.csv (NA-12) that the LaTeX of t11 leaves out; fit on validation, evaluated on the test sessions (n)."
+  ],
+  "sources": [
+   "artifacts/NA-12/tables/t11_explanation_share_theta.csv"
+  ],
+  "copy_of": "",
+  "files": [
+   "t31_market_replication.csv"
+  ]
+ },
+ {
+  "name": "t32_val_b_ic",
+  "title": "Val-B daily ICs of N\u0302_W0 with z_cc, z_on and z_id (NA-11's run of the frozen spec on val-B, before the freeze)",
+  "section": "3",
+  "exploratory": false,
+  "exploratory_rows": [],
+  "columns": [
+   "key",
+   "model_id",
+   "split",
+   "signal",
+   "ic_z_cc",
+   "ic_z_cc_t",
+   "ic_z_cc_ci_low",
+   "ic_z_cc_ci_high",
+   "ic_z_cc_days",
+   "ic_z_cc_n",
+   "ic_z_on",
+   "ic_z_on_t",
+   "ic_z_on_ci_low",
+   "ic_z_on_ci_high",
+   "ic_z_on_days",
+   "ic_z_on_n",
+   "ic_z_id",
+   "ic_z_id_t",
+   "ic_z_id_ci_low",
+   "ic_z_id_ci_high",
+   "ic_z_id_days",
+   "ic_z_id_n",
+   "source"
+  ],
+  "rows": 3,
+  "notes": [
+   "Copied from the val-B smoke run of NA-11 (production.smoke_spec), the frozen spec's code on val-B; it covers the trained and zero-shot Laya models only, so the API models have no val-B IC with z_on or z_id."
+  ],
+  "sources": [
+   "artifacts/NA-11/spec_smoke_val_b.json"
+  ],
+  "copy_of": "",
+  "files": [
+   "t32_val_b_ic.csv"
+  ]
+ },
+ {
+  "name": "t33_placebo_sharpe",
+  "title": "Random-signal placebo (NA-13): 5th, 50th and 95th percentile of the annualized Sharpe ratios of the 100 placebo books of each test universe, gross and net of 5, 10 and 20 bp per side",
+  "section": "6",
+  "exploratory": false,
+  "exploratory_rows": [],
+  "columns": [
+   "key",
+   "point",
+   "exit",
+   "n_books",
+   "sharpe_gross_q05",
+   "sharpe_gross_q50",
+   "sharpe_gross_q95",
+   "sharpe_net_5_q05",
+   "sharpe_net_5_q50",
+   "sharpe_net_5_q95",
+   "sharpe_net_10_q05",
+   "sharpe_net_10_q50",
+   "sharpe_net_10_q95",
+   "sharpe_net_20_q05",
+   "sharpe_net_20_q50",
+   "sharpe_net_20_q95",
+   "source"
+  ],
+  "rows": 45,
+  "notes": [
+   "numpy.quantile (linear interpolation, as NA-13) over the universe's 100 books (seeds 2027\u20132126) in work/strategy/placebo_test.parquet (registered, hash-checked on read). A universe is a decision point, an exit and a set of events; Laya-Fin's, d1-ultra's and the gap fade's books of one family share it."
+  ],
+  "sources": [
+   "work/strategy/placebo_test.parquet"
+  ],
+  "copy_of": "",
+  "files": [
+   "t33_placebo_sharpe.csv"
+  ]
+ },
+ {
+  "name": "t34_prereg_deviations",
+  "title": "Pre-registration deviations: every row of PREREG \u00a715 in one line",
+  "section": "appendix",
+  "exploratory": false,
+  "exploratory_rows": [],
+  "columns": [
+   "key",
+   "row",
+   "date",
+   "chunk",
+   "change",
+   "reason",
+   "freeze"
+  ],
+  "rows": 63,
+  "notes": [
+   "Date and timing (before or after the NA-11 freeze) as in PREREG \u00a715; chunk, change and reason summarized by NA-14 (inputs/prereg_deviations.yaml); the full text is in the log."
+  ],
+  "sources": [
+   "docs/PREREG.md",
+   "artifacts/NA-14/inputs/prereg_deviations.yaml"
+  ],
+  "copy_of": "",
+  "files": [
+   "t34_prereg_deviations.csv"
+  ]
+ },
+ {
+  "name": "t35_break_even",
+  "title": "Break-even cost per side of each test book (NA-13): the cost at which the mean net return is zero",
+  "section": "6",
+  "exploratory": false,
+  "exploratory_rows": [],
+  "columns": [
+   "key",
+   "ann_return_gross",
+   "turnover_daily",
+   "break_even_bp",
+   "formula",
+   "source"
+  ],
+  "rows": 88,
+  "notes": [
+   "Net daily return = gross \u2212 cost \u00d7 turnover (NA-13 strategy.costs), so the mean net return is zero at cost = mean gross \u00f7 mean turnover; ann_return_gross and turnover_daily are copied from NA-13's strategy table."
+  ],
+  "sources": [
+   "artifacts/NA-13/strategy_table.csv"
+  ],
+  "copy_of": "",
+  "files": [
+   "t35_break_even.csv"
   ]
  },
  {
   "name": "f1_rg_class_paths",
-  "title": "Figure 1 data (NA-12): CAR^lvl paths by RG class",
+  "title": "Figure 4 data (NA-12): CAR^lvl paths by RG class",
+  "section": "4",
+  "exploratory": false,
+  "exploratory_rows": [],
   "columns": [
    "key",
    "model",
@@ -1140,7 +1373,10 @@
  },
  {
   "name": "f1_v_decile_paths",
-  "title": "Figure 1 data (NA-12): CAR^lvl paths by V decile",
+  "title": "Figure 3 data (NA-12): CAR^lvl paths by V decile",
+  "section": "4",
+  "exploratory": false,
+  "exploratory_rows": [],
   "columns": [
    "key",
    "model",
@@ -1165,7 +1401,10 @@
  },
  {
   "name": "f2_drift_vs_g",
-  "title": "Figure 2 data (NA-12): sign(G)\u00b7y2 by |G| bin and news-strength tercile",
+  "title": "Figure 4 data (NA-12): sign(G)\u00b7y2 by |G| bin and news-strength tercile",
+  "section": "4",
+  "exploratory": false,
+  "exploratory_rows": [],
   "columns": [
    "key",
    "model",
@@ -1189,7 +1428,10 @@
  },
  {
   "name": "f4_monthly_ic",
-  "title": "Figure 4 data (NA-12): monthly mean daily IC",
+  "title": "Appendix Figure A6 data (NA-12): monthly mean daily IC",
+  "section": "appendix",
+  "exploratory": false,
+  "exploratory_rows": [],
   "columns": [
    "key",
    "model",
@@ -1210,7 +1452,10 @@
  },
  {
   "name": "f5_shapley_shares",
-  "title": "Figure 5 data (NA-12): Shapley shares",
+  "title": "NA-12 Shapley shares (not drawn: their totals are about zero)",
+  "section": "appendix",
+  "exploratory": false,
+  "exploratory_rows": [],
   "columns": [
    "key",
    "model",
@@ -1233,7 +1478,10 @@
  },
  {
   "name": "f8_explanation_ladder",
-  "title": "Figure 8 data (NA-12): the explanation ladder",
+  "title": "Figure 7 data (NA-12): the explanation ladder",
+  "section": "5",
+  "exploratory": false,
+  "exploratory_rows": [],
   "columns": [
    "key",
    "model",
@@ -1255,7 +1503,10 @@
  },
  {
   "name": "fa_reliability",
-  "title": "Appendix data (NA-12): reliability bins",
+  "title": "Appendix Figure A4 data (NA-12): reliability bins",
+  "section": "appendix",
+  "exploratory": false,
+  "exploratory_rows": [],
   "columns": [
    "key",
    "model",

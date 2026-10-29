@@ -1,18 +1,22 @@
-% t26_sconv_overlap (NA-14, from work/strategy/positions_test.parquet, work/strategy/books_test.parquet)
-\begin{table}[tbp]
-\centering\small
-\caption{S-CONV against the price-only gap fade on test: shared positions, same side, daily-return correlation}\label{tab:t26_sconv_overlap}
-\begin{adjustbox}{max width=\linewidth}
-\begin{tabular}{>{\raggedright\arraybackslash}p{12em}>{\raggedright\arraybackslash}p{12em}rrrrrr}
+% t26_sconv_overlap: tab:a-sconv-overlap (NA-14 figures.latex, from artifacts/NA-14/tables/t26_sconv_overlap.csv)
+\begin{table}[htbp]
+\centering
+\small
+\begin{threeparttable}
+\caption{S-CONV against the price-only gap fade: the same positions on the same side.}\label{tab:a-sconv-overlap}
+\begin{tabular}{@{}lS[table-format=1.3]S[table-format=1.3]S[table-format=1.2]S[table-format=3.0]@{}}
 \toprule
-book & benchmark & n positions & n benchmark & shared share & same side share & corr gross & n days \\
+Book & {Shared} & {Same side} & {Correlation} & {Days} \\
 \midrule
-S-CONV$|$\allowbreak{}laya\_\allowbreak{}fin$|$\allowbreak{}D2$|$\allowbreak{}u$|$\allowbreak{}close\_\allowbreak{}t+5$|$\allowbreak{}all & gap\_\allowbreak{}fade$|$\allowbreak{}-$|$\allowbreak{}D2$|$\allowbreak{}gap$|$\allowbreak{}close\_\allowbreak{}t+5$|$\allowbreak{}all & $6{,}716$ & $6{,}716$ & $0.922$ & $0.998$ & $0.957$ & $139$ \\
-S-CONV$|$\allowbreak{}laya\_\allowbreak{}fin$|$\allowbreak{}D1$|$\allowbreak{}u$|$\allowbreak{}close\_\allowbreak{}t$|$\allowbreak{}all & gap\_\allowbreak{}fade$|$\allowbreak{}-$|$\allowbreak{}D1$|$\allowbreak{}gap$|$\allowbreak{}close\_\allowbreak{}t$|$\allowbreak{}all & $5{,}172$ & $5{,}172$ & $0.891$ & $0.998$ & $0.933$ & $138$ \\
-S-CONV$|$\allowbreak{}d1\_\allowbreak{}ultra$|$\allowbreak{}D2$|$\allowbreak{}u$|$\allowbreak{}close\_\allowbreak{}t+5$|$\allowbreak{}all & gap\_\allowbreak{}fade$|$\allowbreak{}-$|$\allowbreak{}D2$|$\allowbreak{}gap$|$\allowbreak{}close\_\allowbreak{}t+5$|$\allowbreak{}all & $6{,}716$ & $6{,}716$ & $0.903$ & $0.998$ & $0.941$ & $139$ \\
-S-CONV$|$\allowbreak{}anchor$|$\allowbreak{}D2$|$\allowbreak{}u$|$\allowbreak{}close\_\allowbreak{}t+5$|$\allowbreak{}all & gap\_\allowbreak{}fade$|$\allowbreak{}-$|$\allowbreak{}D2$|$\allowbreak{}gap$|$\allowbreak{}close\_\allowbreak{}t+5$|$\allowbreak{}all & $6{,}716$ & $6{,}716$ & $0.960$ & $1.000$ & $0.984$ & $139$ \\
+Laya-Fin, D2 to $t{+}5$ & 0.922 & 0.998 & 0.96 & 139 \\
+Laya-Fin, D1 to $C_t$ & 0.891 & 0.998 & 0.93 & 138 \\
+d1-ultra, D2 to $t{+}5$ & 0.903 & 0.998 & 0.94 & 139 \\
+anchor, D2 to $t{+}5$ & 0.960 & 1.000 & 0.98 & 139 \\
 \bottomrule
 \end{tabular}
-\end{adjustbox}
-\par\smallskip{\footnotesize\raggedright Positions are (session, symbol) pairs of the book; shared\_share = $|$book $\cap$ gap fade$|$ / $|$book$|$; same\_side\_share among the shared; corr\_gross = Pearson correlation of the daily gross returns (tier all) over common sessions. Recomputed from work/strategy (NA-13) because NA-13 REPORT \S{}4 states these numbers but no file held them. The anchor's readings are uninformative (near-constant outputs: NA-11 REPORT \S{}7.1 item 4); its rows are reported, not read as nulls.\par}
+\begin{tablenotes}[flushleft]\footnotesize
+\item Shared: the share of the book's (session, symbol) positions also held by the gap fade; same side among those; correlation of the daily gross returns. Recomputed from NA-13's stored positions and books.
+\item The anchor's readings are uninformative (near-constant outputs after one epoch); its rows are reported, not read as nulls.
+\end{tablenotes}
+\end{threeparttable}
 \end{table}

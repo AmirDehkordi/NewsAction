@@ -1,20 +1,23 @@
-% t21_release_dates (NA-14, from artifacts/NA-05/catalog.json, artifacts/NA-14/inputs/operator.yaml, artifacts/NA-12/results/monthly_ic.json, configs/splits.yaml)
-\begin{table}[tbp]
-\centering\small
-\caption{Release dates of the decision models against the sample (test period ends at sample\_end)}\label{tab:t21_release_dates}
-\begin{adjustbox}{max width=\linewidth}
-\begin{tabular}{>{\raggedright\arraybackslash}p{12em}lr>{\raggedright\arraybackslash}p{12em}}
+% t21_release_dates: tab:a-release-dates (NA-14 figures.latex, from artifacts/NA-14/tables/t21_release_dates.csv)
+\begin{table}[htbp]
+\centering
+\small
+\begin{threeparttable}
+\caption{Release dates of the decision models: every release falls after the sample.}\label{tab:a-release-dates}
+\begin{tabular}{@{}lS[table-format=2.0]@{}}
 \toprule
-name & date & days after sample end & source \\
+Model & {Days after the sample} \\
 \midrule
-end of the test period (configs/splits.yaml) & 2026-07-31 & $0.000$ & configs/splits.yaml \\
-Convai Laya (open weights; the base of Laya-Fin and of Laya zero-shot) & 2026-09-18 & $49.000$ & operator, NA-14 preamble item 3 \\
-nace-ai/drex-v2.0 & 2026-10-12 & $73.000$ & artifacts/NA-05/catalog.json (created) \\
-liquid/d1-ultra & 2026-10-15 & $76.000$ & artifacts/NA-05/catalog.json (created) \\
-respan/span-02\textsuperscript{\ddag} & 2026-10-16 & $77.000$ & artifacts/NA-05/catalog.json (created) \\
-answerdotai/ModernBERT-large checkpoint (the anchor) & 2024-12 & --- & answerdotai/ModernBERT-large Dec-2024 checkpoint (PREREG \S{}9.2) \\
+end of the test period, 2026-07-31 & 0 \\
+Laya (open weights; Laya-Fin's base), 2026-09-18 & 49 \\
+drex-v2.0, 2026-10-12 & 73 \\
+d1-ultra, 2026-10-15 & 76 \\
+span-02$^{\ddagger}$, 2026-10-16 & 77 \\
+ModernBERT-large (the anchor's checkpoint), 2024-12 & {---} \\
 \bottomrule
 \end{tabular}
-\end{adjustbox}
-\par\smallskip{\footnotesize\raggedright Days after the end of the test period; the anchor's checkpoint is known to the month only. The anchor's readings are uninformative (near-constant outputs: NA-11 REPORT \S{}7.1 item 4); its rows are reported, not read as nulls. \textsuperscript{\ddag} span-02: the S5 canary fired a STOP after the freeze; the operator chose to proceed (PREREG \S{}15, the post-freeze NA-11 S5 row).\par}
+\begin{tablenotes}[flushleft]\footnotesize
+\item Release dates from the NA-05 catalog (created); Laya's from the operator (Convai's release, weights on Hugging Face); the anchor's checkpoint is known to the month only.
+\end{tablenotes}
+\end{threeparttable}
 \end{table}
