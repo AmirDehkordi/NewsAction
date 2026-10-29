@@ -237,6 +237,22 @@ WORDS: Final = {
     # the vendor's event types (t12) where underscores alone would misread
     "ma_deal": "M\\&A deal",
     "deal_ma_partnership": "deal, M\\&A, partnership",
+    # t12's mechanism-cut labels: a0_ is Call A on the pre-open news (W0), a2_ on the same-day news (W2)
+    # (NA-12 ``analysis.frames.SOURCES``)
+    "vendor_event_type": "vendor event type",
+    "vendor_quantified": "vendor quantified flag",
+    "a0_label_event_type": "own event type (Call A, pre-open news)",
+    "a2_label_event_type": "own event type (Call A, same-day news)",
+    "a0_label_quantified": "own quantified flag (Call A, pre-open news)",
+    "a2_label_quantified": "own quantified flag (Call A, same-day news)",
+    "horizon validity: Spearman(H, share of the t+20 move by C_t)": (
+        r"horizon validity: Spearman($H$, share of the $t{+}20$ move by $C_t$)"
+    ),
+    "H4 width: ΔR² of U_unc and P(no_material_effect)": (
+        r"H4 width: $\Delta R^2$ of the uncertainty score and $P$(no material effect)"
+    ),
+    # t5's cuts
+    "usual_coverage_low": "low usual coverage",
 }
 # d1-ultra's move reasons (Q17), as Figure A11 names them
 REASON: Final = {
@@ -482,23 +498,35 @@ def render(t: Table, keys: Mapping[str, Any]) -> tuple[str, list[str]]:
         **{**t.__dict__, "caption": cite(t.caption, cells), "notes": tuple(cite(n, cells) for n in t.notes)}
     )
     body: list[list[str]] = []
-    rows: list[str] = []
+    blocks: list[tuple[str, list[str]]] = []  # each panel's title and its LaTeX rows (the title row first)
     ncol = len(t.columns)
     for p in t.panels:
-        if p.title:
-            if rows:
-                rows.append(r"\addlinespace")
-            rows.append(rf"\multicolumn{{{ncol}}}{{@{{}}l}}{{\textit{{{p.title}}}}} \\")
+        block = [rf"\multicolumn{{{ncol}}}{{@{{}}l}}{{\textit{{{p.title}}}}} \\"] if p.title else []
+        seen: set[str] = set()
         for label, cs in p.rows:
             if len(cs) != ncol - 1:
                 raise ValueError(f"{t.name}: row {label!r} has {len(cs)} cells for {ncol - 1} columns")
+            if label and label in seen:  # an unlabelled row continues the one above (its SE or t)
+                raise ValueError(f"{t.name}: the row label {label!r} repeats within a panel")
+            seen.add(label)
             line = [label] + [cells.render(c, col.kind) for c, col in zip(cs, t.columns[1:], strict=True)]
             body.append(line)
-            rows.append(" & ".join(line) + r" \\")
+            block.append(" & ".join(line) + r" \\")
+        blocks.append((p.title, block))
+    rows: list[str] = []
+    for title, block in blocks:
+        if title and rows:
+            rows.append(r"\addlinespace")
+        rows += block
     if any(c in ("{" + DASH + "}", DASH) for line in body for c in line[1:]) and not any(
         DASH in n for n in t.notes
     ):
         raise ValueError(f"{t.name}: a cell shows {DASH} but no note says what it means")
+    shown = "\n".join([*rows, *t.head, *(c.head for c in t.columns)])
+    for mark in (r"\dagger", r"\ddagger"):
+        used = re.compile(re.escape(mark) + r"(?![A-Za-z])")
+        if used.search(shown) and not any(used.search(n) for n in t.notes):
+            raise ValueError(f"{t.name}: the table shows ${mark}$ but no note says what it marks")
     specs = []
     for j, col in enumerate(t.columns):
         if col.kind == "S":
@@ -513,31 +541,39 @@ def render(t: Table, keys: Mapping[str, Any]) -> tuple[str, list[str]]:
         lines.append(r"\begin{landscape}")
     if t.long:
         # A long table breaks across pages; its notes follow it as a block (threeparttablex's notes overflow a
-        # longtable's foot), set like the tablenotes of the floats.
+        # longtable's foot), set like the tablenotes of the floats. With titled panels it is one longtable per
+        # panel, the caption on the first, so a page that continues a panel names it.
+        chunks = blocks if len(blocks) > 1 and all(title for title, _ in blocks) else [("", rows)]
+        lines += [r"\begingroup", t.size, *([t.colsep] if t.colsep else [])]
+        for i, (title, chunk) in enumerate(chunks):
+            cont = (
+                rf"\multicolumn{{{ncol}}}{{@{{}}l}}{{\textit{{Table \ref{{{t.label}}}, continued"
+                + (f" ({title})" if title else "")
+                + r"}} \\"
+            )
+            lines += [
+                rf"\begin{{longtable}}{{{spec}}}",
+                rf"\caption{{{t.caption}}}\label{{{t.label}}} \\" if i == 0 else cont,
+                r"\toprule",
+                *t.head,
+                head,
+                r"\midrule",
+                r"\endfirsthead",
+                cont,
+                r"\toprule",
+                *t.head,
+                head,
+                r"\midrule",
+                r"\endhead",
+                r"\midrule",
+                rf"\multicolumn{{{ncol}}}{{r@{{}}}}{{\textit{{continued on the next page}}}} \\",
+                r"\endfoot",
+                r"\bottomrule",
+                r"\endlastfoot",
+                *chunk,
+                r"\end{longtable}",
+            ]
         lines += [
-            r"\begingroup",
-            t.size,
-            *([t.colsep] if t.colsep else []),
-            rf"\begin{{longtable}}{{{spec}}}",
-            rf"\caption{{{t.caption}}}\label{{{t.label}}} \\",
-            r"\toprule",
-            *t.head,
-            head,
-            r"\midrule",
-            r"\endfirsthead",
-            rf"\multicolumn{{{ncol}}}{{@{{}}l}}{{\textit{{Table \ref{{{t.label}}}, continued}}}} \\",
-            r"\toprule",
-            *t.head,
-            head,
-            r"\midrule",
-            r"\endhead",
-            r"\midrule",
-            rf"\multicolumn{{{ncol}}}{{r@{{}}}}{{\textit{{continued on the next page}}}} \\",
-            r"\endfoot",
-            r"\bottomrule",
-            r"\endlastfoot",
-            *rows,
-            r"\end{longtable}",
             r"\endgroup",
             *(
                 [
@@ -590,6 +626,12 @@ NOTE_VENDOR: Final = (
     "so its IC is a possibly look-ahead-contaminated upper bound, not the benchmark; the clean benchmarks "
     "are "
     "bge-ridge, price-only, the LLM baseline and the random-signal placebo."
+)
+# The vendor-label note of the strategy tables, whose † rows are books, not ICs.
+NOTE_VENDOR_BOOKS: Final = (
+    r"$^{\dagger}$Vendor sentiment: its labels were produced retrospectively, so its books are a possibly "
+    "look-ahead-contaminated upper bound, not a benchmark; the clean benchmarks are the price-only gap fade "
+    "and the random-signal placebo."
 )
 NOTE_SPAN: Final = (
     r"$^{\ddagger}$span-02: the S5 canary fired a STOP after the freeze; the operator chose to proceed "
@@ -1060,7 +1102,7 @@ def main_strategies() -> Table:
             r"by "
             r"the gap $U = V - G^{\mathrm{lvl}}$; S-D0 by $\tilde N$; S-D1 and S-D2 by the judgment $J$ "
             r"signed by the move; RG books trade the cases the model calls a misreaction (one name a side).",
-            NOTE_VENDOR + " " + NOTE_API,
+            NOTE_VENDOR_BOOKS + " " + NOTE_API,
         ),
         (
             r" & & \multicolumn{2}{c}{Sharpe ratio} & & & & \\",
@@ -1193,10 +1235,18 @@ def _strategy_label(row: Mapping[str, Any]) -> str:
         str(row["family"]), str(row["family"])
     )
     model = word(row["model"]) if isinstance(row["model"], str) else ""
-    sig = word(row["signal"])
+    sig = "" if str(row["signal"]) == "sentiment" else f" {word(row['signal'])}"  # the family names it
     gated = ", gated" if bool(row["gated"]) else ""
-    parts = [p for p in (fam, model, f"{row['point']} {sig}") if p]
+    parts = [p for p in (fam, model, f"{row['point']}{sig}") if p]
     return ", ".join(parts) + f", to {RUNG.get(str(row['exit']), word(row['exit']))}{gated}"
+
+
+def _rule_label(row: Mapping[str, Any]) -> str:
+    """A book keyed by its NA-13 rule, "family|model|point|signal|exit|gate" ("-" for no model), as t20
+    names it."""
+    fam, model, point, signal, exit_, gate = str(row["key"]).split("|")
+    book = {"family": fam, "model": math.nan if model == "-" else model, "point": point, "signal": signal}
+    return _strategy_label({**book, "exit": exit_, "gated": gate == "gated"})
 
 
 VIEWS: Final[tuple[View, ...]] = (
@@ -1241,7 +1291,8 @@ VIEWS: Final[tuple[View, ...]] = (
     ),
     View(
         "t21_release_dates",
-        "Release dates of the decision models: every release falls after the sample.",
+        "Release dates: every decision model came out after the sample; only the anchor's checkpoint "
+        "predates it.",
         ("name",),
         "Model",
         (("days_after_sample_end", "Days after the sample", "int"),),
@@ -1255,9 +1306,9 @@ VIEWS: Final[tuple[View, ...]] = (
         ),
         notes=(
             DASH_NOTES["t21_release_dates"],
-            "Release dates from the NA-05 catalog (created); Laya's from the operator (Convai's release, "
-            "weights on "
+            "Release dates from the NA-05 catalog; Laya's from the operator (Convai's release, weights on "
             "Hugging Face); the anchor's checkpoint is known to the month only.",
+            NOTE_SPAN,
         ),
     ),
     View(
@@ -1294,10 +1345,11 @@ VIEWS: Final[tuple[View, ...]] = (
     ),
     View(
         "t29_encoding",
-        "Encodings of numbers in states: the val-A search and the val-B confirmation kept E3.",
+        "Encodings of numbers in states: E1 ranked best in the val-A search but fell short of E3 on val-B, "
+        "so E3 was kept.",
         ("split", "model", "encoding"),
         "Split, model, encoding",
-        (("ic", "IC", "f3"), ("t", "$t$", "f2"), ("n_events", "Events", "int"), ("rank", "Rank", "f2")),
+        (("ic", "IC", "f3"), ("t", "$t$", "f2"), ("n_events", "Events", "int"), ("rank", "Rank", "int")),
         where=lambda df: df["model"] != "pooled",
         ci=("ci_low", "ci_high", r"95\% CI", 3),
         notes=(NOTE_SPAN, NOTE_API),
@@ -1333,13 +1385,14 @@ VIEWS: Final[tuple[View, ...]] = (
             ("ic", "IC", "f3"),
             ("ic_t", "$t$", "f2"),
             ("n_obs", "Events", "int"),
-            ("qspread", "Quintile spread", "f3"),
+            ("qspread", "Top $-$ bottom", "f3"),
             ("qspread_p", "$p$", "p"),
         ),
         ci=("ic_ci_low", "ic_ci_high", r"95\% CI", 3),
+        head=(r" & & & & & \multicolumn{2}{c}{Quintile spread} \\", r"\cmidrule(lr){6-7}"),
         notes=(
-            "Quintile spread of the target between the top and bottom quintile of $\\hat N$, in typical "
-            "daily moves.",
+            "Quintile spread: the mean target in the top quintile of $\\hat N$ minus the bottom quintile, in "
+            "typical daily moves, and its $p$; the IC's own test is its $t$.",
             NOTE_ANCHOR,
             NOTE_API,
             NOTE_SPAN,
@@ -1375,6 +1428,11 @@ VIEWS: Final[tuple[View, ...]] = (
             ("ece_before", "ECE before", "f3"),
             ("ece_after", "ECE after", "f3"),
         ),
+        label_fn=lambda r: (
+            f"{word(r['model'])}, {word(r['target'])}"
+            + (", temperature scaling" if str(r["key"]).endswith(":temperature") else "")
+        ),
+        label_width="1.6in",
         notes=(
             NOTE_DASH,
             "Q1's three classes against the targets; skill against val-A climatology; $T$ the temperature "
@@ -1448,10 +1506,12 @@ VIEWS: Final[tuple[View, ...]] = (
             ("q", "BH $q$", "p"),
             ("q_pooled", "Pooled $q$", "p"),
         ),
+        ci=("ci_low", "ci_high", r"95\% CI", 4),
         notes=(
             NOTE_DASH,
             "BH at $q = 0.10$ within each instrument; the pooled family adds d1-ultra's H6 and A3.4 to "
-            "Laya-Fin's.",
+            "Laya-Fin's. The anchor's H7 is reported outside its family, so it has no $q$. Each test has "
+            "either an SE or a 95\\% CI, as NA-12 states it.",
             NOTE_ANCHOR,
             NOTE_API,
         ),
@@ -1462,7 +1522,7 @@ VIEWS: Final[tuple[View, ...]] = (
         ("model", "cut"),
         "Model, cut",
         (
-            ("n_in", "Events in", "int"),
+            ("n_in", "Events", "int"),
             ("wald_f", "Wald $F$", "f2"),
             ("p", "$p$", "p"),
             ("q", "BH $q$", "p"),
@@ -1473,7 +1533,7 @@ VIEWS: Final[tuple[View, ...]] = (
         ),
         notes=(
             "Wald test of $\\hat N\\cdot 1[\\mathrm{cut}]$ and $G\\cdot 1[\\mathrm{cut}]$ added to H2 at "
-            "D2; BH over each model's eight cuts.",
+            "D2; BH over each model's eight cuts. Events: the D2 events in the cut.",
             NOTE_ANCHOR,
             NOTE_API,
         ),
@@ -1550,9 +1610,18 @@ VIEWS: Final[tuple[View, ...]] = (
             ("kappa_ct_p", "$p$", "p"),
             ("lambda_t5", "$\\lambda_{t+5}$", "f3"),
             ("lambda_t5_p", "$p$", "p"),
-            ("nobs_d0", "Events", "int"),
+            ("nobs_d0", "Events ($\\kappa$)", "int"),
+            ("nobs_gap", "Events ($\\lambda$)", "int"),
         ),
-        notes=(NOTE_DASH, NOTE_ANCHOR, NOTE_API),  # portrait: 36 rows overflow a landscape page
+        notes=(
+            NOTE_DASH,
+            "Events ($\\kappa$): the D0 events behind $\\kappa$; events ($\\lambda$): the gap events behind "
+            "$\\lambda_{t+5}$.",
+            NOTE_ANCHOR,
+            NOTE_API,
+        ),  # portrait: 36 rows overflow a landscape page
+        size=r"\footnotesize",  # two event counts fit the text width at the long tables' size
+        colsep=r"\setlength{\tabcolsep}{4pt}",
     ),
     View(
         "t13_shapley",
@@ -1577,10 +1646,11 @@ VIEWS: Final[tuple[View, ...]] = (
             ("r2_p", "$p$", "p"),
             ("increment", "$\\Delta R^2$", "f4"),
             ("increment_p", "$p$", "p"),
-            ("n", "Days", "int"),
+            ("n", "Member-days", "int"),
         ),
         ci=("r2_ci_low", "r2_ci_high", r"95\% CI", 4),
         label_width="2.2in",
+        colsep=r"\setlength{\tabcolsep}{4pt}",  # the member-days column fits the text width
         notes=(
             NOTE_DASH,
             "Out-of-sample $R^2$ of $z_{cc}$, cumulative by step; bootstrap CIs.",
@@ -1623,12 +1693,18 @@ VIEWS: Final[tuple[View, ...]] = (
             ("rho", "$\\rho$", "f3"),
             ("p", "$p$", "p"),
             ("delta_r2", "$\\Delta R^2$", "f4"),
+            ("agreement", "Agreement", "f3"),
             ("nobs", "Events", "int"),
         ),
         landscape=True,
         colsep=r"\setlength{\tabcolsep}{4pt}",
+        label_width="3.5in",  # the long analysis names wrap, so the agreement column fits the page
         notes=(
             NOTE_DASH,
+            "Reading validity: the share of the 500 val-A events on which d1-ultra's answer agrees with the "
+            "vendor's tag (event type, the raw tag, quantified; the rumor tag for credibility) or with the "
+            "earnings calendar (scheduled).",
+            NOTE_ANCHOR,
             NOTE_API,
         ),
     ),
@@ -1659,7 +1735,7 @@ VIEWS: Final[tuple[View, ...]] = (
             "ledger; capacity at 1\\% of the 20-session "
             "ADV (median over decisions). Empty RG books of the anchor are left out. "
             + r"The exploratory MA-cross fade (post hoc) is in Table~\ref{tab:a-ma-cross} and Figure A15.",
-            NOTE_VENDOR,
+            NOTE_VENDOR_BOOKS,
             NOTE_ANCHOR,
             NOTE_API,
         ),
@@ -1712,7 +1788,9 @@ VIEWS: Final[tuple[View, ...]] = (
         notes=(
             "Annualized Sharpe ratios of the 100 random-signal books of each test universe (a decision "
             "point, an exit and "
-            "a set of events), numpy's linear quantiles; from NA-13's stored placebo books.",
+            "a set of events), numpy's linear quantiles; from NA-13's stored placebo books. A universe is "
+            "named by the books that trade on it, with the model where its events are that model's alone.",
+            NOTE_VENDOR_BOOKS,
         ),
     ),
     View(
@@ -1725,8 +1803,15 @@ VIEWS: Final[tuple[View, ...]] = (
             ("turnover_daily", "Turnover", "f2"),
             ("break_even_bp", "Break-even (bp)", "bp1"),
         ),
-        label_fn=lambda r: tex(str(r["key"]).replace("|", ", ").replace("_", " ")),
-        notes=("Gross mean $\\div$ turnover, from NA-13's strategy table.",),
+        where=_not_exploratory("t35_break_even"),
+        label_fn=_rule_label,
+        notes=(
+            "Gross mean $\\div$ turnover, from NA-13's strategy table. "
+            + r"The exploratory MA-cross fade (post hoc) is in Table~\ref{tab:a-ma-cross} and Figure A15.",
+            NOTE_VENDOR_BOOKS,
+            NOTE_ANCHOR,
+            NOTE_API,
+        ),
     ),
     View(
         "t23_company_identification",
@@ -1890,17 +1975,22 @@ SIGNAL_NAME: Final = {"j": " $J$", "rg": " RG"}
 
 
 def universe_books(root: Path) -> dict[str, str]:
-    """Each test universe of the placebo (t33) → the books of t20 that trade on it."""
+    """Each test universe of the placebo (t33) → the books of t20 that trade on it; a book whose universe
+    holds only one model's events (a gated or RG book) is named with that model, so no two universes read
+    alike."""
     st = pd.read_csv(root / sc.TABLES / "t20_strategies.csv", keep_default_na=False, na_values=[""])
-    out: dict[str, list[str]] = {}
+    out: dict[str, dict[str, list[str]]] = {}
     for r in st[st["split"] == "test"].to_dict("records"):
         fam = str(r["family"])
         name = BOOK_NAME.get(fam, fam + SIGNAL_NAME.get(str(r["signal"]), ""))
         name += " gated" if bool(r["gated"]) else ""
-        books = out.setdefault(str(r["universe"]), [])
-        if name not in books:
-            books.append(name)
-    return {u: ", ".join(b) for u, b in out.items()}
+        models = out.setdefault(str(r["universe"]), {}).setdefault(name, [])
+        if isinstance(r["model"], str) and r["model"] not in models:
+            models.append(r["model"])
+    return {
+        u: ", ".join(f"{n} ({word(m[0])})" if len(m) == 1 else n for n, m in books.items())
+        for u, books in out.items()
+    }
 
 
 def appendix_tables(root: Path) -> list[Table]:

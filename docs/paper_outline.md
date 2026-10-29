@@ -17,8 +17,8 @@ post-freeze NA-11 row); the API models fail the §8.3 screens and are model-spec
 **Exploratory material appears only in the appendix:** Appendix Figures A6 (the monthly IC with its exploratory
 ±1 SE bands), A13 (the probes' descriptive columns), A14 and A15 (post hoc), and the appendix tables t17, t24, t25
 and t31. No main figure (1–7) and no main table (1–6) cites an exploratory table or row: not in a caption, not in a
-LaTeX cell, not in a figure's data (`figures.guard`, `tests/test_figures_exploratory.py`). The CSVs of t11 and t20
-keep their exploratory rows; their LaTeX leaves them out and points to t31, t25 and Figure A15.
+LaTeX cell, not in a figure's data (`figures.guard`, `tests/test_figures_exploratory.py`). The CSVs of t11, t20
+and t35 keep their exploratory rows; their LaTeX leaves them out and points to t31, t25 and Figure A15.
 
 ## 1. Question and decision models
 
@@ -167,7 +167,7 @@ NA-14's records, flattened results and aggregations, and the f-tables are figure
 | `t32_val_b_ic` | 3 | NA-11's val-B run of the frozen spec |
 | `t33_placebo_sharpe` | 6 | NA-13's stored placebo books (quantiles) |
 | `t34_prereg_deviations` | appendix | PREREG §15 and NA-14's one-line summaries |
-| `t35_break_even` | 6 | NA-13 strategy table (gross mean ÷ turnover) |
+| `t35_break_even` | 6 | NA-13 strategy table (gross mean ÷ turnover; its LaTeX leaves out the exploratory MA-cross row) |
 | `f1_rg_class_paths` | 4 | NA-12 figure data |
 | `f1_v_decile_paths` | 4 | NA-12 figure data |
 | `f2_drift_vs_g` | 4 | NA-12 figure data |

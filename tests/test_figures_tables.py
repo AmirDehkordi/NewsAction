@@ -12,7 +12,12 @@
   (``latex.render`` refuses one that does not); "<" is text set against its number, so the number stays on
   the decimal column; Table 5's share knowable before the open has its column's two decimals;
 - no NA-14 key holds "/" or "@", which the cite syntax uses;
-- ``docs/paper_outline.md`` maps every table, and every LaTeX table, to the section ``index.json`` records.
+- ``docs/paper_outline.md`` maps every table, and every LaTeX table, to the section ``index.json`` records;
+- the fix pass after the re-verification: a † or ‡ in a table has its note and no row label repeats within a
+  panel (``latex.render`` refuses either); no key with its separators read as spaces is a label (t35); t12
+  prints the reading-validity agreement, t4 every CI that stands for an SE, t3 the quintile spread's own $p$,
+  t9 both event counts, t10 member-days; t21's and t29's captions state the facts; t20's pages name their
+  period.
 """
 
 from __future__ import annotations
@@ -165,6 +170,9 @@ def test_latex_main_tables_and_style() -> None:
         assert "_" not in visible, t["name"]
         for k in ("laya_fin", "d1_ultra", "ic_z_cc", "a2_v", "close_t+5", "n_tilde"):
             assert k not in visible, (t["name"], k)
+        # nor a key with its separators read as spaces (t35's labels were "S-CONV, laya fin, D2, u, …")
+        for k in ("laya fin", "d1 ultra", "laya zs", "n tilde", "span 02", "drex v2", "close t+", ", -,"):
+            assert k not in visible, (t["name"], k)
         assert t["cells"] and all(c in keys for c in t["cells"]), t["name"]
         if t["section"] == latex.MAIN:
             assert (
@@ -228,6 +236,65 @@ def test_a_bound_sits_against_its_number() -> None:
     assert re.fullmatch(
         r"share knowable before the open \(\\%\) & \d+\.\d\d & \{---\} & \d+\.\d\d & .*", share
     ), share
+
+
+def test_a_mark_needs_its_note_and_a_label_appears_once_in_a_panel() -> None:
+    toy = latex.Table(
+        "toy",
+        "tab:toy",
+        latex.APPENDIX,
+        "A toy.",
+        (latex.Col("Row", "l"), latex.Col("Value")),
+        (latex.Panel("", ((r"vendor sentiment$^{\dagger}$", (latex.Txt("1"),)),)),),
+        ("No word on the mark.",),
+    )
+    with pytest.raises(ValueError, match="no note says what it marks"):
+        latex.render(toy, {})
+    assert latex.render(latex.Table(**{**toy.__dict__, "notes": (latex.NOTE_VENDOR_BOOKS,)}), {})
+    twice = latex.Table(
+        **{**toy.__dict__, "panels": (latex.Panel("", (("a", (latex.Txt("1"),)), ("a", (latex.Txt("2"),)))),)}
+    )
+    with pytest.raises(ValueError, match="repeats within a panel"):
+        latex.render(twice, {})
+    for t in _latex():  # what the guards hold, checked on the committed LaTeX too
+        tex = (T / str(t["file"])).read_text(encoding="utf-8")
+        if r"\begin{longtable}" in tex:  # a longtable's \bottomrule is its foot, set before the rows
+            table, _, notes = tex.rpartition(r"\end{longtable}")
+        else:
+            table, _, notes = tex.partition(r"\bottomrule")
+        for mark in (r"$^{\dagger}$", r"$^{\ddagger}$"):
+            if mark in table:
+                assert mark in notes, (t["name"], mark)
+
+
+def test_the_reverification_fixes() -> None:
+    keys = kz.load(T / "keys.json")
+
+    def tex(name: str) -> str:
+        return (T / f"{name}.tex").read_text(encoding="utf-8")
+
+    t12 = tex("t12_question_battery")
+    for item in ("credibility", "event_type", "event_type_vs_raw_tag", "quantified", "scheduled"):
+        v = keys[f"t12_question_battery/reading:liquid_d1-ultra:{item}/agreement"]
+        row = next(ln for ln in t12.splitlines() if f"): {item.replace('_', ' ')} &" in ln)
+        assert f" & {v:.3f} & 500 " in row, row
+    t4 = pd.read_csv(T / "t4_secondary.csv", keep_default_na=False, na_values=[""])
+    with_ci = t4[t4["se"].isna() & t4["ci_low"].notna()]
+    assert len(with_ci) >= 3 and all(
+        f"[${r.ci_low:.4f}$, ${r.ci_high:.4f}$]" in tex("t4_secondary") for r in with_ci.itertuples()
+    )
+    assert r"\multicolumn{2}{c}{Quintile spread}" in tex("t3_ic")
+    assert r"{Events ($\kappa$)} & {Events ($\lambda$)}" in tex("t9_convergence_cuts")
+    assert "{Member-days}" in tex("t10_explanation_ladder") and "{Days}" not in tex("t10_explanation_ladder")
+    assert "only the anchor's checkpoint predates it" in tex("t21_release_dates")
+    assert "(created)" not in tex("t21_release_dates")
+    t29 = pd.read_csv(T / "t29_encoding.csv")
+    val_a = t29[(t29["split"] == "val_a") & (t29["model"] == "pooled")].set_index("encoding")["rank"]
+    assert val_a.idxmin() == "E1" and "E1 ranked best in the val-A search" in tex("t29_encoding")
+    t20 = tex("t20_strategies")
+    assert t20.count(r"\begin{longtable}") == 2 and t20.count(r"\caption{") == 1
+    assert "continued (test)" in t20 and "continued (val-B)" in t20
+    assert "S-CONV, Laya-Fin, D2 $U$, to $t{+}1$ &" in tex("t35_break_even")
 
 
 def test_no_key_holds_the_cite_separators() -> None:

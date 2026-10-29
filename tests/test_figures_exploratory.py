@@ -3,8 +3,11 @@
 - no main figure (1–7) and no main table (T1–T6) cites exploratory material: not in a caption, not in a
   cell of its LaTeX, not in a row of its CSV; ``make paper`` refuses one that does;
 - the guard is not vacuous: Figure 4's old month-effect sentence (t24) planted in a main caption, a t24 cell
-  planted in a main table, and a t24 row planted in a main figure's data are each caught;
-- the index marks every exploratory table and row, including any row whose own text calls it exploratory;
+  planted in a main table, and a t24 row planted in a main figure's data are each caught; so are NA-13's
+  MA-cross fade cited through t35, its path from the Figure 7 data and NA-12's market row from NA-12's own t11
+  planted in a main figure's data (the re-verification found these three routes open);
+- the index marks every exploratory table and row, including any row whose own text or key calls it
+  exploratory;
 - the CSVs keep their exploratory rows, the appendix shows them (A15 and t25 for NA-13's MA-cross fade, t31
   for NA-12's A3.5 market replication), and the appendix LaTeX of t11 and t20 points there;
 - the documents state the rule as it holds: exploratory material appears only in the appendix.
@@ -31,6 +34,7 @@ ROWS = {
     ("t11_explanation_share_theta", "market:r2"),
     ("t20_strategies", FADE),
     ("t20_strategies", "validation|exploratory|ma_cross|fade_no_news|close_t+5"),
+    ("t35_break_even", FADE.split("|", 1)[1]),
 }
 MONTH_EFFECT = (
     "A one-way test of the daily ICs on the calendar month finds no month effect "
@@ -49,9 +53,9 @@ def _latex() -> list[dict[str, Any]]:
 
 
 def _worded(name: str) -> set[str]:
-    """The keys of the rows whose own text says "exploratory" (read without the index)."""
+    """The keys of the rows whose own text or key says "exploratory" (read without the index)."""
     df = pd.read_csv(T / f"{name}.csv", dtype=str, keep_default_na=False)
-    text = df.drop(columns=["key"]).agg(" ".join, axis=1)
+    text = df.agg(" ".join, axis=1)
     return set(df.loc[text.str.contains(WORD), "key"])
 
 
@@ -103,6 +107,42 @@ def test_a_planted_exploratory_row_in_a_main_figure_is_caught(monkeypatch: pytes
     assert guard.violations() == ["fig1_validation_test data: t24_exploratory_d0_signal/company:laya_fin"]
 
 
+def test_the_ma_cross_fade_cited_through_t35_is_caught() -> None:
+    caps = captions.load()
+    cite = f"{{{{t35_break_even/{FADE.split('|', 1)[1]}/break_even_bp@f1}}}}"
+    caps["fig6_strategies"] = {
+        **caps["fig6_strategies"],
+        "caption": f"{caps['fig6_strategies']['caption']} The MA-cross fade breaks even at {cite} bp.",
+    }
+    assert guard.violations(caps=caps) == [
+        f"fig6_strategies caption: t35_break_even/{FADE.split('|', 1)[1]}/break_even_bp"
+    ]
+    assert [b for b in captions.check(captions=caps) if "only the appendix may cite" in b]
+
+
+def test_upstream_exploratory_rows_in_a_main_figure_are_caught(monkeypatch: pytest.MonkeyPatch) -> None:
+    real = render.read
+
+    paths = real("fig6_strategies")
+    session = str(paths.loc[paths["source"] == sc.FIG7, "key"].iloc[0]).rsplit("|", 1)[1]
+    fade_path = f"{FADE.split('|', 1)[1]}|all|{session}"  # NA-13's MA-cross path on a real session
+
+    def read(name: str, layout: Any = None) -> pd.DataFrame:
+        df = real(name, layout)
+        if name == "fig6_strategies":
+            extra = df.iloc[[0, 0]].copy()
+            extra["source"] = [sc.FIG7, f"{sc.NA12_TAB}/t11_explanation_share_theta.csv"]
+            extra["key"] = [fade_path, "market:r2"]
+            df = pd.concat([df, extra], ignore_index=True)
+        return df
+
+    monkeypatch.setattr(render, "read", read)
+    assert guard.violations() == [
+        f"fig6_strategies data: {sc.FIG7}/{fade_path}",
+        "fig6_strategies data: t11_explanation_share_theta/market:r2",
+    ]
+
+
 def test_the_index_marks_every_exploratory_table_and_row() -> None:
     index = _index()
     assert {n for n, t in index.items() if t["exploratory"]} == TABLES
@@ -122,9 +162,13 @@ def test_the_csv_keeps_the_rows_and_the_appendix_shows_them() -> None:
     assert t31["source"] == f"{sc.NA12_TAB}/t11_explanation_share_theta.csv (row market:r2)"
     cells = t31.drop("source")
     assert len(cells) >= 6 and all(cells[c] == t11[c] for c in cells.index)
+    t35 = pd.read_csv(T / "t35_break_even.csv").set_index("key")
+    assert FADE.split("|", 1)[1] in t35.index  # the CSV keeps NA-13's row
     cited = {t["name"]: t["cells"] for t in _latex()}
     assert not [c for c in cited["t11_explanation_share_theta"] if "/market:r2/" in c]
     assert not [c for c in cited["t20_strategies"] if "|exploratory|" in c]
+    assert not [c for c in cited["t35_break_even"] if "/exploratory|" in c]
+    assert r"\ref{tab:a-ma-cross} and Figure A15" in (T / "t35_break_even.tex").read_text(encoding="utf-8")
     assert r"\ref{tab:a-market-replication}" in (T / "t11_explanation_share_theta.tex").read_text(
         encoding="utf-8"
     )

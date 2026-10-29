@@ -3,7 +3,7 @@
 \centering
 \small
 \begin{threeparttable}
-\caption{Release dates of the decision models: every release falls after the sample.}\label{tab:a-release-dates}
+\caption{Release dates: every decision model came out after the sample; only the anchor's checkpoint predates it.}\label{tab:a-release-dates}
 \begin{tabular}{@{}lS[table-format=2.0]@{}}
 \toprule
 Model & {Days after the sample} \\
@@ -18,7 +18,8 @@ ModernBERT-large (the anchor's checkpoint), 2024-12 & {---} \\
 \end{tabular}
 \begin{tablenotes}[flushleft]\footnotesize
 \item ---: the anchor's checkpoint is dated by month only, before the sample, so it has no day count.
-\item Release dates from the NA-05 catalog (created); Laya's from the operator (Convai's release, weights on Hugging Face); the anchor's checkpoint is known to the month only.
+\item Release dates from the NA-05 catalog; Laya's from the operator (Convai's release, weights on Hugging Face); the anchor's checkpoint is known to the month only.
+\item $^{\ddagger}$span-02: the S5 canary fired a STOP after the freeze; the operator chose to proceed (PREREG \S15, post-freeze NA-11 row).
 \end{tablenotes}
 \end{threeparttable}
 \end{table}

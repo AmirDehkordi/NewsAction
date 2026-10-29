@@ -7,7 +7,9 @@
 
 - a main figure's title or caption citing an exploratory table or an exploratory row (``captions.yaml``);
 - a main LaTeX table (T1–T6) printing a cell of one (``tables/latex.json``);
-- a main figure's CSV plotting a row of one (``figures/*.csv``, its ``source`` and ``key``).
+- a main figure's CSV plotting a row of one (``figures/*.csv``, its ``source`` and ``key``), read from the
+  NA-14 table or from the NA-12 table it copies, or any upstream row whose key names NA-13's "exploratory"
+  family (its MA-cross fade in the strategy table and the Figure 7 data).
 
 The exploratory tables and rows are those ``tables/index.json`` marks (``tables.EXPLORATORY_TABLES`` and
 ``tables.EXPLORATORY_ROWS``); a figure is main unless it is an appendix figure (``figA…``).
@@ -27,6 +29,7 @@ from newsaction.figures import sources as sc
 from newsaction.paths import Layout, resolve_layout
 
 NA14_TABLE: Final = f"{sc.TABLES}/"
+EXPLORATORY_FAMILY: Final = "exploratory"  # NA-13's family of its post hoc MA-cross fade, a part of its keys
 
 
 def exploratory(layout: Layout | None = None) -> tuple[set[str], set[tuple[str, str]]]:
@@ -50,7 +53,9 @@ def violations(
 ) -> list[str]:
     lay = resolve_layout(layout)
     tables, rows = exploratory(lay)
-    names = [t["name"] for t in json.loads((lay.root / sc.TABLES / "index.json").read_text(encoding="utf-8"))]
+    listing = json.loads((lay.root / sc.TABLES / "index.json").read_text(encoding="utf-8"))
+    names = [t["name"] for t in listing]
+    copies = {str(t["copy_of"]): t["name"] for t in listing if t.get("copy_of")}  # NA-12 path → NA-14 table
 
     def bad(cited: str) -> bool:
         table, key = _split(cited, names)
@@ -74,10 +79,10 @@ def violations(
             continue
         df = render.read(fig, lay)
         for src, key in zip(df["source"], df["key"], strict=True):
-            if str(src).startswith(NA14_TABLE):
-                table = Path(str(src)).stem
-                if table in tables or (table, str(key)) in rows:
-                    out.append(f"{fig} data: {table}/{key}")
+            s, k = str(src), str(key)
+            table = Path(s).stem if s.startswith(NA14_TABLE) else copies.get(s, "")
+            if (table and (table in tables or (table, k) in rows)) or EXPLORATORY_FAMILY in k.split("|"):
+                out.append(f"{fig} data: {table or s}/{k}")
     return out
 
 

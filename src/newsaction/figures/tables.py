@@ -80,6 +80,10 @@ EXPLORATORY_ROWS: Final[dict[str, tuple[Callable[[pd.DataFrame], pd.Series], str
         lambda df: df["family"] == "exploratory",
         "The exploratory MA-cross fade (post hoc) is in Table t25 and Figure A15.",
     ),
+    "t35_break_even": (
+        lambda df: df["key"].astype(str).str.split("|").str[0] == "exploratory",
+        "The exploratory MA-cross fade (post hoc) is in Table t25 and Figure A15.",
+    ),
 }
 # The paper section of every table (docs/paper_outline.md): 1–7 the main text, "appendix" the rest. A
 # table's LaTeX may sit in a different place (the main tables T1–T6 draw on these; ``figures.latex``).

@@ -12,16 +12,17 @@ API call, no Kaggle run, no FMP request; nothing reads `newsaction.lock`).
   captions above with a takeaway), every number a cited cell of `tables/keys.json`, plus a one-page summary of the
   63 pre-registration deviations.
 - **`artifacts/NA-14/paper_preview.tex`** sets every figure and table in outline order with its caption;
-  `make paper-preview` compiles it with tectonic: no error, no overfull box, every font embedded, 81 pages
-  (`artifacts/NA-14/paper_preview.pdf`, sha256 `74aff6d22c8489130a91cc8305b478c034cdbd8cebbe6cb4d7ef2f8ce3a88d7a`,
-  reported, not enforced).
+  `make paper-preview` compiles it with tectonic: no error, no overfull box, every font embedded, 82 pages
+  (`artifacts/NA-14/paper_preview.pdf`, sha256 `552ec45a2113bd5ded84203e323fe20981ab60e28fb19a407b4517a19791f59b`,
+  reported, not enforced; §12).
 - **Every plotted value traces to its upstream cell** (`tests/test_figures_trace.py`, all 22 figure CSVs); the two
   aggregations of stored files (placebo Sharpe quantiles, break-even costs) and the Wilson intervals are recomputed
   by tests.
 - **Exploratory material appears only in the appendix:** Figures A6, A13, A14, A15 and the tables t17, t24, t25,
   t31. No main figure and no main table cites exploratory material (`figures.guard`, which `make paper` enforces;
   `tests/test_figures_exploratory.py`, which plants a citation in a caption, a table and a figure's data). This
-  fixes operator check 5e of the first verification.
+  fixes operator check 5e of the first verification; the fix pass of §12 closes the routes the re-verification
+  found open (t35's MA-cross row, upstream rows in a figure's data).
 - **`make paper`** rebuilds all of it offline in about 12 seconds and reproduces every digest (110 text outputs
   enforced, 44 PDF/PNG files reported equal); it writes no ledger and imports neither the decision-model client
   nor the lock.
@@ -321,3 +322,67 @@ upstream cell, every caption and table number is a cell of `tables/keys.json`). 
   `test_figures_tables.py`, `test_figures_preview.py`; docs `REPLICATION.md` (the three CSV digests, the preview
   checks), `paper_outline.md`, `decisions/NA-14.md`, `DATA_CONTRACT.md` (NA-14 section regenerated, 158 entries);
   `.gitignore` (the preview log).
+
+## 12. Fix pass after the re-verification (operator, 2026-10-29, on top of 1bbc5f9)
+
+The re-verification at 1bbc5f9 passed every check except operator check 5 (appendix LaTeX tables), and found two
+routes left open in the 5e guard. This pass changes the LaTeX of 13 tables, marks one more exploratory row in
+`index.json`, and extends the guard and its tests. No table CSV, `keys.json` value, figure or caption changes, so
+AC1–AC4 hold as before. Decisions 39–44 in `docs/decisions/NA-14.md`.
+
+### 12.1 Check 5: the appendix tables
+
+- **Marks with their notes.** t21's ‡ and t33's † get their notes. The strategy tables (Table 6, t20, t33, t35) carry
+  a vendor note about books, not ICs. `latex.render` now refuses a † or ‡ without a note.
+- **No key as a label.**
+  - t35's rows are named as t20's ("S-CONV, Laya-Fin, D2 $U$, to $t+1$"). Its exploratory MA-cross row leaves its
+    LaTeX, which points to Table A33 and Figure A15.
+  - t12's mechanism cuts read "own event type (Call A, pre-open news)" and similar. Its two analysis names are
+    typeset.
+  - t5 reads "low usual coverage". t21 drops "(created)". Vendor sentiment's books no longer repeat its name.
+- **Numbers that were missing or mislabelled.**
+  - t12 prints the five reading-validity agreements (0.990, 0.572, 0.454, 0.494, 0.552).
+  - t4 prints the 95% CI of each test whose uncertainty NA-12 states as a CI, and says why the anchor's H7 has no
+    $q$.
+  - t3 sets the quintile spread and its $p$ under one header.
+  - t9 prints both event counts ($\kappa$ and $\lambda$). t10's "Days" are "Member-days".
+- **Captions.**
+  - t29: "E1 ranked best in the val-A search but fell short of E3 on val-B, so E3 was kept".
+  - t21: "every decision model came out after the sample; only the anchor's checkpoint predates it".
+- **No repeated label.**
+  - t33 names a universe's model where its events are that model's alone.
+  - t15's temperature rows read "…, $e_5$, temperature scaling".
+  - t20 is one longtable per period, so every page says "continued (test)" or "continued (val-B)".
+  - `latex.render` now refuses a row label repeated within a panel.
+- **Fit.** The wider tables fit the text width: t9 at `\footnotesize`, a 4 pt column gap in t9 and t10, and wrapped
+  label columns in t12 and t15.
+
+### 12.2 The 5e guard
+
+- t35's `exploratory|ma_cross|fade_no_news|close_t+5` is an exploratory row (`tables.EXPLORATORY_ROWS`,
+  `index.json`), so a main caption or table citing it is refused.
+- A main figure's data row is refused when it comes from an NA-12 table whose NA-14 copy marks it exploratory, or
+  from any upstream file whose key names NA-13's "exploratory" family (the MA-cross path of the Figure 7 data).
+- The index test reads keys as well as text. A plant of each route is caught. Removing either new render guard,
+  either new guard route or t35's row turns the tests red.
+
+### 12.3 Checks
+
+| Check | Result |
+|---|---|
+| `make paper` | "outputs": "all equal" (110), "figures": "all equal" (44), 37 inputs, "ledgers_unchanged": true, "forbidden_imports": [] |
+| `make paper-preview` | 82 pages; `paper_preview.log`: 0 Overfull, 0 Underfull, 0 undefined references, 0 errors, 0 LaTeX warnings; 65 fonts, all embedded; PDF sha256 `552ec45a2113bd5ded84203e323fe20981ab60e28fb19a407b4517a19791f59b` (reported, not enforced) |
+| each changed table on its own | the 13 tables compiled with the preview's preamble, `tectonic --keep-logs`: 0 overfull; each rendered and looked at |
+| captions, guard | `python -m newsaction.figures.captions`: 0 problems; `figures.guard`: no violation |
+| `make verify` | exit 0, with no other NewsAction pytest running: ruff check and format (302 files), mypy --strict (168 files), pytest 2134 passed, 3 skipped, 2 xfailed in 248 s, manifest OK (444 artifacts), ledgers OK (test_access 29, trials 545); peak RSS 8.0 GB |
+
+### 12.4 Files whose digest changed (against 1bbc5f9's `digests.json`)
+
+- **Text outputs** (110; none added or removed; 15 changed): `tables/index.json`, `tables/latex.json`, and the LaTeX
+  of `tab6`, t3, t4, t5, t9, t10, t12, t15, t20, t21, t29, t33 and t35.
+- **Figures, inputs:** none.
+- **Not enforced:** `paper_preview.pdf`.
+- **Other files:**
+  - code `figures/latex.py`, `tables.py`, `guard.py`;
+  - tests `test_figures_tables.py`, `test_figures_exploratory.py`;
+  - docs `paper_outline.md`, `decisions/NA-14.md`, `DATA_CONTRACT.md` (NA-14 section regenerated).

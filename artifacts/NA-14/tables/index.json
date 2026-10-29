@@ -1322,7 +1322,9 @@
   "title": "Break-even cost per side of each test book (NA-13): the cost at which the mean net return is zero",
   "section": "6",
   "exploratory": false,
-  "exploratory_rows": [],
+  "exploratory_rows": [
+   "exploratory|ma_cross|fade_no_news|close_t+5"
+  ],
   "columns": [
    "key",
    "ann_return_gross",
