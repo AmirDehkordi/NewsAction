@@ -164,7 +164,7 @@ The table CSVs:
 | `t31_market_replication.csv` | `47e320d34232bd5932908a377f84b9135d627865c2846cb91bcf5e6d6f730cb5` |
 | `t32_val_b_ic.csv` | `b2ae900683c016a071001e7285abeb2913eeb5d7db5cd4990110b350237c695a` |
 | `t33_placebo_sharpe.csv` | `23f4be70017dead01d6c839cfcdad22fc8d17569105daaf2a3c4d1f9de0dd1a9` |
-| `t34_prereg_deviations.csv` | `9fbc3b09165470ced5af69b6aa368326ebef61d0444305d0f08eb78b5e73c36c` |
+| `t34_prereg_deviations.csv` | `21bed8d1c2d2f520d1f44866922aba1699d3093dd540691523634ae40d5e8cfd` |
 | `t35_break_even.csv` | `c58d8dd3a89d9fa84cc7118d8bc4aeefe38ccc2799bf0d0404b1181306922470` |
 | `t36_selective_coverage.csv` | `16154cc72359b8d414061f7ebb2e22f04c03ba298d85bee274bd6bf445448a27` |
 | `t37_watch_open.csv` | `9839242fef8e8a86c9d43ae5f3fbc7dea2b991776f8181aeccb7c3be75899729` |

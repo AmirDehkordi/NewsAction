@@ -8144,7 +8144,12 @@
    "t34_prereg_deviations/row:65/chunk",
    "t34_prereg_deviations/row:65/date",
    "t34_prereg_deviations/row:65/freeze",
-   "t34_prereg_deviations/row:65/reason"
+   "t34_prereg_deviations/row:65/reason",
+   "t34_prereg_deviations/row:66/change",
+   "t34_prereg_deviations/row:66/chunk",
+   "t34_prereg_deviations/row:66/date",
+   "t34_prereg_deviations/row:66/freeze",
+   "t34_prereg_deviations/row:66/reason"
   ]
  },
  {

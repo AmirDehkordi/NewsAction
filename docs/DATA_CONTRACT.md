@@ -2645,7 +2645,7 @@ sha256 on a rerun (labels and export were run twice: 8 of 8 files identical).
 - **Key:** one entry per row of PREREG §15
 - **Rows / coverage:** the one-line summaries of the deviations (t34 checks each against its row)
 - **Availability:** after NA-12, NA-13 and NA-13b (test-period results are their stored outputs; nothing here reads the lock)
-- **sha256:** `66f21abb3cdcedb12b10d2458b2413f4fea896392282aac3e4222486c190075f`
+- **sha256:** `ce5550840096c1ba78eb403c98b5d3d616b06d9140e65e0fbf7ef3b25102b6a4`
 
 ### `artifacts/NA-14/paper_preview.tex`
 - **Producer:** `newsaction.figures.preview` (make paper)
@@ -2681,7 +2681,7 @@ sha256 on a rerun (labels and export were run twice: 8 of 8 files identical).
 - **Key:** one file
 - **Rows / coverage:** what `make paper` must reproduce
 - **Availability:** after NA-12, NA-13 and NA-13b (test-period results are their stored outputs; nothing here reads the lock)
-- **sha256:** `5d3700783fd1c45bcb5d3410454da6595a3fce08c380322ff411822013971960`
+- **sha256:** `30ba96e5c88a5eb2990864e5aa83156c22b7737d95907afce50c61834a60b287`
 
 ### `artifacts/NA-14/figures/fig1_validation_test.csv`
 - **Producer:** `newsaction.figures.data` (`fig1`)
@@ -3696,9 +3696,9 @@ sha256 on a rerun (labels and export were run twice: 8 of 8 files identical).
 - **Inputs:** `docs/PREREG.md`, `artifacts/NA-14/inputs/prereg_deviations.yaml`
 - **Schema:** `key`, `row`, `date`, `chunk`, `change`, `reason`, `freeze`
 - **Key:** `key` unique
-- **Rows / coverage:** 65 rows: Pre-registration deviations: every row of PREREG §15 in one line
+- **Rows / coverage:** 66 rows: Pre-registration deviations: every row of PREREG §15 in one line
 - **Availability:** after NA-12, NA-13 and NA-13b (test-period results are their stored outputs; nothing here reads the lock)
-- **sha256:** `9fbc3b09165470ced5af69b6aa368326ebef61d0444305d0f08eb78b5e73c36c`
+- **sha256:** `21bed8d1c2d2f520d1f44866922aba1699d3093dd540691523634ae40d5e8cfd`
 
 ### `artifacts/NA-14/tables/t35_break_even.csv`
 - **Producer:** `newsaction.figures.tables`
@@ -4200,9 +4200,9 @@ sha256 on a rerun (labels and export were run twice: 8 of 8 files identical).
 - **Inputs:** `artifacts/NA-14/tables/t34_prereg_deviations.csv` (the cells of `keys.json`)
 - **Schema:** LaTeX: booktabs, threeparttable(x) notes, siunitx S columns; a float or a longtable
 - **Key:** one file
-- **Rows / coverage:** appendix table tab:a-deviations (325 cited cells)
+- **Rows / coverage:** appendix table tab:a-deviations (330 cited cells)
 - **Availability:** after NA-12, NA-13 and NA-13b (test-period results are their stored outputs; nothing here reads the lock)
-- **sha256:** `714dd55ad8cd58c63032ccd6543d42eabc7aacb3bdfc6ec8ebd9a2e8a9579db9`
+- **sha256:** `529a62eb18cb1623640450a70c772adda0ffc0207fbc6fc712270cc504624d71`
 
 ### `artifacts/NA-14/tables/t36_selective_coverage.tex`
 - **Producer:** `newsaction.figures.latex`
@@ -4256,7 +4256,7 @@ sha256 on a rerun (labels and export were run twice: 8 of 8 files identical).
 - **Key:** one entry per LaTeX table
 - **Rows / coverage:** which cells each LaTeX table prints
 - **Availability:** after NA-12, NA-13 and NA-13b (test-period results are their stored outputs; nothing here reads the lock)
-- **sha256:** `f8771428e4546bbafce9bda4ab22779a713f84c794778911f5900a5638852071`
+- **sha256:** `2e2ed24bc94fe5b60c93a61b14201d57fc86d39ad081d5b6af151ae786c719e2`
 
 ### `artifacts/NA-14/tables/keys.json`
 - **Producer:** `newsaction.figures.tables`
@@ -4265,7 +4265,7 @@ sha256 on a rerun (labels and export were run twice: 8 of 8 files identical).
 - **Key:** one file
 - **Rows / coverage:** the cells the captions cite
 - **Availability:** after NA-12, NA-13 and NA-13b (test-period results are their stored outputs; nothing here reads the lock)
-- **sha256:** `5e6634dcd43a04fb60fe3137c4bd8d137440989933d0ee28a05bee7ebc1200b8`
+- **sha256:** `94b1fcb5b8d1fee659125ce426b6d2cb8c54caca779aef6241096c9f44cbfc5f`
 
 ### `artifacts/NA-14/tables/index.json`
 - **Producer:** `newsaction.figures.tables`
@@ -4274,7 +4274,7 @@ sha256 on a rerun (labels and export were run twice: 8 of 8 files identical).
 - **Key:** one file
 - **Rows / coverage:** the table index
 - **Availability:** after NA-12, NA-13 and NA-13b (test-period results are their stored outputs; nothing here reads the lock)
-- **sha256:** `7f59fede860aae634795e28d95f0dec790095c96f2f17270f50ac65d453d11fd`
+- **sha256:** `6de6c9301f6e9c2d1865451745725c0ee2b53fbf9cbac39d41ae1475c80ebe43`
 
 ## NA-13b — when does the signal work? (`newsaction.selective`, exploratory)
 

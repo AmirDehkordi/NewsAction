@@ -69,3 +69,4 @@ rows:
   - {row: 63, date: 2026-10-28, chunk: NA-13, change: "Strategy engine fixed before any test-period return", reason: "PREREG gives books, not joins"}
   - {row: 64, date: 2026-10-29, chunk: operator, change: "Forward test (paper 2) pre-registered: F1 to F5", reason: "Confirmatory forward test"}
   - {row: 65, date: 2026-10-29, chunk: NA-13b, change: "Exploratory selective study: rules fixed before its test", reason: "The prompt leaves joins open"}
+  - {row: 66, date: 2026-10-29, chunk: operator, change: "Forward test: F6 overconfidence, F7 conviction", reason: "Re-tests NA-13b's findings"}

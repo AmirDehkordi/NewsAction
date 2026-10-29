@@ -1304,7 +1304,7 @@
    "reason",
    "freeze"
   ],
-  "rows": 65,
+  "rows": 66,
   "notes": [
    "Date and timing (before or after the NA-11 freeze) as in PREREG \u00a715; chunk, change and reason summarized by NA-14 (inputs/prereg_deviations.yaml); the full text is in the log."
   ],
