@@ -2453,3 +2453,176 @@ sha256 on a rerun (labels and export were run twice: 8 of 8 files identical).
 - **Rows / coverage:** table file `t9_convergence_cuts.tex`
 - **Availability:** test; outcomes from the test period's outcomes, after unblinding (NA-12 S1)
 - **sha256:** `c89ddfc721e737bbb855f4b4070774ea3446d63c6d8eefda1ba7ded414fdfccd`
+
+## NA-13 — strategies and economic significance (`newsaction.strategy`)
+
+### `work/strategy/market_public.parquet`
+- **Producer:** `newsaction.strategy.market public`
+- **Inputs:** `panel.build.assemble` on the public inputs; `work/panel/intraday_public.parquet`
+- **Schema:** `session`, `symbol_id`, `company_id`, `split`, `member`, `is_rep`, `raw_open`, `raw_close`, `adj_close`, `r_cc`, `r_id`, `r_spy_cc`, `r_spy_id`, `beta_m`, `ar_cc`, `adv20`, `ma20`, `ma50`, `ma20_prev`, `ma50_prev`, `p10`, `r_10c`, `r_spy_10c`
+- **Key:** (`session`, `symbol_id`) unique
+- **Rows / coverage:** val-A and val-B member and post-exit rows; equal to `panel_public` on the shared columns
+- **Availability:** returns of session t are known at its close; `beta_m`, `adv20` end at t−1
+- **sha256:** `197029706fc8a5233672bf4af41ffce3121e0ea7a51a81d16b4b7cb95a7875f7`
+
+### `work/strategy/market_test.parquet`
+- **Producer:** `newsaction.strategy.market test` (once, `NA_UNBLIND=1`)
+- **Inputs:** `newsaction.lock` (purpose targets) reads of the blinded prices, total-return check and 30-minute bars (logged in `ledgers/test_access.jsonl`), assembled as `panel.build.test_returns_panel` and `bars.derive.test_intraday_panel` do
+- **Schema:** as `market_public`
+- **Key:** (`session`, `symbol_id`) unique
+- **Rows / coverage:** the test period's member and post-exit rows (73,498, as `targets_test`); its val-B rows equal the public build and its `r_cc`, `r_spy_cc`, `ar_cc` equal `targets_test` (`artifacts/NA-13/market_test.json`)
+- **Availability:** test-period returns, after unblinding; `beta_m`, `adv20` end at t−1
+- **sha256:** `a8dd253d72cbd0e811ce2be5adaa1e7f18b7c75332d636b8ac625fcdc5765580`
+
+### `work/strategy/ma_cross_books.parquet`
+- **Producer:** `newsaction.strategy.ma_cross`
+- **Inputs:** `work/panel/panel_public.parquet`, the market panels, the D0 frames
+- **Schema:** `period`, `session`, `gross`, `turnover`, `active`, `net_5`, `net_10`, `net_20`
+- **Key:** (`period`, `session`) unique
+- **Rows / coverage:** the exploratory no-news MA-cross fade (operator item 9), validation and test
+- **Availability:** exploratory, after unblinding
+- **sha256:** `96cd616b9c8f10c68f7d9e4e191cbbf3a553ffb2861db0277c678ffc06dfdb98`
+
+### `work/strategy/books_val_b.parquet`
+- **Producer:** `newsaction.strategy.run` `val_b`
+- **Inputs:** `work/analysis/frame_{d0,d2}_{laya_fin,d1_ultra,anchor}.parquet`, `work/baselines/sentiment.parquet`, the market panel, `configs/frozen.yaml` (`strategy`, maps, gates)
+- **Schema:** `rule`, `split`, `tier` (all / top100 / mid / rest), `session`, `gross`, `turnover`, `active`, `net_5`, `net_10`, `net_20`
+- **Key:** (`rule`, `tier`, `session`) unique
+- **Rows / coverage:** every non-empty book's daily series over its window (first entry to last exit)
+- **Availability:** val-B (reference; the maps and gates were fit on val-A)
+- **sha256:** `720d8a963875db84da03c688ae236ebecd713312d1225a495e656347147abf09`
+
+### `work/strategy/positions_val_b.parquet`
+- **Producer:** `newsaction.strategy.run` `val_b`
+- **Inputs:** as the books
+- **Schema:** `rule`, `event_id`, `session`, `symbol_id`, `tier`, `cohort`, `beta`, `adv20`, `decision_utc`, `entry_utc`, `exit_utc`, the inputs' instants (`news_utc`, `reaction_utc`, `tier_utc`, `risk_utc`, `calibration_utc`), `side`, `weight`, `score`, `group`
+- **Key:** (`rule`, `event_id`) unique
+- **Rows / coverage:** every position of every book
+- **Availability:** val-B (reference; the maps and gates were fit on val-A)
+- **sha256:** `3f53b166d8fa0ac7bec94265a5b4a7ce10be120d8b2569baa33785493a7443f1`
+
+### `work/strategy/placebo_val_b.parquet`
+- **Producer:** `newsaction.strategy.run` `val_b`
+- **Inputs:** the books' universes
+- **Schema:** `universe`, `seed`, `sharpe_gross`, `sharpe_net_{5,10,20}`, `ann_return_gross`, `ann_return_net_{5,10,20}`
+- **Key:** (`universe`, `seed`) unique
+- **Rows / coverage:** 100 random-signal books (seeds 2027–2126) per universe
+- **Availability:** val-B (reference; the maps and gates were fit on val-A)
+- **sha256:** `3afb87655673961d7f35f7fdc114431d99f45fd7c0d60c627f8ad28ad3e87e83`
+
+### `work/strategy/placebo_paths_val_b.parquet`
+- **Producer:** `newsaction.strategy.run` `val_b`
+- **Inputs:** the placebo books
+- **Schema:** `universe`, `session`, `cum_net_10_q05`, `cum_net_10_q50`, `cum_net_10_q95`
+- **Key:** (`universe`, `session`) unique
+- **Rows / coverage:** the placebo's percentile paths of the cumulative net return at 10 bp
+- **Availability:** val-B (reference; the maps and gates were fit on val-A)
+- **sha256:** `cf48913c6661879148a5c49af975531f643cfba64b8e51af79f99865109b7afe`
+
+### `artifacts/NA-13/results/books_val_b.json`
+- **Producer:** `newsaction.strategy.run` `val_b`
+- **Inputs:** as the books
+- **Schema:** per rule: the rule, counts (events, purged, β fallbacks, zero-return days), metrics, capacity, placebo percentiles
+- **Key:** one file
+- **Rows / coverage:** every pre-registered book and benchmark, empty ones included
+- **Availability:** val-B (reference; the maps and gates were fit on val-A)
+- **sha256:** `7900a88db8eeff2a31a05df1bac6695b912e6f7e4c06231d4cd49ae86f62c749`
+
+### `work/strategy/books_test.parquet`
+- **Producer:** `newsaction.strategy.run` `test`
+- **Inputs:** `work/analysis/frame_{d0,d2}_{laya_fin,d1_ultra,anchor}.parquet`, `work/baselines/sentiment.parquet`, the market panel, `configs/frozen.yaml` (`strategy`, maps, gates)
+- **Schema:** `rule`, `split`, `tier` (all / top100 / mid / rest), `session`, `gross`, `turnover`, `active`, `net_5`, `net_10`, `net_20`
+- **Key:** (`rule`, `tier`, `session`) unique
+- **Rows / coverage:** every non-empty book's daily series over its window (first entry to last exit)
+- **Availability:** test-period returns from `work/strategy/market_test.parquet` (after unblinding)
+- **sha256:** `dab383be66554632cdb1a075782d7f26e7f4e972cf0953d81cbd90b72151f86d`
+
+### `work/strategy/positions_test.parquet`
+- **Producer:** `newsaction.strategy.run` `test`
+- **Inputs:** as the books
+- **Schema:** `rule`, `event_id`, `session`, `symbol_id`, `tier`, `cohort`, `beta`, `adv20`, `decision_utc`, `entry_utc`, `exit_utc`, the inputs' instants (`news_utc`, `reaction_utc`, `tier_utc`, `risk_utc`, `calibration_utc`), `side`, `weight`, `score`, `group`
+- **Key:** (`rule`, `event_id`) unique
+- **Rows / coverage:** every position of every book
+- **Availability:** test-period returns from `work/strategy/market_test.parquet` (after unblinding)
+- **sha256:** `203b8668b53955618238a76d602e778018f84776394e7c38d4498c9b67b0e9e6`
+
+### `work/strategy/placebo_test.parquet`
+- **Producer:** `newsaction.strategy.run` `test`
+- **Inputs:** the books' universes
+- **Schema:** `universe`, `seed`, `sharpe_gross`, `sharpe_net_{5,10,20}`, `ann_return_gross`, `ann_return_net_{5,10,20}`
+- **Key:** (`universe`, `seed`) unique
+- **Rows / coverage:** 100 random-signal books (seeds 2027–2126) per universe
+- **Availability:** test-period returns from `work/strategy/market_test.parquet` (after unblinding)
+- **sha256:** `2812e846b555c8e25fde3b127bf9df3c08f395741fdaeb3fbcde2bb3871edcdb`
+
+### `work/strategy/placebo_paths_test.parquet`
+- **Producer:** `newsaction.strategy.run` `test`
+- **Inputs:** the placebo books
+- **Schema:** `universe`, `session`, `cum_net_10_q05`, `cum_net_10_q50`, `cum_net_10_q95`
+- **Key:** (`universe`, `session`) unique
+- **Rows / coverage:** the placebo's percentile paths of the cumulative net return at 10 bp
+- **Availability:** test-period returns from `work/strategy/market_test.parquet` (after unblinding)
+- **sha256:** `4596074650f39f1d724b01ea5655ecaf7784cf86adc07324b0c72766d1a912d6`
+
+### `artifacts/NA-13/results/books_test.json`
+- **Producer:** `newsaction.strategy.run` `test`
+- **Inputs:** as the books
+- **Schema:** per rule: the rule, counts (events, purged, β fallbacks, zero-return days), metrics, capacity, placebo percentiles
+- **Key:** one file
+- **Rows / coverage:** every pre-registered book and benchmark, empty ones included
+- **Availability:** test-period returns from `work/strategy/market_test.parquet` (after unblinding)
+- **sha256:** `8ea70d15fe96c18f75c95b564b2119ff73be752ab6749331eca53912421658ce`
+
+### `artifacts/NA-13/market_test.json`
+- **Producer:** `newsaction.strategy.market test`
+- **Inputs:** the test build
+- **Schema:** output path and sha256, sessions, the lock reads, the consistency gaps
+- **Key:** one file
+- **Rows / coverage:** the record of the one NA-13 access sequence
+- **Availability:** after unblinding
+- **sha256:** `b01909a35ba336a3ac2bad258d56a98d4592ec9ca4a0e426342cc198d27492a9`
+
+### `artifacts/NA-13/results/ma_cross.json`
+- **Producer:** `newsaction.strategy.ma_cross`
+- **Inputs:** as its books
+- **Schema:** per period: crosses, the group statistics (mean bp, Newey–West t, days, crosses), the fade book
+- **Key:** one file
+- **Rows / coverage:** validation (reproduces the operator's numbers) and test
+- **Availability:** exploratory, after unblinding
+- **sha256:** `974bfab1c04a59606eaeb62c52b61567b264640131baf996187ae6649594cf4f`
+
+### `artifacts/NA-13/strategy_table.csv`
+- **Producer:** `newsaction.strategy.tables`
+- **Inputs:** the books, the placebo, the trials ledger (n_trials for the DSR)
+- **Schema:** `order`, `split`, `family`, `model`, `point`, `signal`, `exit`, `gated`, `role`, `rule`, `universe`, the metrics, `dsr_*_net_{5,10,20}`, `capacity_*`, `note`, `n_trials`
+- **Key:** (`split`, `rule`) unique
+- **Rows / coverage:** every book on test and val-B, S-CONV first; the exploratory fade last
+- **Availability:** test and val-B (reference)
+- **sha256:** `82ac46c930fef646d6911062ae053075ea99c2e2001d64396638fce2384b5b8b`
+
+### `artifacts/NA-13/strategy_table.tex`
+- **Producer:** `newsaction.strategy.tables`
+- **Inputs:** `strategy_table.csv`
+- **Schema:** booktabs tabular; title and notes as comments
+- **Key:** one file
+- **Rows / coverage:** the test books
+- **Availability:** test
+- **sha256:** `67386daeab07d8e251a8d988f0d9762d9a397a8e85cc034216e2ae2aa7232e80`
+
+### `artifacts/NA-13/fig7_data.csv`
+- **Producer:** `newsaction.strategy.tables`
+- **Inputs:** the test books, the placebo paths, the exploratory fade
+- **Schema:** `rule`, `tier`, `session`, `cum_net_10`, `series` (book / placebo_band), `cum_net_10_q05/_q50/_q95`
+- **Key:** (`rule`, `tier`, `session`) unique
+- **Rows / coverage:** Figure 7: cumulative net returns at 10 bp by tier, with the benchmarks and the placebo band
+- **Availability:** test
+- **sha256:** `a7b92b463d4aa0f90dcbed361ad5d87232a3258cefa4bbac0877e1d3be8887f1`
+
+### `artifacts/NA-13/results/strategy_summary.json`
+- **Producer:** `newsaction.strategy.tables`
+- **Inputs:** the trials ledger, `market_test.json`
+- **Schema:** n_trials and its parts, the DSR settings, the lock reads, row counts
+- **Key:** one file
+- **Rows / coverage:** the DSR's trial count
+- **Availability:** after unblinding
+- **sha256:** `ddfbb405824fa716cebc4d323cd5f65ac922fbdfb6631b84be0ce7709c3508fc`

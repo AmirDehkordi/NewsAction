@@ -1,0 +1,58 @@
+{
+ "n_trials": 545,
+ "n_trials_parts": {
+  "baseline": 50,
+  "baseline_grid": 58,
+  "dm_reading_validity": 4,
+  "dm_tournament_probe": 30,
+  "dm_tournament_stage1": 42,
+  "dm_tournament_stage2": 30,
+  "filter": 10,
+  "filter_frontier": 70,
+  "filter_hparam": 12,
+  "filter_sensitivity": 2,
+  "final_selection": 6,
+  "na07_anchoring": 3,
+  "na07_encoding": 21,
+  "na07_numeracy": 3,
+  "strategy": 200,
+  "trained_model": 4
+ },
+ "n_trials_rule": "every row of ledgers/trials.jsonl: NA-13's 'strategy' rows plus the model, encoding and filter selection trials of NA-03..NA-11 (PRD NA-13 S3; PREREG \u00a712)",
+ "selection_trials": 345,
+ "strategy_rows": {
+  "pre_registered": 174,
+  "exploratory": 26
+ },
+ "dsr": {
+  "trials_sr_var": "analytic (1 + SR^2/2)/(T - 1)",
+  "returns": "daily net, per period"
+ },
+ "lock_reads": [
+  {
+   "ts": "2026-10-28T22:54:21.648574+00:00",
+   "name": "prices_raw_2026",
+   "purpose": "targets",
+   "caller": "src/newsaction/strategy/market.py:<genexpr>:189",
+   "allowed": true
+  },
+  {
+   "ts": "2026-10-28T22:54:21.695356+00:00",
+   "name": "total_return_check_2026",
+   "purpose": "targets",
+   "caller": "src/newsaction/strategy/market.py:<genexpr>:189",
+   "allowed": true
+  },
+  {
+   "ts": "2026-10-28T22:54:21.719353+00:00",
+   "name": "bars30_2026",
+   "purpose": "targets",
+   "caller": "src/newsaction/strategy/market.py:test_panel:190",
+   "allowed": true
+  }
+ ],
+ "rows": {
+  "strategy_table": 194,
+  "fig7": 36607
+ }
+}
