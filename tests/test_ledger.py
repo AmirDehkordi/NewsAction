@@ -244,8 +244,11 @@ def test_trial_ledger(tmp_path: Path) -> None:
     }
     led.log(good)
     led.log({**good, "kind": "encoding", "value": None})
-    assert led.count() == 2 and led.count(kind="model") == 1 and led.count(chunk="NA-07") == 0
-    for bad in ({"split": "holdout"}, {"chunk": "06"}, {"params_hash": "abc"}, {"value": float("nan")},
+    led.log({**good, "chunk": "NA-13b", "kind": "exploratory"})
+    assert led.count() == 3 and led.count(kind="model") == 1 and led.count(chunk="NA-07") == 0
+    assert led.count(chunk="NA-13b") == 1
+    bad_chunks = ({"chunk": "06"}, {"chunk": "NA-13bb"}, {"chunk": "NA-13B"}, {"chunk": "NA-1"})
+    for bad in ({"split": "holdout"}, *bad_chunks, {"params_hash": "abc"}, {"value": float("nan")},
                 {"extra": 1}):  # fmt: skip
         with pytest.raises(ValueError):
             led.log({**good, **bad})

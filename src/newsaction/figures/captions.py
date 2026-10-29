@@ -81,7 +81,7 @@ class Cells:
 
 
 def main_figure(name: str) -> bool:
-    """Figures 1–7 are the paper's; A1–A15 are the appendix's."""
+    """Figures 1–7 are the paper's; A1–A19 (every ``figA…`` stem) are the appendix's."""
     return not name.startswith("figA")
 
 
@@ -151,7 +151,7 @@ def render(layout: Layout | None = None) -> str:
         "",
         "Rendered from `captions.yaml` by `python -m newsaction.figures.captions`; every number is a "
         "table cell "
-        "(`tables/keys.json`); notation is LaTeX math. Figures 1–7 are the paper's; A1–A15 the appendix's. "
+        "(`tables/keys.json`); notation is LaTeX math. Figures 1–7 are the paper's; A1–A19 the appendix's. "
         "Section "
         "numbers follow `docs/paper_outline.md`.",
         "",

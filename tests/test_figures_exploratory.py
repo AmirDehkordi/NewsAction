@@ -5,7 +5,8 @@
 - the guard is not vacuous: Figure 4's old month-effect sentence (t24) planted in a main caption, a t24 cell
   planted in a main table, and a t24 row planted in a main figure's data are each caught; so are NA-13's
   MA-cross fade cited through t35, its path from the Figure 7 data and NA-12's market row from NA-12's own t11
-  planted in a main figure's data (the re-verification found these three routes open);
+  planted in a main figure's data (the re-verification found these three routes open), and so is a row of
+  NA-13b's own tables (exploratory as a whole) planted in a main figure's data;
 - the index marks every exploratory table and row, including any row whose own text or key calls it
   exploratory;
 - the CSVs keep their exploratory rows, the appendix shows them (A15 and t25 for NA-13's MA-cross fade, t31
@@ -28,7 +29,23 @@ from newsaction.paths import ROOT
 
 T = ROOT / sc.TABLES
 WORD = re.compile(r"\bexploratory\b", re.IGNORECASE)
-TABLES = {"t17_sector_exploratory", "t24_exploratory_d0_signal", "t25_ma_cross", "t31_market_replication"}
+NA13B = {
+    "t36_selective_coverage",
+    "t37_watch_open",
+    "t38_conditioning",
+    "t39_conditioning_books",
+    "t40_conditioning_detail",
+    "t41_output_histograms",
+    "t42_output_summary",
+    "t43_band_disclosure",
+}
+TABLES = {
+    "t17_sector_exploratory",
+    "t24_exploratory_d0_signal",
+    "t25_ma_cross",
+    "t31_market_replication",
+    *NA13B,
+}
 FADE = "test|exploratory|ma_cross|fade_no_news|close_t+5"
 ROWS = {
     ("t11_explanation_share_theta", "market:r2"),
@@ -140,6 +157,25 @@ def test_upstream_exploratory_rows_in_a_main_figure_are_caught(monkeypatch: pyte
     assert guard.violations() == [
         f"fig6_strategies data: {sc.FIG7}/{fade_path}",
         "fig6_strategies data: t11_explanation_share_theta/market:r2",
+    ]
+
+
+def test_na13b_rows_in_a_main_figure_are_caught(monkeypatch: pytest.MonkeyPatch) -> None:
+    real = render.read
+
+    def read(name: str, layout: Any = None) -> pd.DataFrame:
+        df = real(name, layout)
+        if name == "fig2_priced_at_open":
+            extra = df.iloc[[0, 0]].copy()
+            extra["source"] = [sc.COVERAGE, f"{sc.TABLES}/t36_selective_coverage.csv"]
+            extra["key"] = "laya_fin|conviction|0.1|test|z_id"
+            df = pd.concat([df, extra], ignore_index=True)
+        return df
+
+    monkeypatch.setattr(render, "read", read)
+    assert guard.violations() == [
+        f"fig2_priced_at_open data: {sc.COVERAGE}/laya_fin|conviction|0.1|test|z_id",
+        "fig2_priced_at_open data: t36_selective_coverage/laya_fin|conviction|0.1|test|z_id",
     ]
 
 

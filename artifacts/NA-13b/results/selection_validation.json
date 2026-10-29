@@ -1,0 +1,621 @@
+{
+ "exploratory": true,
+ "stage": "validation (val-A and val-B only; no test row read)",
+ "written_at": "2026-10-29T17:02:20.317964+00:00",
+ "git_sha": "1e2b0db00045d719d2ca392982c58e8159c50cb7",
+ "rule": {
+  "each": 1.0,
+  "pooled": 2.0,
+  "val_b_only": 2.5,
+  "outcome": "z_id",
+  "seen_on_test": [
+   "e1_earnings",
+   "e3_before_0800",
+   "e6_conviction"
+  ]
+ },
+ "n_pairs": 75,
+ "selected": [
+  "laya_fin|e2_numbers",
+  "laya_fin|e2_material",
+  "laya_fin|e2_effect",
+  "laya_fin|e4_busy_event",
+  "d1_ultra|e4_busy_day",
+  "laya_fin|e6_lf_mag",
+  "d1_ultra|e7_agree",
+  "laya_fin|e9_division"
+ ],
+ "cuts": {
+  "median_a0_h": 4.172461242138537,
+  "median_a0_u_unc": 1.237742969988056,
+  "median_a0_p_mixed": 0.4386055069579756,
+  "median_a0_m": 0.5492049215204136,
+  "median_a0_p_no_material_effect": 0.27991093821852586,
+  "median_attention_mean": 6.216666666666667,
+  "median_sigma_cc": 0.010989892849831507,
+  "median_lf_mag": 0.9154939688742161,
+  "median_d1_conf": 0.1534886248519674,
+  "day_median_n_events": 125.0,
+  "day_median_n_earnings": 2.0,
+  "day_median_vix_prev": 15.699999809265137,
+  "day_median_abs_spy_on": 0.0021321231310362787,
+  "q70_abs_laya_fin": 0.05356519762426615,
+  "q70_abs_d1_ultra": 0.648070392025605
+ },
+ "conditions": {
+  "e1_earnings": {
+   "group": "E1",
+   "label": "earnings day",
+   "level": "event",
+   "note": "the earnings-calendar flag (a scheduled release in W0), not the vendor tag",
+   "models": [
+    "laya_fin",
+    "d1_ultra"
+   ],
+   "splits": [
+    "val_a",
+    "val_b",
+    "test"
+   ]
+  },
+  "e1_vendor_quantified": {
+   "group": "E1",
+   "label": "vendor: quantified",
+   "level": "event",
+   "note": "",
+   "models": [
+    "laya_fin",
+    "d1_ultra"
+   ],
+   "splits": [
+    "val_a",
+    "val_b",
+    "test"
+   ]
+  },
+  "e1_press_wire": {
+   "group": "E1",
+   "label": "press wire",
+   "level": "event",
+   "note": "",
+   "models": [
+    "laya_fin",
+    "d1_ultra"
+   ],
+   "splits": [
+    "val_a",
+    "val_b",
+    "test"
+   ]
+  },
+  "e1_imprecise": {
+   "group": "E1",
+   "label": "imprecise timestamp",
+   "level": "event",
+   "note": "a state article stamped to the date or the hour",
+   "models": [
+    "laya_fin",
+    "d1_ultra"
+   ],
+   "splits": [
+    "val_a",
+    "val_b",
+    "test"
+   ]
+  },
+  "e2_new": {
+   "group": "E2",
+   "label": "d1: new (not known)",
+   "level": "event",
+   "note": "",
+   "models": [
+    "laya_fin",
+    "d1_ultra"
+   ],
+   "splits": [
+    "val_a",
+    "val_b",
+    "test"
+   ]
+  },
+  "e2_numbers": {
+   "group": "E2",
+   "label": "d1: numbers (not narrative)",
+   "level": "event",
+   "note": "",
+   "models": [
+    "laya_fin",
+    "d1_ultra"
+   ],
+   "splits": [
+    "val_a",
+    "val_b",
+    "test"
+   ]
+  },
+  "e2_scheduled": {
+   "group": "E2",
+   "label": "d1: scheduled",
+   "level": "event",
+   "note": "",
+   "models": [
+    "laya_fin",
+    "d1_ultra"
+   ],
+   "splits": [
+    "val_a",
+    "val_b",
+    "test"
+   ]
+  },
+  "e2_company": {
+   "group": "E2",
+   "label": "d1: company-specific",
+   "level": "event",
+   "note": "",
+   "models": [
+    "laya_fin",
+    "d1_ultra"
+   ],
+   "splits": [
+    "val_a",
+    "val_b",
+    "test"
+   ]
+  },
+  "e2_confirmed": {
+   "group": "E2",
+   "label": "d1: confirmed",
+   "level": "event",
+   "note": "",
+   "models": [
+    "laya_fin",
+    "d1_ultra"
+   ],
+   "splits": [
+    "val_a",
+    "val_b",
+    "test"
+   ]
+  },
+  "e2_long_horizon": {
+   "group": "E2",
+   "label": "d1: impact horizon > median",
+   "level": "event",
+   "note": "",
+   "models": [
+    "laya_fin",
+    "d1_ultra"
+   ],
+   "splits": [
+    "val_a",
+    "val_b",
+    "test"
+   ]
+  },
+  "e2_low_uncertainty": {
+   "group": "E2",
+   "label": "d1: uncertainty < median",
+   "level": "event",
+   "note": "",
+   "models": [
+    "laya_fin",
+    "d1_ultra"
+   ],
+   "splits": [
+    "val_a",
+    "val_b",
+    "test"
+   ]
+  },
+  "e2_few_mixed": {
+   "group": "E2",
+   "label": "d1: mixed signals < median",
+   "level": "event",
+   "note": "",
+   "models": [
+    "laya_fin",
+    "d1_ultra"
+   ],
+   "splits": [
+    "val_a",
+    "val_b",
+    "test"
+   ]
+  },
+  "e2_material": {
+   "group": "E2",
+   "label": "d1: materiality > median",
+   "level": "event",
+   "note": "",
+   "models": [
+    "laya_fin",
+    "d1_ultra"
+   ],
+   "splits": [
+    "val_a",
+    "val_b",
+    "test"
+   ]
+  },
+  "e2_effect": {
+   "group": "E2",
+   "label": "d1: P(no material effect) < median",
+   "level": "event",
+   "note": "",
+   "models": [
+    "laya_fin",
+    "d1_ultra"
+   ],
+   "splits": [
+    "val_a",
+    "val_b",
+    "test"
+   ]
+  },
+  "e3_before_0800": {
+   "group": "E3",
+   "label": "latest article before 08:00",
+   "level": "event",
+   "note": "",
+   "models": [
+    "laya_fin",
+    "d1_ultra"
+   ],
+   "splits": [
+    "val_a",
+    "val_b",
+    "test"
+   ]
+  },
+  "e3_0400_0800": {
+   "group": "E3",
+   "label": "04:00-08:00 vs 08:00-09:15",
+   "level": "event",
+   "note": "events whose latest article precedes 04:00 are left out of this comparison",
+   "models": [
+    "laya_fin",
+    "d1_ultra"
+   ],
+   "splits": [
+    "val_a",
+    "val_b",
+    "test"
+   ]
+  },
+  "e4_friday": {
+   "group": "E4",
+   "label": "Friday",
+   "level": "day",
+   "note": "",
+   "models": [
+    "laya_fin",
+    "d1_ultra"
+   ],
+   "splits": [
+    "val_a",
+    "val_b",
+    "test"
+   ]
+  },
+  "e4_monday": {
+   "group": "E4",
+   "label": "Monday",
+   "level": "day",
+   "note": "",
+   "models": [
+    "laya_fin",
+    "d1_ultra"
+   ],
+   "splits": [
+    "val_a",
+    "val_b",
+    "test"
+   ]
+  },
+  "e4_busy_event": {
+   "group": "E4",
+   "label": "busy news day (ratio >= 1.5)",
+   "level": "event",
+   "note": "the event's own W0 attention ratio (event level)",
+   "models": [
+    "laya_fin",
+    "d1_ultra"
+   ],
+   "splits": [
+    "val_a",
+    "val_b",
+    "test"
+   ]
+  },
+  "e4_busy_day": {
+   "group": "E4",
+   "label": "day's news count > median",
+   "level": "day",
+   "note": "",
+   "models": [
+    "laya_fin",
+    "d1_ultra"
+   ],
+   "splits": [
+    "val_a",
+    "val_b",
+    "test"
+   ]
+  },
+  "e4_earnings_season": {
+   "group": "E4",
+   "label": "day's earnings count > median",
+   "level": "day",
+   "note": "",
+   "models": [
+    "laya_fin",
+    "d1_ultra"
+   ],
+   "splits": [
+    "val_a",
+    "val_b",
+    "test"
+   ]
+  },
+  "e4_macro": {
+   "group": "E4",
+   "label": "macro day (FOMC, CPI or payrolls)",
+   "level": "day",
+   "note": "FOMC and CPI from the frozen calendar; payrolls hand-checked on bls.gov",
+   "models": [
+    "laya_fin",
+    "d1_ultra"
+   ],
+   "splits": [
+    "val_a",
+    "val_b",
+    "test"
+   ]
+  },
+  "e4_vix": {
+   "group": "E4",
+   "label": "VIX(t-1) > median",
+   "level": "day",
+   "note": "the ^VIX close of the session before (NA-00's copy of Data/market)",
+   "models": [
+    "laya_fin",
+    "d1_ultra"
+   ],
+   "splits": [
+    "val_a",
+    "val_b",
+    "test"
+   ]
+  },
+  "e4_spy_gap": {
+   "group": "E4",
+   "label": "|SPY overnight| > median",
+   "level": "day",
+   "note": "known at the open, after the 09:15 decision",
+   "models": [
+    "laya_fin",
+    "d1_ultra"
+   ],
+   "splits": [
+    "val_a",
+    "val_b",
+    "test"
+   ]
+  },
+  "e5_tier": {
+   "group": "E5",
+   "label": "size tier 251-500",
+   "level": "event",
+   "note": "",
+   "models": [
+    "laya_fin",
+    "d1_ultra"
+   ],
+   "splits": [
+    "val_a",
+    "val_b",
+    "test"
+   ]
+  },
+  "e5_dv_tier": {
+   "group": "E5",
+   "label": "dollar-volume tier 251-500",
+   "level": "event",
+   "note": "",
+   "models": [
+    "laya_fin",
+    "d1_ultra"
+   ],
+   "splits": [
+    "val_a",
+    "val_b",
+    "test"
+   ]
+  },
+  "e5_low_coverage": {
+   "group": "E5",
+   "label": "low usual coverage",
+   "level": "event",
+   "note": "",
+   "models": [
+    "laya_fin",
+    "d1_ultra"
+   ],
+   "splits": [
+    "val_a",
+    "val_b",
+    "test"
+   ]
+  },
+  "e5_high_sigma": {
+   "group": "E5",
+   "label": "sigma > median",
+   "level": "event",
+   "note": "",
+   "models": [
+    "laya_fin",
+    "d1_ultra"
+   ],
+   "splits": [
+    "val_a",
+    "val_b",
+    "test"
+   ]
+  },
+  "e5_momentum": {
+   "group": "E5",
+   "label": "direction agrees with z_m20",
+   "level": "event",
+   "note": "",
+   "models": [
+    "laya_fin",
+    "d1_ultra"
+   ],
+   "splits": [
+    "val_a",
+    "val_b",
+    "test"
+   ]
+  },
+  "e5_price_text": {
+   "group": "E5",
+   "label": "price-move text",
+   "level": "event",
+   "note": "",
+   "models": [
+    "laya_fin",
+    "d1_ultra"
+   ],
+   "splits": [
+    "val_a",
+    "val_b",
+    "test"
+   ]
+  },
+  "e6_conviction": {
+   "group": "E6",
+   "label": "conviction top 30%",
+   "level": "event",
+   "note": "|N\u0302| at or above its val-A 70th percentile (the gate's percentile; the frozen gate itself ranks by the stated confidence)",
+   "models": [
+    "laya_fin",
+    "d1_ultra"
+   ],
+   "splits": [
+    "val_a",
+    "val_b",
+    "test"
+   ]
+  },
+  "e6_lf_mag": {
+   "group": "E6",
+   "label": "Laya-Fin H-mag > median",
+   "level": "event",
+   "note": "",
+   "models": [
+    "laya_fin",
+    "d1_ultra"
+   ],
+   "splits": [
+    "val_a",
+    "val_b",
+    "test"
+   ]
+  },
+  "e6_d1_conf": {
+   "group": "E6",
+   "label": "d1 stated confidence > median",
+   "level": "event",
+   "note": "",
+   "models": [
+    "laya_fin",
+    "d1_ultra"
+   ],
+   "splits": [
+    "val_a",
+    "val_b",
+    "test"
+   ]
+  },
+  "e7_agree": {
+   "group": "E7",
+   "label": "Laya-Fin and d1-ultra agree",
+   "level": "event",
+   "note": "",
+   "models": [
+    "laya_fin",
+    "d1_ultra"
+   ],
+   "splits": [
+    "val_a",
+    "val_b",
+    "test"
+   ]
+  },
+  "e7_api3": {
+   "group": "E7",
+   "label": "three API models agree",
+   "level": "event",
+   "note": "span-02 and drex-v2.0 have no val-A production run",
+   "models": [
+    "laya_fin",
+    "d1_ultra"
+   ],
+   "splits": [
+    "val_b",
+    "test"
+   ]
+  },
+  "e7_rank_avg": {
+   "group": "E7",
+   "label": "rank average of Laya-Fin and d1-ultra",
+   "level": "paired",
+   "note": "sign of the mean of sign(N\u0302)\u00b7F(|N\u0302|), F each model's val-A distribution of |N\u0302|; against the model's own sign on the same events",
+   "models": [
+    "laya_fin",
+    "d1_ultra"
+   ],
+   "splits": [
+    "val_a",
+    "val_b",
+    "test"
+   ]
+  },
+  "e8_cost": {
+   "group": "E8",
+   "label": "|V| x sigma > cost hurdle",
+   "level": "event",
+   "note": "|V|\u00b7\u03c3_cc > 2 \u00d7 10 bp \u00d7 2 legs",
+   "models": [
+    "laya_fin",
+    "d1_ultra"
+   ],
+   "splits": [
+    "val_a",
+    "val_b",
+    "test"
+   ]
+  },
+  "e9_division": {
+   "group": "E9",
+   "label": "d1 numbers and material (Laya-Fin direction)",
+   "level": "event",
+   "note": "",
+   "models": [
+    "laya_fin"
+   ],
+   "splits": [
+    "val_a",
+    "val_b",
+    "test"
+   ]
+  }
+ },
+ "tables": {
+  "cuts": "afb0c5b3ddf002962d2ccc533800b787d6efe51ebb544f669c139ae8a20e31f2",
+  "selection_validation": "779b992f294ee97c5d60e5de5d70759a1d6f2484b94fde0b8633ca2a7a19de08"
+ },
+ "validation_rows": 663,
+ "seconds": 1.7
+}

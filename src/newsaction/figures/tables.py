@@ -8,7 +8,8 @@ convention) and ``index.json``. The LaTeX of the paper tables is a separate view
 
 - **Copies.** NA-12's 20 tables (CSV byte for byte; ``keys.json`` equal to NA-12's), NA-13's strategy table
   and the figure sources of NA-03, NA-06, NA-07, NA-11 and NA-12, each with its row ``key`` in front (the
-  figure-data copies are data only).
+  figure-data copies are data only), and NA-13b's eight tables (exploratory, post hoc), which hold their own
+  ``key``.
 - **Flattened results.** NA-12's exploratory "where the D0 signal lives" JSON, NA-13's MA-cross JSON and the
   val-B step of NA-11's run of the frozen spec, one row per object of scalars, so their numbers can be cited.
   The values are copied.
@@ -68,6 +69,15 @@ EXPLORATORY_TABLES: Final = (
     "t24_exploratory_d0_signal",
     "t25_ma_cross",
     "t31_market_replication",
+    # NA-13b, "When does the signal work?" (PREREG §15, NA-13b row): all of it
+    "t36_selective_coverage",
+    "t37_watch_open",
+    "t38_conditioning",
+    "t39_conditioning_books",
+    "t40_conditioning_detail",
+    "t41_output_histograms",
+    "t42_output_summary",
+    "t43_band_disclosure",
 )
 # Exploratory rows of the other tables: the CSV keeps them; the LaTeX of the table leaves them out and says
 # where the appendix shows them (operator check 5e; tests/test_figures_exploratory.py).
@@ -125,6 +135,14 @@ SECTION: Final = {
     "t33_placebo_sharpe": "6",
     "t34_prereg_deviations": "appendix",
     "t35_break_even": "6",
+    "t36_selective_coverage": "appendix",
+    "t37_watch_open": "appendix",
+    "t38_conditioning": "appendix",
+    "t39_conditioning_books": "appendix",
+    "t40_conditioning_detail": "appendix",
+    "t41_output_histograms": "appendix",
+    "t42_output_summary": "appendix",
+    "t43_band_disclosure": "appendix",
     "f1_v_decile_paths": "4",
     "f1_rg_class_paths": "4",
     "f2_drift_vs_g": "4",
@@ -135,6 +153,11 @@ SECTION: Final = {
 }
 NOTE_EXPLORATORY: Final = (
     "Exploratory (post hoc): requested after unblinding; no hypothesis, outside every family, no claim."
+)
+NOTE_NA13B: Final = (
+    "NA-13b, the operator's study of when the D0 signal works (PREREG §15, NA-13b row): thresholds and "
+    "medians from val-A, conditions selected on val-A and val-B by a rule fixed before the test, the test "
+    "evaluated once. Copied from NA-13b's table with its own row key."
 )
 
 
@@ -210,6 +233,54 @@ KEYED: Final = (
     ("f5_shapley_shares", sc.SHAPLEY, "NA-12 Shapley shares (not drawn: their totals are about zero)"),
     ("f8_explanation_ladder", sc.LADDER, "Figure 7 data (NA-12): the explanation ladder"),
     ("fa_reliability", sc.RELIABILITY, "Appendix Figure A4 data (NA-12): reliability bins"),
+    (
+        "t36_selective_coverage",
+        sc.COVERAGE,
+        "NA-13b risk-coverage curves (exploratory): hit rate, mean signed move and daily IC of the D0 "
+        "reading by coverage, ranked by conviction |N̂| or by the stated confidence, per split and target",
+    ),
+    (
+        "t37_watch_open",
+        sc.WATCH_OPEN,
+        "NA-13b watching the open (exploratory): daily ICs with y1 of the pre-open and 10:00 readings, the "
+        "revision and the first bar; the mean move when the first bar went against or with the pre-open view",
+    ),
+    (
+        "t38_conditioning",
+        sc.SELECTION,
+        "NA-13b conditioning study (exploratory): each (model, condition) pair's validation selection and "
+        "its one test evaluation on the primary outcome z_id",
+    ),
+    (
+        "t39_conditioning_books",
+        sc.SELECTIVE_BOOKS,
+        "NA-13b tradable versions (exploratory): the books of the selected conditions, E8 and E9, on val-B "
+        "(in-sample for the selection) and test",
+    ),
+    (
+        "t40_conditioning_detail",
+        sc.CONDITIONING,
+        "NA-13b conditioning study in detail (exploratory): inside, outside and their difference for every "
+        "pair, outcome and split",
+    ),
+    (
+        "t41_output_histograms",
+        sc.HISTOGRAMS,
+        "NA-13b output distributions (exploratory): histograms of N̂ and of the stated confidence per model "
+        "and split, bins from val-A",
+    ),
+    (
+        "t42_output_summary",
+        sc.OUTPUT_SUMMARY,
+        "NA-13b output distributions (exploratory): mean, SD and percentiles of N̂ and of the stated "
+        "confidence per model and split",
+    ),
+    (
+        "t43_band_disclosure",
+        sc.BANDS,
+        "NA-13b band check (exploratory; the operator's disclosure): |N̂| bands at the val-A 50th, 70th and "
+        "90th percentiles, hit rate and mean signed moves per split",
+    ),
 )
 
 
@@ -227,6 +298,8 @@ def keyed_tables(root: Path) -> list[PaperTable]:
                 "Sharpe ratios annualized with √252; costs per side on both legs and the SPY hedge; "
                 "no borrow cost. DSR with n_trials from the trials ledger.",
             )
+        elif path in sc.NA13B:
+            notes = (NOTE_EXPLORATORY, NOTE_NA13B)
         out.append(PaperTable(name, title, df, notes, (path,)))
     return out
 
@@ -454,7 +527,7 @@ def spend(root: Path, ledgers: Path) -> PaperTable:
         },
         {
             "key": "trials",
-            "item": "rows of the trials ledger (the DSR's N)",
+            "item": "rows of the trials ledger",
             "value": float(_count(ledgers / "trials.jsonl")),
             "source": "ledgers/trials.jsonl",
         },
@@ -469,7 +542,7 @@ def spend(root: Path, ledgers: Path) -> PaperTable:
         "t22_spend",
         "Spend and requests of the whole project (ledgers; caps from configs/project.yaml)",
         _frame(rows),
-        ("NA-12, NA-13 and NA-14 made no API call, Kaggle run or FMP request.",),
+        ("NA-12, NA-13, NA-13b and NA-14 made no API call, Kaggle run or FMP request.",),
         (
             "ledgers/spend.jsonl",
             "ledgers/fmp_requests.jsonl",

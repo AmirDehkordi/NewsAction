@@ -1,0 +1,24 @@
+{
+ "n_trials": 1620,
+ "parts": {
+  "baseline": 50,
+  "baseline_grid": 58,
+  "dm_reading_validity": 4,
+  "dm_tournament_probe": 30,
+  "dm_tournament_stage1": 42,
+  "dm_tournament_stage2": 30,
+  "exploratory": 1075,
+  "filter": 10,
+  "filter_frontier": 70,
+  "filter_hparam": 12,
+  "filter_sensitivity": 2,
+  "final_selection": 6,
+  "na07_anchoring": 3,
+  "na07_encoding": 21,
+  "na07_numeracy": 3,
+  "strategy": 200,
+  "trained_model": 4
+ },
+ "written_at": "2026-10-29T17:08:36.057465+00:00",
+ "git_sha": "d587293bfee95c048012b94f5654ac263e28d126"
+}

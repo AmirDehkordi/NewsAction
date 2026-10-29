@@ -1,0 +1,51 @@
+% t37_watch_open: tab:a-watch-open (NA-14 figures.latex, from artifacts/NA-14/tables/t37_watch_open.csv, artifacts/NA-12/tables/t2_h2_over_under.csv, artifacts/NA-12/tables/t6_convergence_ladder.csv, artifacts/NA-12/tables/t7_gap_closure.csv, artifacts/NA-14/tables/t20_strategies.csv)
+\begin{table}[htbp]
+\centering
+\small
+\setlength{\tabcolsep}{4pt}
+\begin{threeparttable}
+\caption{Exploratory (post hoc): the 10:00 reading adds nothing to the pre-open one; on val-B and the test the ICs of the 10:00 reading and of the revision with $y_1$ are negative for both models (NA-13b).}\label{tab:a-watch-open}
+\begin{tabular}{@{}>{\raggedright\arraybackslash}p{2.95in}S[table-format=-1.3]S[table-format=-1.2]S[table-format=-1.3]S[table-format=-1.2]S[table-format=-1.3]S[table-format=-1.2]@{}}
+\toprule
+ & \multicolumn{2}{c}{val-A} & \multicolumn{2}{c}{val-B} & \multicolumn{2}{c}{Test} \\
+\cmidrule(lr){2-3}\cmidrule(lr){4-5}\cmidrule(lr){6-7}
+Model: statistic & {Value} & {$t$} & {Value} & {$t$} & {Value} & {$t$} \\
+\midrule
+\multicolumn{7}{@{}l}{\textit{Panel A: watching the open (NA-13b)}} \\
+Laya-Fin: IC, pre-open reading $\hat N_{\mathrm{D0}}$ & 0.047 & 3.94 & 0.008 & 0.50 & 0.026 & 2.09 \\
+Laya-Fin: IC, 10:00 reading $\hat N_{\mathrm{D1}}$ & 0.034 & 1.66 & -0.024 & -1.48 & -0.013 & -0.85 \\
+Laya-Fin: IC, the revision & 0.001 & 0.07 & -0.027 & -1.41 & -0.036 & -2.33 \\
+Laya-Fin: IC, the first bar $G_{\mathrm{D1}}$ & 0.030 & 1.53 & -0.034 & -1.59 & -0.016 & -1.03 \\
+Laya-Fin: mean, first bar against & -0.010 & -0.35 & 0.000 & -0.01 & 0.045 & 1.73 \\
+Laya-Fin: mean, first bar with & 0.111 & 3.74 & -0.037 & -1.18 & -0.001 & -0.04 \\
+d1-ultra: IC, pre-open reading $\hat N_{\mathrm{D0}}$ & 0.014 & 0.90 & 0.019 & 1.64 & -0.004 & -0.31 \\
+d1-ultra: IC, 10:00 reading $\hat N_{\mathrm{D1}}$ & 0.029 & 1.41 & -0.020 & -1.52 & -0.014 & -1.11 \\
+d1-ultra: IC, the revision & 0.018 & 1.21 & -0.043 & -2.68 & -0.011 & -0.84 \\
+d1-ultra: IC, the first bar $G_{\mathrm{D1}}$ & 0.030 & 1.53 & -0.034 & -1.59 & -0.016 & -1.03 \\
+d1-ultra: mean, first bar against & -0.039 & -1.52 & 0.039 & 1.32 & 0.008 & 0.35 \\
+d1-ultra: mean, first bar with & 0.078 & 3.15 & -0.013 & -0.38 & -0.036 & -1.50 \\
+\addlinespace
+\multicolumn{7}{@{}l}{\textit{Panel B: pre-registered D1 results (NA-12, NA-13; test, for reference)}} \\
+Laya-Fin: over/under $b$ at D1 & {---} & {---} & {---} & {---} & 0.229 & {---} \\
+Laya-Fin: over/under $c$ at D1 & {---} & {---} & {---} & {---} & 0.013 & {---} \\
+Laya-Fin: $\kappa$ at 10:00 & {---} & {---} & {---} & {---} & 0.273 & {---} \\
+Laya-Fin: $\lambda$ at $C_t$ from D1 & {---} & {---} & {---} & {---} & -0.011 & {---} \\
+Laya-Fin: S-D1 $J$, gross Sharpe & {---} & {---} & {---} & {---} & 0.76 & {---} \\
+Laya-Fin: S-CONV from 10:00, gross Sharpe & {---} & {---} & {---} & {---} & 1.61 & {---} \\
+d1-ultra: over/under $b$ at D1 & {---} & {---} & {---} & {---} & -0.018 & {---} \\
+d1-ultra: over/under $c$ at D1 & {---} & {---} & {---} & {---} & 0.015 & {---} \\
+d1-ultra: $\kappa$ at 10:00 & {---} & {---} & {---} & {---} & 0.610 & {---} \\
+d1-ultra: $\lambda$ at $C_t$ from D1 & {---} & {---} & {---} & {---} & -0.013 & {---} \\
+d1-ultra: S-D1 $J$, gross Sharpe & {---} & {---} & {---} & {---} & -0.28 & {---} \\
+d1-ultra: S-CONV from 10:00, gross Sharpe & {---} & {---} & {---} & {---} & 0.03 & {---} \\
+\bottomrule
+\end{tabular}
+\begin{tablenotes}[flushleft]\footnotesize
+\item Exploratory (post hoc): requested after unblinding; no hypothesis, outside every family, no claim. NA-13b, the operator's study of when the D0 signal works (PREREG \S15, NA-13b row): thresholds from val-A. The operator's assistant computed the first of these statistics on all three splits, the test included, before NA-13b (the band check of Table~\ref{tab:a-band-disclosure} and the first four ICs of Table~\ref{tab:a-watch-open}); they shaped the study, they are reproduced exactly here, and no threshold is chosen from them.
+\item Multiple comparisons: Panel A holds 36 statistics (six for each model and split; the first bar is the same for both models), so about two with $|t| > 2$ are expected by chance.
+\item Panel A: the daily IC with $y_1$, the move from 10:00 to the close (PREREG \S5.6), of the pre-open reading $\hat N_{\mathrm{D0}}$, of the 10:00 reading $\hat N_{\mathrm{D1}}$ (Call B at D1), of the revision $z(\hat N_{\mathrm{D1}}) - z(\hat N_{\mathrm{D0}})$ and of the first bar's move $G_{\mathrm{D1}}$, with its Newey--West $t$ (5 lags); then the mean of $\mathrm{sign}(\hat N_{\mathrm{D0}})\,y_1$ over the events whose first bar moved against, or with, the pre-open reading, with a day-clustered $t$. Events outside the embargo; the first bar is the same for both models.
+\item Panel B: the pre-registered D1 estimates on the test (NA-12, NA-13): the over/under coefficients $b$ and $c$ (Table~\ref{tab:a-h2-over-under}), $\kappa$ at 10:00 (Table~\ref{tab:a-convergence-ladder}), $\lambda$ at the close from D1 (Table~\ref{tab:a-gap-closure}) and the annualized gross Sharpe ratios of S-D1 $J$ and of S-CONV from 10:00 to the close (Table~\ref{tab:a-strategies}). ---: Panel B holds the test estimates only; their standard errors and $p$ are in those tables.
+\item The API models fail the \S8.3 contamination screens, so their results are model-specific (\S1.3).
+\end{tablenotes}
+\end{threeparttable}
+\end{table}

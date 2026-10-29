@@ -307,7 +307,7 @@ class TrialRecord(BaseModel):
 
     model_config = ConfigDict(extra="forbid", frozen=True, allow_inf_nan=False)
 
-    chunk: str = Field(pattern=r"^NA-\d{2}$")
+    chunk: str = Field(pattern=r"^NA-\d{2}[a-z]?$")  # NA-13b: an operator chunk between two PRD chunks
     kind: str = Field(min_length=1)
     name: str = Field(min_length=1)
     params_hash: str = Field(pattern=r"^[0-9a-f]{64}$")

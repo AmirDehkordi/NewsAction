@@ -69,6 +69,8 @@ def test_bare_digits() -> None:
     )
     assert kz.bare_digits(text) == ["0.36", "12", "93%"]
     assert kz.bare_digits("{{a/b/c}} and [[0.5]] and S-D0, Top-100, e5, R², MA20/MA50") == []
+    assert kz.bare_digits(r"NA-13b's $y_1$, y1 and $\hat N_{\mathrm{D1}}$") == []  # a chunk and an outcome
+    assert kz.bare_digits("NA-13bc and y3") == ["NA-13bc", "y3"]
     math = r"$y_2$, $t{+}20$, $C_{t-1}$, $R^2$, $z_{cc}$, $|G| \geq [[3]]$, $\kappa_h = [[1]]$"
     assert kz.bare_digits(math) == []
     assert kz.bare_digits(r"$\kappa_h = 1$ and $\pm 1.96$") == ["1", "1.96"]

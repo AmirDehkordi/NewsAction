@@ -1,0 +1,16 @@
+key,name,value
+median_a0_h,median_a0_h,4.172461242138537
+median_a0_u_unc,median_a0_u_unc,1.237742969988056
+median_a0_p_mixed,median_a0_p_mixed,0.4386055069579756
+median_a0_m,median_a0_m,0.5492049215204136
+median_a0_p_no_material_effect,median_a0_p_no_material_effect,0.27991093821852586
+median_attention_mean,median_attention_mean,6.216666666666667
+median_sigma_cc,median_sigma_cc,0.010989892849831507
+median_lf_mag,median_lf_mag,0.9154939688742161
+median_d1_conf,median_d1_conf,0.1534886248519674
+day_median_n_events,day_median_n_events,125.0
+day_median_n_earnings,day_median_n_earnings,2.0
+day_median_vix_prev,day_median_vix_prev,15.699999809265137
+day_median_abs_spy_on,day_median_abs_spy_on,0.0021321231310362787
+q70_abs_laya_fin,q70_abs_laya_fin,0.05356519762426615
+q70_abs_d1_ultra,q70_abs_d1_ultra,0.648070392025605

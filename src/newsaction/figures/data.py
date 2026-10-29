@@ -3,7 +3,8 @@
     uv run python -m newsaction.figures.data
 
 Every builder selects rows of NA-03, NA-06, NA-07, NA-11, NA-12 and NA-13 outputs, or of the NA-14 tables
-that copy or aggregate them (``sources``), and writes them in the long figure format with their provenance.
+that copy or aggregate them (``sources``; NA-13b's exploratory tables only through their NA-14 copies), and
+writes them in the long figure format with their provenance.
 Nothing here estimates anything. The arithmetic is an interval: ±1.96 (or, in an exploratory figure, ±1)
 stored standard errors, ±1.96 × |value / t| from a stored t, or the Wilson interval of a stored proportion
 and its stored number of trials (``sources.rows``). Two NA-14 tables hold simple aggregations of stored
@@ -11,8 +12,8 @@ files, each recomputed by its test: the placebo's Sharpe quantiles (t33, from NA
 break-even costs (t30, gross mean ÷ turnover from NA-13's strategy table). The figure modules then read only
 their CSV.
 
-The main figures (1–7) follow the paper's findings; the appendix figures (A1–A15) hold the rest, the
-anchor and every exploratory panel.
+The main figures (1–7) follow the paper's findings; the appendix figures (A1–A19) hold the rest, the
+anchor and every exploratory panel (A16–A19: NA-13b, when the D0 signal works).
 """
 
 from __future__ import annotations
@@ -42,6 +43,12 @@ T16: Final = f"{sc.NA12_TAB}/t16_robustness.csv"
 T24: Final = f"{sc.TABLES}/t24_exploratory_d0_signal.csv"
 T25: Final = f"{sc.TABLES}/t25_ma_cross.csv"
 T33: Final = f"{sc.TABLES}/t33_placebo_sharpe.csv"
+T36: Final = f"{sc.TABLES}/t36_selective_coverage.csv"
+T37: Final = f"{sc.TABLES}/t37_watch_open.csv"
+T38: Final = f"{sc.TABLES}/t38_conditioning.csv"
+T40: Final = f"{sc.TABLES}/t40_conditioning_detail.csv"
+T41: Final = f"{sc.TABLES}/t41_output_histograms.csv"
+FA_RELIABILITY: Final = f"{sc.TABLES}/fa_reliability.csv"
 NA03_SUMMARY: Final = "artifacts/NA-03/summary.json"
 
 # Event-time rungs (PREREG A1.2): figure-data point → position on an axis that is not to scale.
@@ -1167,6 +1174,178 @@ def figa15(src: sc.Sources) -> pd.DataFrame:
     return pd.concat(out, ignore_index=True)
 
 
+# --- NA-13b (exploratory, post hoc): when the D0 signal works ----------------------------------------------
+
+SELECTIVE_MODELS: Final = ("laya_fin", "d1_ultra", "span_02", "drex_v2", "laya_zs")
+INSTRUMENTS: Final = ("laya_fin", "d1_ultra")  # drawn in colour, with their intervals
+SPLITS: Final = ("val_a", "val_b", "test")
+# (panel, target, column of t36): the rows of Figure A16
+COVERAGE_PANELS: Final = (("a", "z_on", "signed"), ("b", "z_id", "signed"), ("c", "z_cc", "hit"))
+WATCH_STATISTICS: Final = ("ic_pre_open", "ic_ten", "ic_revision")
+CONDITION_FLAGS: Final = ("selected", "seen_on_test", "vendor")
+OUTPUT_MEASURES: Final = (("a", "n_hat"), ("b", "conf"))
+
+
+def figa16(src: sc.Sources) -> pd.DataFrame:
+    """Appendix A16, exploratory (post hoc; NA-13b via t36): risk-coverage curves of the D0 reading, the mean
+    signed z_on (a) and z_id (b) and the hit rate against z_cc (c) of the events kept at each coverage, on
+    val-A, val-B and test, ranked by conviction |N̂| for every model (95% bootstrap intervals for Laya-Fin and
+    d1-ultra) and by the stated confidence for Laya-Fin and d1-ultra (thresholds from val-A)."""
+    t = src.frame(T36)
+    out = []
+    for panel, target, col in COVERAGE_PANELS:
+        for ranking, models in (("conviction", SELECTIVE_MODELS), ("confidence", INSTRUMENTS)):
+            for model in models:
+                d = t[(t["model"] == model) & (t["ranking"] == ranking) & (t["target"] == target)]
+                band = ranking == "conviction" and model in INSTRUMENTS
+                out.append(
+                    sc.rows(
+                        d,
+                        T36,
+                        panel=panel,
+                        series=f"={model}",
+                        label="split",
+                        role=f"={ranking}",
+                        x=f"={target}",
+                        x_col="coverage",
+                        y_col=col,
+                        ci="table" if band else "",
+                        lo_col=f"{col}_ci_low" if band else "",
+                        hi_col=f"{col}_ci_high" if band else "",
+                    )
+                )
+    return pd.concat(out, ignore_index=True)
+
+
+def figa17(src: sc.Sources) -> pd.DataFrame:
+    """Appendix A17, exploratory (post hoc; NA-13b via t37): watching the open, the daily IC with y1 of the
+    pre-open reading N̂_D0, of the 10:00 reading N̂_D1 and of their revision for Laya-Fin (a) and d1-ultra (b)
+    on val-A, val-B and test, with the stored 95% intervals (mean ± 1.96 Newey–West SE)."""
+    t = src.frame(T37)
+    out = []
+    for panel, model in (("a", "laya_fin"), ("b", "d1_ultra")):
+        for i, split in enumerate(SPLITS):
+            d = t[(t["model"] == model) & (t["split"] == split) & t["statistic"].isin(list(WATCH_STATISTICS))]
+            out.append(
+                sc.rows(
+                    d,
+                    T37,
+                    panel=panel,
+                    series=f"={model}",
+                    role="statistic",
+                    x=f"={split}",
+                    xv=float(i),
+                    y_col="value",
+                    ci="table",
+                    lo_col="ci_low",
+                    hi_col="ci_high",
+                )
+            )
+    return pd.concat(out, ignore_index=True)
+
+
+def figa18(src: sc.Sources) -> pd.DataFrame:
+    """Appendix A18, exploratory (post hoc; NA-13b via t40 and t38): the conditioning study, the
+    inside-minus-outside difference of the primary outcome sign(N̂)·z_id for every condition E1–E9 on val-A,
+    val-B and test (95% intervals from the t), for Laya-Fin (a) and d1-ultra (b), with each pair's validation
+    selection, its [seen on test] mark and its vendor-field mark (t38)."""
+    detail, pairs = src.frame(T40), src.frame(T38)
+    order = {c: float(i) for i, c in enumerate(dict.fromkeys(pairs["condition"]))}
+    out = []
+    for panel, model in (("a", "laya_fin"), ("b", "d1_ultra")):
+        d = detail[
+            (detail["model"] == model) & (detail["outcome"] == "z_id") & detail["split"].isin(list(SPLITS))
+        ].copy()
+        d["xpos"] = d["condition"].map(order)
+        out.append(
+            sc.rows(
+                d,
+                T40,
+                panel=panel,
+                series=f"={model}",
+                label="group",
+                role="split",
+                x="condition",
+                xv="xpos",
+                y_col="diff",
+                ci="t",
+                se_col="diff_t",
+            )
+        )
+        p = pairs[pairs["model"] == model].copy()
+        p["xpos"] = p["condition"].map(order)
+        for flag in CONDITION_FLAGS:
+            out.append(
+                sc.rows(
+                    p,
+                    T38,
+                    panel=panel,
+                    series=f"={model}",
+                    label="group",
+                    role=f"={flag}",
+                    x="condition",
+                    xv="xpos",
+                    y_col=flag,
+                )
+            )
+    return pd.concat(out, ignore_index=True)
+
+
+def figa19(src: sc.Sources) -> pd.DataFrame:
+    """Appendix A19, exploratory (post hoc; NA-13b via t41): each model's outputs, the share of its events per
+    bin of N̂ (a) and of the stated confidence (b) on val-A, val-B and test (bins from val-A), beside NA-12's
+    reliability diagram on test (c): the hit rate of Q1's top class against e5 by bin of its probability, with
+    the events per bin and the ECE (fa_reliability, t15)."""
+    h, e = src.frame(T41), src.frame(T15)
+    r = src.frame(FA_RELIABILITY)
+    r = r[(r["target"] == "e5") & (r["n"] > 0)]
+    out = []
+    for model in SELECTIVE_MODELS:
+        for panel, measure in OUTPUT_MEASURES:
+            d = h[(h["model"] == model) & (h["measure"] == measure)]
+            out.append(
+                sc.rows(
+                    d,
+                    T41,
+                    panel=panel,
+                    series=f"={model}",
+                    label="split",
+                    role=f"={measure}",
+                    x="bin",
+                    x_col="mid",
+                    y_col="share",
+                )
+            )
+        d = r[r["model"] == model]
+        for role in ("hit_rate", "n"):
+            out.append(
+                sc.rows(
+                    d,
+                    FA_RELIABILITY,
+                    panel="c",
+                    series=f"={model}",
+                    label="=test",
+                    role=f"={role}",
+                    x="bin",
+                    x_col="confidence",
+                    y_col=role,
+                )
+            )
+        out.append(
+            sc.rows(
+                e[e["key"] == f"{model}:e5"],
+                T15,
+                panel="c",
+                series=f"={model}",
+                label="=test",
+                role="=ece",
+                x="=ece",
+                y_col="ece",
+            )
+        )
+    return pd.concat(out, ignore_index=True)
+
+
 BUILDERS: Final[Mapping[str, Callable[[sc.Sources], pd.DataFrame]]] = {
     "fig1_validation_test": fig1,
     "fig2_priced_at_open": fig2,
@@ -1190,6 +1369,10 @@ BUILDERS: Final[Mapping[str, Callable[[sc.Sources], pd.DataFrame]]] = {
     "figA13_probes": figa13,
     "figA14_exploratory_d0": figa14,
     "figA15_exploratory_ma_cross": figa15,
+    "figA16_selective_coverage": figa16,
+    "figA17_watch_open": figa17,
+    "figA18_conditioning_map": figa18,
+    "figA19_output_histograms": figa19,
 }
 
 

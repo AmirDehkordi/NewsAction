@@ -1,4 +1,4 @@
-"""Appendix figures A1–A15 (PRD NA-14 S2 "Appendix"; the operator's revision pass).
+"""Appendix figures A1–A19 (PRD NA-14 S2 "Appendix"; the operator's revision pass; NA-13b).
 
     uv run python -m newsaction.figures.render figA1_tournament ...
 
@@ -8,8 +8,10 @@ NA-12 §13; the release dates are in its caption); A7 convergence in detail, wit
 anchor; A8 Figure 4 (b) for Laya-Fin; A9 the Shapley values by instrument and tier; A10 Call B with the news
 removed or shuffled; A11 persistence by move reason; A12 the other books' paths and S-CONV by tier; A13 the
 probes' descriptive columns (exploratory); A14 and A15 exploratory (post hoc): where the D0 signal lives, and
-news with a moving-average cross. Exploratory figures say so above their panels. Panels that show one quantity
-on one scale share their axis. Each function draws one figure from its CSV (``render.draw`` reads it;
+news with a moving-average cross; A16 to A19 exploratory (post hoc, NA-13b): when the D0 signal works, its
+risk-coverage curves, the 10:00 reading against the pre-open one, the conditioning study and the distribution
+of the outputs beside their reliability. Exploratory figures say so above their panels. Panels that show one
+quantity on one scale share their axis. Each function draws one figure from its CSV (``render.draw`` reads it;
 ``NAMES`` maps function → figure).
 """
 
@@ -18,6 +20,7 @@ from __future__ import annotations
 from typing import Final
 
 import numpy as np
+import numpy.typing as npt
 import pandas as pd
 from matplotlib.axes import Axes
 from matplotlib.figure import Figure
@@ -45,6 +48,10 @@ NAMES: Final = {
     "probes": "figA13_probes",
     "exploratory_d0": "figA14_exploratory_d0",
     "exploratory_ma_cross": "figA15_exploratory_ma_cross",
+    "selective_coverage": "figA16_selective_coverage",
+    "watch_open": "figA17_watch_open",
+    "conditioning_map": "figA18_conditioning_map",
+    "output_histograms": "figA19_output_histograms",
 }
 EXPLORATORY: Final = "Exploratory (post hoc)"
 # Model ids of NA-05/06/07/11 as the paper writes them; the entity decides the colour.
@@ -776,6 +783,352 @@ def exploratory_ma_cross(df: pd.DataFrame) -> Figure:
         ["validation", "test"],
         loc="outside lower left",
         ncols=2,
+    )
+    _exploratory(fig)
+    return fig
+
+
+# --- A16 to A19: when the D0 signal works (NA-13b, post hoc) ------------------------------------------------
+
+SPLIT: Final = {"val_a": "val-A", "val_b": "val-B", "test": "test"}
+INSTRUMENTS: Final = ("d1_ultra", "laya_fin")  # in drawing order: the primary instrument on top
+OTHERS: Final = ("span_02", "drex_v2", "laya_zs")
+COVERAGE_TICKS: Final = (1.0, 0.7, 0.5, 0.3, 0.1, 0.05)
+COVERAGE_ROW: Final = {
+    "a": r"mean $\mathrm{sign}(\hat N)\,z_{on}$",
+    "b": r"mean $\mathrm{sign}(\hat N)\,z_{id}$",
+    "c": r"hit rate against $z_{cc}$",
+}
+GATE: Final = 0.3  # the frozen confidence gates keep the events at or above their val-A 70th percentile
+
+
+def _sqrt(x: npt.ArrayLike) -> npt.NDArray[np.float64]:
+    out: npt.NDArray[np.float64] = np.sqrt(np.maximum(np.asarray(x, dtype=float), 0.0))
+    return out
+
+
+def _square(x: npt.ArrayLike) -> npt.NDArray[np.float64]:
+    out: npt.NDArray[np.float64] = np.square(np.asarray(x, dtype=float))
+    return out
+
+
+def _coverage_key() -> Line2D:
+    """The legend key of a curve ranked by the stated confidence: a thin line with hollow dots."""
+    return Line2D(
+        [],
+        [],
+        color=style.INK_2,
+        linewidth=style.LINE_THIN,
+        marker="o",
+        markersize=3.0,
+        markerfacecolor=style.SURFACE,
+        markeredgecolor=style.INK_2,
+        markeredgewidth=0.9,
+    )
+
+
+def selective_coverage(df: pd.DataFrame) -> Figure:
+    """A row per quantity and a column per split; each row shares its scale and every panel the coverage axis,
+    from every event on the left to the 5% the model is surest of on the right. The axis is on a square-root
+    scale: a linear one crowds the tail (10% and 5%), a log one the points from 100% to 30%."""
+    fig, axes = style.new(style.WIDTH_FULL, 6.2, 3, 3, sharex=True, sharey="row")
+    for i, letter in enumerate("abc"):
+        for j, split in enumerate(SPLIT):
+            ax = axes[i][j]
+            sub = df[(df["panel"] == letter) & (df["label"] == split)]
+            conviction = sub[sub["role"] == "conviction"]
+            for model in OTHERS:
+                m = conviction[conviction["series"] == model].sort_values("xv")
+                ax.plot(m["xv"], m["y"], color=style.CONTEXT, linewidth=style.LINE_THIN, zorder=2)
+            for model in INSTRUMENTS:
+                c = style.color(model)
+                m = conviction[conviction["series"] == model].sort_values("xv")
+                style.band(ax, m["xv"], m["lo"], m["hi"], c)
+                ax.plot(m["xv"], m["y"], color=c, linewidth=style.LINE, zorder=3)
+                k = sub[(sub["role"] == "confidence") & (sub["series"] == model)].sort_values("xv")
+                ax.plot(k["xv"], k["y"], color=c, linewidth=style.LINE_THIN, zorder=3.5)
+                style.dots(ax, k["xv"], k["y"], color=c, hollow=True, size=3.0, zorder=4)
+            style.zero_line(ax, 0.5 if letter == "c" else 0.0)
+            style.ref_line(ax, GATE, horizontal=False)
+            ax.set_xscale("function", functions=(_sqrt, _square))
+            ax.xaxis.set_major_locator(FixedLocator(list(COVERAGE_TICKS)))
+            ax.xaxis.set_minor_locator(NullLocator())
+            ax.xaxis.set_major_formatter(_pct(0))
+            if i == 0:
+                ax.set_title(SPLIT[split])
+        axes[i][0].set_ylabel(rf"$\mathbf{{({letter})}}$ {COVERAGE_ROW[letter]}")
+    axes[0][0].set_xlim(1.12, 0.028)  # read left to right: fewer, surer events; room for the end labels
+    style.label(
+        axes[0][0],
+        GATE * 1.06,
+        0.97,
+        "frozen gate\n(70th pct.)",
+        ha="right",
+        va="top",
+        color=style.INK_2,
+        fontsize=style.SIZE_SMALL,
+        transform=axes[0][0].get_xaxis_transform(),
+    )
+    axes[2][1].set_xlabel("coverage: the share of events kept, the model's surest first (square-root scale)")
+    style.legend(
+        fig,
+        [
+            style.key(style.color("laya_fin"), line=True),
+            style.key(style.color("d1_ultra"), line=True),
+            Line2D([], [], color=style.CONTEXT, linewidth=style.LINE_THIN),
+            _coverage_key(),
+        ],
+        [
+            "Laya-Fin",
+            "d1-ultra",
+            rf"{style.NAME['span_02']}, drex-v2.0, Laya zero-shot",
+            "by stated confidence",
+        ],
+        loc="outside lower center",
+        ncols=4,
+    )
+    _exploratory(fig)
+    return fig
+
+
+# (label, marker, offset within the split's group) of the three readings of Figure A17
+WATCH: Final = {
+    "ic_pre_open": ("pre-open, D0", "o", -0.24),
+    "ic_ten": ("10:00, D1", "s", 0.0),
+    "ic_revision": ("revision", "D", 0.24),
+}
+
+
+def watch_open(df: pd.DataFrame) -> Figure:
+    """Both panels show the daily IC with y1, so they share the y-axis; the colour is the model, the marker
+    the reading."""
+    fig, axes = style.new(style.WIDTH_HALF, 2.75, 1, 2, sharey=True)
+    for ax, letter in zip(axes[0], "ab", strict=True):
+        sub = df[df["panel"] == letter]
+        model = str(sub["series"].iloc[0])
+        c = style.color(model)
+        for statistic, (_, marker, dx) in WATCH.items():
+            m = sub[sub["role"] == statistic].sort_values("xv")
+            style.dots(ax, m["xv"] + dx, m["y"], m["lo"], m["hi"], color=c, marker=marker, size=3.4)
+        style.zero_line(ax)
+        groups = sub.drop_duplicates("xv").sort_values("xv")
+        ax.set_xticks(groups["xv"].tolist(), [SPLIT[str(s)] for s in groups["x"]])
+        ax.tick_params(axis="x", length=0)
+        ax.set_xlim(-0.5, 2.5)
+        style.title(ax, letter, style.NAME[model])
+    axes[0][0].set_ylabel(r"daily IC with $y_1$")
+    style.legend(
+        fig,
+        [style.key(style.INK_2, marker=marker) for _, marker, _ in WATCH.values()],
+        [text for text, _, _ in WATCH.values()],
+        loc="outside lower center",
+        ncols=3,
+        columnspacing=1.0,
+        handletextpad=0.2,
+    )
+    _exploratory(fig)
+    return fig
+
+
+# The groups and conditions of NA-13b (e), as Figure A18 and its table name them (selective.conditions)
+CONDITION_GROUP: Final = {
+    "E1": "E1 the news item",
+    "E2": "E2 d1-ultra's reading of the news",
+    "E3": "E3 timing",
+    "E4": "E4 the day",
+    "E5": "E5 the stock",
+    "E6": "E6 the model's reading",
+    "E7": "E7 two or more models",
+    "E8": "E8 the cost hurdle",
+    "E9": "E9 Laya-Fin on d1-ultra's labels",
+}
+CONDITION: Final = {
+    "e1_earnings": "earnings day",
+    "e1_vendor_quantified": "quantified",
+    "e1_press_wire": "press wire",
+    "e1_imprecise": "imprecise timestamp",
+    "e2_new": "new, not known",
+    "e2_numbers": "numbers, not narrative",
+    "e2_scheduled": "scheduled",
+    "e2_company": "company-specific",
+    "e2_confirmed": "confirmed",
+    "e2_long_horizon": "impact horizon above median",
+    "e2_low_uncertainty": "uncertainty below median",
+    "e2_few_mixed": "mixed signals below median",
+    "e2_material": "materiality above median",
+    "e2_effect": r"$P$(no material effect) below median",
+    "e3_before_0800": "latest article before 08:00",
+    "e3_0400_0800": "04:00 to 08:00, not 08:00 to 09:15",
+    "e4_friday": "Friday",
+    "e4_monday": "Monday",
+    "e4_busy_event": r"busy news day (ratio $\geq 1.5$)",
+    "e4_busy_day": "news count above median",
+    "e4_earnings_season": "earnings count above median",
+    "e4_macro": "FOMC, CPI or payrolls day",
+    "e4_vix": r"VIX at $t-1$ above median",
+    "e4_spy_gap": r"$|$SPY overnight$|$ above median",
+    "e5_tier": "size tier 251 to 500",
+    "e5_dv_tier": "dollar-volume tier 251 to 500",
+    "e5_low_coverage": "low usual coverage",
+    "e5_high_sigma": r"$\sigma$ above median",
+    "e5_momentum": r"direction agrees with $z_{m20}$",
+    "e5_price_text": "price-move text",
+    "e6_conviction": "conviction top 30%",
+    "e6_lf_mag": "Laya-Fin's magnitude above median",
+    "e6_d1_conf": "d1-ultra's confidence above median",
+    "e7_agree": "Laya-Fin and d1-ultra agree",
+    "e7_api3": "three API models agree",
+    "e7_rank_avg": "rank average of the two models",
+    "e8_cost": r"$|V|\,\sigma$ above the hurdle",
+    "e9_division": "numbers and material",
+}
+# (marker, hollow, offset within the row, size) of each split in Figure A18; a filled dot needs more size than
+# a hollow one to read as large
+SPLIT_MARK: Final = {
+    "val_a": ("o", True, 0.29, 2.8),
+    "val_b": ("s", True, 0.0, 2.8),
+    "test": ("o", False, -0.29, 3.4),
+}
+
+
+def _condition_rows(df: pd.DataFrame) -> list[tuple[str, str]]:
+    """The rows of Figure A18, grouped E1 to E9: † marks a vendor field (a retrospective label), "(seen)" a
+    condition seen on test before the study."""
+    flags = df[df["role"].isin(("seen_on_test", "vendor"))].pivot_table(
+        index="x", columns="role", values="y", aggfunc="max"
+    )
+    rows: list[tuple[str, str]] = []
+    for group, g in df.drop_duplicates("x").sort_values("xv").groupby("label", sort=False):
+        rows.append(("head", CONDITION_GROUP[str(group)]))
+        for c in g["x"]:
+            text = CONDITION[str(c)] + (r"$^{\dagger}$" if flags.loc[c, "vendor"] > 0.5 else "")
+            rows.append((str(c), text + (" (seen)" if flags.loc[c, "seen_on_test"] > 0.5 else "")))
+    return rows
+
+
+def conditioning_map(df: pd.DataFrame) -> Figure:
+    """Both panels share the rows (one per condition, grouped E1 to E9) and the scale of the difference."""
+    fig, axes = style.new(style.WIDTH_FULL, 6.9, 1, 2, sharex=True)
+    rows = _condition_rows(df)
+    for ax, letter in zip(axes[0], "ab", strict=True):
+        sub = df[df["panel"] == letter]
+        model = str(sub["series"].iloc[0])
+        c = style.color(model)
+        ys = style.row_axis(ax, rows)
+        selected = sub[(sub["role"] == "selected") & (sub["y"] > 0.5)]
+        for cond in selected["x"]:
+            ax.axhspan(
+                ys[str(cond)] - 0.5, ys[str(cond)] + 0.5, color=style.GRID, alpha=0.6, linewidth=0, zorder=0.4
+            )
+        for split, (marker, hollow, dy, size) in SPLIT_MARK.items():
+            m = sub[sub["role"] == split]
+            y = [ys[str(cond)] + dy for cond in m["x"]]
+            style.dots(
+                ax,
+                m["y"],
+                y,
+                m["lo"],
+                m["hi"],
+                color=c,
+                marker=marker,
+                hollow=hollow,
+                size=size,
+                horizontal=True,
+            )
+        style.zero_line(ax, horizontal=False)
+        # ticks where most differences lie (E1's earnings day runs wider); math prints a true minus sign
+        ax.xaxis.set_major_locator(FixedLocator([-0.5, -0.25, 0.0, 0.25, 0.5]))
+        ax.xaxis.set_major_formatter(FuncFormatter(lambda v, _: f"${v:g}$"))
+        style.title(ax, letter, style.NAME[model])
+    axes[0][1].sharey(axes[0][0])
+    axes[0][1].tick_params(labelleft=False)
+    fig.supxlabel(
+        r"inside minus outside: mean $\mathrm{sign}(\hat N)\,z_{id}$ (typical daily moves)",
+        fontsize=style.SIZE,
+    )
+    style.legend(
+        fig,
+        [
+            style.key(style.INK_2, hollow=True),
+            style.key(style.INK_2, marker="s", hollow=True),
+            style.key(style.INK_2),
+            Rectangle((0, 0), 1, 1, facecolor=style.GRID, alpha=0.6, edgecolor="none"),
+        ],
+        ["val-A", "val-B", "test", "selected on validation"],
+        loc="outside upper right",
+        ncols=4,
+    )
+    _exploratory(fig)
+    return fig
+
+
+OUTPUT_TITLE: Final = {"a": r"$\hat N$", "b": "stated confidence", "c": "reliability on test"}
+SPLIT_TONE: Final = {
+    "val_a": (style.MUTED, style.LINE_THIN),
+    "val_b": (style.INK_2, style.LINE_THIN),
+    "test": (style.INK, style.LINE),
+}
+
+
+def _steps(
+    mid: npt.NDArray[np.float64], share: npt.NDArray[np.float64]
+) -> tuple[npt.NDArray[np.float64], npt.NDArray[np.float64]]:
+    """The outline of a histogram of equal-width bins centred on ``mid``: up from zero at the first edge,
+    across every bin, down to zero at the last."""
+    w = float(np.median(np.diff(mid)))
+    edges = np.append(mid - w / 2, mid[-1] + w / 2)
+    return np.repeat(edges, 2), np.concatenate([[0.0], np.repeat(share, 2), [0.0]])
+
+
+def output_histograms(df: pd.DataFrame) -> Figure:
+    """A row per model. The histograms (a, b) show one quantity, the share of events per bin, so they share
+    the row's scale; the reliability diagrams (c) share both axes down the column."""
+    models = list(dict.fromkeys(df["series"]))
+    fig, axes = style.new(style.WIDTH_FULL, 6.7, len(models), 3)
+    for i, model in enumerate(models):
+        a, b, c = axes[i]
+        b.sharey(a)
+        if i:
+            c.sharex(axes[0][2])
+            c.sharey(axes[0][2])
+        for ax, letter in ((a, "a"), (b, "b")):
+            sub = df[(df["panel"] == letter) & (df["series"] == model)]
+            for split, (tone, width) in SPLIT_TONE.items():
+                h = sub[sub["label"] == split].sort_values("xv")
+                x, y = _steps(h["xv"].to_numpy(dtype=float), h["y"].to_numpy(dtype=float))
+                ax.plot(x, y, color=tone, linewidth=width, zorder=3 if split == "test" else 2)
+        a.set_ylim(bottom=0.0)  # after both histograms, so the shared scale holds the taller
+        sub = df[(df["panel"] == "c") & (df["series"] == model)]
+        col = style.color(model)
+        hit = sub[sub["role"] == "hit_rate"].sort_values("xv")
+        n = sub[sub["role"] == "n"].set_index("x")["y"]
+        c.plot([0, 1], [0, 1], color=style.BASELINE, linewidth=style.LINE_THIN, dashes=(3.0, 2.0), zorder=1)
+        c.plot(hit["xv"], hit["y"], color=col, linewidth=style.LINE_THIN, zorder=2)
+        sizes = 2.0 + 14.0 * np.sqrt(n.reindex(hit["x"]).to_numpy() / float(n.max()))
+        c.scatter(
+            hit["xv"], hit["y"], s=sizes**1.3, color=col, edgecolor=style.SURFACE, linewidth=0.5, zorder=3
+        )
+        ece = float(sub.loc[sub["role"] == "ece", "y"].iloc[0])
+        style.label(
+            c, 0.04, 0.95, f"ECE {ece:.3f}", ha="left", va="top", transform=c.transAxes, color=style.INK_2
+        )
+        c.set_xlim(0.3, 1.0)
+        c.set_ylim(0.0, 1.0)
+        c.set_ylabel("hit rate")
+        a.set_ylabel(f"{style.NAME[model]}\nshare of events")
+        b.tick_params(labelleft=False)
+        if i == 0:
+            for ax, letter in ((a, "a"), (b, "b"), (c, "c")):
+                style.title(ax, letter, OUTPUT_TITLE[letter])
+    axes[-1][0].set_xlabel(r"$\hat N$, bins from val-A")
+    axes[-1][1].set_xlabel("stated confidence, bins from val-A")
+    axes[-1][2].set_xlabel("top-class confidence (bin mean)")
+    style.legend(
+        fig,
+        [Line2D([], [], color=tone, linewidth=width) for tone, width in SPLIT_TONE.values()],
+        [SPLIT[s] for s in SPLIT_TONE],
+        loc="outside upper center",
+        ncols=3,
     )
     _exploratory(fig)
     return fig

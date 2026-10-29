@@ -9,7 +9,7 @@
   and the check catches a planted one;
 - the restored layouts (the polish pass): Figure 5's stacked bars beside the news-steps zoom, Figure 7's
   sorted bars with the labelled baseline and screening threshold, A9's six panels; panels of one quantity on
-  one scale share their axis;
+  one scale share their axis, NA-13b's A16 to A19 included;
 - a figure module reads no file, and drawing a figure reads only its CSV;
 - drawing from the committed CSV writes the committed PDF and PNG byte for byte.
 """
@@ -238,4 +238,19 @@ def test_restored_layouts_and_shared_axes() -> None:
         plt.close(fig)
     fig = _drawn("fig2_priced_at_open")
     assert fig.axes[0].get_xlim() == fig.axes[1].get_xlim()
+    plt.close(fig)
+
+
+def test_na13b_panels_of_one_quantity_share_their_scale() -> None:
+    fig = _drawn("figA16_selective_coverage")  # a row per quantity, a column per split
+    assert len(fig.axes) == 9 and all(_shared(fig, "y", (0, 1), (1, 2), (3, 4), (4, 5), (6, 7), (7, 8)))
+    assert not any(_shared(fig, "y", (0, 3), (3, 6))) and all(_shared(fig, "x", (0, 4), (0, 8)))
+    plt.close(fig)
+    for name in ("figA17_watch_open", "figA18_conditioning_map"):
+        fig = _drawn(name)
+        assert all(_shared(fig, "y", (0, 1))), name
+        plt.close(fig)
+    fig = _drawn("figA19_output_histograms")  # a row per model: (a, b) histograms, (c) reliability
+    assert all(_shared(fig, "y", (0, 1), (3, 4), (12, 13))) and not any(_shared(fig, "y", (0, 3)))
+    assert all(_shared(fig, "x", (2, 5), (2, 14))) and all(_shared(fig, "y", (2, 5), (2, 14)))
     plt.close(fig)
