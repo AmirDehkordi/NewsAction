@@ -3,14 +3,14 @@
 \scriptsize
 \setlength{\tabcolsep}{3pt}
 \begin{longtable}{@{}rll>{\raggedright\arraybackslash}p{2.85in}>{\raggedright\arraybackslash}p{1.7in}l@{}}
-\caption{Pre-registration deviations (PREREG \S15), one line per row of the log.}\label{tab:a-deviations} \\
+\caption{Deviations from the pre-registration: all 66 entries of its deviations log, one line each.}\label{tab:a-deviations} \\
 \toprule
-Row & Date & Chunk & Change & Reason & Freeze \\
+Row & Date & Stage & Change & Reason & Freeze \\
 \midrule
 \endfirsthead
 \multicolumn{6}{@{}l}{\textit{Table \ref{tab:a-deviations}, continued}} \\
 \toprule
-Row & Date & Chunk & Change & Reason & Freeze \\
+Row & Date & Stage & Change & Reason & Freeze \\
 \midrule
 \endhead
 \midrule
@@ -18,75 +18,75 @@ Row & Date & Chunk & Change & Reason & Freeze \\
 \endfoot
 \bottomrule
 \endlastfoot
-1 & 10-24 & NA-00 & Freeze hash stops at \S{}15; \S{}15 checked as append-only & The log must grow after the freeze & before \\
-2 & 10-24 & NA-00 & Test-year adjusted closes sit outside the sealed folder & Data/ is read-only & before \\
-3 & 10-24 & operator & Amendment A1: convergence to $V$, H2-C, S-CONV & Operator, before any data & before \\
-4 & 10-24 & operator & Amendments A2, A3: battery v2, explaining moves & Operator, before any data & before \\
-5 & 10-24 & NA-01 & Share classes grouped by issuer name & ATOM rarely has a CIK & before \\
-6 & 10-24 & NA-01 & Company cap from one class; shares on the split basis & CIQ shares are company-level & before \\
-7 & 10-24 & NA-01 & Test-month ranking closes rebuilt from adjusted ones & Tiers needed before the freeze & before \\
-8 & 10-24 & NA-01 & Ids without Data/prices use ATOM's total return & Else about 7\% of members drop & before \\
-9 & 10-24 & NA-01 & Sector pool: one class per company, own company out & No company in its own factor & before \\
-10 & 10-24 & NA-01 & Target details: volume, $\sigma$ floor, multi-day scaling & PREREG leaves them open & before \\
-11 & 10-24 & NA-01 verif. & Share counts checked against Yahoo, used when CIQ is off & Bad CIQ shares for large names & before \\
-12 & 10-24 & NA-01 verif. & Price-level check at dividend dates; HON rescaled & ATOM's HON closes were halved & before \\
-13 & 10-24 & NA-01 verif. & ATOM raw volume put on the traded share basis & Pre-split volume was adjusted & before \\
-14 & 10-24 & NA-02 & News tickers mapped through dated aliases & ATOM holds no renames & before \\
-15 & 10-24 & NA-02 & Near-duplicates grouped in time order; novelty fixed & Keeps grouping point-in-time & before \\
-16 & 10-24 & NA-02 & Rules of the after-the-fact price-talk detector & PREREG names categories only & before \\
-17 & 10-24 & NA-02 & Leakage audit of vendor sentiment ($z_{id}$ vs $z_{on}$) & PREREG states it in words & before \\
-18 & 10-25 & NA-03 & Rule filters reach the budget by seeded thinning & A yes-or-no rule has no threshold & before \\
-19 & 10-25 & NA-03 & Filter comparison sample purged and embargoed & Purge and embargo left open & before \\
-20 & 10-25 & NA-03 & F5, F6 trained on articles; tuning metric fixed & Training unit left open & before \\
-21 & 10-25 & NA-03 & D2 events, third-party exclusion, data end defined & PREREG does not cover them & before \\
-22 & 10-25 & NA-04 & The company block carries the GICS sector only & ATOM has no industry level & before \\
-23 & 10-25 & NA-04 & Codebook scales for multi-day moves, market series & PREREG gives them no scale & before \\
-24 & 10-25 & NA-04 & Publication lags of market, FRED, earnings fields & Availability left to NA-04 & before \\
-25 & 10-25 & NA-04 & Masking widened: periods, dates, tickers, names & Residue above the target & before \\
-26 & 10-25 & NA-04 & No pre-market talk in Call B; question text written & Numbers stay in the codebook & before \\
-27 & 10-25 & NA-04 & Move explainers and TradingView items left out & They carry the session's move & before \\
-28 & 10-25 & NA-04 & Residual names (about 1\% of states) accepted & Content alone identifies half & before \\
-29 & 10-26 & NA-04 & Non-English articles and English price talk removed & Price talk in 2.5\% of states & before \\
-30 & 10-26 & NA-04 & More date forms; every price move and level removed & Date residue failed AC2 & before \\
-31 & 10-26 & NA-04 & Running market stories left out of pre-open states & Live pages held the outcome & before \\
-32 & 10-26 & NA-04 & Residues below 0.5\% of states accepted, disclosed & The seventh verification passed & before \\
-33 & 10-26 & NA-02 & Articles of undecided parsing status allowed & Operator decision A & before \\
-34 & 10-26 & NA-06 & Tournament samples, IC, confidence set, screens fixed & PREREG leaves details open & before \\
-35 & 10-27 & op. (NA-06) & No API model passes \S{}8.3; top three kept, model-specific & Within-model tests stay valid & before \\
-36 & 10-27 & NA-07 & Encoding search and anchoring test operationalized & PREREG gives rules only & before \\
-37 & 10-27 & NA-07 & Numeracy gate for encodings other than E3 & The fallback was undefined & before \\
-38 & 10-27 & op. (NA-10) & FMP request cap raised from 3,000 to 17,000 & FMP serves 30 days a request & before \\
-39 & 10-27 & NA-10 & Decision point D1: the 10:00 price, returns, scales & PREREG leaves them open & before \\
-40 & 10-27 & NA-10 & Per-session basis of 30-minute bars; 5 bp bound failing & Vendor data need it & before \\
-41 & 10-27 & NA-10 & The D1 Call B state and its half-hour wording & No phrase for the 10:00 move & before \\
-42 & 10-27 & NA-10 verif. & Request counts and the 5 bp gap corrected & Recomputed from the ledger & before \\
+1 & 10-24 & setup & Freeze hash stops at the log; the log is append-only & The log must grow after the freeze & before \\
+2 & 10-24 & setup & Test-year adjusted closes sit outside the sealed folder & Raw data are read-only & before \\
+3 & 10-24 & operator & Amendment: convergence to $V$ and its strategy & Operator, before any data & before \\
+4 & 10-24 & operator & Amendments: question battery v2, explaining moves & Operator, before any data & before \\
+5 & 10-24 & prices & Share classes grouped by issuer name & The database rarely has a CIK & before \\
+6 & 10-24 & prices & Company cap from one class; shares on the split basis & Vendor shares are company-level & before \\
+7 & 10-24 & prices & Test-month ranking closes rebuilt from adjusted ones & Tiers needed before the freeze & before \\
+8 & 10-24 & prices & Stocks without adjusted prices use total returns & Else about 7\% of members drop & before \\
+9 & 10-24 & prices & Sector pool: one class per company, own company out & No company in its own factor & before \\
+10 & 10-24 & prices & Target details: volume, $\sigma$ floor, multi-day scaling & The plan leaves them open & before \\
+11 & 10-24 & price checks & Share counts checked against a second source & Bad vendor shares for large names & before \\
+12 & 10-24 & price checks & Price-level check at dividend dates; one stock rescaled & One stock's closes were halved & before \\
+13 & 10-24 & price checks & Raw volume put on the traded share basis & Pre-split volume was adjusted & before \\
+14 & 10-24 & news & News tickers mapped through dated aliases & The database holds no renames & before \\
+15 & 10-24 & news & Near-duplicates grouped in time order; novelty fixed & Keeps grouping point-in-time & before \\
+16 & 10-24 & news & Rules of the after-the-fact price-talk detector & The plan names categories only & before \\
+17 & 10-24 & news & Leakage audit of vendor sentiment ($z_{id}$ vs $z_{on}$) & The plan states it in words & before \\
+18 & 10-25 & filters & Rule filters reach the budget by seeded thinning & A yes-or-no rule has no threshold & before \\
+19 & 10-25 & filters & Filter comparison sample purged and embargoed & Purge and embargo left open & before \\
+20 & 10-25 & filters & Learned filters trained on articles; tuning metric fixed & Training unit left open & before \\
+21 & 10-25 & filters & Post-close events, third-party exclusion, data end & The plan does not cover them & before \\
+22 & 10-25 & masking & The company block carries the sector only & The database has no industry & before \\
+23 & 10-25 & masking & Codebook scales for multi-day moves, market series & The plan gives them no scale & before \\
+24 & 10-25 & masking & Publication lags of market, macro and earnings fields & Availability left open & before \\
+25 & 10-25 & masking & Masking widened: periods, dates, tickers, names & Residue above the target & before \\
+26 & 10-25 & masking & No pre-market talk in post-reaction states & Numbers stay in the codebook & before \\
+27 & 10-25 & masking & Move explainers and aggregator reposts left out & They carry the session's move & before \\
+28 & 10-25 & masking & Residual names (about 1\% of states) accepted & Content alone identifies half & before \\
+29 & 10-26 & masking & Non-English articles and English price talk removed & Price talk in 2.5\% of states & before \\
+30 & 10-26 & masking & More date forms; every price move and level removed & Date residue failed a check & before \\
+31 & 10-26 & masking & Running market stories left out of pre-open states & Live pages held the outcome & before \\
+32 & 10-26 & masking & Residues below 0.5\% of states accepted, disclosed & The final check passed & before \\
+33 & 10-26 & news & Articles of undecided parsing status allowed & Operator decision & before \\
+34 & 10-26 & tournament & Tournament samples, IC, confidence set, screens fixed & The plan leaves details open & before \\
+35 & 10-27 & operator & No API model passes the screens; top three kept & Within-model tests stay valid & before \\
+36 & 10-27 & encoding & Encoding search and anchoring test operationalized & The plan gives rules only & before \\
+37 & 10-27 & encoding & Numeracy gate for encodings other than the default & The fallback was undefined & before \\
+38 & 10-27 & operator & Intraday bar request cap raised from 3,000 to 17,000 & The vendor serves 30 days a call & before \\
+39 & 10-27 & bars & Decision point D1: the 10:00 price, returns, scales & The plan leaves them open & before \\
+40 & 10-27 & bars & Per-session basis of 30-minute bars; 5 bp bound failing & Vendor data need it & before \\
+41 & 10-27 & bars & The D1 post-reaction state and its half-hour wording & No phrase for the 10:00 move & before \\
+42 & 10-27 & bars check & Request counts and the 5 bp gap corrected & Recomputed from the ledger & before \\
 43 & 10-27 & operator & Two attention cuts; timing and text robustness & Limited attention; leak checks & before \\
-44 & 10-26 & NA-08 & Trained models read 1,036 tokens instead of 1,024 & No state or question is cut & before \\
-45 & 10-27 & NA-08 & One seed and one epoch per trained model for now & One week's Kaggle quota & before \\
-46 & 10-27 & NA-09 & Baselines operationalized: events, features, LLM & PREREG names them only & before \\
-47 & 10-28 & NA-11 & Analysis spec: samples, inference, bootstrap, families & Frozen code must fix them & before \\
-48 & 10-28 & NA-11 & Freeze hash also covers inference and metrics code & The frozen spec runs them & before \\
-49 & 10-28 & op. (NA-11) & Trained instruments pinned to the seed-13 runs & Later seeds must not change them & before \\
-50 & 10-28 & NA-11 & Final selection: val-B IC on common events & Event set left open & before \\
-51 & 10-28 & op. (NA-11) & Company identification with matched distractors & Removes baseline bias & before \\
-52 & 10-28 & NA-11 & Live-format residue counted with the frozen pattern & First count was narrow & before \\
-53 & 10-28 & op. (NA-11) & H1b, the IC with $z_{id}$, joins the Holm family & Tests what S-D0 trades & before \\
-54 & 10-28 & op. (NA-11) & Production plan: d1-ultra as the API comparator & The PRD names no rule & before \\
-55 & 10-28 & op. (NA-11) & Three robustness variants dropped; 08:00 approximated & They need new states & before \\
-56 & 10-28 & op. (NA-11) & Canary baselines and drift check for API models & NA-05 had none for them & before \\
-57 & 10-28 & op. (NA-11) & span-02's canary STOP judged noise; proceed & Inside its own repeat range & after \\
-58 & 10-28 & op. (NA-11) & Price-only D2 test predictions moved to NA-12 & A feature is a test outcome & after \\
+44 & 10-26 & training & Trained models read 1,036 tokens instead of 1,024 & No state or question is cut & before \\
+45 & 10-27 & training & One seed and one epoch per trained model for now & One week's free GPU quota & before \\
+46 & 10-27 & baselines & Baselines operationalized: events, features, LLM & The plan names them only & before \\
+47 & 10-28 & freeze & Analysis spec: samples, inference, bootstrap, families & Frozen code must fix them & before \\
+48 & 10-28 & freeze & Freeze hash also covers inference and metrics code & The frozen spec runs them & before \\
+49 & 10-28 & operator & Trained instruments pinned to the seed-13 runs & Later seeds must not change them & before \\
+50 & 10-28 & freeze & Final selection: val-B IC on common events & Event set left open & before \\
+51 & 10-28 & operator & Company identification with matched distractors & Removes baseline bias & before \\
+52 & 10-28 & freeze & Live-format residue counted with the frozen pattern & First count was narrow & before \\
+53 & 10-28 & operator & H1b, the IC with $z_{id}$, joins the Holm family & Tests what the open book trades & before \\
+54 & 10-28 & operator & Production plan: d1-ultra as the API comparator & The specification names no rule & before \\
+55 & 10-28 & operator & Three robustness variants dropped; 08:00 approximated & They need new states & before \\
+56 & 10-28 & operator & Canary baselines and drift check for API models & None existed for them & before \\
+57 & 10-28 & operator & span-02's canary stop judged noise; proceed & Inside its own repeat range & after \\
+58 & 10-28 & operator & Price-only post-close test predictions after unblinding & A feature is a test outcome & after \\
 59 & 10-28 & operator & Anchor robustness runs fixed before unblinding & Near-constant anchor outputs & after \\
-60 & 10-28 & NA-12 & NA-12's calls of the frozen spec fixed in advance & Caller fixes joins, families & after \\
-61 & 10-28 & NA-12 & Figure data definitions and code fixes & No pre-registered number moves & after \\
-62 & 10-28 & op. (NA-12) & Exploratory analyses after unblinding, dated & Paper trail for post hoc work & after \\
-63 & 10-28 & NA-13 & Strategy engine fixed before any test-period return & PREREG gives books, not joins & after \\
-64 & 10-29 & operator & Forward test (paper 2) pre-registered: F1 to F5 & Confirmatory forward test & after \\
-65 & 10-29 & NA-13b & Exploratory selective study: rules fixed before its test & The prompt leaves joins open & after \\
-66 & 10-29 & operator & Forward test: F6 overconfidence, F7 conviction & Re-tests NA-13b's findings & after \\
+60 & 10-28 & analysis & Calls of the frozen spec fixed before unblinding & Caller fixes joins, families & after \\
+61 & 10-28 & analysis & Figure data definitions and code fixes & No pre-registered number moves & after \\
+62 & 10-28 & operator & Exploratory analyses after unblinding, dated & Paper trail for post hoc work & after \\
+63 & 10-28 & strategies & Strategy engine fixed before any test-period return & The plan gives books, not joins & after \\
+64 & 10-29 & operator & Forward test pre-registered: F1 to F5 & Confirmatory forward test & after \\
+65 & 10-29 & exploratory & Exploratory study: rules fixed before its test & The request leaves joins open & after \\
+66 & 10-29 & operator & Forward test: F6 overconfidence, F7 conviction & Re-tests exploratory findings & after \\
 \end{longtable}
 \endgroup
 \vspace{-0.5\baselineskip}
 {\footnotesize\raggedright
-Dates are in the sample's last calendar year (MM-DD); Freeze: written before or after the freeze. Summaries by NA-14; the full text is in PREREG \S15.\par
+Dates are in the sample's last calendar year (MM-DD); Stage: the part of the project that wrote the entry; Freeze: written before or after the freeze. The summaries are the authors'; the full text of each entry is in the pre-registration's deviations log, in the replication package.\par
 }

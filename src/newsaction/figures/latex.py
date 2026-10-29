@@ -649,16 +649,16 @@ NOTE_VENDOR_BOOKS: Final = (
     "and the random-signal placebo."
 )
 NOTE_SPAN: Final = (
-    r"$^{\ddagger}$span-02: the S5 canary fired a STOP after the freeze; the operator chose to proceed "
-    r"(PREREG "
-    r"\S15, post-freeze NA-11 row)."
+    r"$^{\ddagger}$span-02: after the freeze, a stability check that repeats earlier requests (the canary) "
+    r"fired "
+    r"for it; its build was unchanged, and production went ahead under a rule recorded in the deviations log."
 )
 NOTE_ANCHOR: Final = (
     "The anchor's readings are uninformative (near-constant outputs after one epoch); its rows are reported, "
     "not read as nulls."
 )
 NOTE_API: Final = (
-    r"The API models fail the \S8.3 contamination screens, so their results are model-specific (\S1.3)."
+    r"The API models fail the pre-registered contamination screens, so their results are model-specific."
 )
 NOTE_EXPLORATORY: Final = (
     "Exploratory (post hoc): requested after unblinding; no hypothesis, outside every family, no claim."
@@ -678,6 +678,19 @@ DASH_NOTES: Final = {
     "no day count.",
     "t22_spend": "---: no cap.",
     "t25_ma_cross": "---: the groups have mean returns and the tradable fades Sharpe ratios.",
+}
+
+
+# The rows of t30 (``tables.derived``), as the paper names them.
+T30_LABELS: Final = {
+    "laya_fin:rg_events": "Laya-Fin's events with $|\\hat N| \\geq 0.5$ (its three RG classes)",
+    "tournament:models": "Models in the zero-shot tournament",
+    "tournament:stage2": "Models in the tournament's second stage",
+    "conditioning:pairs": "Conditioning study (exploratory): (model, condition) pairs",
+    "conditioning:selected": "Conditioning study (exploratory): pairs selected on validation",
+    "conditioning:selected_reversed": "Conditioning study (exploratory): selected pairs negative on the test",
+    "conditioning:selected_positive": "Conditioning study (exploratory): selected pairs positive on the test",
+    "ablations:failed": "Ablation requests rate-limited and not retried",
 }
 
 
@@ -725,7 +738,9 @@ def main_primary() -> Table:
         "tab1_primary",
         "tab:primary",
         MAIN,
-        "Primary hypotheses on the test period: none is supported for the primary instrument, Laya-Fin.",
+        "Primary hypotheses on the test period: none of the five is supported for the primary instrument, "
+        "Laya-Fin (Holm $p$ from {{t1_primary/H3/primary_p_holm@f3}} to "
+        "{{t1_primary/H1/primary_p_holm@f3}}).",
         (
             Col("Hypothesis", "l"),
             Col("Estimate"),
@@ -734,7 +749,7 @@ def main_primary() -> Table:
             Col("Holm $p$"),
             Col("Estimate"),
             Col("$p$"),
-            Col(r"Verdict (\S1.3)", "l"),
+            Col(r"Verdict", "l"),
         ),
         (Panel("", rows),),
         (
@@ -746,7 +761,8 @@ def main_primary() -> Table:
             "single interval (---); $b$ and $c$ with their standard errors are in "
             "Table~\\ref{tab:over-under}. Estimates and CIs to three decimals, H3's and H4's to four, since "
             "those increments are an order smaller.",
-            "Verdict (\\S1.3): general if Laya-Fin's Holm $p < 0.05$ with the predicted sign and the "
+            "Verdict (the pre-registered headline rule): general if Laya-Fin's Holm $p < 0.05$ with the "
+            "predicted sign and the "
             "anchor's "
             "own $p < 0.05$ with the same sign; model-specific if only Laya-Fin's holds; otherwise not "
             "supported. " + NOTE_ANCHOR + " Its $p$ is its own, not Holm-adjusted.",
@@ -810,8 +826,11 @@ def main_ic() -> Table:
         "tab2_ic_by_target",
         "tab:ic-target",
         MAIN,
-        "Daily IC by target: the API models' signal is in the overnight move, and no model predicts the move "
-        "after the open.",
+        "Daily IC by target: the API models' IC is {{t3_ic/d1_ultra:z_on/ic@f3}} to "
+        "{{t3_ic/drex_v2:z_on/ic@f3}} "
+        "with the overnight move and about zero with the move after the open; no model predicts the move "
+        "after "
+        "the open.",
         (
             Col("Model", "l"),
             Col("$z_{cc}$"),
@@ -831,9 +850,9 @@ def main_ic() -> Table:
             "D0 events outside the "
             "embargo "
             f"(val-B 2025-10-01 to 2025-12-31; test {period()}).",
-            "Val-B ICs with $z_{on}$ and $z_{id}$ come from NA-11's run of the frozen spec on val-B before "
-            "the "
-            "freeze, which covered the trained and zero-shot Laya models only (---: not computed).",
+            "Val-B ICs with $z_{on}$ and $z_{id}$ come from a run of the frozen specification on val-B "
+            "before "
+            "the freeze, which covered the trained and zero-shot Laya models only (---: not computed).",
             NOTE_ANCHOR + " " + NOTE_API + " " + NOTE_SPAN,
         ),
         (
@@ -873,9 +892,10 @@ def main_over_under() -> Table:
         "tab3_over_under",
         "tab:over-under",
         MAIN,
-        "The over/under regression: the reversal coefficient $c$ has the predicted sign but is not "
-        "significant, "
-        "and the news coefficient $b$ is not positive at the close.",
+        "The over/under regression (H2): for Laya-Fin the news coefficient $b$ is "
+        "{{t2_h2_over_under/laya_fin:D2/b@f3}} and the reversal coefficient $c$ is "
+        "{{t2_h2_over_under/laya_fin:D2/c@f3}} ($p$ = {{t2_h2_over_under/laya_fin:D2/c_p@f3}}): $c$ has the "
+        "predicted sign but is not significant, and $b$ is not positive at the close.",
         (
             Col("Decision point", "l"),
             Col("$b$"),
@@ -930,9 +950,11 @@ def main_convergence() -> Table:
         "tab4_convergence",
         "tab:convergence",
         MAIN,
-        r"Convergence to the news-implied value $V$: prices reach part of $V$ on day $t$, then partly fade; "
-        r"the "
-        r"gap's half-life is not reached within $t{+}20$.",
+        r"Convergence to the news-implied value $V$: prices reach part of $V$ on day $t$ ($\kappa$ at the "
+        r"close "
+        r"{{t6_convergence_ladder/laya_fin:ladder:C_t/kappa@f2}} for Laya-Fin and "
+        r"{{t6_convergence_ladder/d1_ultra:ladder:C_t/kappa@f2}} for d1-ultra), then partly fade; the gap's "
+        r"half-life is not reached within $t{+}20$.",
         (Col("", "l"), *(Col(RUNG[r]) for r in KAPPA_RUNGS), Col("Half-life")),
         (
             Panel(r"Panel A: convergence ladder $\kappa_h$ (D0 events)", tuple(a)),
@@ -964,8 +986,8 @@ def main_explaining() -> Table:
     models = ("laya_fin", "d1_ultra", "anchor")
     steps = (
         ("ex_ante", "+ ex-ante news (D0)"),
-        ("ex_post", "+ same-day news (Call A)"),
-        ("explanation", "+ explanation (Call B reads the move)"),
+        ("ex_post", "+ same-day news"),
+        ("explanation", "+ explanation (reads the move)"),
     )
     rows = []
     for step, label in steps:
@@ -1003,8 +1025,11 @@ def main_explaining() -> Table:
         "tab5_explaining_moves",
         "tab:explaining",
         MAIN,
-        "Explaining realized moves: same-day news explains a small share of the stock-specific variance (H5, "
-        "supported for Laya-Fin); reading the move explains far more.",
+        "Explaining realized moves: same-day news explains "
+        "{{t10_explanation_ladder/laya_fin:all:ex_post/r2@pct2}} "
+        "of the stock-specific variance for Laya-Fin (H5, supported) and "
+        "{{t10_explanation_ladder/d1_ultra:all:ex_post/r2@pct2}} for d1-ultra; reading the move explains "
+        "{{t10_explanation_ladder/d1_ultra:all:explanation/r2@pct1}}.",
         (Col("Step", "l"), *(Col(h) for m in models for h in (r"$R^2$", r"$\Delta R^2$"))),
         (
             Panel(r"Panel A: the explanation ladder, out-of-sample $R^2$ of $z_{cc}$ (\%)", tuple(rows)),
@@ -1018,7 +1043,8 @@ def main_explaining() -> Table:
             r"Roll's first step, the market and the sector, explains "
             r"{{t10_explanation_ladder/roll_r2/r2@pct1}} of "
             r"total daily variance, a different base. The explanation step needs "
-            r"Call B's explanation answer, which only d1-ultra gives; it reads the realized move, so it is "
+            r"the post-reaction reading's explanation answer, which only d1-ultra gives; it reads the "
+            r"realized move, so it is "
             r"not a "
             r"prediction. H5 is the only secondary test that survives Benjamini--Hochberg ($q$ 0.10) for "
             r"Laya-Fin. ---: not applicable (the first step has no increment; only d1-ultra answers the "
@@ -1090,7 +1116,9 @@ def main_strategies() -> Table:
         "tab6_strategies",
         "tab:strategies",
         MAIN,
-        "Strategies on the test period: no pre-registered book survives costs and the deflated Sharpe ratio.",
+        "Strategies on the test period: no pre-registered book survives costs and the deflated Sharpe ratio "
+        "(the largest deflated-Sharpe probability is "
+        "{{t20_strategies/test|S-D2|laya_fin|D2|rg|close_t+5|all/dsr_prob_net_10@f3}}).",
         (
             Col("Book", "l"),
             Col("Holding", "l"),
@@ -1110,10 +1138,12 @@ def main_strategies() -> Table:
             r"per side, in basis points, at which the mean net return is zero (gross mean $\div$ turnover). "
             r"Placebo: the percentile of the gross Sharpe among 100 random-signal books on the same events. "
             r"DSR: "
-            r"the deflated-Sharpe probability at 10 bp with the "
-            r"{{t20_strategies/test|S-CONV|laya_fin|D2|u|close_t+5|all/n_trials@int}} trials in the ledger "
-            r"when NA-13 computed it. Each family is "
-            r"shown at its hypothesis' horizon; every book is in Table~\ref{tab:a-strategies}. S-CONV ranks "
+            r"the deflated-Sharpe probability at 10 bp with "
+            r"$N$ = {{t20_strategies/test|S-CONV|laya_fin|D2|u|close_t+5|all/n_trials@int}} trials, every "
+            r"trial "
+            r"logged when these pre-registered strategies were evaluated (the ledger holds "
+            r"{{t22_spend/trials/value@int}} after the post hoc exploratory study). Each family is "
+            r"shown at its hypothesis' horizon; every book is in the replication package. S-CONV ranks "
             r"by "
             r"the gap $U = V - G^{\mathrm{lvl}}$; S-D0 by $\tilde N$; S-D1 and S-D2 by the judgment $J$ "
             r"signed by the move; RG books trade the cases the model calls a misreaction (one name a side).",
@@ -1267,7 +1297,9 @@ def _rule_label(row: Mapping[str, Any]) -> str:
 VIEWS: Final[tuple[View, ...]] = (
     View(
         "t14_model_comparison",
-        "Model comparison: the daily IC with $z_{cc}$ on val-B and test, the cost and the latency.",
+        "Model comparison: every val-B IC with $z_{cc}$ that is positive falls on the test (Laya-Fin "
+        "{{t14_model_comparison/laya_fin/ic_val_b@f3}} to {{t14_model_comparison/laya_fin/ic_test@f3}}); the "
+        "cost and the latency.",
         ("model",),
         "Model",
         (
@@ -1433,7 +1465,9 @@ VIEWS: Final[tuple[View, ...]] = (
     ),
     View(
         "t15_calibration",
-        "Calibration of the three-class forecasts: the trained models are calibrated but barely informative.",
+        "Calibration of the three-class forecasts: the trained models are calibrated but barely informative "
+        "(Laya-Fin's ECE {{t15_calibration/laya_fin:e5/ece@f3}}), the API models overconfident (ECE "
+        "{{t15_calibration/drex_v2:e5/ece@f3}} to {{t15_calibration/span_02:e5/ece@f3}}).",
         ("model", "target"),
         "Model, target",
         (
@@ -1452,8 +1486,9 @@ VIEWS: Final[tuple[View, ...]] = (
         label_width="1.6in",
         notes=(
             NOTE_DASH,
-            "Q1's three classes against the targets; skill against val-A climatology; $T$ the temperature "
-            "fit on val-A.",
+            "The pre-open reading's three classes (a fall, no move or a rise, split at $\\pm 0.5$ typical "
+            "moves) "
+            "against the targets; skill against val-A climatology; $T$ the temperature fit on val-A.",
             NOTE_ANCHOR,
             NOTE_SPAN,
         ),
@@ -1513,7 +1548,8 @@ VIEWS: Final[tuple[View, ...]] = (
     ),
     View(
         "t4_secondary",
-        "Secondary hypotheses: only H5 survives Benjamini--Hochberg for Laya-Fin.",
+        "Secondary hypotheses: only H5 survives Benjamini--Hochberg for Laya-Fin ($q$ = "
+        "{{t4_secondary/laya_fin:H5/q@f3}}).",
         ("model", "test"),
         "Model, test",
         (
@@ -1528,14 +1564,15 @@ VIEWS: Final[tuple[View, ...]] = (
             NOTE_DASH,
             "BH at $q = 0.10$ within each instrument; the pooled family adds d1-ultra's H6 and A3.4 to "
             "Laya-Fin's. The anchor's H7 is reported outside its family, so it has no $q$. Each test has "
-            "either an SE or a 95\\% CI, as NA-12 states it.",
+            "either an SE or a 95\\% CI, as the frozen analysis reports it.",
             NOTE_ANCHOR,
             NOTE_API,
         ),
     ),
     View(
         "t5_heterogeneity",
-        "Heterogeneity of H2: no cut differs.",
+        "Heterogeneity of H2: no cut differs (Laya-Fin's Wald $p$ from "
+        "{{t5_heterogeneity/laya_fin:tier_top100/p@f2}} to {{t5_heterogeneity/laya_fin:tier_mid/p@f2}}).",
         ("model", "cut"),
         "Model, cut",
         (
@@ -1931,11 +1968,11 @@ VIEWS: Final[tuple[View, ...]] = (
     ),
     View(
         "t30_derived",
-        "Sums of figure-data cells cited in captions.",
+        "Counts and sums of upstream cells cited in captions and in the paper.",
         ("key",),
         "Quantity",
         (("value", "Value", "int"),),
-        label_fn=lambda r: "Laya-Fin's events with $|\\hat N| \\geq 0.5$ (its three RG classes)",
+        label_fn=lambda r: T30_LABELS[str(r["key"])],
     ),
 )
 
@@ -1959,20 +1996,21 @@ def deviations_table(df: pd.DataFrame) -> Table:
         "t34_prereg_deviations",
         "tab:a-deviations",
         APPENDIX,
-        "Pre-registration deviations (PREREG \\S15), one line per row of the log.",
+        f"Deviations from the pre-registration: all {{{{{name}/row:{len(df):02d}/row@int}}}} entries of its "
+        "deviations log, one line each.",
         (
             Col("Row", "r"),
             Col("Date", "l"),
-            Col("Chunk", "l"),
+            Col("Stage", "l"),
             Col("Change", r">{\raggedright\arraybackslash}p{2.85in}"),
             Col("Reason", r">{\raggedright\arraybackslash}p{1.7in}"),
             Col("Freeze", "l"),
         ),
         (Panel("", rows),),
         (
-            "Dates are in the sample's last calendar year (MM-DD); Freeze: written before or after the "
-            "freeze. Summaries by "
-            "NA-14; the full text is in PREREG \\S15.",
+            "Dates are in the sample's last calendar year (MM-DD); Stage: the part of the project that wrote "
+            "the entry; Freeze: written before or after the freeze. The summaries are the authors'; the full "
+            "text of each entry is in the pre-registration's deviations log, in the replication package.",
         ),
         size=r"\scriptsize",
         colsep=r"\setlength{\tabcolsep}{3pt}",

@@ -1,67 +1,67 @@
 key,row,date,chunk,change,reason,freeze
-row:01,1,2026-10-24,NA-00,Freeze hash stops at §15; §15 checked as append-only,The log must grow after the freeze,before
-row:02,2,2026-10-24,NA-00,Test-year adjusted closes sit outside the sealed folder,Data/ is read-only,before
-row:03,3,2026-10-24,operator,"Amendment A1: convergence to $V$, H2-C, S-CONV","Operator, before any data",before
-row:04,4,2026-10-24,operator,"Amendments A2, A3: battery v2, explaining moves","Operator, before any data",before
-row:05,5,2026-10-24,NA-01,Share classes grouped by issuer name,ATOM rarely has a CIK,before
-row:06,6,2026-10-24,NA-01,Company cap from one class; shares on the split basis,CIQ shares are company-level,before
-row:07,7,2026-10-24,NA-01,Test-month ranking closes rebuilt from adjusted ones,Tiers needed before the freeze,before
-row:08,8,2026-10-24,NA-01,Ids without Data/prices use ATOM's total return,Else about 7% of members drop,before
-row:09,9,2026-10-24,NA-01,"Sector pool: one class per company, own company out",No company in its own factor,before
-row:10,10,2026-10-24,NA-01,"Target details: volume, $\sigma$ floor, multi-day scaling",PREREG leaves them open,before
-row:11,11,2026-10-24,NA-01 verif.,"Share counts checked against Yahoo, used when CIQ is off",Bad CIQ shares for large names,before
-row:12,12,2026-10-24,NA-01 verif.,Price-level check at dividend dates; HON rescaled,ATOM's HON closes were halved,before
-row:13,13,2026-10-24,NA-01 verif.,ATOM raw volume put on the traded share basis,Pre-split volume was adjusted,before
-row:14,14,2026-10-24,NA-02,News tickers mapped through dated aliases,ATOM holds no renames,before
-row:15,15,2026-10-24,NA-02,Near-duplicates grouped in time order; novelty fixed,Keeps grouping point-in-time,before
-row:16,16,2026-10-24,NA-02,Rules of the after-the-fact price-talk detector,PREREG names categories only,before
-row:17,17,2026-10-24,NA-02,Leakage audit of vendor sentiment ($z_{id}$ vs $z_{on}$),PREREG states it in words,before
-row:18,18,2026-10-25,NA-03,Rule filters reach the budget by seeded thinning,A yes-or-no rule has no threshold,before
-row:19,19,2026-10-25,NA-03,Filter comparison sample purged and embargoed,Purge and embargo left open,before
-row:20,20,2026-10-25,NA-03,"F5, F6 trained on articles; tuning metric fixed",Training unit left open,before
-row:21,21,2026-10-25,NA-03,"D2 events, third-party exclusion, data end defined",PREREG does not cover them,before
-row:22,22,2026-10-25,NA-04,The company block carries the GICS sector only,ATOM has no industry level,before
-row:23,23,2026-10-25,NA-04,"Codebook scales for multi-day moves, market series",PREREG gives them no scale,before
-row:24,24,2026-10-25,NA-04,"Publication lags of market, FRED, earnings fields",Availability left to NA-04,before
-row:25,25,2026-10-25,NA-04,"Masking widened: periods, dates, tickers, names",Residue above the target,before
-row:26,26,2026-10-25,NA-04,No pre-market talk in Call B; question text written,Numbers stay in the codebook,before
-row:27,27,2026-10-25,NA-04,Move explainers and TradingView items left out,They carry the session's move,before
-row:28,28,2026-10-25,NA-04,Residual names (about 1% of states) accepted,Content alone identifies half,before
-row:29,29,2026-10-26,NA-04,Non-English articles and English price talk removed,Price talk in 2.5% of states,before
-row:30,30,2026-10-26,NA-04,More date forms; every price move and level removed,Date residue failed AC2,before
-row:31,31,2026-10-26,NA-04,Running market stories left out of pre-open states,Live pages held the outcome,before
-row:32,32,2026-10-26,NA-04,"Residues below 0.5% of states accepted, disclosed",The seventh verification passed,before
-row:33,33,2026-10-26,NA-02,Articles of undecided parsing status allowed,Operator decision A,before
-row:34,34,2026-10-26,NA-06,"Tournament samples, IC, confidence set, screens fixed",PREREG leaves details open,before
-row:35,35,2026-10-27,op. (NA-06),"No API model passes §8.3; top three kept, model-specific",Within-model tests stay valid,before
-row:36,36,2026-10-27,NA-07,Encoding search and anchoring test operationalized,PREREG gives rules only,before
-row:37,37,2026-10-27,NA-07,Numeracy gate for encodings other than E3,The fallback was undefined,before
-row:38,38,2026-10-27,op. (NA-10),"FMP request cap raised from 3,000 to 17,000",FMP serves 30 days a request,before
-row:39,39,2026-10-27,NA-10,"Decision point D1: the 10:00 price, returns, scales",PREREG leaves them open,before
-row:40,40,2026-10-27,NA-10,Per-session basis of 30-minute bars; 5 bp bound failing,Vendor data need it,before
-row:41,41,2026-10-27,NA-10,The D1 Call B state and its half-hour wording,No phrase for the 10:00 move,before
-row:42,42,2026-10-27,NA-10 verif.,Request counts and the 5 bp gap corrected,Recomputed from the ledger,before
+row:01,1,2026-10-24,setup,Freeze hash stops at the log; the log is append-only,The log must grow after the freeze,before
+row:02,2,2026-10-24,setup,Test-year adjusted closes sit outside the sealed folder,Raw data are read-only,before
+row:03,3,2026-10-24,operator,Amendment: convergence to $V$ and its strategy,"Operator, before any data",before
+row:04,4,2026-10-24,operator,"Amendments: question battery v2, explaining moves","Operator, before any data",before
+row:05,5,2026-10-24,prices,Share classes grouped by issuer name,The database rarely has a CIK,before
+row:06,6,2026-10-24,prices,Company cap from one class; shares on the split basis,Vendor shares are company-level,before
+row:07,7,2026-10-24,prices,Test-month ranking closes rebuilt from adjusted ones,Tiers needed before the freeze,before
+row:08,8,2026-10-24,prices,Stocks without adjusted prices use total returns,Else about 7% of members drop,before
+row:09,9,2026-10-24,prices,"Sector pool: one class per company, own company out",No company in its own factor,before
+row:10,10,2026-10-24,prices,"Target details: volume, $\sigma$ floor, multi-day scaling",The plan leaves them open,before
+row:11,11,2026-10-24,price checks,Share counts checked against a second source,Bad vendor shares for large names,before
+row:12,12,2026-10-24,price checks,Price-level check at dividend dates; one stock rescaled,One stock's closes were halved,before
+row:13,13,2026-10-24,price checks,Raw volume put on the traded share basis,Pre-split volume was adjusted,before
+row:14,14,2026-10-24,news,News tickers mapped through dated aliases,The database holds no renames,before
+row:15,15,2026-10-24,news,Near-duplicates grouped in time order; novelty fixed,Keeps grouping point-in-time,before
+row:16,16,2026-10-24,news,Rules of the after-the-fact price-talk detector,The plan names categories only,before
+row:17,17,2026-10-24,news,Leakage audit of vendor sentiment ($z_{id}$ vs $z_{on}$),The plan states it in words,before
+row:18,18,2026-10-25,filters,Rule filters reach the budget by seeded thinning,A yes-or-no rule has no threshold,before
+row:19,19,2026-10-25,filters,Filter comparison sample purged and embargoed,Purge and embargo left open,before
+row:20,20,2026-10-25,filters,Learned filters trained on articles; tuning metric fixed,Training unit left open,before
+row:21,21,2026-10-25,filters,"Post-close events, third-party exclusion, data end",The plan does not cover them,before
+row:22,22,2026-10-25,masking,The company block carries the sector only,The database has no industry,before
+row:23,23,2026-10-25,masking,"Codebook scales for multi-day moves, market series",The plan gives them no scale,before
+row:24,24,2026-10-25,masking,"Publication lags of market, macro and earnings fields",Availability left open,before
+row:25,25,2026-10-25,masking,"Masking widened: periods, dates, tickers, names",Residue above the target,before
+row:26,26,2026-10-25,masking,No pre-market talk in post-reaction states,Numbers stay in the codebook,before
+row:27,27,2026-10-25,masking,Move explainers and aggregator reposts left out,They carry the session's move,before
+row:28,28,2026-10-25,masking,Residual names (about 1% of states) accepted,Content alone identifies half,before
+row:29,29,2026-10-26,masking,Non-English articles and English price talk removed,Price talk in 2.5% of states,before
+row:30,30,2026-10-26,masking,More date forms; every price move and level removed,Date residue failed a check,before
+row:31,31,2026-10-26,masking,Running market stories left out of pre-open states,Live pages held the outcome,before
+row:32,32,2026-10-26,masking,"Residues below 0.5% of states accepted, disclosed",The final check passed,before
+row:33,33,2026-10-26,news,Articles of undecided parsing status allowed,Operator decision,before
+row:34,34,2026-10-26,tournament,"Tournament samples, IC, confidence set, screens fixed",The plan leaves details open,before
+row:35,35,2026-10-27,operator,No API model passes the screens; top three kept,Within-model tests stay valid,before
+row:36,36,2026-10-27,encoding,Encoding search and anchoring test operationalized,The plan gives rules only,before
+row:37,37,2026-10-27,encoding,Numeracy gate for encodings other than the default,The fallback was undefined,before
+row:38,38,2026-10-27,operator,"Intraday bar request cap raised from 3,000 to 17,000",The vendor serves 30 days a call,before
+row:39,39,2026-10-27,bars,"Decision point D1: the 10:00 price, returns, scales",The plan leaves them open,before
+row:40,40,2026-10-27,bars,Per-session basis of 30-minute bars; 5 bp bound failing,Vendor data need it,before
+row:41,41,2026-10-27,bars,The D1 post-reaction state and its half-hour wording,No phrase for the 10:00 move,before
+row:42,42,2026-10-27,bars check,Request counts and the 5 bp gap corrected,Recomputed from the ledger,before
 row:43,43,2026-10-27,operator,Two attention cuts; timing and text robustness,Limited attention; leak checks,before
-row:44,44,2026-10-26,NA-08,"Trained models read 1,036 tokens instead of 1,024",No state or question is cut,before
-row:45,45,2026-10-27,NA-08,One seed and one epoch per trained model for now,One week's Kaggle quota,before
-row:46,46,2026-10-27,NA-09,"Baselines operationalized: events, features, LLM",PREREG names them only,before
-row:47,47,2026-10-28,NA-11,"Analysis spec: samples, inference, bootstrap, families",Frozen code must fix them,before
-row:48,48,2026-10-28,NA-11,Freeze hash also covers inference and metrics code,The frozen spec runs them,before
-row:49,49,2026-10-28,op. (NA-11),Trained instruments pinned to the seed-13 runs,Later seeds must not change them,before
-row:50,50,2026-10-28,NA-11,Final selection: val-B IC on common events,Event set left open,before
-row:51,51,2026-10-28,op. (NA-11),Company identification with matched distractors,Removes baseline bias,before
-row:52,52,2026-10-28,NA-11,Live-format residue counted with the frozen pattern,First count was narrow,before
-row:53,53,2026-10-28,op. (NA-11),"H1b, the IC with $z_{id}$, joins the Holm family",Tests what S-D0 trades,before
-row:54,54,2026-10-28,op. (NA-11),Production plan: d1-ultra as the API comparator,The PRD names no rule,before
-row:55,55,2026-10-28,op. (NA-11),Three robustness variants dropped; 08:00 approximated,They need new states,before
-row:56,56,2026-10-28,op. (NA-11),Canary baselines and drift check for API models,NA-05 had none for them,before
-row:57,57,2026-10-28,op. (NA-11),span-02's canary STOP judged noise; proceed,Inside its own repeat range,after
-row:58,58,2026-10-28,op. (NA-11),Price-only D2 test predictions moved to NA-12,A feature is a test outcome,after
+row:44,44,2026-10-26,training,"Trained models read 1,036 tokens instead of 1,024",No state or question is cut,before
+row:45,45,2026-10-27,training,One seed and one epoch per trained model for now,One week's free GPU quota,before
+row:46,46,2026-10-27,baselines,"Baselines operationalized: events, features, LLM",The plan names them only,before
+row:47,47,2026-10-28,freeze,"Analysis spec: samples, inference, bootstrap, families",Frozen code must fix them,before
+row:48,48,2026-10-28,freeze,Freeze hash also covers inference and metrics code,The frozen spec runs them,before
+row:49,49,2026-10-28,operator,Trained instruments pinned to the seed-13 runs,Later seeds must not change them,before
+row:50,50,2026-10-28,freeze,Final selection: val-B IC on common events,Event set left open,before
+row:51,51,2026-10-28,operator,Company identification with matched distractors,Removes baseline bias,before
+row:52,52,2026-10-28,freeze,Live-format residue counted with the frozen pattern,First count was narrow,before
+row:53,53,2026-10-28,operator,"H1b, the IC with $z_{id}$, joins the Holm family",Tests what the open book trades,before
+row:54,54,2026-10-28,operator,Production plan: d1-ultra as the API comparator,The specification names no rule,before
+row:55,55,2026-10-28,operator,Three robustness variants dropped; 08:00 approximated,They need new states,before
+row:56,56,2026-10-28,operator,Canary baselines and drift check for API models,None existed for them,before
+row:57,57,2026-10-28,operator,span-02's canary stop judged noise; proceed,Inside its own repeat range,after
+row:58,58,2026-10-28,operator,Price-only post-close test predictions after unblinding,A feature is a test outcome,after
 row:59,59,2026-10-28,operator,Anchor robustness runs fixed before unblinding,Near-constant anchor outputs,after
-row:60,60,2026-10-28,NA-12,NA-12's calls of the frozen spec fixed in advance,"Caller fixes joins, families",after
-row:61,61,2026-10-28,NA-12,Figure data definitions and code fixes,No pre-registered number moves,after
-row:62,62,2026-10-28,op. (NA-12),"Exploratory analyses after unblinding, dated",Paper trail for post hoc work,after
-row:63,63,2026-10-28,NA-13,Strategy engine fixed before any test-period return,"PREREG gives books, not joins",after
-row:64,64,2026-10-29,operator,Forward test (paper 2) pre-registered: F1 to F5,Confirmatory forward test,after
-row:65,65,2026-10-29,NA-13b,Exploratory selective study: rules fixed before its test,The prompt leaves joins open,after
-row:66,66,2026-10-29,operator,"Forward test: F6 overconfidence, F7 conviction",Re-tests NA-13b's findings,after
+row:60,60,2026-10-28,analysis,Calls of the frozen spec fixed before unblinding,"Caller fixes joins, families",after
+row:61,61,2026-10-28,analysis,Figure data definitions and code fixes,No pre-registered number moves,after
+row:62,62,2026-10-28,operator,"Exploratory analyses after unblinding, dated",Paper trail for post hoc work,after
+row:63,63,2026-10-28,strategies,Strategy engine fixed before any test-period return,"The plan gives books, not joins",after
+row:64,64,2026-10-29,operator,Forward test pre-registered: F1 to F5,Confirmatory forward test,after
+row:65,65,2026-10-29,exploratory,Exploratory study: rules fixed before its test,The request leaves joins open,after
+row:66,66,2026-10-29,operator,"Forward test: F6 overconfidence, F7 conviction",Re-tests exploratory findings,after

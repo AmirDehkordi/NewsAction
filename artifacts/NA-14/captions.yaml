@@ -131,9 +131,11 @@ fig6_strategies:
   caption: >-
     Strategies on the test period (NA-13). (a, b) Annualized Sharpe ratio of each main book, gross and net of [[10
     bp]] per side on both legs and the SPY hedge, at the exit of its hypothesis' horizon; the gray box is the [[5th]]
-    to [[95th]] percentile of the book's [[100]] random-signal books; (b) has its own scale. Gross, every book lies
-    inside its placebo range (S-CONV's: {{t33_placebo_sharpe/D2|close_t+5|32ca4af468b92207/sharpe_gross_q05@signed2}}
-    to {{t33_placebo_sharpe/D2|close_t+5|32ca4af468b92207/sharpe_gross_q95@signed2}}); net, every one is negative
+    to [[95th]] percentile of the book's [[100]] random-signal books; (b) has its own scale. Gross, no book reaches
+    the top of its placebo range (S-CONV's: {{t33_placebo_sharpe/D2|close_t+5|32ca4af468b92207/sharpe_gross_q05@signed2}}
+    to {{t33_placebo_sharpe/D2|close_t+5|32ca4af468b92207/sharpe_gross_q95@signed2}}), and Laya-Fin's S-D2 $J$ falls
+    below its bottom (placebo percentile
+    {{t20_strategies/test|S-D2|laya_fin|D2|j|close_t+5|all/placebo_pct_gross@f0}}); net, every one is negative
     (Laya-Fin's S-CONV {{t20_strategies/test|S-CONV|laya_fin|D2|u|close_t+5|all/sharpe_net_10@signed2}}, gross
     {{t20_strategies/test|S-CONV|laya_fin|D2|u|close_t+5|all/sharpe_gross@signed2}}; S-D0
     {{t20_strategies/test|S-D0|laya_fin|D0|n_tilde|close_t|all/sharpe_net_10@signed2}}; S-D1 $J$

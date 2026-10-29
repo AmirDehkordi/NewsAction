@@ -4,7 +4,7 @@
 \small
 \setlength{\tabcolsep}{3pt}
 \begin{threeparttable}
-\caption{Strategies on the test period: no pre-registered book survives costs and the deflated Sharpe ratio.}\label{tab:strategies}
+\caption{Strategies on the test period: no pre-registered book survives costs and the deflated Sharpe ratio (the largest deflated-Sharpe probability is 0.024).}\label{tab:strategies}
 \begin{tabular}{@{}llS[table-format=-1.2]S[table-format=-2.2]S[table-format=1.2]S[table-format=-2.1]S[table-format=2.0]S[table-format=1.3, table-space-text-pre={$<$}]@{}}
 \toprule
  & & \multicolumn{2}{c}{Sharpe ratio} & & & & \\
@@ -31,8 +31,8 @@ vendor sentiment$^{\dagger}$ & open to close & 0.27 & -6.24 & 4.36 & 0.4 & 62 & 
 \bottomrule
 \end{tabular}
 \begin{tablenotes}[flushleft]\footnotesize
-\item Annualized Sharpe ratios ($\sqrt{252}$), gross and net of 10 bp per side on both legs and the SPY hedge; no borrow cost. Turnover: dollars traded a day per dollar of capital. Break-even: the cost per side, in basis points, at which the mean net return is zero (gross mean $\div$ turnover). Placebo: the percentile of the gross Sharpe among 100 random-signal books on the same events. DSR: the deflated-Sharpe probability at 10 bp with the 545 trials in the ledger when NA-13 computed it. Each family is shown at its hypothesis' horizon; every book is in Table~\ref{tab:a-strategies}. S-CONV ranks by the gap $U = V - G^{\mathrm{lvl}}$; S-D0 by $\tilde N$; S-D1 and S-D2 by the judgment $J$ signed by the move; RG books trade the cases the model calls a misreaction (one name a side).
-\item $^{\dagger}$Vendor sentiment: its labels were produced retrospectively, so its books are a possibly look-ahead-contaminated upper bound, not a benchmark; the clean benchmarks are the price-only gap fade and the random-signal placebo. The API models fail the \S8.3 contamination screens, so their results are model-specific (\S1.3).
+\item Annualized Sharpe ratios ($\sqrt{252}$), gross and net of 10 bp per side on both legs and the SPY hedge; no borrow cost. Turnover: dollars traded a day per dollar of capital. Break-even: the cost per side, in basis points, at which the mean net return is zero (gross mean $\div$ turnover). Placebo: the percentile of the gross Sharpe among 100 random-signal books on the same events. DSR: the deflated-Sharpe probability at 10 bp with $N$ = 545 trials, every trial logged when these pre-registered strategies were evaluated (the ledger holds 1,620 after the post hoc exploratory study). Each family is shown at its hypothesis' horizon; every book is in the replication package. S-CONV ranks by the gap $U = V - G^{\mathrm{lvl}}$; S-D0 by $\tilde N$; S-D1 and S-D2 by the judgment $J$ signed by the move; RG books trade the cases the model calls a misreaction (one name a side).
+\item $^{\dagger}$Vendor sentiment: its labels were produced retrospectively, so its books are a possibly look-ahead-contaminated upper bound, not a benchmark; the clean benchmarks are the price-only gap fade and the random-signal placebo. The API models fail the pre-registered contamination screens, so their results are model-specific.
 \end{tablenotes}
 \end{threeparttable}
 \end{table}

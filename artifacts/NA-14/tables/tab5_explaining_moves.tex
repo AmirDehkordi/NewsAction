@@ -3,7 +3,7 @@
 \centering
 \small
 \begin{threeparttable}
-\caption{Explaining realized moves: same-day news explains a small share of the stock-specific variance (H5, supported for Laya-Fin); reading the move explains far more.}\label{tab:explaining}
+\caption{Explaining realized moves: same-day news explains 0.25\% of the stock-specific variance for Laya-Fin (H5, supported) and 0.82\% for d1-ultra; reading the move explains 15.8\%.}\label{tab:explaining}
 \begin{tabular}{@{}lS[table-format=2.3]S[table-format=1.2]S[table-format=2.3, table-space-text-pre={$<$}]S[table-format=2.2]S[table-format=2.3]S[table-format=1.2]@{}}
 \toprule
  & \multicolumn{2}{c}{Laya-Fin} & \multicolumn{2}{c}{d1-ultra} & \multicolumn{2}{c}{Anchor} \\
@@ -12,8 +12,8 @@ Step & {$R^2$} & {$\Delta R^2$} & {$R^2$} & {$\Delta R^2$} & {$R^2$} & {$\Delta 
 \midrule
 \multicolumn{7}{@{}l}{\textit{Panel A: the explanation ladder, out-of-sample $R^2$ of $z_{cc}$ (\%)}} \\
 + ex-ante news (D0) & 0.13 & {---} & 0.28 & {---} & 0.01 & {---} \\
-+ same-day news (Call A) & 0.25 & 0.12 & 0.82 & 0.53 & 0.03 & 0.02 \\
-+ explanation (Call B reads the move) & {---} & {---} & 15.76 & 14.94 & {---} & {---} \\
++ same-day news & 0.25 & 0.12 & 0.82 & 0.53 & 0.03 & 0.02 \\
++ explanation (reads the move) & {---} & {---} & 15.76 & 14.94 & {---} & {---} \\
 share knowable before the open (\%) & 53.17 & {---} & 34.78 & {---} & 35.63 & {---} \\
 \addlinespace
 \multicolumn{7}{@{}l}{\textit{Panel B: the secondary test H5}} \\
@@ -23,8 +23,8 @@ BH $q$ & 0.058 & {---} & {$<$}0.001 & {---} & 0.358 & {---} \\
 \bottomrule
 \end{tabular}
 \begin{tablenotes}[flushleft]\footnotesize
-\item Covered member-days of the test period; out-of-sample $R^2$ of the stock-specific move $z_{cc}$ (the market and sector removed) by cumulative step, in \%; $\Delta R^2$ is the step's increment. Roll's first step, the market and the sector, explains 25.3\% of total daily variance, a different base. The explanation step needs Call B's explanation answer, which only d1-ultra gives; it reads the realized move, so it is not a prediction. H5 is the only secondary test that survives Benjamini--Hochberg ($q$ 0.10) for Laya-Fin. ---: not applicable (the first step has no increment; only d1-ultra answers the explanation question; the share and Panel B have one value per model). $R^2$, $\Delta R^2$ and the share in \% to two decimals; $p$ and $q$ to three.
-\item The anchor's readings are uninformative (near-constant outputs after one epoch); its rows are reported, not read as nulls. The API models fail the \S8.3 contamination screens, so their results are model-specific (\S1.3).
+\item Covered member-days of the test period; out-of-sample $R^2$ of the stock-specific move $z_{cc}$ (the market and sector removed) by cumulative step, in \%; $\Delta R^2$ is the step's increment. Roll's first step, the market and the sector, explains 25.3\% of total daily variance, a different base. The explanation step needs the post-reaction reading's explanation answer, which only d1-ultra gives; it reads the realized move, so it is not a prediction. H5 is the only secondary test that survives Benjamini--Hochberg ($q$ 0.10) for Laya-Fin. ---: not applicable (the first step has no increment; only d1-ultra answers the explanation question; the share and Panel B have one value per model). $R^2$, $\Delta R^2$ and the share in \% to two decimals; $p$ and $q$ to three.
+\item The anchor's readings are uninformative (near-constant outputs after one epoch); its rows are reported, not read as nulls. The API models fail the pre-registered contamination screens, so their results are model-specific.
 \end{tablenotes}
 \end{threeparttable}
 \end{table}

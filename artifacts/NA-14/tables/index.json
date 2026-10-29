@@ -1160,20 +1160,28 @@
  },
  {
   "name": "t30_derived",
-  "title": "Sums of figure-data cells cited in captions",
+  "title": "Counts and sums of upstream cells cited in captions and in the paper",
   "section": "4",
   "exploratory": false,
-  "exploratory_rows": [],
+  "exploratory_rows": [
+   "conditioning:pairs",
+   "conditioning:selected",
+   "conditioning:selected_positive",
+   "conditioning:selected_reversed"
+  ],
   "columns": [
    "key",
    "value",
    "formula",
    "source"
   ],
-  "rows": 1,
+  "rows": 8,
   "notes": [],
   "sources": [
-   "artifacts/NA-12/figure_data/fig1_rg_class_paths.csv"
+   "artifacts/NA-12/figure_data/fig1_rg_class_paths.csv",
+   "artifacts/NA-06/fig3_data.csv",
+   "artifacts/NA-13b/tables/selection.csv",
+   "artifacts/NA-11/ablation_runs.json"
   ],
   "copy_of": "",
   "files": [

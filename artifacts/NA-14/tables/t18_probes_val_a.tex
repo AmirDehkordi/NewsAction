@@ -24,7 +24,7 @@ anchor & {---} & 0.43 & 0.00 & {---} & {---} & 0.055 & 0.043 \\
 \item ---: the probe was not run for that model.
 \item Exploratory: the probes' descriptive columns (NA-11), not hypotheses.
 \item The anchor's readings are uninformative (near-constant outputs after one epoch); its rows are reported, not read as nulls.
-\item $^{\ddagger}$span-02: the S5 canary fired a STOP after the freeze; the operator chose to proceed (PREREG \S15, post-freeze NA-11 row).
+\item $^{\ddagger}$span-02: after the freeze, a stability check that repeats earlier requests (the canary) fired for it; its build was unchanged, and production went ahead under a rule recorded in the deviations log.
 \end{tablenotes}
 \end{threeparttable}
 \end{table}

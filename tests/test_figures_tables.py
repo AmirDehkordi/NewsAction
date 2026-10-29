@@ -194,7 +194,25 @@ def test_latex_main_tables_and_style() -> None:
 def test_latex_carries_the_operator_labels() -> None:
     t14 = (T / "t14_model_comparison.tex").read_text(encoding="utf-8")
     assert r"vendor sentiment$^{\dagger}$" in t14 and "look-ahead-contaminated upper bound" in t14
-    assert "near-constant outputs" in t14 and r"span-02$^{\ddagger}$" in t14 and "S5" in t14
+    assert "near-constant outputs" in t14 and r"span-02$^{\ddagger}$" in t14 and "canary" in t14
+    # NA-16: the notes name no pipeline stage (the paper uses these tables as they are)
+    for name in (
+        "tab1_primary",
+        "tab2_ic_by_target",
+        "tab3_over_under",
+        "tab4_convergence",
+        "tab5_explaining_moves",
+        "tab6_strategies",
+        "t4_secondary",
+        "t5_heterogeneity",
+        "t14_model_comparison",
+        "t15_calibration",
+        "t34_prereg_deviations",
+    ):
+        text = (
+            (T / f"{name}.tex").read_text(encoding="utf-8").split("\n", 1)[1]
+        )  # past the provenance comment
+        assert not re.search(r"NA-\d\d|PREREG|\\S\d|S5 canary|\bChunk\b", text), name
     assert "Exploratory (post hoc)" in (T / "t17_sector_exploratory.tex").read_text(encoding="utf-8")
     assert r"$\hat{N}$" in latex.tex("N̂_W0") and latex.tex("a_b & 50%") == r"a\_b \& 50\%"
     assert latex.tex("$z_{cc}$ and −1") == "$z_{cc}$ and $-$1"
@@ -350,8 +368,12 @@ def test_the_outline_maps_every_table_to_its_section() -> None:
 def test_a_dsr_states_the_n_it_was_computed_with() -> None:
     cited = {t["name"]: t["cells"] for t in _latex()}
     n13 = "t20_strategies/test|S-CONV|laya_fin|D2|u|close_t+5|all/n_trials"
-    for name in ("tab6_strategies", "t20_strategies"):
-        assert n13 in cited[name] and "t22_spend/trials/value" not in cited[name], name
+    assert n13 in cited["t20_strategies"] and "t22_spend/trials/value" not in cited["t20_strategies"]
+    # Table 6 states the DSR's N (NA-13's stored count) and, beside it, the ledger's size after the
+    # exploratory study (NA-16: text, note and appendix agree); the N it deflates with stays NA-13's.
+    assert n13 in cited["tab6_strategies"]
+    tab6 = (T / "tab6_strategies.tex").read_text(encoding="utf-8")
+    assert "every trial logged when these pre-registered strategies were evaluated" in tab6
     caps = (ROOT / "artifacts" / "NA-14" / "captions.yaml").read_text(encoding="utf-8")
     assert "t22_spend/trials/value" not in caps and f"{{{{{n13}@int}}}}" in caps
     t39 = pd.read_csv(T / "t39_conditioning_books.csv")

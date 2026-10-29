@@ -68,6 +68,7 @@ def inputs() -> list[str]:
         tables.PREREG,
         tables.NA08_REPORT,
         tables.NA11_REPORT,
+        tables.ABLATIONS,
         data.NA03_SUMMARY,
         captions.CAPTIONS,
         f"work/{tables.POSITIONS}",
