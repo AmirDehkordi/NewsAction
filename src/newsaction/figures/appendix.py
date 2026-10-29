@@ -4,12 +4,13 @@
 
 In the order of the paper's sections: A1 the zero-shot tournament; A2 the importance filters; A3 the encoding
 study; A4 reliability; A5 the robustness forest; A6 the monthly IC (exploratory: its ±1 SE bands come from
-NA-12 §13); A7 convergence in detail, with every V decile and the anchor; A8 Figure 4 (b) for Laya-Fin; A9 the
-Shapley values; A10 Call B with the news removed or shuffled; A11 persistence by move reason; A12 the other
-books' paths and S-CONV by tier; A13 the probes' descriptive columns (exploratory); A14 and A15 exploratory
-(post hoc): where the D0 signal lives, and news with a moving-average cross. Exploratory figures say so above
-their panels. Each function draws one figure from its CSV (``render.draw`` reads it; ``NAMES`` maps function →
-figure).
+NA-12 §13; the release dates are in its caption); A7 convergence in detail, with every V decile and the
+anchor; A8 Figure 4 (b) for Laya-Fin; A9 the Shapley values by instrument and tier; A10 Call B with the news
+removed or shuffled; A11 persistence by move reason; A12 the other books' paths and S-CONV by tier; A13 the
+probes' descriptive columns (exploratory); A14 and A15 exploratory (post hoc): where the D0 signal lives, and
+news with a moving-average cross. Exploratory figures say so above their panels. Panels that show one quantity
+on one scale share their axis. Each function draws one figure from its CSV (``render.draw`` reads it;
+``NAMES`` maps function → figure).
 """
 
 from __future__ import annotations
@@ -157,7 +158,7 @@ def filters(df: pd.DataFrame) -> Figure:
     ax.plot(
         [0, 0.55], [0, 0.55], color=style.BASELINE, linewidth=style.LINE_THIN, dashes=(3.0, 2.0), zorder=1
     )
-    tone = {"F5": (style.INK, style.LINE), "F6": (style.INK_2, style.LINE)}
+    tone = {"F5": (style.INK, style.LINE), "F6": (style.MUTED, style.LINE)}  # F6 mid-grey: it runs beside F5
     for filt in sorted(f["series"].unique()):
         m = f[f["series"] == filt].sort_values("xv")
         c, lw = tone.get(str(filt), (style.CONTEXT, style.LINE_THIN))
@@ -175,7 +176,7 @@ def filters(df: pd.DataFrame) -> Figure:
         [
             style.key(style.INK, line=True),
             style.key(style.INK),
-            style.key(style.INK_2, line=True),
+            style.key(style.MUTED, line=True),
             Line2D([], [], color=style.CONTEXT, linewidth=style.LINE_THIN),
             style.key(style.BASELINE, dashed=True),
         ],
@@ -273,7 +274,9 @@ FOREST_TITLES: Final = {"a": "Laya-Fin, H1", "b": "Laya-Fin, H1b", "c": "Laya-Fi
 
 
 def robustness(df: pd.DataFrame) -> Figure:
+    """(a) and (d) both show H1, so they share a scale; H1b (b) and the IC (c) keep their own."""
     fig, axes = style.new(style.WIDTH_FULL, 3.6, 1, 4)
+    axes[0][3].sharex(axes[0][0])
     variants = df.drop_duplicates("xv").sort_values("xv")
     rows = [(str(v), VARIANT[str(v)]) for v in variants["x"]]
     for ax, letter in zip(axes[0], "abcd", strict=True):
@@ -316,7 +319,8 @@ def robustness(df: pd.DataFrame) -> Figure:
 
 
 def monthly_ic(df: pd.DataFrame) -> Figure:
-    fig, axes = style.new(style.WIDTH_FULL, 2.5)
+    """The y-range is the data's with a margin; the releases, all after the sample, are in the caption."""
+    fig, axes = style.new(style.WIDTH_FULL, 2.4)
     ax = axes[0][0]
     m = df[df["role"] == "monthly_ic"].copy()
     m["date"] = pd.to_datetime(m["x"] + "-15")
@@ -335,34 +339,16 @@ def monthly_ic(df: pd.DataFrame) -> Figure:
         loc="lower left",
         borderaxespad=0.4,
     )
-    rel = df[df["role"] == "release"].copy()
-    rel["date"] = pd.to_datetime(rel["x"])
-    end = rel.loc[rel["series"] == "sample_end", "date"].iloc[0]
-    last = rel["date"].max()
-    ax.axvspan(end, last + pd.Timedelta(days=12), color=style.GRID, alpha=0.6, linewidth=0, zorder=0.5)
-    top = 0.235
-    for key in ("laya", "drex_v2", "d1_ultra", "span_02"):
-        ax.axvline(
-            rel.loc[rel["series"] == key, "date"].iloc[0],
-            color=style.INK_2,
-            linewidth=style.LINE_THIN,
-            zorder=1.6,
-        )
-    for key, text in (("laya", "Laya released"), ("drex_v2", "API models released")):
-        d = rel.loc[rel["series"] == key, "date"].iloc[0]
-        style.label(
-            ax, d - pd.Timedelta(days=3), 0.0, text, ha="right", va="center", rotation=90, color=style.INK_2
-        )
-    style.label(
-        ax, end + pd.Timedelta(days=4), -0.14, "after the sample", ha="left", va="bottom", color=style.INK_2
-    )
     for split, text in (("val_a", "val-A"), ("val_b", "val-B"), ("test", "test")):
         s = m[m["label"] == split]
         mid = s["date"].min() + (s["date"].max() - s["date"].min()) / 2
-        style.label(ax, mid, top, text, ha="center", va="top", color=style.INK_2)
+        style.label(
+            ax, mid, 0.97, text, ha="center", va="top", color=style.INK_2, transform=ax.get_xaxis_transform()
+        )
     style.zero_line(ax)
-    ax.set_ylim(-0.15, 0.25)
-    ax.set_xlim(m["date"].min() - pd.Timedelta(days=20), last + pd.Timedelta(days=12))
+    margin = 0.02
+    ax.set_ylim(float(m["lo"].min()) - margin, float(m["hi"].max()) + 2.0 * margin)
+    ax.set_xlim(m["date"].min() - pd.Timedelta(days=20), m["date"].max() + pd.Timedelta(days=20))
     style.month_ticks(ax, (1, 4, 7, 10), "%b %Y")
     ax.set_ylabel(r"monthly mean of the daily IC with $z_{cc}$")
     _exploratory(fig, r"Exploratory (post hoc): the bands are $\pm 1$ implied SE of a month's mean")
@@ -393,15 +379,18 @@ def _all_deciles(ax: Axes, d: pd.DataFrame, model: str) -> None:
         p = paths[paths["series"] == series].sort_values("xv")
         style.label(ax, float(p["xv"].iloc[-1]) + 0.15, float(p["y"].iloc[-1]), text, ha="left")
     style.zero_line(ax)
-    ticks(ax, paths, sparse=True)
+    ticks(ax, paths)
     ax.set_xlim(-0.35, 9.6)
 
 
 def convergence_detail(df: pd.DataFrame) -> Figure:
-    fig, axes = style.new(style.WIDTH_FULL, 2.5, 1, 3)
-    a, b, c = axes[0]
+    """(a) and (b) share the CAR scale; (c), the ladder, spans the row below, so every rung is labelled."""
+    fig, axd = style.mosaic(style.WIDTH_FULL, 4.4, [["a", "b"], ["c", "c"]], height_ratios=[1.15, 1.0])
+    a, b, c = axd["a"], axd["b"], axd["c"]
+    b.sharey(a)
     _all_deciles(a, df[df["panel"] == "a"], "laya_fin")
     _all_deciles(b, df[df["panel"] == "b"], "d1_ultra")
+    b.tick_params(labelleft=False)
     a.set_ylabel(r"$\mathrm{CAR}^{\mathrm{lvl}}$ (typical daily moves)")
     style.title(a, "a", r"Laya-Fin, deciles of $V$")
     style.title(b, "b", r"d1-ultra, deciles of $V$")
@@ -415,8 +404,8 @@ def convergence_detail(df: pd.DataFrame) -> Figure:
         style.label(c, 8.4, float(s["y"].iloc[-1]), style.NAME[model], ha="left")
     style.ref_line(c, 1.0, color=style.INK_2)
     style.zero_line(c)
-    ticks(c, k, sparse=True)
-    c.set_xlim(0.6, 11.4)
+    ticks(c, k)
+    c.set_xlim(0.6, 9.3)
     c.set_ylabel(r"$\kappa_h$")
     style.title(c, "c", r"$\kappa_h$, with the anchor")
     return fig
@@ -437,33 +426,45 @@ GROUP: Final = {
     "R": r"$R$, price and reaction",
     "N": r"$N$, news (Call A)",
     "J": r"$J$, judgements (Call B)",
-    "R+N+J": r"total, $R + N + J$",
 }
+SHAPLEY_TIER: Final = {"all": "all", "top100": "Top\n100", "mid": "101 to\n250", "rest": "251 to\n500"}
+SHAPLEY_COLUMN: Final = {"laya_fin": "Laya-Fin", "d1_ultra": "d1-ultra", "anchor": "anchor, uninformative"}
+SHAPLEY_ROW: Final = {
+    "r2": ("$R^2$", r"Shapley value of $R^2$ ($\times 10^{-3}$)"),
+    "ic": ("IC", r"Shapley value of IC ($\times 10^{-3}$)"),
+}
+BAR: Final = 0.23  # the slot of one group's bar; each bar leaves a surface gap within it
 
 
 def shapley(df: pd.DataFrame) -> Figure:
-    fig, axes = style.new(style.WIDTH_FULL, 1.9, 1, 2)
-    rows = [(g, GROUP[g]) for g in GROUP]
-    for ax, letter, title in zip(
-        axes[0], "ab", (r"Out-of-sample $R^2$ of $y_2$", r"Mean daily IC with $y_2$"), strict=True
-    ):
+    fig, axes = style.new(style.WIDTH_FULL, 4.0, 2, 3, sharex=True, sharey="row")
+    for ax, letter in zip(axes.ravel(), "abcdef", strict=True):
         sub = df[df["panel"] == letter]
-        ys = style.row_axis(ax, rows)
-        for model, dy in (("laya_fin", 0.2), ("d1_ultra", 0.0), ("anchor", -0.2)):
-            s = sub[sub["series"] == model]
-            style.dots(ax, s["y"], [ys[str(x)] + dy for x in s["x"]], color=style.color(model))
-        style.zero_line(ax, horizontal=False)
-        style.title(ax, letter, title)
-        if letter == "b":
-            ax.tick_params(labelleft=False)
+        model, metric = str(sub["label"].iloc[0]), str(sub["role"].iloc[0])
+        for i, (group, colour) in enumerate(zip(GROUP, style.COMPONENT, strict=True)):
+            m = sub[sub["series"] == group].sort_values("xv")
+            ax.bar(
+                m["xv"] + (i - 1) * BAR, 1e3 * m["y"], width=BAR - 0.03, color=colour, linewidth=0, zorder=2
+            )
+        total = sub[sub["series"] == "R+N+J"].sort_values("xv")
+        style.dots(ax, total["xv"], 1e3 * total["y"], color=style.INK, marker="D", size=style.DOT, zorder=4)
+        style.zero_line(ax)
+        tiers = sub.drop_duplicates("xv").sort_values("xv")
+        ax.set_xticks(tiers["xv"].tolist(), [SHAPLEY_TIER[str(t)] for t in tiers["x"]])
+        ax.set_xlim(-0.5, 3.5)
+        ax.grid(axis="x", visible=False)
+        style.title(ax, letter, f"{SHAPLEY_COLUMN[model]}: {SHAPLEY_ROW[metric][0]}")
+        if letter in "ad":
+            ax.set_ylabel(SHAPLEY_ROW[metric][1])
     style.legend(
         fig,
-        [style.key(style.color(m)) for m in ("laya_fin", "d1_ultra", "anchor")],
-        ["Laya-Fin", "d1-ultra", "anchor"],
+        [Rectangle((0, 0), 1, 1, facecolor=c, edgecolor="none") for c in style.COMPONENT]
+        + [style.key(style.INK, marker="D")],
+        [*GROUP.values(), r"total, $R + N + J$"],
         loc="outside upper center",
-        ncols=3,
+        ncols=4,
+        handlelength=1.0,
     )
-    fig.supxlabel("Shapley value (test, D2, pooled over tiers)", fontsize=style.SIZE)
     return fig
 
 
@@ -561,10 +562,17 @@ A12_TITLES: Final = {
 
 
 def strategy_paths(df: pd.DataFrame) -> Figure:
+    """(a) and (b) share a scale, as do the S-CONV tiers (d) to (f); S-D2 (c) loses far less, so it keeps its
+    own (the caption says so)."""
     fig, axes = style.new(style.WIDTH_FULL, 4.0, 2, 3, sharex=True)
+    axes[0][1].sharey(axes[0][0])
+    axes[1][1].sharey(axes[1][0])
+    axes[1][2].sharey(axes[1][0])
     for ax, letter in zip(axes.ravel(), "abcdef", strict=True):
         _path_panel(ax, df[df["panel"] == letter], band=letter in "abc")
         style.title(ax, letter, A12_TITLES[letter])
+        if letter in "bef":
+            ax.tick_params(labelleft=False)
     for ax in axes[:, 0]:
         ax.set_ylabel("cumulative net, 10 bp (%)")
     style.legend(
@@ -593,7 +601,8 @@ def strategy_paths(df: pd.DataFrame) -> Figure:
 
 
 def probes(df: pd.DataFrame) -> Figure:
-    fig, axes = style.new(style.WIDTH_FULL, 2.6, 1, 2)
+    """Both panels show the daily IC of N̂ on val-A, so they share the x-axis."""
+    fig, axes = style.new(style.WIDTH_FULL, 2.6, 1, 2, sharex=True)
     for ax, letter, roles, title in (
         (axes[0][0], "a", ("masked", "unmasked"), "Masked against unmasked states"),
         (axes[0][1], "b", ("real", "shuffled"), "Real against shuffled news"),
@@ -688,33 +697,30 @@ def exploratory_d0(df: pd.DataFrame) -> Figure:
         style.dots(c, [sd["y"]], [ys[s]], color=style.color(s))
     c.set_xlabel("SD across companies")
     style.title(c, "c", "Spread across companies")
-    style.legend(
-        fig,
-        [
-            style.key(style.INK_2, marker="s", hollow=True),
-            style.key(style.INK_2, marker="s"),
-            style.key(style.INK_2, hollow=True),
-            style.key(style.INK_2),
-            style.key(style.INK),
-            style.key(style.INK_2),
-            style.key(style.CONTEXT),
-            Rectangle((0, 0), 1, 1, facecolor=style.BAND_GREY, edgecolor="none"),
-        ],
-        [
-            "(a) earnings days, val-B",
-            "earnings days, test",
-            "other events, val-B",
-            "other events, test",
-            "(b) Top 100",
-            "101 to 250",
-            "251 to 500",
-            "(c) shuffle null, 95% range",
-        ],
-        loc="outside lower center",
-        ncols=4,
-        columnspacing=1.0,
-        handletextpad=0.3,
-    )
+    small = {"fontsize": style.SIZE_SMALL, "handletextpad": 0.3, "columnspacing": 0.8, "handlelength": 1.0}
+    for ax, handles, labels, ncols in (
+        (
+            a,
+            [
+                style.key(style.INK_2, marker="s", hollow=True),
+                style.key(style.INK_2, marker="s"),
+                style.key(style.INK_2, hollow=True),
+                style.key(style.INK_2),
+            ],
+            ["earnings, val-B", "earnings, test", "other, val-B", "other, test"],
+            2,
+        ),
+        (b, [style.key(style.INK), style.key(style.INK_2), style.key(style.CONTEXT)], list(TIER.values()), 2),
+        (
+            c,
+            [style.key(style.INK_2), Rectangle((0, 0), 1, 1, facecolor=style.BAND_GREY, edgecolor="none")],
+            ["the signal's SD", "shuffle null, 95% range"],
+            1,
+        ),
+    ):  # each legend narrower than its panel, two rows tall
+        style.legend(
+            ax, handles, labels, loc="upper center", bbox_to_anchor=(0.5, -0.2), ncols=ncols, **small
+        )
     _exploratory(fig)
     return fig
 

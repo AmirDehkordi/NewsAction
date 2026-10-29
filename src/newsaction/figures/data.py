@@ -39,7 +39,6 @@ T13: Final = f"{sc.NA12_TAB}/t13_shapley.csv"
 T14: Final = f"{sc.NA12_TAB}/t14_model_comparison.csv"
 T15: Final = f"{sc.NA12_TAB}/t15_calibration.csv"
 T16: Final = f"{sc.NA12_TAB}/t16_robustness.csv"
-T21: Final = f"{sc.TABLES}/t21_release_dates.csv"
 T24: Final = f"{sc.TABLES}/t24_exploratory_d0_signal.csv"
 T25: Final = f"{sc.TABLES}/t25_ma_cross.csv"
 T33: Final = f"{sc.TABLES}/t33_placebo_sharpe.csv"
@@ -355,20 +354,58 @@ def fig4(src: sc.Sources) -> pd.DataFrame:
 FIG5_CUTS: Final = ("all", "event_days", "tier:top100", "tier:mid", "tier:rest")
 
 
+FIG5_STEPS: Final = ("ex_ante", "ex_post", "explanation")
+
+
 def fig5(src: sc.Sources) -> pd.DataFrame:
-    """Figure 5 (PREREG A3): (a) the news steps of the explanation ladder, the out-of-sample R² of z_cc after
-    the ex-ante (D0) and the ex-post (same-day) news, for Laya-Fin and d1-ultra; (b) d1-ultra's R² after the
-    explanation step (Call B sees the move), by cut (NA-12 t10, 95% bootstrap intervals)."""
+    """Figure 5 (PREREG A3; NA-12 t10): (a) d1-ultra's out-of-sample R² of z_cc by cut, stacked by step: the
+    ex-ante (D0) news' R², then the stored increments of the same-day news and of the explanation (Call B
+    sees the move), with each bar's total and its 95% bootstrap interval; (b) the news steps on their own
+    scale, the R² after the ex-ante and after the same-day news, for Laya-Fin and d1-ultra (all covered
+    member-days)."""
     t = src.frame(T10)
     out = []
-    for model in ("laya_fin", "d1_ultra"):
-        for pos, step in enumerate(("ex_ante", "ex_post")):
-            r = _one(t, t["key"] == f"{model}:all:{step}", f"t10 {model}:all:{step}")
+    for pos, cut in enumerate(FIG5_CUTS):
+        for step in FIG5_STEPS:
+            r = _one(t, t["key"] == f"d1_ultra:{cut}:{step}", f"t10 d1_ultra:{cut}:{step}")
             out.append(
                 sc.rows(
                     r,
                     T10,
                     panel="a",
+                    series=f"={step}",
+                    label="=d1_ultra",
+                    role="=segment",
+                    x=f"={cut}",
+                    xv=float(pos),
+                    y_col="r2" if step == "ex_ante" else "increment",
+                )
+            )
+        r = _one(t, t["key"] == f"d1_ultra:{cut}:explanation", f"t10 d1_ultra:{cut}:explanation")
+        out.append(
+            sc.rows(
+                r,
+                T10,
+                panel="a",
+                series="=explanation",
+                label="=d1_ultra",
+                role="=total",
+                x=f"={cut}",
+                xv=float(pos),
+                y_col="r2",
+                ci="table",
+                lo_col="r2_ci_low",
+                hi_col="r2_ci_high",
+            )
+        )
+    for model in ("laya_fin", "d1_ultra"):
+        for pos, step in enumerate(FIG5_STEPS[:2]):
+            r = _one(t, t["key"] == f"{model}:all:{step}", f"t10 {model}:all:{step}")
+            out.append(
+                sc.rows(
+                    r,
+                    T10,
+                    panel="b",
                     series=f"={model}",
                     role=f"={step}",
                     x=f"={step}",
@@ -379,23 +416,6 @@ def fig5(src: sc.Sources) -> pd.DataFrame:
                     hi_col="r2_ci_high",
                 )
             )
-    for pos, cut in enumerate(FIG5_CUTS):
-        r = _one(t, t["key"] == f"d1_ultra:{cut}:explanation", f"t10 d1_ultra:{cut}")
-        out.append(
-            sc.rows(
-                r,
-                T10,
-                panel="b",
-                series="=d1_ultra",
-                role="=explanation",
-                x=f"={cut}",
-                xv=float(pos),
-                y_col="r2",
-                ci="table",
-                lo_col="r2_ci_low",
-                hi_col="r2_ci_high",
-            )
-        )
     return pd.concat(out, ignore_index=True)
 
 
@@ -517,7 +537,7 @@ def fig6(src: sc.Sources) -> pd.DataFrame:
 def fig7(src: sc.Sources) -> pd.DataFrame:
     """Figure 7: company identification on masked val-A states with activity-matched distractors (NA-11): each
     model's share of correct identifications with its Wilson 95% interval (from the share and the valid
-    answers), the matched baseline and the §8.3 screen bar."""
+    answers), the matched baseline and the §8.3 screening threshold."""
     c = src.frame(sc.COMPANY_ID)
     out = [
         sc.rows(
@@ -807,14 +827,12 @@ def figa5(src: sc.Sources) -> pd.DataFrame:
 
 
 MONTHLY_MODELS: Final = ("laya_fin", "d1_ultra")
-RELEASES: Final = ("sample_end", "laya", "drex_v2", "d1_ultra", "span_02")
 
 
 def figa6(src: sc.Sources) -> pd.DataFrame:
     """Appendix A6, exploratory: the monthly mean of the daily IC of N̂_W0 with z_cc over val-A, val-B and
-    test,
-    with ±1 implied standard error of a month's mean (NA-12 §13.3 via t24, exploratory), and the release
-    dates (t21)."""
+    test, with ±1 implied standard error of a month's mean (NA-12 §13.3 via t24, exploratory). The release
+    dates, all after the sample, are in the caption (t21), not on the time axis."""
     t = src.frame(T24)
     out = []
     for model in MONTHLY_MODELS:
@@ -834,20 +852,6 @@ def figa6(src: sc.Sources) -> pd.DataFrame:
                 se_col="se",
             )
         )
-    r = src.frame(T21)
-    r = r[r["key"].isin(list(RELEASES))]
-    out.append(
-        sc.rows(
-            r,
-            T21,
-            panel="a",
-            series="key",
-            label="name",
-            role="=release",
-            x="date",
-            y_col="days_after_sample_end",
-        )
-    )
     return pd.concat(out, ignore_index=True)
 
 
@@ -870,25 +874,30 @@ def figa8(src: sc.Sources) -> pd.DataFrame:
 
 SHAPLEY_GROUPS: Final = ("R", "N", "J", "total")
 SHAPLEY_MODELS: Final = ("laya_fin", "d1_ultra", "anchor")
+SHAPLEY_TIERS: Final = ("all", "top100", "mid", "rest")
 
 
 def figa9(src: sc.Sources) -> pd.DataFrame:
-    """Appendix A9: exact Shapley values of the out-of-sample R² and of the mean daily IC of y2 at D2 over the
-    feature groups R, N and J, with the full model's total, pooled over tiers (t13)."""
+    """Appendix A9: exact Shapley values of the out-of-sample R² (panels a–c) and of the mean daily IC (d–f)
+    of y2 at D2 over the feature groups R, N and J, with the full model's total, for all member-days and by
+    tier; one panel per instrument (t13)."""
     t = src.frame(T13)
     out = []
-    for panel, metric in (("a", "r2"), ("b", "ic")):
+    panels = iter("abcdef")
+    for metric in ("r2", "ic"):
         for model in SHAPLEY_MODELS:
-            d = t[t["key"].isin([f"{model}:all:{metric}:{g}" for g in SHAPLEY_GROUPS])].copy()
-            d["xpos"] = d["group"].map({"R": 0.0, "N": 1.0, "J": 2.0, "R+N+J": 3.0})
+            keys = [f"{model}:{tier}:{metric}:{g}" for tier in SHAPLEY_TIERS for g in SHAPLEY_GROUPS]
+            d = t.set_index("key").loc[keys].reset_index()
+            d["xpos"] = d["tier"].map({k: float(i) for i, k in enumerate(SHAPLEY_TIERS)})
             out.append(
                 sc.rows(
                     d,
                     T13,
-                    panel=panel,
-                    series=f"={model}",
+                    panel=next(panels),
+                    series="group",
+                    label=f"={model}",
                     role=f"={metric}",
-                    x="group",
+                    x="tier",
                     xv="xpos",
                     y_col="shapley",
                 )

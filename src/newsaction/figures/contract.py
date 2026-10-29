@@ -199,8 +199,9 @@ def write(layout: Layout | None = None) -> list[str]:
         p.relative_to(lay.root).as_posix() for p in (lay.root / sc.ARTIFACTS).rglob("*") if p.is_file()
     }
     # The REPORT is documentation, as in NA-12 and NA-13; the compiled preview depends on tectonic's bundle,
-    # so its digest is reported in the REPORT, not registered.
-    listed = {e.path for e in entries} | {paper.REPORT, preview.PDF}
+    # so its digest is reported in the REPORT, not registered; its log names the build directory and is not
+    # committed.
+    listed = {e.path for e in entries} | {paper.REPORT, preview.PDF, preview.LOG}
     if on_disk - listed:
         raise ValueError(f"NA-14 files without a contract entry: {sorted(on_disk - listed)[:5]}")
     keep = {e.path for e in entries}

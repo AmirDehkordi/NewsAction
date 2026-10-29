@@ -4,8 +4,9 @@
 
 A figure module holds ``NAME`` and ``plot(df) -> Figure`` and reads no file. ``draw`` reads
 ``artifacts/NA-14/figures/<NAME>.csv``, the only input of the figure, draws it in the paper style and refuses
-it unless it is 6.5 or 3.15 in wide, no text is below 7 pt and every text prints in Computer Modern as
-written (notation as math, no raw underscore); then it writes the PDF and the PNG next to the CSV.
+it unless it is 6.5 or 3.15 in wide, no text is below 7 pt, every text prints in Computer Modern as
+written (notation as math, no raw underscore) and no label touches a line, a marker, a bar, a spine, another
+label or an uncovered gridline (``style.overlaps``); then it writes the PDF and the PNG next to the CSV.
 """
 
 from __future__ import annotations
@@ -105,6 +106,9 @@ def check(fig: Figure, name: str) -> None:
     bad = [t.get_text() for t in style.texts(fig) if not style.plain_text_ok(t.get_text())]
     if bad:
         raise ValueError(f"{name}: text that Computer Modern cannot print as written (use math): {bad[:3]}")
+    touching = style.overlaps(fig)
+    if touching:
+        raise ValueError(f"{name}: a label overlaps a mark: {touching[:3]}")
 
 
 def draw(name: str, layout: Layout | None = None) -> list[Path]:

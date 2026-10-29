@@ -8,9 +8,11 @@ margins, one column) with the preamble the tables need, every main figure and ta
 ``docs/paper_outline.md`` with its caption, then the appendix. It refuses an outline that misses or repeats a
 figure or a LaTeX table. ``make paper`` writes it, so its digest is enforced.
 
-``compile`` runs tectonic (deterministic mode) on it and checks the result: no TeX error, no overfull box
-wider than 1 pt, every font of the PDF embedded. It copies the PDF to ``paper_preview.pdf`` and reports its
-sha256 without enforcing it (tectonic's bundle and engine decide the bytes).
+``compile`` runs tectonic (deterministic mode, ``--keep-logs``) on it and checks the result: no TeX error, no
+overfull box, no float taller than the page, no undefined reference, every font of the PDF embedded. It
+copies the PDF to ``paper_preview.pdf`` and the log to ``paper_preview.log`` (not committed: it names the
+temporary build directory), and reports the PDF's sha256 without enforcing it (tectonic's bundle and engine
+decide the bytes).
 """
 
 from __future__ import annotations
@@ -35,8 +37,9 @@ from newsaction.paths import Layout, resolve_layout
 
 PREVIEW: Final = f"{sc.ARTIFACTS}/paper_preview.tex"
 PDF: Final = f"{sc.ARTIFACTS}/paper_preview.pdf"
+LOG: Final = f"{sc.ARTIFACTS}/paper_preview.log"
 TECTONIC: Final = ("tectonic", "/opt/homebrew/bin/tectonic")
-OVERFULL_PT: Final = 1.0
+OVERFULL_PT: Final = 0.0  # the polish pass: no overfull box at all
 
 # The paper's sections and what each shows, in order (docs/paper_outline.md).
 Outline = tuple[tuple[str, tuple[str, ...]], ...]
@@ -242,6 +245,24 @@ _OVERFULL: Final = re.compile(
     r"Overfull \\[hv]box \((\d+(?:\.\d+)?)pt too (?:wide|high)\)(.*)$", re.MULTILINE
 )
 _WHERE: Final = re.compile(r"warning: (\S+?):\d+: Overfull \\[hv]box \((\d+(?:\.\d+)?)pt")
+_UNDEFINED: Final = re.compile(
+    r"(Reference|Citation) `[^']*' on page \d+ undefined|There were undefined references"
+)
+
+
+_TOO_LARGE: Final = re.compile(r"Float too large for page by \d+(?:\.\d+)?pt on input line \d+")
+
+
+def undefined(log: str) -> list[str]:
+    """The undefined references and citations a LaTeX log reports."""
+    return sorted({m.group(0) for m in _UNDEFINED.finditer(log)})
+
+
+def too_large(log: str) -> list[str]:
+    """The floats a LaTeX log reports as taller than the page (they run into the bottom margin)."""
+    return [m.group(0) for m in _TOO_LARGE.finditer(log)]
+
+
 _STREAM: Final = re.compile(rb"stream\r?\n(.*?)\r?\nendstream", re.DOTALL)
 _DICT: Final = re.compile(rb"<<(?:[^<>]|<[^<]|>[^>])*?/Type\s*/FontDescriptor(?:[^<>]|<[^<]|>[^>])*?>>")
 _FONTNAME: Final = re.compile(rb"/FontName\s*/([^\s/>\[]+)")
@@ -329,7 +350,11 @@ def compile_pdf(layout: Layout | None = None) -> tuple[int, dict[str, Any]]:
             {w for w, b in _WHERE.findall(proc.stderr) if float(b) > OVERFULL_PT}
         )
         report["overfull_max_pt"] = max((b for b, _ in boxes), default=0.0)
-        report["overfull_above_1pt"] = [f"{b:.2f}pt {w}" for b, w in boxes if b > OVERFULL_PT]
+        report["overfull"] = [f"{b:.2f}pt {w}" for b, w in boxes if b > OVERFULL_PT]
+        report["undefined"] = undefined(log)
+        report["float_too_large"] = too_large(log)
+        if log:
+            (lay.root / LOG).write_text(log, encoding="utf-8")
         pdf_tmp = Path(tmp) / "paper_preview.pdf"
         if proc.returncode != 0 or not pdf_tmp.is_file():
             report["stderr"] = proc.stderr[-2000:]
@@ -342,7 +367,14 @@ def compile_pdf(layout: Layout | None = None) -> tuple[int, dict[str, Any]]:
     report["pages"] = pages(data)
     report["pdf"] = PDF
     report["pdf_sha256"] = hashlib.sha256(data).hexdigest()
-    ok = not report["errors"] and not report["overfull_above_1pt"] and not report["fonts_not_embedded"] and f
+    ok = (
+        not report["errors"]
+        and not report["overfull"]
+        and not report["undefined"]
+        and not report["float_too_large"]
+        and not report["fonts_not_embedded"]
+        and f
+    )
     return (0 if ok else 1), report
 
 

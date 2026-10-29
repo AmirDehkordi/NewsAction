@@ -145,6 +145,7 @@ MODEL: Final = {
     "local:laya-typed-decisions": "Laya zero-shot",
     "local/laya-base": "Laya base (local)",
     "local:laya-base": "Laya base (local)",
+    "openai/gpt-6-luna-decisions": "gpt-6-luna",  # as the figures name it
 }
 RUNG: Final = {
     "O_t": r"$O_t$",
@@ -190,20 +191,111 @@ WORDS: Final = {
     "placebo": "placebo-adjusted",
     "True": "yes",
     "False": "no",
+    # cuts, steps and variants of the NA-12 tables, as the figures name them
+    "event_days": "event days",
+    "non_event_days": "non-event days",
+    "ex_ante": "ex-ante news",
+    "ex_post": "same-day news",
+    "explanation": "explanation (reads the move)",
+    "market+sector": "market and sector (Roll)",
+    "tier_top100": "Top 100",
+    "tier_mid": "101 to 250",
+    "tier_rest": "251 to 500",
+    "abs_g_gap_d1": r"$|G|$, D1 gap",
+    "abs_g_gap_d2": r"$|G|$, D2 gap",
+    "[0, 1)": "$[0, 1)$",
+    "[1, 2)": "$[1, 2)$",
+    "[2, inf)": r"$[2, \infty)$",
+    "D2, |G| in [0, 1)": r"D2, $|G| \in [0, 1)$",
+    "D2, |G| in [1, 2)": r"D2, $|G| \in [1, 2)$",
+    "D2, |G| in [2, inf)": r"D2, $|G| \in [2, \infty)$",
+    "|z_cc| >= 1": r"$|z_{cc}| \geq 1$",
+    "ladder_clean": "ladder, clean windows",
+    "ladder_h10": r"ladder, $h^{*} = t{+}10$",
+    "ladder_plateau": "ladder",  # its rung says "plateau"
+    "O_t → C_t+10": r"$O_t$ to $t{+}10$",
+    "O_t → C_t+20": r"$O_t$ to $t{+}20$",
+    "H2C_kappa_hstar": r"H2-C, $\kappa$ at $h^{*}$",
+    "H2C_kappa_increase": r"H2-C, $\kappa$ increase",
+    "H2C_lambda_t5": r"H2-C, $\lambda_{t+5}$",
+    "H2C_tracking_naive": "H2-C, naive tracking",
+    "h2_d2": "H2 at D2",
+    # the robustness variants (t16), as Figure A5 names them
+    "dollar_volume_tiers": "dollar-volume tiers",
+    "exclude_date_only_hour": "no date-only or hour-stamped article",
+    "exclude_half_days": "no half days",
+    "non_overlapping": "non-overlapping events",
+    "exclude_delisting_flag": "no delisting flag",
+    "without_price_move_text": "without price-move text",
+    "timing_before_04:00": "latest article before 04:00",
+    "timing_04:00_08:00": "latest article 04:00 to 08:00",
+    "timing_08:00_09:15": "latest article 08:00 to 09:15",
+    "gated_s_d1": "gated S-D1",
+    "summary_text_variant": "summary text",
+    "unmasked_trained_models": "unmasked, trained models",
+    "vendor_tags_in_text": "vendor tags in the text",
+    # the vendor's event types (t12) where underscores alone would misread
+    "ma_deal": "M\\&A deal",
+    "deal_ma_partnership": "deal, M\\&A, partnership",
 }
+# d1-ultra's move reasons (Q17), as Figure A11 names them
+REASON: Final = {
+    "analyst_action": "analyst action",
+    "capital_returns_financing": "capital returns, financing",
+    "deal_ma_partnership": "deal, M\\&A, partnership",
+    "earnings_results": "earnings results",
+    "guidance_outlook": "guidance, outlook",
+    "legal_regulatory": "legal, regulatory",
+    "management_governance": "management, governance",
+    "market_or_sector_move": "market or sector move",
+    "no_identifiable_news": "no identifiable news",
+    "product_operations": "product, operations",
+    "sector_or_macro": "sector or macro",
+}
+# the moving-average cross groups, as Figure A15 names them
+MA_GROUP: Final = {
+    "all": "all crosses",
+    "none": "no news",
+    "agree_laya_fin": "agree, Laya-Fin",
+    "disagree_laya_fin": "disagree, Laya-Fin",
+    "agree_d1_ultra": "agree, d1-ultra",
+    "disagree_d1_ultra": "disagree, d1-ultra",
+}
+# the D0 cutoff variants, "w0_cutoff_<HH:MM>" with "_approx" when approximated (no clock literal in src/)
+_CUTOFF: Final = re.compile(r"^w0_cutoff_(\d\d:\d\d)(_approx)?$")
+_ABLATION: Final = re.compile(r"^b2_(no_news|shuffled): IC of b2_(c|j|n_hat) with y2 \((real|ablated)\)$")
 
 
 def word(v: Any) -> str:
-    """A categorical value as the paper writes it: a model, a rung, a tier, a symbol, or the value with its
-    underscores read as spaces (never a raw key)."""
+    """A categorical value as the paper writes it: a model, a rung, a tier, a symbol, a cut ("tier:mid",
+    "event_type:…"), Call B's ablations, or the value with its underscores read as spaces (never a raw
+    key)."""
     s = str(v)
     for table in (MODEL, RUNG, TIER, WORDS):
         if s in table:
             return table[s]
+    head, sep, rest = s.partition(":")
+    if sep and head == "tier" and rest in TIER:
+        return TIER[rest]
+    if sep and head == "event_type":
+        return REASON.get(rest, tex(rest.replace("_", " ")))
+    c = _CUTOFF.match(s)
+    if c:
+        return f"{c.group(1)} cutoff" + (" (approximated)" if c.group(2) else "")
+    m = _ABLATION.match(s)
+    if m:
+        ablation = "news removed" if m.group(1) == "no_news" else "shuffled news"
+        return f"Call B, {ablation}: {WORDS[m.group(2)]} ({m.group(3)})"
     return tex(s.replace("_", " "))
 
 
 # --- cells --------------------------------------------------------------------------------------------------
+
+
+# "<" before a number in an S column is text set against it (siunitx's comparator would leave a gap before an
+# integer field wider than the number's), so the number stays on the decimal column.
+LT: Final = "{$<$}"
+DASH: Final = "---"
 
 
 @dataclass(frozen=True)
@@ -284,7 +376,7 @@ class Cells:
     def num(self, c: Num) -> str:
         v = self.value(c.table, c.key, c.column)
         if v is None or (isinstance(v, float) and math.isnan(v)):
-            return "{---}"
+            return "{" + DASH + "}"
         if isinstance(v, str):
             if c.fmt == "md":  # an ISO date as month-day
                 return "{" + v[5:] + "}"
@@ -296,7 +388,7 @@ class Cells:
             return "{$\\infty$}" if x > 0 else "{$-\\infty$}"
         f = c.fmt
         if f == "p":
-            return "<0.001" if x < 0.001 else f"{x:.3f}"
+            return f"{LT}0.001" if x < 0.001 else f"{x:.3f}"
         if f == "int":
             return f"{round(x):d}"
         if f.startswith("pct"):
@@ -314,7 +406,7 @@ class Cells:
     def ci(self, c: CI) -> str:
         lo, hi = self.value(c.table, c.key, c.lo), self.value(c.table, c.key, c.hi)
         if lo is None or hi is None or any(isinstance(v, float) and math.isnan(v) for v in (lo, hi)):
-            return "---"
+            return DASH
 
         def m(v: Any) -> str:
             return f"${float(v):.{c.decimals}f}$"
@@ -322,8 +414,9 @@ class Cells:
         return f"[{m(lo)}, {m(hi)}]"
 
     def render(self, cell: Cell, kind: str) -> str:
+        """A cell as LaTeX; an empty cell (``None``) shows a dash, whose meaning the table's notes give."""
         if cell is None:
-            return "{}" if kind == "S" else ""
+            return "{" + DASH + "}" if kind == "S" else DASH
         if isinstance(cell, Txt):
             return "{" + cell.text + "}" if kind == "S" else cell.text
         if isinstance(cell, CI):
@@ -332,32 +425,41 @@ class Cells:
         s = self.num(cell)
         if kind == "S":
             return s
+        if s.startswith(LT):
+            return f"$<{s[len(LT) :]}$"
         return s.strip("{}") if s.startswith("{") else f"${s.replace('{(}', '(').replace('{)}', ')')}$"
 
 
-_NUMBER: Final = re.compile(r"^(<)?(-)?(\d*)(?:\.(\d+))?$")
+_NUMBER: Final = re.compile(r"^(-)?(\d*)(?:\.(\d+))?$")
 
 
 def table_format(cells: Iterable[str]) -> str:
-    """siunitx's table-format for an S column from its rendered numbers (text cells in braces are skipped)."""
-    lt = neg = False
+    """siunitx's table-format for an S column from its rendered numbers (text cells in braces are skipped);
+    the text set against a number, "(" … ")" around a standard error or "<" before a bound, gets its
+    space."""
+    neg = False
     ints = decs = 0
-    paren = False
+    paren = lt = False
     for c in cells:
         if c.startswith("{(}"):
             paren = True
             c = c[3:-3]
+        elif c.startswith(LT):
+            lt = True
+            c = c[len(LT) :]
         elif c.startswith("{") or not c:
             continue
         m = _NUMBER.match(c)
         if m is None:
             raise ValueError(f"not a number for an S column: {c!r}")
-        lt |= bool(m.group(1))
-        neg |= bool(m.group(2))
-        ints = max(ints, len(m.group(3) or "0"))
-        decs = max(decs, len(m.group(4) or ""))
-    spec = f"{'<' if lt else ''}{'-' if neg else ''}{max(ints, 1)}.{decs}"
+        neg |= bool(m.group(1))
+        ints = max(ints, len(m.group(2) or "0"))
+        decs = max(decs, len(m.group(3) or ""))
+    if paren and lt:
+        raise ValueError("an S column holds both standard errors and bounds")
+    spec = f"{'-' if neg else ''}{max(ints, 1)}.{decs}"
     extra = ", table-space-text-pre=(, table-space-text-post=)" if paren else ""
+    extra += f", table-space-text-pre={LT}" if lt else ""
     return f"S[table-format={spec}{extra}]"
 
 
@@ -393,6 +495,10 @@ def render(t: Table, keys: Mapping[str, Any]) -> tuple[str, list[str]]:
             line = [label] + [cells.render(c, col.kind) for c, col in zip(cs, t.columns[1:], strict=True)]
             body.append(line)
             rows.append(" & ".join(line) + r" \\")
+    if any(c in ("{" + DASH + "}", DASH) for line in body for c in line[1:]) and not any(
+        DASH in n for n in t.notes
+    ):
+        raise ValueError(f"{t.name}: a cell shows {DASH} but no note says what it means")
     specs = []
     for j, col in enumerate(t.columns):
         if col.kind == "S":
@@ -501,6 +607,21 @@ NOTE_EXPLORATORY: Final = (
     "Exploratory (post hoc): requested after unblinding; no hypothesis, outside every family, no claim."
 )
 NOTE_STARS: Final = "Significance: no stars are used; $p$ is one-sided unless stated."
+NOTE_DASH: Final = (
+    "---: the source table has no value for the row; the statistic does not apply to it or was not computed."
+)
+# What a dash means where the reason is one and plain (the other appendix tables carry NOTE_DASH).
+DASH_NOTES: Final = {
+    "t2_h2_over_under": "---: not estimated for that row (at D0 there is no $G$, so no $c$).",
+    "t7_gap_closure": "---: the half-life is a rung, not an estimate, so it has no standard error, $p$, "
+    "$\\psi_h$ or event count.",
+    "t13_shapley": "---: a total has no share.",
+    "t18_probes_val_a": "---: the probe was not run for that model.",
+    "t21_release_dates": "---: the anchor's checkpoint is dated by month only, before the sample, so it has "
+    "no day count.",
+    "t22_spend": "---: no cap.",
+    "t25_ma_cross": "---: the groups have mean returns and the tradable fades Sharpe ratios.",
+}
 
 
 # --- the main tables ----------------------------------------------------------------------------------------
@@ -564,8 +685,10 @@ def main_primary() -> Table:
             f"Test period {period()}, events outside the embargo. Estimates in each hypothesis' direction; "
             "$p$ one-sided; 95\\% CIs and $p$ from a stationary block bootstrap over sessions (block 5, "
             "10,000 draws); Holm over H1, H1b, H2, H3 and H4 at 0.05.",
-            "H2: the estimate is $\\min(b, -c)$ and $p = \\max(p_b, p_c)$ (both must hold); $b$ and $c$ with "
-            "their standard errors are in Table~\\ref{tab:over-under}.",
+            "H2: the estimate is $\\min(b, -c)$ and $p = \\max(p_b, p_c)$ (both must hold), so it has no "
+            "single interval (---); $b$ and $c$ with their standard errors are in "
+            "Table~\\ref{tab:over-under}. Estimates and CIs to three decimals, H3's and H4's to four, since "
+            "those increments are an order smaller.",
             "Verdict (\\S1.3): general if Laya-Fin's Holm $p < 0.05$ with the predicted sign and the "
             "anchor's "
             "own $p < 0.05$ with the same sign; model-specific if only Laya-Fin's holds; otherwise not "
@@ -647,7 +770,8 @@ def main_ic() -> Table:
             r"$z_{cc}$, "
             r"the overnight move $z_{on}$ (previous close to open) and the move after the open $z_{id}$ "
             r"(open to "
-            "close), each in typical daily moves; Newey--West $t$ in parentheses; D0 events outside the "
+            "close), each in typical daily moves, to three decimals; Newey--West $t$ in parentheses, to two; "
+            "D0 events outside the "
             "embargo "
             f"(val-B 2025-10-01 to 2025-12-31; test {period()}).",
             "Val-B ICs with $z_{on}$ and $z_{id}$ come from NA-11's run of the frozen spec on val-B before "
@@ -712,7 +836,7 @@ def main_over_under() -> Table:
             r"(next open to $t{+}5$), $\hat N$ from the day's news and $G$ the day's move; at D1 the move "
             r"after "
             r"10:00 on $\hat N$ from the pre-open news and the move to 10:00; at D0 $y = z_{id}$ and there "
-            r"is no $G$. "
+            r"is no $G$, so no $c$ (---). "
             "Two-way clustered (session, firm) standard errors in parentheses; $p_b$ tests $b > 0$ and "
             "$p_c$ tests "
             "$c < 0$, one-sided. H2 is the D2 row of Laya-Fin.",
@@ -767,7 +891,10 @@ def main_convergence() -> Table:
             r"half-life is "
             r"the first rung with $\lambda_h \geq 0.5$ ($\infty$: not reached within $t{+}20$). Two-way "
             r"clustered "
-            r"standard errors in parentheses; $t{+}k$ is the close of session $t+k$.",
+            r"standard errors in parentheses; $t{+}k$ is the close of session $t+k$. ---: not estimated; "
+            r"$\lambda_h$ is reported at $t{+}1$, $t{+}5$ and $t{+}20$ from D2 and also at $C_t$ from D1, "
+            r"and the half-life belongs to $\lambda_h$ alone. $\kappa_h$ to two decimals, $\lambda_h$ to "
+            r"three, since it is an order smaller.",
             NOTE_ANCHOR + " " + NOTE_API,
         ),
         size=r"\small",
@@ -805,7 +932,7 @@ def main_explaining() -> Table:
     rows.append(
         (
             "share knowable before the open (\\%)",
-            tuple(c for m in models for c in (Num(T10, f"{m}:all:knowable", "r2", "pct0"), None)),
+            tuple(c for m in models for c in (Num(T10, f"{m}:all:knowable", "r2", "pct2"), None)),
         )
     )
     h5 = []
@@ -837,7 +964,9 @@ def main_explaining() -> Table:
             r"Call B's explanation answer, which only d1-ultra gives; it reads the realized move, so it is "
             r"not a "
             r"prediction. H5 is the only secondary test that survives Benjamini--Hochberg ($q$ 0.10) for "
-            r"Laya-Fin.",
+            r"Laya-Fin. ---: not applicable (the first step has no increment; only d1-ultra answers the "
+            r"explanation question; the share and Panel B have one value per model). $R^2$, $\Delta R^2$ and "
+            r"the share in \% to two decimals; $p$ and $q$ to three.",
             NOTE_ANCHOR + " " + NOTE_API,
         ),
         (
@@ -976,15 +1105,38 @@ class View:
     ci: tuple[str, str, str, int] | None = None  # (lo, hi, header, decimals) after the first number column
     label_width: str = ""  # a wrapped label column of this width (long labels)
     colsep: str = ""
+    int_keys: tuple[str, ...] = ()  # rows that are counts: their numbers print as whole numbers
     extra: dict[str, Any] = field(default_factory=dict)
 
 
 def _label(v: View, row: Mapping[str, Any]) -> str:
+    """The row label: the label columns' words, a part said twice in a row once ("all tiers, all tiers")."""
     if v.label_fn is not None:
         return v.label_fn(row)
-    return ", ".join(
-        word(row[c]) for c in v.label_cols if not (isinstance(row[c], float) and math.isnan(row[c]))
-    )
+    parts = [word(row[c]) for c in v.label_cols if not (isinstance(row[c], float) and math.isnan(row[c]))]
+    return ", ".join(p for i, p in enumerate(parts) if i == 0 or p != parts[i - 1])
+
+
+def _ma_label(row: Mapping[str, Any]) -> str:
+    period, _, rest = str(row["key"]).removeprefix("periods:").partition(":")
+    if rest == "fade_no_news":
+        return f"{word(period)}, the no-news fade"
+    group, _, days = rest.removeprefix("statistics:").partition("|")
+    return f"{word(period)}, {MA_GROUP[group]}, {days} days"
+
+
+def _share_label(row: Mapping[str, Any]) -> str:
+    """t11's items: the explained share by cut, θ by decision point, persistence by move reason."""
+    kind, _, rest = str(row["key"]).partition(":")
+    if kind == "share":
+        cut, _, level = rest.partition(":")
+        what = "all" if cut == "all" else TIER[level] if cut == "tier" else REASON[level]
+        return f"explained share ({what})"
+    if kind == "theta":
+        return rf"$\theta$ at {rest.upper()}"
+    if kind == "persistence":
+        return f"persistence ({REASON[rest]})"
+    return word(str(row["key"]).replace(":", ", "))
 
 
 def view_table(v: View, df: pd.DataFrame, label: str) -> Table:
@@ -997,7 +1149,8 @@ def view_table(v: View, df: pd.DataFrame, label: str) -> Table:
             k = str(row["key"])
             cells: list[Cell] = []
             for j, (col, _h, fmt) in enumerate(v.cols):
-                cells.append(Num(v.name, k, col, fmt) if col in row else None)
+                f = "int" if k in v.int_keys and fmt.startswith("f") else fmt
+                cells.append(Num(v.name, k, col, f) if col in row else None)
                 if v.ci is not None and j == 0:
                     cells.append(CI(v.name, k, v.ci[0], v.ci[1], v.ci[3]))
             rows.append((_label(v, {str(c): x for c, x in row.items()}), tuple(cells)))
@@ -1068,7 +1221,7 @@ VIEWS: Final[tuple[View, ...]] = (
             "llm_subsample:llm": "LLM baseline, its subsample",
             "baseline:price_only_d2": r"price-only (D2, IC with $y_2$)",
         }.get(str(r["key"]), MODEL.get(str(r["key"]).removeprefix("baseline:"), word(r["model"]))),
-        notes=(NOTE_VENDOR, NOTE_SPAN, NOTE_ANCHOR, NOTE_API),
+        notes=(NOTE_DASH, NOTE_VENDOR, NOTE_SPAN, NOTE_ANCHOR, NOTE_API),
     ),
     View(
         "t27_tournament",
@@ -1101,6 +1254,7 @@ VIEWS: Final[tuple[View, ...]] = (
             + f", {r['date']}"
         ),
         notes=(
+            DASH_NOTES["t21_release_dates"],
             "Release dates from the NA-05 catalog (created); Laya's from the operator (Convai's release, "
             "weights on "
             "Hugging Face); the anchor's checkpoint is known to the month only.",
@@ -1112,8 +1266,11 @@ VIEWS: Final[tuple[View, ...]] = (
         ("item",),
         "Item",
         (("value", "Value", "f2"), ("cap", "Cap", "f0")),
+        int_keys=("openrouter_spend_lines", "fmp_requests", "trials", "test_access"),
         notes=(
-            "Spend in USD; Kaggle GPU-hours from the NA-08 and NA-11 reports (Kaggle keeps no ledger here). "
+            DASH_NOTES["t22_spend"],
+            "Spend in USD and GPU-hours to two decimals; counts are whole numbers. "
+            "Kaggle GPU-hours from the NA-08 and NA-11 reports (Kaggle keeps no ledger here). "
             "NA-12, "
             "NA-13 and NA-14 made no API call, Kaggle run or FMP request.",
         ),
@@ -1160,6 +1317,7 @@ VIEWS: Final[tuple[View, ...]] = (
         ci=("ci_low", "ci_high", r"95\% CI", 4),
         panel="model",
         notes=(
+            NOTE_DASH,
             "Holm within each model; the verdict is Laya-Fin's (Table~\\ref{tab:primary}).",
             NOTE_ANCHOR,
             NOTE_API,
@@ -1218,6 +1376,7 @@ VIEWS: Final[tuple[View, ...]] = (
             ("ece_after", "ECE after", "f3"),
         ),
         notes=(
+            NOTE_DASH,
             "Q1's three classes against the targets; skill against val-A climatology; $T$ the temperature "
             "fit on val-A.",
             NOTE_ANCHOR,
@@ -1242,7 +1401,9 @@ VIEWS: Final[tuple[View, ...]] = (
             ("ic_y2", "IC $y_2$", "f3"),
         ),
         landscape=True,
+        colsep=r"\setlength{\tabcolsep}{4pt}",  # the longest variant names fit on one line
         notes=(
+            NOTE_DASH,
             "Each variant raw and placebo-adjusted (\\S5.7). Call B ablations: IC of $J$, $C$ and $\\hat N$ "
             "with $y_2$, real against "
             "ablated.",
@@ -1268,6 +1429,7 @@ VIEWS: Final[tuple[View, ...]] = (
         ),
         landscape=True,
         notes=(
+            DASH_NOTES["t2_h2_over_under"],
             "DK: Driscoll--Kraay standard errors (5 lags) as robustness.",
             NOTE_ANCHOR,
             NOTE_API,
@@ -1287,6 +1449,7 @@ VIEWS: Final[tuple[View, ...]] = (
             ("q_pooled", "Pooled $q$", "p"),
         ),
         notes=(
+            NOTE_DASH,
             "BH at $q = 0.10$ within each instrument; the pooled family adds d1-ultra's H6 and A3.4 to "
             "Laya-Fin's.",
             NOTE_ANCHOR,
@@ -1328,6 +1491,7 @@ VIEWS: Final[tuple[View, ...]] = (
             ("nobs", "Events", "int"),
         ),
         notes=(
+            NOTE_DASH,
             "Variants: the ladder; clean windows (no other selected event in the window); $h^{*} = t{+}10$; "
             "the plateau.",
             NOTE_ANCHOR,
@@ -1348,6 +1512,7 @@ VIEWS: Final[tuple[View, ...]] = (
             ("nobs", "Events", "int"),
         ),
         notes=(
+            DASH_NOTES["t7_gap_closure"],
             "The half-life rows hold the first rung with $\\lambda_h \\geq 0.5$ ($\\infty$: not reached "
             "within $t{+}20$).",
             NOTE_ANCHOR,
@@ -1387,8 +1552,7 @@ VIEWS: Final[tuple[View, ...]] = (
             ("lambda_t5_p", "$p$", "p"),
             ("nobs_d0", "Events", "int"),
         ),
-        landscape=True,
-        notes=(NOTE_ANCHOR, NOTE_API),
+        notes=(NOTE_DASH, NOTE_ANCHOR, NOTE_API),  # portrait: 36 rows overflow a landscape page
     ),
     View(
         "t13_shapley",
@@ -1397,6 +1561,7 @@ VIEWS: Final[tuple[View, ...]] = (
         "Model, tier, metric, group",
         (("shapley", "Shapley value", "f4"), ("share", "Share", "f3"), ("n", "Events", "int")),
         notes=(
+            DASH_NOTES["t13_shapley"],
             "Shares are of a total that is about zero, so they carry no information.",
             NOTE_ANCHOR,
             NOTE_API,
@@ -1416,7 +1581,12 @@ VIEWS: Final[tuple[View, ...]] = (
         ),
         ci=("r2_ci_low", "r2_ci_high", r"95\% CI", 4),
         label_width="2.2in",
-        notes=("Out-of-sample $R^2$ of $z_{cc}$, cumulative by step; bootstrap CIs.", NOTE_ANCHOR, NOTE_API),
+        notes=(
+            NOTE_DASH,
+            "Out-of-sample $R^2$ of $z_{cc}$, cumulative by step; bootstrap CIs.",
+            NOTE_ANCHOR,
+            NOTE_API,
+        ),
     ),
     View(
         "t11_explanation_share_theta",
@@ -1432,8 +1602,9 @@ VIEWS: Final[tuple[View, ...]] = (
             ("n", "Events", "int"),
         ),
         where=_not_exploratory("t11_explanation_share_theta"),
-        label_fn=lambda r: word(str(r["key"]).replace(":", ", ")),
+        label_fn=_share_label,
         notes=(
+            NOTE_DASH,
             r"The exploratory A3.5 market-level replication is in Table~\ref{tab:a-market-replication}.",
             NOTE_API,
         ),
@@ -1456,7 +1627,10 @@ VIEWS: Final[tuple[View, ...]] = (
         ),
         landscape=True,
         colsep=r"\setlength{\tabcolsep}{4pt}",
-        notes=(NOTE_API,),
+        notes=(
+            NOTE_DASH,
+            NOTE_API,
+        ),
     ),
     View(
         "t20_strategies",
@@ -1590,6 +1764,7 @@ VIEWS: Final[tuple[View, ...]] = (
         size=r"\footnotesize",
         colsep=r"\setlength{\tabcolsep}{4pt}",
         notes=(
+            DASH_NOTES["t18_probes_val_a"],
             "Exploratory: the probes' descriptive columns (NA-11), not hypotheses.",
             NOTE_ANCHOR,
             NOTE_SPAN,
@@ -1630,15 +1805,9 @@ VIEWS: Final[tuple[View, ...]] = (
             ("sharpe_net_10", "Net 10 bp", "f2"),
         ),
         where=lambda df: df["key"].str.contains("statistics|fade_no_news$", regex=True),
-        label_fn=lambda r: tex(
-            str(r["key"])
-            .replace("periods:", "")
-            .replace(":statistics:", ", ")
-            .replace(":", ", ")
-            .replace("|", ", ")
-            .replace("_", " ")
-        ),
+        label_fn=_ma_label,
         notes=(
+            DASH_NOTES["t25_ma_cross"],
             NOTE_EXPLORATORY,
             "MA20/MA50 crosses; signed abnormal return over 5 or 20 days by group; the tradable no-news "
             "fade.",

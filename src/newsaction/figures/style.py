@@ -17,14 +17,24 @@ follows the entity in every figure: Laya-Fin, the primary instrument, is slot 1 
 comparator, slot 2 (orange), and the price-only benchmark (the gap fade) slot 3 (aqua); the validator passes
 the three on all pairs against white (worst CVD ΔE 9.2, normal vision 24.0), and aqua's contrast (2.8:1)
 is relieved by direct labels and the CSV beside every figure. Every other model, the placebo and the
-reference lines are context in the greys. Classes of one model that are ordered (news-strength terciles,
-the Under / Fair / Over classes) take that model's ordinal ramp: blue steps 250 / 450 / 650, and orange at
-the lightness of blue 250, the orange slot itself and orange at the lightness of blue 550 (both validated
-with ``--ordinal``). Components (R, N, J, the steps of the explanation ladder) are encoded by position,
-never by a colour of their own. The anchor is uninformative and stays out of the main figures.
+reference lines are context in the greys; in Figure 7 the three production comparators (d1-ultra, span-02,
+drex-v2.0) share the comparator colour, d1-ultra's slot. Classes of one model that are ordered
+(news-strength terciles, the Under / Fair / Over classes) take that model's ordinal ramp: blue steps
+250 / 450 / 650, and the orange slot's hue at the OKLCH lightness of the same three blue steps (both
+validated with ``--ordinal``; as lines in one panel the orange steps pass the adjacent CVD and normal-vision
+checks too, ΔE 16.6 and 19.2, where the earlier steps at blue 250, the slot and blue 550 failed the normal-
+vision floor between Under and Fair, ΔE 7.7). Components (the steps of the explanation ladder in Figure 5,
+the feature groups R, N, J in Figure A9) take the muted component palette: the reference hues of slots 7,
+5 and 4 (violet, magenta, yellow) held, chroma muted to 0.11 and lightness stepped 0.46 / 0.64 / 0.76, so
+the thin first steps of a stack are its darkest and the large last step its lightest; the validator
+passes the three on all pairs against white (worst CVD ΔE 15.5, normal vision 18.5), and the sand step's
+2.2:1 contrast is relieved by the value labels and the CSV. The anchor is uninformative and stays out of
+the main figures.
 
 **Marks.** Lines 1.2 pt, interval lines 0.7 pt, markers 4 pt with a white ring, bands at 15% opacity, light
-horizontal gridlines only, no top or right spine. Text is ink, never the series colour.
+horizontal gridlines only, no top or right spine. Text is ink, never the series colour; a label inside the
+plot and a legend sit on a knockout of the surface, so a gridline stops at them, and no label touches a
+line, a marker, a bar or a spine.
 
 **Files.** Vector PDF (TrueType fonts embedded, no dates) and a 300-dpi PNG without a software stamp, so a
 rebuild writes the same bytes.
@@ -47,6 +57,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 import numpy.typing as npt
 from matplotlib.axes import Axes
+from matplotlib.collections import LineCollection, PathCollection
 from matplotlib.dates import DateFormatter, MonthLocator
 from matplotlib.figure import Figure
 from matplotlib.legend import Legend
@@ -78,12 +89,16 @@ BAND_GREY: Final = "#d6d5ce"
 # Categorical slots, fixed order (reference palette, light).
 SLOTS: Final = ("#2a78d6", "#eb6834", "#1baf7a", "#eda100", "#e87ba4", "#008300", "#6250d6", "#e34948")
 BLUE: Final = {250: "#86b6ef", 450: "#2a78d6", 550: "#1c5cab", 650: "#104281"}
-# The orange slot's hue and chroma at the OKLCH lightness of BLUE[250] and BLUE[550] (chroma clipped to sRGB).
-ORANGE: Final = {250: "#ff8653", 450: SLOTS[1], 550: "#a82800"}
+# The orange slot's hue and chroma at the OKLCH lightness of BLUE[250], BLUE[450] and BLUE[650] (chroma
+# clipped to sRGB).
+ORANGE: Final = {250: "#ff9067", 450: "#c94908", 650: "#752600"}
 RAMP: Final = {
     "laya_fin": (BLUE[250], BLUE[450], BLUE[650]),
-    "d1_ultra": (ORANGE[250], ORANGE[450], ORANGE[550]),
+    "d1_ultra": (ORANGE[250], ORANGE[450], ORANGE[650]),
 }
+# The muted component palette, in its fixed order (violet, magenta, yellow hues at OKLCH C 0.11).
+COMPONENT: Final = ("#514e93", "#c16e8d", "#daa75c")
+COMPARATOR: Final = SLOTS[1]
 
 LINE: Final = 1.2
 LINE_THIN: Final = 0.7
@@ -301,11 +316,18 @@ def ref_line(ax: Axes, value: float, *, horizontal: bool = True, color: str = IN
         ax.axvline(value, color=color, **kw)
 
 
+# A label's knockout: the surface behind its text, so a gridline stops at the label instead of crossing it
+# (a label never sits on a data mark; the knockout only hides the hairline grid).
+KNOCKOUT: Final = {"boxstyle": "square,pad=0.08", "facecolor": SURFACE, "edgecolor": "none"}
+
+
 def label(ax: Axes, x: float, y: float, text: str, **kw: Any) -> Text:
-    """A direct label in the text ink (never the series colour), data coordinates by default."""
+    """A direct label in the text ink (never the series colour), data coordinates by default, on a
+    knockout."""
     kw.setdefault("fontsize", SIZE)
     kw.setdefault("color", INK)
     kw.setdefault("va", "center")
+    kw.setdefault("bbox", dict(KNOCKOUT))
     t = ax.text(x, y, text, **kw)
     t.set_in_layout(False)
     return t
@@ -337,11 +359,17 @@ def key(
 
 
 def legend(where: Axes | Figure, handles: Sequence[Any], labels: Sequence[str], **kw: Any) -> Legend:
-    """A small legend outside the data (the caller places it)."""
-    kw.setdefault("frameon", False)
+    """A small legend outside the data (the caller places it), on a knockout without a visible frame."""
+    kw.setdefault("frameon", True)
+    kw.setdefault("fancybox", False)
+    kw.setdefault("facecolor", SURFACE)
+    kw.setdefault("edgecolor", SURFACE)
+    kw.setdefault("framealpha", 1.0)
     kw.setdefault("fontsize", SIZE)
     kw.setdefault("handlelength", 1.4)
-    return where.legend(list(handles), list(labels), **kw)
+    leg = where.legend(list(handles), list(labels), **kw)
+    leg.get_frame().set_linewidth(0.0)
+    return leg
 
 
 def rung_axis(ax: Axes, positions: Sequence[float], labels: Sequence[str]) -> None:
@@ -405,6 +433,149 @@ def texts(fig: Figure) -> list[Text]:
 def text_sizes(fig: Figure) -> list[float]:
     """The font size of every visible, non-empty text of a figure (the ≥ 7 pt check)."""
     return [float(t.get_fontsize()) for t in texts(fig)]
+
+
+# --- no label on a mark -------------------------------------------------------------------------------------
+
+TRIM: Final = 0.3  # px trimmed off each side of a text box (a glyph box is a little larger than its ink)
+Box = tuple[float, float, float, float]  # x0, y0, x1, y1 in display pixels
+
+
+def _drawn(fig: Figure, t: Text) -> bool:
+    """False for a tick label whose tick lies outside the view: matplotlib keeps it visible but never draws
+    it."""
+    for ax in fig.axes:
+        for axis in (ax.xaxis, ax.yaxis):
+            for tick in axis.get_major_ticks() + axis.get_minor_ticks():
+                if t is tick.label1 or t is tick.label2:
+                    lo, hi = sorted(axis.get_view_interval())
+                    return bool(tick.get_visible()) and lo - 1e-9 <= float(tick.get_loc()) <= hi + 1e-9
+    return True
+
+
+def _box(b: Any, grow: float = 0.0) -> Box:
+    return (float(b.x0) - grow, float(b.y0) - grow, float(b.x1) + grow, float(b.y1) + grow)
+
+
+def _meets(a: Box, b: Box) -> bool:
+    return a[0] < b[2] and b[0] < a[2] and a[1] < b[3] and b[1] < a[3]
+
+
+def _crosses(box: Box, xy: npt.NDArray[np.float64]) -> bool:
+    """True if the polyline ``xy`` (display pixels) passes through ``box`` (Liang–Barsky clipping per
+    segment)."""
+    xy = xy[np.isfinite(xy).all(axis=1)]
+    if len(xy) == 1:
+        return bool(box[0] < xy[0, 0] < box[2] and box[1] < xy[0, 1] < box[3])
+    if len(xy) < 2:
+        return False
+    x0, y0, x1, y1 = xy[:-1, 0], xy[:-1, 1], xy[1:, 0], xy[1:, 1]
+    t0, t1 = np.zeros(len(x0)), np.ones(len(x0))
+    ok = np.ones(len(x0), dtype=bool)
+    for p, q in (
+        (x0 - x1, x0 - box[0]),
+        (x1 - x0, box[2] - x0),
+        (y0 - y1, y0 - box[1]),
+        (y1 - y0, box[3] - y0),
+    ):
+        flat = p == 0
+        ok &= ~(flat & (q < 0))
+        with np.errstate(divide="ignore", invalid="ignore"):
+            r = np.where(flat, 0.0, q / np.where(flat, 1.0, p))
+        t0 = np.where(~flat & (p < 0), np.maximum(t0, r), t0)
+        t1 = np.where(~flat & (p > 0), np.minimum(t1, r), t1)
+    return bool((ok & (t0 <= t1)).any())
+
+
+def _knocked_out(t: Text) -> bool:
+    patch = t.get_bbox_patch()
+    return patch is not None and mpl.colors.to_hex(patch.get_facecolor()) == SURFACE
+
+
+def overlaps(fig: Figure) -> list[str]:
+    """Every text or legend of a drawn figure that touches a line, a whisker, a marker, a bar, a spine or
+    another text, and every one that crosses a gridline without a knockout (``KNOCKOUT``, a legend's surface
+    frame). A line counts with its width; bands (``fill_between``) are not marks."""
+    r = cast(Any, fig.canvas).get_renderer()
+    legends = [leg for leg in fig.findobj(Legend) if isinstance(leg, Legend)]
+    member: dict[int, Legend] = {id(a): leg for leg in legends for a in leg.findobj()}
+    labels: list[tuple[str, Box, object, bool]] = []  # text, box, its axes (or None), knocked out
+    for t in texts(fig):
+        if id(t) in member or not _drawn(fig, t):
+            continue
+        labels.append((t.get_text(), _box(t.get_window_extent(r), -TRIM), t.axes, _knocked_out(t)))
+    for leg in legends:
+        frame = leg.get_frame()
+        knocked = leg.get_frame_on() and mpl.colors.to_hex(frame.get_facecolor()) == SURFACE
+        names = ", ".join(x.get_text() for x in leg.get_texts()[:2])
+        labels.append((f"the legend ({names})", _box(leg.get_window_extent(r), -TRIM), None, knocked))
+    px = fig.dpi / 72.0
+    found: list[str] = []
+    for ax in fig.axes:
+        lines: list[tuple[str, npt.NDArray[np.float64], float]] = []  # what, polyline, half width (px)
+        boxes: list[tuple[str, Box]] = []
+        for ln in ax.get_lines():
+            if id(ln) in member or not ln.get_visible() or ln.get_color() == GRID:  # GRID: a row guide
+                continue
+            xy = np.asarray(
+                ln.get_transform().transform(np.asarray(ln.get_xydata(), dtype=float)), dtype=float
+            )
+            if ln.get_linestyle() not in ("None", "none", "", " "):
+                lines.append((f"a line ({ln.get_color()})", xy, float(ln.get_linewidth()) * px / 2))
+            if ln.get_marker() not in (None, "None", "none", "", " "):
+                half = float(ln.get_markersize()) * px / 2
+                boxes += [
+                    ("a marker", (x - half, y - half, x + half, y + half)) for x, y in xy if np.isfinite(x)
+                ]
+        for col in ax.collections:
+            if id(col) in member or not col.get_visible():
+                continue
+            if isinstance(col, LineCollection):
+                half = float(np.max(np.atleast_1d(col.get_linewidth()))) * px / 2
+                for seg in col.get_segments():
+                    xy = np.asarray(col.get_transform().transform(np.asarray(seg, dtype=float)), dtype=float)
+                    lines.append(("a whisker", xy, half))
+            elif isinstance(col, PathCollection):
+                offs = col.get_offset_transform().transform(col.get_offsets())
+                sizes = np.broadcast_to(
+                    np.sqrt(np.asarray(col.get_sizes(), dtype=float)) * px / 2, (len(offs),)
+                )
+                boxes += [
+                    ("a marker", (x - s, y - s, x + s, y + s)) for (x, y), s in zip(offs, sizes, strict=True)
+                ]
+        for patch in ax.patches:
+            if id(patch) not in member and patch.get_visible():
+                boxes.append(("a bar", _box(patch.get_window_extent(r))))
+        for side, spine in ax.spines.items():
+            if spine.get_visible():
+                boxes.append((f"the {side} spine", _box(spine.get_window_extent(r))))
+        grid: list[npt.NDArray[np.float64]] = []
+        for axis in (ax.xaxis, ax.yaxis):
+            lo, hi = sorted(axis.get_view_interval())
+            for tick in axis.get_major_ticks():
+                gl = tick.gridline
+                if gl.get_visible() and lo <= float(tick.get_loc()) <= hi:
+                    data = np.column_stack(
+                        np.broadcast_arrays(*(np.asarray(v, dtype=float) for v in gl.get_data()))
+                    )
+                    grid.append(np.asarray(gl.get_transform().transform(data), dtype=float))
+        for text, box, owner, knocked in labels:
+            if owner is not ax and not (owner is None and _meets(box, _box(ax.bbox))):
+                continue
+            hits = [
+                w
+                for w, xy, half in lines
+                if _crosses((box[0] - half, box[1] - half, box[2] + half, box[3] + half), xy)
+            ]
+            hits += [w for w, b in boxes if _meets(box, b)]
+            if not knocked and any(_crosses(box, xy) for xy in grid):
+                hits.append("a gridline (no knockout)")
+            found += [f"{text!r} touches {w}" for w in dict.fromkeys(hits)]
+    for i, (a, ba, _, _) in enumerate(labels):
+        for b, bb, _, _ in labels[i + 1 :]:
+            if _meets(ba, bb):
+                found.append(f"{a!r} touches {b!r}")
+    return found
 
 
 def save(fig: Figure, stem: Path) -> list[Path]:

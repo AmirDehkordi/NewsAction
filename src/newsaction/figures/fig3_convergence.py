@@ -46,7 +46,17 @@ def deciles(ax: Axes, d: pd.DataFrame, model: str, groups: tuple[tuple[str, str]
         style.ref_line(ax, target, color=c)
         end = p.iloc[-1]
         style.label(ax, float(end["xv"]) + 0.15, float(end["y"]), text, ha="left")
-        style.label(ax, float(p["xv"].iloc[0]) + 0.1, target, "mean $V$", va="bottom", color=style.INK_2)
+        ax.annotate(  # below its dashed target, clear of the line and of the gridlines
+            "mean $V$",
+            (float(p["xv"].iloc[0]) + 0.1, target),
+            xytext=(0.0, -2.0),
+            textcoords="offset points",
+            ha="left",
+            va="top",
+            fontsize=style.SIZE,
+            color=style.INK_2,
+            bbox=dict(style.KNOCKOUT),
+        ).set_in_layout(False)
 
 
 def plot(df: pd.DataFrame) -> Figure:
@@ -70,7 +80,17 @@ def plot(df: pd.DataFrame) -> Figure:
         style.dots(b, x, m["y"], m["lo"], m["hi"], color=c)
         style.label(b, 8.45, float(m["y"].iloc[-1]), style.NAME[model], ha="left")
     style.ref_line(b, 1.0, color=style.INK_2)
-    style.label(b, 1.0, 1.0, r"$\kappa_h = 1$", ha="left", va="bottom", color=style.INK_2)
+    b.annotate(
+        r"$\kappa_h = 1$",
+        (1.0, 1.0),
+        xytext=(0.0, 2.0),
+        textcoords="offset points",
+        ha="left",
+        va="bottom",
+        fontsize=style.SIZE,
+        color=style.INK_2,
+        bbox=dict(style.KNOCKOUT),
+    ).set_in_layout(False)
     style.zero_line(b)
     life = pb[pb["role"] == "half_life"]
     if not all(math.isinf(float(v)) for v in life["y"]):

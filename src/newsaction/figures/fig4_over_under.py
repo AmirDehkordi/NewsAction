@@ -3,11 +3,11 @@
     uv run python -m newsaction.figures.render fig4_over_under
 
 (a) d1-ultra's D2 events by RG class (Under, Fair, Over; pooled over the tiers), sign(N̂)·CAR^lvl with ±1.96
-event-level SE bands, against each class's mean signed V (dashed), which each label gives. (b) d1-ultra's
-drift
-after the close, sign(G)·y2, by bin of the day's move |G|, one line per tercile of news strength |V|, with
-±1.96 SE bands. The classes and terciles are ordered, so they take d1-ultra's orange ramp (light to dark).
-Laya-Fin's panel (b) is Appendix Figure A8. Event time is not to scale.
+event-level SE bands, against each class's mean signed V, which each label gives (dashed in the class's
+colour, dotted for Under, short dashes for Fair, long dashes for Over, because the three lie close).
+(b) d1-ultra's drift after the close, sign(G)·y2, by bin of the day's move |G|, one line per tercile of news
+strength |V|, with ±1.96 SE bands. The classes and terciles are ordered, so they take d1-ultra's orange ramp
+(light to dark). Laya-Fin's panel (b) is Appendix Figure A8. Event time is not to scale.
 """
 
 from __future__ import annotations
@@ -22,6 +22,8 @@ from newsaction.figures import render, style
 
 NAME = "fig4_over_under"
 CLASSES: Final = ("Under", "Fair", "Over")
+# The classes' mean V lie close together, so each dashed target has its own pattern besides its colour.
+TARGET_DASHES: Final = {"Under": (1.0, 1.4), "Fair": (3.0, 1.6), "Over": (6.0, 1.6)}
 TERCILES: Final = ("weak", "medium", "strong")
 BINS: Final = {
     "[0, 0.5)": r"$[0, 0.5)$",
@@ -81,8 +83,9 @@ def plot(df: pd.DataFrame) -> Figure:
             [0.0, float(x.iloc[-1])],
             [target, target],
             color=c,
-            linewidth=style.LINE_THIN,
-            dashes=(3.0, 2.0),
+            linewidth=0.9,
+            dashes=TARGET_DASHES[cls],
+            dash_capstyle="butt",
             zorder=2,
         )
         style.label(

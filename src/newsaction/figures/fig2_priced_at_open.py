@@ -54,7 +54,7 @@ def plot(df: pd.DataFrame) -> Figure:
     a.set_xlim(-0.065, 0.135)
     a.set_xticks([-0.05, 0.0, 0.05, 0.10])
     b.set_xlabel(r"$\mathrm{IC}(z_{on}) - \mathrm{IC}(z_{id})$")
-    b.set_xlim(-0.06, 0.135)
+    b.set_xlim(-0.065, 0.135)  # the same IC scale as (a)
     b.set_xticks([-0.05, 0.0, 0.05, 0.10])
     style.title(a, "a", "Overnight and after the open")
     style.title(b, "b", "H1")

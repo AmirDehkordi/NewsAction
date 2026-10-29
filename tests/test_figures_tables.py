@@ -8,6 +8,9 @@
 - the LaTeX: at most six main tables; booktabs rules and no vertical rule; threeparttable notes; siunitx
   S columns; a caption above with a label; no raw underscore or internal key in the visible text; every
   number a cited cell of ``keys.json``; the operator's labels on the vendor-label rows, the anchor, span-02;
+- the polish pass: an empty cell shows a dash and every table with a dash says in its notes what it means
+  (``latex.render`` refuses one that does not); "<" is text set against its number, so the number stays on
+  the decimal column; Table 5's share knowable before the open has its column's two decimals;
 - no NA-14 key holds "/" or "@", which the cite syntax uses;
 - ``docs/paper_outline.md`` maps every table, and every LaTeX table, to the section ``index.json`` records.
 """
@@ -180,6 +183,51 @@ def test_latex_carries_the_operator_labels() -> None:
     assert latex.tex("$z_{cc}$ and −1") == "$z_{cc}$ and $-$1"
     with pytest.raises(ValueError):
         latex.tex("€")
+
+
+def test_empty_cells_show_a_dash_that_the_notes_explain() -> None:
+    blank = re.compile(r"&\s*\{\}\s*(?=&|\\\\)")
+    for t in _latex():
+        tex = (T / str(t["file"])).read_text(encoding="utf-8")
+        body = "\n".join(ln for ln in tex.splitlines() if not ln.lstrip().startswith("%"))
+        table, _, notes = body.partition(r"\bottomrule")
+        assert not blank.search(table), t["name"]
+        if "{---}" in table or "& --- " in table:
+            assert "---" in notes, t["name"]
+    toy = latex.Table(
+        "toy",
+        "tab:toy",
+        latex.APPENDIX,
+        "A toy.",
+        (latex.Col("Row", "l"), latex.Col("Value")),
+        (latex.Panel("", (("a", (None,)),)),),
+        ("No word on the dash.",),
+    )
+    with pytest.raises(ValueError, match="no note says"):
+        latex.render(toy, {})
+    explained = latex.Table(**{**toy.__dict__, "notes": ("---: not computed.",)})
+    assert r"a & {---} \\" in latex.render(explained, {})[0]
+
+
+def test_a_bound_sits_against_its_number() -> None:
+    cells = latex.Cells({"t/k/p": 0.0004, "t/k/q": 0.02})
+    assert (
+        cells.num(latex.Num("t", "k", "p", "p")) == "{$<$}0.001"
+        and cells.num(latex.Num("t", "k", "q", "p")) == "0.020"
+    )
+    assert cells.render(latex.Num("t", "k", "p", "p"), "c") == "$<0.001$"
+    assert (
+        latex.table_format(["0.020", "{$<$}0.001", "{---}"])
+        == "S[table-format=1.3, table-space-text-pre={$<$}]"
+    )
+    for t in _latex():
+        tex = (T / str(t["file"])).read_text(encoding="utf-8")
+        assert not re.search(r"&\s*<", tex), t["name"]  # no bare comparator in an S column
+    tab5 = (T / "tab5_explaining_moves.tex").read_text(encoding="utf-8")
+    share = next(ln for ln in tab5.splitlines() if ln.startswith("share knowable"))
+    assert re.fullmatch(
+        r"share knowable before the open \(\\%\) & \d+\.\d\d & \{---\} & \d+\.\d\d & .*", share
+    ), share
 
 
 def test_no_key_holds_the_cite_separators() -> None:

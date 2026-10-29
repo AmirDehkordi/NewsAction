@@ -29,3 +29,6 @@ htmlcov/
 
 # OS
 .DS_Store
+
+# NA-14 preview build log (names the temporary build directory)
+/artifacts/NA-14/paper_preview.log

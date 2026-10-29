@@ -5,8 +5,9 @@
 (a, b) The annualized Sharpe ratio of each main book of Laya-Fin and d1-ultra on test, gross and net of 10 bp
 per side, at the exit of its hypothesis' horizon, with the gap fade beside S-CONV; the gray box behind a
 book's
-rows is the 5th–95th percentile of its 100 random-signal books (t33; one universe per book). (c) S-CONV's
-cumulative net return at 10 bp against the gap fade, with the placebo's 5th–95th percentile band.
+rows is the 5th–95th percentile of its 100 random-signal books (t33; one universe per book); (b) has its own
+scale, wide enough for every placebo range. (c) S-CONV's cumulative net return at 10 bp against the gap fade,
+with the placebo's 5th–95th percentile band. One legend above the panels names the colours of all three.
 """
 
 from __future__ import annotations
@@ -65,7 +66,7 @@ def sharpe(ax: Axes, d: pd.DataFrame, rows: list[tuple[str, str]]) -> None:
 
 
 def plot(df: pd.DataFrame) -> Figure:
-    fig, axd = style.mosaic(style.WIDTH_FULL, 2.75, [["a", "b", "c"]], width_ratios=[1.0, 0.9, 1.35])
+    fig, axd = style.mosaic(style.WIDTH_FULL, 2.95, [["a", "b", "c"]], width_ratios=[1.0, 0.9, 1.35])
     a, b, c = axd["a"], axd["b"], axd["c"]
     pa, pb = df[df["panel"] == "a"], df[df["panel"] == "b"]
     rows = _rows(pa)
@@ -74,7 +75,7 @@ def plot(df: pd.DataFrame) -> Figure:
     b.tick_params(labelleft=False)
     a.set_xlim(-4.2, 4.2)
     a.set_xticks([-4, -2, 0, 2, 4])
-    b.set_xlim(-14.0, 3.0)
+    b.set_xlim(-15.5, 3.0)  # S-D1's placebo range starts at -14.04
     b.set_xticks([-12, -8, -4, 0])
     a.set_xlabel("Sharpe ratio, gross")
     b.set_xlabel("Sharpe ratio, net of 10 bp")
@@ -105,7 +106,7 @@ def plot(df: pd.DataFrame) -> Figure:
     labels.append("placebo, 5th to 95th pct.")
     order = [2, 1, 0, 3]
     style.legend(
-        c, [handles[i] for i in order], [labels[i] for i in order], loc="lower left", borderaxespad=0.3
+        fig, [handles[i] for i in order], [labels[i] for i in order], loc="outside upper center", ncols=4
     )
     style.zero_line(c)
     start = band["date"].min().to_period("M").start_time

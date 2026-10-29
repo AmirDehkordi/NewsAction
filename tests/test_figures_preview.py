@@ -4,8 +4,8 @@
   1–6) in the main text in their order and the rest after ``\\appendix``;
 - the committed ``paper_preview.tex`` is the current rendering, every figure is included at its natural size
   (no scaling) and every table by ``\\input``;
-- the PDF checks are not vacuous: every font of a figure PDF is embedded, the page count is read, and an
-  overfull box on tectonic's console is caught;
+- the PDF checks are not vacuous: every font of a figure PDF is embedded, the page count is read, an overfull
+  box on tectonic's console, a float taller than the page and an undefined reference in the log are caught;
 - the committed preview PDF, if present, has every font embedded.
 """
 
@@ -51,6 +51,20 @@ def test_an_overfull_box_on_the_console_is_caught() -> None:
     line = r"warning: tables/x.tex:26: Overfull \hbox (9.23401pt too wide) in paragraph at lines 26--26"
     boxes = [float(m.group(1)) for m in preview._OVERFULL.finditer(line)]
     assert boxes == [9.23401] and preview._WHERE.findall(line) == [("tables/x.tex", "9.23401")]
+    assert preview.OVERFULL_PT == 0.0  # the polish pass: no overfull box at all
+
+
+def test_an_undefined_reference_is_caught() -> None:
+    log = "LaTeX Warning: Reference `tab:x' on page 3 undefined on input line 12.\n"
+    log += "LaTeX Warning: There were undefined references.\n"
+    assert preview.undefined(log) == [
+        "Reference `tab:x' on page 3 undefined",
+        "There were undefined references",
+    ]
+    assert preview.undefined("Output written on paper_preview.pdf (81 pages).") == []
+    float_log = "LaTeX Warning: Float too large for page by 36.69621pt on input line 55.\n"
+    assert preview.too_large(float_log) == ["Float too large for page by 36.69621pt on input line 55"]
+    assert preview.too_large(log) == []
 
 
 def test_the_committed_pdf_embeds_every_font() -> None:
