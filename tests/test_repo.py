@@ -20,7 +20,8 @@ def git(*args: str) -> subprocess.CompletedProcess[bytes]:
     "path",
     ["Data", "work", "cache", "Data/news_2025.parquet", "work/MANIFEST.json", "cache/decisions.sqlite",
      ".env", "kaggle.json", "x.sqlite", ".venv/bin/python", "src/newsaction/__pycache__/x.pyc",
-     ".mypy_cache/x", ".ruff_cache/x", "m.ckpt", "m.safetensors", "ledgers/spend.jsonl.lock"],
+     ".mypy_cache/x", ".ruff_cache/x", "m.ckpt", "m.safetensors", "ledgers/spend.jsonl.lock",
+     "artifacts/NA-02/spam_judgments.csv", "artifacts/NA-02/detector_eval.csv"],
 )  # fmt: skip
 def test_gitignore_excludes(path: str) -> None:
     assert git("check-ignore", "-q", "--no-index", path).returncode == 0, path
@@ -34,7 +35,8 @@ def test_committed_paths_not_ignored(path: str) -> None:
 
 
 def test_data_is_not_tracked() -> None:
-    assert git("ls-files", "Data", "work", "cache", ".env").stdout == b""
+    news_text = ("artifacts/NA-02/spam_judgments.csv", "artifacts/NA-02/detector_eval.csv")
+    assert git("ls-files", "Data", "work", "cache", ".env", *news_text).stdout == b""
 
 
 def test_initial_docs_commit_is_the_root_of_main() -> None:

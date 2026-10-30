@@ -4,6 +4,10 @@
 /work
 /cache
 
+# NewsWitch text (NA-02 judged titles and sentences): on the operator's machine only, never on GitHub
+/artifacts/NA-02/spam_judgments.csv
+/artifacts/NA-02/detector_eval.csv
+
 # Secrets
 .env
 kaggle.json

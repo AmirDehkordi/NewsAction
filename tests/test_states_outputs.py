@@ -66,6 +66,8 @@ def test_schema_json_and_hash(rel: str) -> None:
 def test_splits_and_counts() -> None:
     """One state per event, except events whose every article is excluded or lost its text in masking
     (build_states.json)."""
+    if not (ROOT / "work" / "events").is_dir():
+        pytest.skip("work/events is absent (run the NA-03 build)")
     built = json.loads((ROOT / "artifacts" / "NA-04" / "build_states.json").read_text(encoding="utf-8"))
     d0 = io.read_parquet("events/events_d0.parquet", columns=["event_id"])
     d2 = io.read_parquet("events/events_d2.parquet", columns=["event_id", "split"])

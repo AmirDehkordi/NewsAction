@@ -94,6 +94,8 @@ def test_metrics_file_has_val_a_rows_only() -> None:
     path = ROOT / "artifacts" / "NA-09" / "baseline_val_metrics.csv"
     if not path.is_file():
         pytest.skip("artifacts/NA-09/baseline_val_metrics.csv is absent (run the metrics stage)")
+    if not (ROOT / "work" / "baselines").is_dir():
+        pytest.skip("work/baselines is absent (run the NA-09 build)")
     t = pd.read_csv(path)
     assert "llm" not in set(t["model"])  # its 2,000 events are val-B: no metric
     for model, g in t.groupby("model"):

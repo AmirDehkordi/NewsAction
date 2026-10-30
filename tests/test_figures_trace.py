@@ -121,6 +121,8 @@ def test_key_parts() -> None:
 
 
 def test_placebo_quantiles_recompute_from_na13s_books() -> None:
+    if not (ROOT / "work" / tb.PLACEBO).is_file():
+        pytest.skip(f"work/{tb.PLACEBO} is absent (run NA-13)")
     placebo = io.read_parquet(tb.PLACEBO, columns=["universe", "seed", *tb.PLACEBO_COLUMNS])
     t33 = pd.read_csv(ROOT / sc.TABLES / "t33_placebo_sharpe.csv").set_index("key")
     assert len(t33) == placebo["universe"].nunique() and (t33["n_books"] == 100).all()

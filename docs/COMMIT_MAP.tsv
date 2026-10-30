@@ -1,0 +1,177 @@
+# Old commit -> new commit after the history rewrite of 2026-10-30 (upload to GitHub). Hashes cited in
+# commit messages, REPORTs, decisions and the ledgers' git_sha fields are old ones; look them up here.
+old_commit	new_commit	date	subject
+3d7098861c9264d6a98c60b705039f7aaa6c3a84	ba21b6c6614df92d3ddf3129f9ec35d8ad074900	2026-10-24	chore: initial docs
+56e03afd052bf8549b818b64e1c127d49f77d192	5fa60db90c5c558e22ab41ab85ae342007f637b2	2026-10-24	feat(NA-00): scaffold, time/lock/ledger guards, market parquet
+914a1a16ada4fe5f2da8620400a28da0bd7f7d0d	9248fddec491a2002c1e01336dd4aba2cfd826ff	2026-10-24	Merge branch 'feat/NA-00-scaffold' (NA-00: scaffold, time/lock/ledger guards)
+7ccfc833e645413decdf8db4e3e2e9e4b6609bd7	8bd82d24d7ce50185b4f3f12c1f0f07f62960179	2026-10-24	docs: PREREG amendments A1–A3 wired into NA chunks
+bf7f6422680aa6d4b9c801e5e18cf24a72902051	007c38fb8d5dfb401e392687807410d56aaec97b	2026-10-24	feat(NA-01): read-only ATOM snapshot export and registration
+c716fada90bf9d9ee515ec1d83e2a8c90a6d22f3	0d2f16fc9ccb4b6baef53d70e22f348847d97aaa	2026-10-24	feat(NA-01): point-in-time daily panel, tiers, targets and reactions
+250cba7018da565000025ef1702c1ab2b76fd793	5fd83a25058e41a4f58c6b18ce5e382784d4dc66	2026-10-24	docs(NA-01): data contract, decisions and self-audit report
+ce8f6ac83cc3f5fe28340c6c1d9aad05eb5ec8aa	6cd5df10132bb8ff3a1d6aa232c3bb3937305437	2026-10-24	fix(NA-01): cross-check share counts and raw price levels before ranking
+d94bb69d12126e9b4c379a7ac670431ff31e3a91	fca0f5af10c285e5c7368f92ed784bf7fea29c28	2026-10-24	docs(NA-01): revision 2 report, decisions and data contract
+faa6ad5cba6bcc3ed9ade9e8fabcdff8f1368da8	c3c5e554d5fc37937abee94dc1523b7fba9c7a16	2026-10-24	fix(NA-01): restore ATOM raw volume days already on a later split basis
+cb63ca28d43449e0f25b6cb569df5d0331d8a49d	79ebe8e4164b2d51efdfd4f3f0d28b64366b3355	2026-10-24	Merge branch 'feat/NA-01-panel' (NA-01: ATOM snapshot, PIT daily panel, tiers, sealed 2026)
+1ef42196085b6a4f216abefb5605924111450635	30ddb30b26802d04d73dc7bc4ac211fbac2bba78	2026-10-24	docs(PREREG): NA-01 rows in the §15 deviations log
+8cbcc1638901935f04e884501ec3082c8cd466ec	c86f44797a28df35b3ef925db6dbd7c9f6802733	2026-10-24	feat(NA-02): timed, member-mapped, cleaned news with embeddings and PIT novelty
+ebeafe1b1373a48cb928c7455aa75c4cc048321e	85349116f9095bd9d3e35144ffc7721c1def660c	2026-10-24	feat(NA-02): leakage audit, timing audit and re-derived diagnostics on public sessions
+80f9694325a68a4df94a8719502c76fae78fc6b2	73a109262e4820944ba3249e0508799deb231ddd	2026-10-24	docs(NA-02): data contract, decisions, self-audit report and artifacts
+aabbafa07ccd0749f282bf8d3a1c5cf02f95ac95	af45f7f5751a325840d1c2c159a2e723c965e88c	2026-10-25	Merge branch 'feat/NA-02-news' (NA-02: timed, member-mapped, cleaned news, embeddings, PIT novelty, leakage audit)
+176cf8da804b10aa4ab563534698e784f43b08db	51708d51cb6d44d79075a99cf44186263fc4beef	2026-10-25	docs(PREREG): NA-02 rows in the §15 deviations log
+36f01462560db0deaba28bc2d96986a4c8fcb8b9	533cd0e414453322f02a6592a4f7f0e653028503	2026-10-25	feat(NA-03): material labels, filters F0-F6, val-A rule, events and projection
+a0a520ca1e786ed5b41c9c0f70e788bf30276b22	34c38b681142679bc0ba5136212edde5ff583fda	2026-10-25	feat(NA-03): freeze filter F5 from the val-A comparison; trial ledger and tables
+d8004ef0a1089f43fb338d09eedf0373cd411cbb	2817b583f7699f7a16b2ecb20dd8ce94654e7017	2026-10-25	docs(NA-03): data contract, decisions and self-audit report
+599c42be57dc5e7e1222702af72a4d08d40bb630	d77ccf48ff4db6d67e2f59d24c768c746f8677c9	2026-10-25	Merge branch 'feat/NA-03-filters' (NA-03: material labels, importance filters F0-F6, frozen F5, events, call projection)
+45b3da03545c3cddba06704eba34e3bfc83f12cc	057e298a593abaf29681064a928683ba8a436dd3	2026-10-25	docs(PREREG): NA-03 rows in the §15 deviations log
+e50c57d0e0fd81c9be759ff6b840669ae08365ca	0e423fce699a3fdbe345260f1e8e6692e5cb3cef	2026-10-25	feat(NA-04): codebook v1, question battery v1, aliases, macro calendar and state configs
+fda4452ef5ed8fd40017cf3cf40b5c71f2a627dc	5a53c3442eb651e2d07ba9a8fbaf256c8f8ddfbf	2026-10-25	feat(NA-04): states package: context, masking, leak scanner, build and report
+74901e54d76b7bf3220ce1911ad63a0ee8d969f3	323874c920f00b38ba88ff10080a413cb09299bc	2026-10-25	docs(NA-04): data contract, decisions, artifacts and self-audit report
+1ea2241d02eab7d1091f9be4f421a280950d8cb0	f42e854972fb5e338c2da7427c76f69c44d70af6	2026-10-25	fix(NA-04): mask every leak class of the verification; independent leak scanner
+6a417a5eb4861d9ff0f2b0af893aa24da4984db2	fe19014abe1f7545b2e922e3c26cfd06aa346d26	2026-10-25	docs(NA-04): revision 1 report, decisions, data contract and rebuilt artifacts
+5de23e2f6efaccccbd0993b2b137ea551b64e59a	2efc001d3e252fc9238af564178db69c001ba86c	2026-10-25	fix(NA-04): mask capitalized English-word tickers, CJK forms and glued years; scanner without a ticker list
+20577368a3fcbda653aa09831e319e92a1b9287b	b31c6e5791548844fa4c6a44bdf8f63004c03e11	2026-10-25	docs(NA-04): revision 2 report, decisions, data contract and rebuilt artifacts
+314efd2a0473d1837abfb478b6eaca7781cb86be	88c69f07dfa411e7ae8da40bb08420db92f7b6ca	2026-10-26	fix(NA-04): drop move explainers and TradingView reposts from states; mask the remaining date forms
+53e2f0d00ce14a4d419ab4f293cee92f9826a039	fd1ecc8c34f46d0af0ffcbc615f5723566991ff1	2026-10-26	docs(NA-04): revision 3 report, decisions, data contract and rebuilt artifacts
+940668de46cb69e760e818d437f48db9dde311db	10ef2d7773eb0de96a3e4835c5f86f6686849ebb	2026-10-26	fix(NA-04): drop non-English articles and the remaining English price talk from states
+c03a704542847b1aadb24ce87f1e1e3f1c4c965c	50bde4dc32f6cd41af3ad5f2d178267114f17635	2026-10-26	test(NA-04): a share-price level that only the verb rule catches (a fundamental in the stretch)
+8bdf5bc3fc912ec383db7b804029e0191649148e	c5f8a549b4348f1c11ea904856b4b8eb50d42de3	2026-10-26	fix(NA-04): drop any remaining cents-precision share price, options chatter and "of N%" moves
+dd11b87f274b1ab2a37f156a7e6f1565ebcbf2c0	1fc5452826446319892f7ed9a6cb35840908ee18	2026-10-26	fix(NA-04): a cents amount after a price word is a level; Mon-DD-YYYY dates; scanner sentence breaks
+36f597dd202e6f9f8957a91e2d9f2b70b44bef13	b37ff549a635438cb77182edff66f75751e4a099	2026-10-26	fix(NA-04): consensus price targets, quoted prices and per-share deal prices with words between
+5e764ecc2d625e350a552db297e69defe91f9bf2	93b829e669fb6992ee9f9747925f45c1f6b3ab8b	2026-10-26	fix(NA-04): scanner deal prices do not cross a dividend or earnings word
+e62f9dcb5c0b7b6a05961cb897bba2f4c3df5685	2ccae97019b77e08c6617aff7f038489f57b6cb8	2026-10-26	test(NA-04): events without text bounded at 0.3% (0.22% after the second price-talk pass)
+3680bd2f78c0bbf8416a77f867d0a4fd9f0120d5	3ebebba1650fe49ce2be4f2cb860556a0be36458	2026-10-26	test(NA-04): cover the scanner's quote guard, abbreviation-aware sentence breaks and the options rule
+085be64df70ad3ccfc3f33943f8935d64e82dd52	91c23225b6edda397a9ce9f5815c98c0d762165d	2026-10-26	docs(NA-04): revision 4 report, decisions, data contract and rebuilt artifacts
+c056249339d81349c0fe59f489fb4435f805cb35	c3f609c74ae731271ddbcca597dabb4824d0c1c0	2026-10-26	fix(NA-04): revision 5, the fifth verification's date forms and every price move or level
+0fdc7efeb3b1d52c8cd771c041e057adb6b5d765	9803aca3a95d4f91c11997b7e8503ea3854ba106	2026-10-26	fix(NA-04): revision 5, second pass after reading every price and date hit of the first build
+3a73c52aa6e7a807e8ab105da865802789484ae4	f044fd3491ed84015b16a957ee0c346e7835d7e7	2026-10-26	fix(NA-04): revision 5, third pass; bounds for events and market sessions without text
+7af819260fbc0a9f4fda43f8f30736aba4d9e10d	3c8d269653e36d686a1a1fd026a09b05ff8592f7	2026-10-26	fix(NA-04): index levels before a word starting with a count noun ("the 5,000 milestone"); "returned N%"
+d8a2d026b5a2527704b03b8bfd4ae4c78a84fa14	1151ca8a320765350fce4f4cca489e5761d45878	2026-10-26	test(NA-04): revision-5 mutations that survived get a test; the scanner counts "Recently 24th" and "$3.42/share"
+a005fe1dd9a465f8fbbc84b9a9dbd793927b356c	ebf7bfdf5d6459b8f1a4400373574c40d9e71036	2026-10-26	docs(NA-04): revision 5 report, decisions, data contract and rebuilt artifacts
+b6705c4c7bef34d7d8fc04e02d6c17143a0470c9	80013760ae13e508ebfe1a5e281b54734c94e2fa	2026-10-26	fix(NA-04): running market stories out of W0 states (revision 6, PREREG §15 NA-04 row 10)
+c70ca7fb718258376e218c95b6f67a425a21f8b6	d2c4623426372409668f2d265a496530889e2d74	2026-10-26	test(NA-04): running-story golden cases, the W0-only scope, and the scanner's post-open count
+01860ee029399c8d3679dd05ed4c7ae7653c4926	16b2a30ac088e9e7bd87b85721607a1996fcf56c	2026-10-26	docs(NA-04): revision 6 report, decisions, data contract and rebuilt artifacts
+e9b50358801dbcfed092177d35ae9349bd4ca80b	bec1b3a222902efa2a66a63c6956043b00308d4c	2026-10-26	Merge branch 'feat/NA-04-states' (NA-04: states, numbers-as-words codebook, masking, independent leak scanner, question battery v1)
+f4976a74626aaf81749a315409c077090ce6dd3c	6eaa9d791a6a38284558c6cb21a2a01a9c9d7af9	2026-10-26	docs(PREREG): NA-04 rows in the §15 deviations log
+c508cb131b60c28b154fb2a306c05673ac56b71d	f00debf1af7a80161b463929afb13f64bdb329fd	2026-10-26	feat(NA-02): parsing_allowed None counts as third-party OK when the operator allows it
+6f8cd66390889e8d1fa5724b9f08e87614d00b72	10e6d87c71b81982d7bfe39d7d07cfa132633651	2026-10-26	fix(NA-02): no test-period date literal in the third_party_ok docstring
+3986d13d2253156fd399af8e3cf126bedbe3fa76	ebf7eac78669102ebc4d4ff010ba1edd3d46460a	2026-10-26	fix(NA-04): the live-format rule also matches behind a scraper's age prefix
+ab5e729cc84f6515cdaee924cbd19665da133f01	b55faf2ced9a4ffa5e64cea361ef2b9ad70d0ad1	2026-10-26	docs: decision-A rebuild of NA-02 -> NA-04 (data contract, reports, artifacts)
+f33f451be78b8f41f1a60c11cc2fc78d9b3e117a	e31774605bd5e0a288bffcb5029298e79f6778f6	2026-10-26	Merge branch 'chore/parsing-allowed-none' (operator decision A: parsing_allowed None articles are third-party OK; NA-02 -> NA-04 rebuild)
+214108f1c8f97bbf6a538c2c2f6062120ae22b1e	9e97f7f5a0434336e59827904c7de51f8bce76d3	2026-10-26	docs(PREREG): NA-02 row (parsing_allowed None policy and the NA-02 -> NA-04 rebuild) in the §15 deviations log
+5d1c975106a2164bd63628d46b98b15ae6f3af14	eadbb1f57707edd434248300d5c39779d69e0bdb	2026-10-26	feat(NA-05): decision-model client, cache, budget guard, catalog, local Laya, canary, pilot
+c7cd18516c3ad0301a36e81799732dc5466ca84b	4275ad736f6502a2831f8635fd9da53adc76e12a	2026-10-26	feat(NA-05): pilot results: catalog snapshot, canary baseline, eligibility, spend
+f379d6bd3d632d9f833e3153089289edee59fe70	d64c09a0c032f18cc495ba7ff84db873ab83b2d5	2026-10-26	docs(NA-05): report, decisions, data contract and README guard row
+6fa09e2626b19e2a8c942f02543b23338fc68e1b	3460411dad3b57e89c52b3be9d0855e0ac705fdd	2026-10-26	feat(NA-05): renormalize rounded probabilities; record the NA-11 canary rule
+a382e83fb8395dce3d31443fb4332acfbb0202c3	0304bb8e637b6a9c66b5191b0dcd000ba56a2875	2026-10-26	docs(NA-05): operator decisions; pilot and canary recomputed from the cache
+dd40ca6875346ef47f23bb97113d2c8151088049	b80766c3b190e5ffee3d2af5ac9941a063d859d0	2026-10-26	Merge branch 'feat/NA-05-client-pilot' (NA-05: decision-model client, cache, budget guard, catalog, canary, local Laya, pilot)
+a55b43b23c39e36c9df8b9c82af82506d722de87	827254df94ecd146f7c352bd8e3434fb98d74a59	2026-10-26	feat(NA-06): tournament package: samples, metrics, MCS, edits, probes, screens
+63c2384782809e3f2563b29094b57af1b6b55835	945d8b3780a2be07d348a2442722e4af4c0aa701	2026-10-26	feat(NA-06): tournament results: leaderboard, probes, screens; val-B opened
+4a3b5166962d455bf7ddf05f1ffaa4c09fdad3dd	786cccef6fb3cc9eacc42002fb84fc46185d9f63	2026-10-26	docs(NA-06): report and decisions
+fb608f14487a832efbe32b46e1a64fecd018c45d	865dde15e5ddba4c892895645fe4691cb4e26a6b	2026-10-27	Merge branch 'feat/NA-06-tournament' (NA-06: zero-shot decision-model tournament, MCS, contamination probes; val-B opened)
+7bc114b8732f930c5ec31ca14079827ada31002d	b8a1f2c40ce0256d383518908463a07947701dac	2026-10-27	docs(PREREG): operator decision on NA-06's failed screens in the §15 deviations log
+630ab3c7884a76241bb47392107ae7f11420c13d	b8cceecd277b2ebf34bfaf3002528630f978b760	2026-10-27	feat(NA-07): encoding and anchoring study package
+2beab737d9b60a8ace97bef3ecff770137c3af1a	9011c45f02c61eee3d3d2a8f5afa862e9ec61c23	2026-10-27	feat(NA-07): results: E3 kept on val-B, anchoring present (2 calls per event)
+315acfb7241d65011574fcd1f23b76cbb6c558e1	7bf31e5b4c0acb6e6189338f02961fa179f1be14	2026-10-27	docs(NA-07): report and decisions
+062eaaa2c20d62ce5c5787287256c4bea790837f	48b41020e1ed93b4584028bfafc1b2e3e94f2919	2026-10-27	Merge branch 'feat/NA-07-encoding' (NA-07: encoding E3 kept, anchoring present, calls_per_event = 2)
+53c36c5c8f0aabac9f4f9ee59d0c557b1b6c3940	e400aeaaba0bab436878d2d2ea2153e6a60b9e4d	2026-10-27	docs(NA-07): REPORT §9 states the second PREREG row's timing exactly
+fc13888c1a0b78d266583e0c0275befbd7db177f	b0aefcab51436fce2d5d2b9e6538d67fc7cdd143	2026-10-27	docs(PREREG): NA-10 rows in the §15 deviations log; FMP request cap raised to 17,000
+e18057194d5650ce928a748c1d3a67dde01f944e	031035c641964b2b890a042f2a977fdd46176370	2026-10-27	feat(NA-10): 30-minute FMP bars, price basis, D1 reactions, targets and states
+82a5252696c2eb66a9f6b7b3202a9176827f34d4	e0c46804f89d99b96e03a7e1031779aa14b08aa9	2026-10-27	docs(NA-10): report, decisions, data contract, artifacts and ledgers
+4cfc8ed0034e3f3f2f013550f67871a5301f1dbe	e85200ca98773dd60d22ed9000292e0ed6cf4427	2026-10-27	Merge branch 'feat/NA-10-bars30' (NA-10: 30-minute FMP bars, price basis, D1 10:00 inputs and states, sealed 2026 bars)
+3aa333840e07405616ec5f2d475a9d898e7a25a0	3583cbbe100941d91120ab49338f0ca1cdbffd15	2026-10-27	docs(NA-10): FMP cap of 17,000 in CLAUDE.md and the PRD; REPORT 3.4 basis correction
+d5c55f4bd41fdbe429e912b7433def86b1162d1f	8e49981d40d6686ffc9f0516edfdf085e9822a1c	2026-10-27	docs(PREREG): NA-10 corrections (counts, the 5 bp explanation, timing) in the §15 deviations log
+ef356ba3448dc8ac4d6f82cfae67d8d05ec44165	21f071fdc156fc7ef7fc9d0fe117e10a28997798	2026-10-27	docs(PREREG): operator's heterogeneity cuts 7–8, sector exploratory and two robustness checks in §15
+84c16356525ea62709f8e9b054734720a6285b80	50ca0c9dc54c861eb326749fae8f4f6062db27e9	2026-10-26	feat(NA-08): labels, private Kaggle dataset, Laya-Fin / anchor notebook, import, cards
+dfca72a6aa0a89e82aa00935c13922da72ab327e	a667f95a76bcac083ca750d8518b5b750feaa96a	2026-10-26	feat(NA-08): MAX_LEN 1,036 so that no state is cut (operator decision)
+ecffb74510e7b27b058dd5f9a8884c9d980ecbcf	1276993d1d9c2b704fb4e02f32c8b3ee214abc93	2026-10-26	fix(NA-08): summary cell reads the probe rate when a pilot launch does not rehearse
+f6c5b172d5c4845b7867befdbb3fdb823bd7e20e	4bd3689d29c6799453774243b3bbb45b49a9dc8d	2026-10-26	feat(NA-08): throughput pilot verified; plan of 8 one-epoch runs (operator decision)
+1d920d93fccdee2cb1736c410861d5f5ac63797f	8fc3839db46b1bc5df279a68593b7e67a4afa949	2026-10-27	feat(NA-08): controls.json reports every head's val-A IC of the shuffled-label run
+f545f139baf12597664940bd971d0d3349a57464	6775d495269516dbe72ba0e418afc1de0dc5aab0	2026-10-27	feat(NA-08): one seed per model within this week's quota (operator decision)
+0d6135d46cce1b9cbb45b8f4e3113a75b69eba35	4d8a876eac123d68a81997e01220a8038e321eee	2026-10-27	docs(NA-08): laya-s13 verified (1 epoch, 7.6 h); anchor-s13 pushed within quota
+ac93d3f45bd05f5e2877ee146f4fbf461ecd871c	dd2972c509469a873dbddeeebc36e61cbe0f7dde	2026-10-27	docs(NA-08): shuffle-s13's measured training rate (7.89 seq/s) in the run log
+4832317dbba0e9b5f3247f91136a4b5dca8256ae	e1f02113464b8efbae3fe933e94827f6b082530e	2026-10-27	feat(NA-08): anchor-s13 verified; repro-s13 with a 7.0 h budget under the quota left
+e54a3aba8c99fcca1be28b976f9c00e510f113d2	a4a4d72ff0be99fd4cab80d21b28eb2bbcfa46cd	2026-10-27	feat(NA-08): import and cards on the verified runs; repro-s13 running
+b5afdb3aa53ec69972e3644ff0d4e01f4a6b239e	2226cdffef905f98e4b219d4b8ef2aac94e173e5	2026-10-27	docs(NA-08): anchor-s13's measured training rate (7.41 seq/s) in the run log
+82c1a73186418da54ac4a1f7c65aa149763d5caf	2131db6bbf39569613ba4b9de1b2c632e94e2d02	2026-10-27	feat(NA-08): repro-s13 deferred under AC3; final REPORT and self-audit
+24978f63050a2c8a8bc9371f25858cc04b8bbaed	053074380489cd325ce0c710f600c48a66311b17	2026-10-28	docs(PREREG): NA-08's two §15 rows (MAX_LEN 1,036; one seed per model, repro-s13 deferred)
+8d6529491449616cc840c0b079fcfea122acedce	6f4c4ac018b558eada35a5f0c228ff3b06d59a90	2026-10-28	Merge branch 'feat/NA-08-trained-dm' (NA-08: Laya-Fin and anchor trained on Kaggle, seed 13; private dataset, val-A cards; repro deferred)
+cf4b6f2e57bb3772347a5a3af1ec44f5ba51411a	eb2779cbe276736d568a52b755b01e93bc8a908c	2026-10-28	docs(NA-08): the two PREREG §15 rows are committed (24978f6), not pending
+4cf4c2be23bb394e961c034330f96115104888ad	7b34af3ec618185e0b9a8da920536c73c0f8c1ba	2026-10-27	feat(NA-09): baselines in one prediction schema, chat_json, LLM at matched cost
+9d56102394952ff5fec7e970531a9e76d001f865	4a53163de518bf52da7aace9d4d226623ec42e1d	2026-10-28	feat(NA-09): Laya zero-shot predictions, final val-A metrics and report
+96911631920712ee6de0648acc89a3480a1391f9	901075dfb8e509b2fec206a6c853e99d7a3766c8	2026-10-28	Merge branch 'feat/NA-09-baselines' (NA-09: PREREG §10 baselines in one schema, Laya zero-shot on all non-test states, LLM baseline at matched cost)
+dd16ca3b328c87076cc810fc445d1cde4901e20f	2367b1db81b6c58e1793be6a512a54e650350c89	2026-10-28	feat(NA-11): analysis spec, inference, Shapley and metrics (S1)
+fefc2ee831373106829a6f3379ca8dfe2e2bb6b6	9c4218204497a6dcbb5cdc2db0e2451c8a4b47d8	2026-10-28	feat(NA-11): val-B final selection, frozen selections and seed pin (S2)
+27f8b0be803a9b30fa04effdd2290539ac50b127	70d04ee34b0e6feddfd19e1c04721924983fcc30	2026-10-28	docs(PREREG): NA-11 §15 rows before the freeze
+5c6027789d29d7daefe5fa20a884bd47516e522a	2bc352ff18690a1830a0525c59220e260ed5dc7b	2026-10-28	feat(NA-11): H1b, canary baselines and the disclosed probes before the freeze
+f8f3b4c345cf32bb63823d0689760144cdb6ce5f	60fc0e6812758c4d26c884b55d7b8d7cef82572b	2026-10-28	docs(PREREG): NA-11 §15 rows for H1b, the production plan, §11.6 and the canary
+3751d8e9dd7051a7382696b0f32660262cc3dc3d	08ef3f4a754ee14c2443f9ca0906860a7e1549f9	2026-10-28	chore(NA-11): freeze (PREREG §4.4)
+d86d1c387b79d92392825cf02e203692e57219e3	6f4632a67f984d8f8b47a3ea52d73e44dacfe6f3	2026-10-28	feat(NA-11): 2026 Call B states through the lock (S4) and the S5 canary
+6536ebc9e0e2a8640ea41d4a34e1ad0ade122ff2	6bca6ee8242f0ef0352e669709af814dcad2966b	2026-10-28	feat(NA-11): S7 inference-only Kaggle export and kernels
+311f27717ad290b3815f58f8e29350535f735a78	1ff377af7f540eaee6c8057fc26e714f5707c98a	2026-10-28	docs(PREREG): post-freeze §15 row for the S5 span-02 STOP and its decision
+af43763fedbd118bd444f789c7e1a1779e629a4d	dda7d0115010cc0e41384ff80172d9be9836ee2e	2026-10-28	feat(NA-11): S8 ablations, LLM baseline test subsample, price-only D0 test predictions
+35aaf73aee2b4bd4c885cdcd6f8aaccfb7d9776b	11c537128545ac1c18668072dee2e13dde7d10e6	2026-10-28	feat(NA-11): S9 production summary, val-A probe table, end-of-S6 canary judge
+6838f4a58c786a245d563590178dbbf885298aa0	7a514ce649f1c40fea146e12397e10273d0e465f	2026-10-28	fix(NA-11): lazy LightGBM import in price_only_test; pre-freeze throwaway layouts
+eb6d4a3ec3d41eb16788d7f2dd1652dc16f32c75	19f050702f239056a1970dc6d0deaec53a79ff9b	2026-10-28	test(NA-11): the inference program refuses a label column
+aa9052683805a847d83457f8f54234cf1b8687e4	cd7ec2fc96420f216a8f50656c128b0812f6ef67	2026-10-28	fix(NA-11): LLM test predictions take company_id from the D0 events; ledger spend in the record
+c81757cc55d1a738fa2dc95812e318dde5117f45	38e4614b60d4b867feb7a17b1508820b80ae2475	2026-10-28	docs(PREREG): post-freeze §15 row, price-only D2 test predictions move to NA-12
+da7f948447d4a63c06e670a019e8c23701401598	01fa022824591c49626f418cc2d07a8cd7f69b5a	2026-10-28	feat(NA-11): one retry pass for S6's transient failures
+bcbbc6e8ee89b0ff4627cb21f592368d747f5451	6b0db6f72b8276aa83b9462a289fc28cf3c98355	2026-10-28	feat(NA-11): contract entries for the freeze record, canary checks, S6/S9 records and S7 imports
+8c89b01e84e3ec7fdd9bf3aaa145c75c5f8c6032	44fede071a815aa3424c7d6ee1b0e28e81e85a6c	2026-10-28	feat(NA-11): probe table adds NA-06's edit_mean_shift and threshold-free flips
+e9c418601b79f078e8cd74b2aa0dd87ed94f4bd6	a029ffcaadbdc36e9e3c1c6b1916495ada31f116	2026-10-28	feat(NA-11): descriptive probe additions; market eligible count in the summary
+39c2d3a2b97a4d4c314d4dbc78af0fb741040407	2fa0cb954373f2ebad1740823af6973a7d92b560	2026-10-28	feat(NA-11): probe table adds the edit-shift t; freeze entry without a date literal
+57de8cc4bb4296919a9521c52d3e7d340e1d1eba	263a2e5bdfaef2640d54a0002ab8ae70eb681a47	2026-10-28	docs(NA-11): REPORT, decisions, artifacts, contract and ledgers
+79e12312624d54624d0513242e798786b8507b64	ca902346370b53edeadf4145b5643184a82de003	2026-10-28	Merge branch 'feat/NA-11-freeze-production' (NA-11: final selection on val-B, analysis spec, freeze, production, ablations)
+6215740374811a077b19721eec1210c3b1b26798	1b651cfc2755a1c39559f764a01d71d58a527653	2026-10-28	docs(PREREG): operator §15 row, anchor robustness runs fixed before unblinding
+e51c43b3d276aed22dd91d311d930e0279a4110f	8ed8d510ced5bcd6d587e3c1825e2d155ea501da	2026-10-28	docs(PREREG): NA-12 §15 row before unblinding
+cb7cac07a669ba8505a290b5fd1a682bcb75c959	f3e0cfc2aecfcf97ff62e06371f0979ba41b872e	2026-10-28	feat(NA-12): unblinding, price-only D2 and run_all, rehearsed on val-B
+4e21750a12e3795c82ee56422779acb23e53f90c	65ce3ddcbe5963b2c97a0bcc7a6a2fb11de4e9fe	2026-10-28	feat(NA-12): tables, contract writer, ICs and the exploratory sector section
+cbcc00e370dd3d9b36b12b88e0b0907385e2c826	2a559f68e8a4f07654907400b7e0a7adcf8c8121	2026-10-28	feat(NA-12): S1 unblinding, the one "targets" access sequence
+b084bebcdab9dfd484ae0aa08434343a95b2141b	de3b0a93e0d9e613364252285d7ca67e56d641d1	2026-10-28	feat(NA-12): price-only D2 test predictions, first after unblinding
+40e3f6c1d61dca6f47b4e211d42857eadeca01b1	ea6e1893677461440dce743a6477c35ef5304b16	2026-10-28	feat(NA-12): S2, the frozen spec on the test split
+83801485d9ede1be95a637141186c815176e42f8	1aeb78dbae1792a0b2844d940a56dcf3def38592	2026-10-28	feat(NA-12): S3 tables (CSV, booktabs LaTeX, keys.json, index.json)
+07de17e4e4ec0ab7b79e4bf83ea561c67dd7e7dd	2e84d54a758ba29aea1ae9a4e9bbf8c77d78c853	2026-10-28	fix(NA-12): Figure 1 data, V deciles ranked by N̂ and signed RG paths
+9e88c2c3108f2425c3eaffcfa8cb9c1a8dd97034	de4f72038629d24a87ea16b936e8ee166b8fdac4	2026-10-28	test(NA-12): guards for the price-only D2 step, the test-inputs join, the path check and the model roles
+6df7d07dc7f6707490af0d1d7fe88d4e8f36b950	9bec90d441cfccc2f361796b85a2726899522936	2026-10-28	fix(NA-12): tables keep an infinite half-life ("never within t+20")
+f333dc42feae4e039a38fc33a8ea8e75282266fe	a2358fb124f778558af82dd61b4e8d68276b42ae	2026-10-28	docs(NA-12): REPORT, decisions and the §15 row after unblinding
+3eb08fbb1caaf93b148948c983dc6d4a024b17af	84d33a1a945eead99aa0eac12c6283a9655b0524	2026-10-28	feat(NA-12): exploratory "where the D0 signal lives" (operator request after unblinding)
+0d2db50ac8ed3ede3957c869dedb711d049bbbbf	e298fd2671c55e6c6c72e703296cd18eda04358a	2026-10-28	Merge branch 'feat/NA-12-analysis' (NA-12: unblinding and the pre-registered analyses)
+661aa4dd0716d4a3da49aceb10e3e885d1a6307c	a628150c3e0c764ea389f5185a2000e9c1242e0f	2026-10-28	docs(PREREG): operator §15 row dating NA-12's post-unblinding exploratory section
+98d2276932d28839e83e67badce570f34b2447a5	4964875b17ef06675acdc0be5fb88069a2789671	2026-10-28	feat(NA-13): strategy engine, returns panel, costs, capacity and the deflated Sharpe
+7a84e4b3733d18613bc5e71967516767f7a3f6ce	2fbd2a874fcdf430cd67718119eec9de1452917e	2026-10-28	docs(PREREG): NA-13 §15 row before any test-period strategy return
+4646d85f4d78f023ce404b128a1ab46dce717749	72d0288acfb5710ff098be0d4036b88692f62c8d	2026-10-28	feat(NA-13): rehearse the test build's route on val-B with empty blinded frames
+c9c09bc928da850211f6c9297e595c0447f055b5	d8a30dc276cf92c2c03576a92ad8374e98006e77	2026-10-28	style(NA-13): wrap a docstring line
+bd3cef4c7388425d04180d5ea898042d9de45cdb	d302efbeea08779637818f1c46a02bb794bf7402	2026-10-28	feat(NA-13): tables, DSR at the final trial count, the trials ledger, the exploratory MA-cross add-on
+0c134ffd53104dcde15613c83f021c41d138d05e	5231700e00882e14a4c90d11718c84dbf463fe4f	2026-10-28	docs(NA-13): REPORT, decisions, strategy table, Figure 7 data, contract and ledgers
+b10b4f1df5f5d3e9a8de5d390cddc1fea53faf2d	4e7a3c6ff9afe6e94530ccd4c1ced0e23390ba28	2026-10-29	Merge branch 'feat/NA-13-strategies' (NA-13: strategies and economic significance)
+da5a6ba872b3ff91fb3cb461aaa8bd73212e63f7	1280da04f1a3d50b146796334d01baaeb71e6963	2026-10-29	feat(NA-14): figure style, provenance and the paper figures
+fc19c7300ae52677c164ffa00685addd7ac4e37b	ba7afcbbb8b3cd0deef68da37e075224fbe4a1e3	2026-10-29	feat(NA-14): paper tables, keys and checked captions
+35fb4b790f33cb0012d869d533d3625e99aeaf13	dfc48f27172f05023f59b9325158746460836a69	2026-10-29	feat(NA-14): make paper with input and output digests, and the data contract
+6d92f7e0eab1ece5d20fced2541b791f53bdc8ca	2b757f0bc846a104f8b897e8490df98943cf49ba	2026-10-29	test(NA-14): trace, captions, keys, style, tables and the offline rebuild
+53c2feead697c79b5e90ecc44acad19a37bca1e2	91e8ca1afee8dc17c6a3770a20234d4d7eb88e16	2026-10-29	docs(NA-14): figures, tables, captions, digests, REPLICATION, outline, REPORT, decisions, contract
+5cccde1f87c903aae7c2b0b3125512213b1b5887	0b76ba986ef99f6567c80cc6cf4d1faa2da927ff	2026-10-29	docs(NA-14): REPORT with the final make verify run
+b10af0a3446f2479b844cadaba018fb943e31306	c1d00bdd9cfdf3e8d268a0c5febde3489f29f7da	2026-10-29	feat(NA-14): redesign paper figures and LaTeX tables for an arXiv preprint
+58f44fdb27b2eea4bcbdebe1174d80bca776e0e0	a7784b9efc0f850c2c06bc64a5f7626464cd759e	2026-10-29	feat(NA-14): rebuild paper artifacts, digests and data contract
+49a2fbe54e703745ea8c01720d4fa81fc04abd10	b69bd7dc24df88906dd0833825d06e49b25b8a6c	2026-10-29	docs(NA-14): record the revision pass in REPORT, decisions, outline and replication
+3ef46ba084e7924f9a89daa3366f4736f4135392	640b01535f1f44bdfc769424762bd5f106bd9f73	2026-10-29	feat(NA-14): polish pass: restore Figures 5, 7 and A9, align axes, refuse labels on marks, polish tables
+2df4fc581299395a148182b9ad187b7a1f7a1515	45f9b94f8f773e27dbf108832b719ca2d54f76b0	2026-10-29	feat(NA-14): rebuild paper artifacts, digests and data contract (polish pass)
+1bbc5f9d706ab70ed5f9a5b3f800a7808d589458	4d1e8ad0ffeabb5930376fc04a18aa3065f7eb58	2026-10-29	docs(NA-14): record the polish pass in REPORT, decisions and outline
+54bee19e89d1fff31f6bc224508206e00cf280e4	49fa8ca9cd3b544af85fafd3d0d0ec742bbbbede	2026-10-29	fix(NA-14): appendix LaTeX tables and the 5e guard routes found by the re-verification
+651b56e473191c0da026b5fa629a8184593ff3ba	3fad6799d0a3e74eacfeb105b0ba5d92ee659921	2026-10-29	fix(NA-14): print values that round to zero without a sign
+3a2ed77b0197ca0b86675870d0da0c817f26a433	313e68d6ebf6e2349cd957e514c9f6ff937bf66a	2026-10-29	Merge branch 'feat/NA-14-paper-figures' (NA-14: paper figures, tables, replication package)
+c3351ed8125cecfe518b04c7bf094d74a24d9a0b	c6840604c643368ad569cd372c0aecc264e857f5	2026-10-29	docs(PREREG): operator §15 row pre-registering the forward test; the paper-2 research plan
+1e2b0db00045d719d2ca392982c58e8159c50cb7	bd6a9d91868fadb2373a069189071b5ddb678010	2026-10-29	feat(NA-13b): selective prediction, the 10:00 reading and the conditioning study (code and tests)
+e4510626f3311d41be36aa809fe456ff62dcc35a	4e912ae6759b440231831a57a7306ba2534d8b56	2026-10-29	feat(NA-13b): the validation selection (val-A and val-B only), before the test stage
+d587293bfee95c048012b94f5654ac263e28d126	1d8294631d1381b85071f80c77994734a523ef21	2026-10-29	docs(PREREG): NA-13b §15 row, the exploratory operationalization and its selection, before the test
+e43de1017796f607200e1324ea8a33a4b216bb45	55e8dadb68e519fdeeb39885c8654a0a5a1d92fa	2026-10-29	feat(NA-13b): the one test evaluation, the tradable versions, the trials and the DSR
+9b3954a36274927bb6f60a91ab4f7a3e3c5a99fa	8265ef7e77773f4882c096273e5e4afe1ea9d8d9	2026-10-29	feat(NA-13b): wire the exploratory outputs into make paper (t36-t43, Figures A16-A19)
+8eb944fccea0af57d7e6ef6e5c50f67531b1c192	ff912d9264ab94b92f58b0e798f5680e61f2f85c	2026-10-29	docs(NA-13b): REPORT, decisions and self-audit
+ac8bf68ef888ee848e8fd811dae492b389d8b497	5bb5ee9a565596b90b1081666c1c1a71d8e0d845	2026-10-29	fix(NA-13b): the independent review's findings (guards, contract inputs, paper disclosures)
+7adb1310b762dba95715140174bc25bb84f04bc8	e92c32c122ca2a7461f832021b630ecddaf3a58f	2026-10-29	docs(NA-13b): REPORT and decisions after the independent review
+7c29f489e55f8d718d0304672d50efe782647b1d	70e01282369f24d6fdbd56771318619355a3c60c	2026-10-29	Merge branch 'feat/NA-13b-selective' (NA-13b: when does the signal work? exploratory)
+6719c5993204783f72c869a37800a4e0481e4ecf	4919a16830221b9011f15ae441ce2d8b608e7b97	2026-10-29	docs(PREREG): operator §15 row adding forward tests F6 (overconfidence) and F7 (conviction concentration)
+8371696d7e14ca0d1f99e70c2ff56a16736ce735	f4b929fc92a83ce74c7763f41178a976e9b7046e	2026-10-29	docs(plans): paper-2 plan updated with NA-13b's verified results and forward tests F6-F7
+34cde1665420340b2b0db79192641f92faeaf9f3	ce8a968dc91048e1e319ef89b9aea91625e8201b	2026-10-29	feat(NA-16): NA-14 tables and Figure 5 ready for the manuscript
+0adc90871c8902c08354e70ee707287efd8ed536	bd29aab4c144ba8ae906cdab31415bbadd63fe0d	2026-10-29	feat(NA-16): manuscript build: make paper-text and make paper-pdf
+261447bec3f4e2d8fed8f2117f14c63b0e522031	0e20d2a6661b12d8a64cc9130115ed1a24420d26	2026-10-29	docs(NA-16): the manuscript, arXiv files and replication notes
+ea8790a1ce53eaebfc00228b617546ffd669922d	da9f08b6a6f187195d49641ee049c5023d958c35	2026-10-29	docs(NA-16): REPORT and decisions
+03dfe75044f0ea9094d3ef2e2a651cc8f538f890	fb000a2cbdb0db22e4866e5b57f2ae7f45a28831	2026-10-29	fix(NA-16): aligned Figures 1-2, three authors, wider keywords

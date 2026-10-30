@@ -25,6 +25,44 @@ make verify
 Optional dependency groups are declared but not installed by default: `uv sync --extra embed`
 (NA-02), `--extra laya` (NA-05), `--extra kaggle` (NA-08).
 
+## Working from the GitHub copy
+
+The private GitHub repository holds the code, configs, docs, ledgers, committed artifacts and the paper sources.
+It does **not** hold any data. These stay on the operator's machine:
+
+- `Data/`: NewsWitch news, prices and market files (raw, licensed);
+- `work/`: derived data;
+- `cache/`: decision-model responses;
+- `.env`: API keys;
+- `artifacts/NA-02/{spam_judgments,detector_eval}.csv`: judged NewsWitch titles and sentences (gitignored).
+
+```bash
+brew install git-lfs tectonic && git lfs install   # once per machine; ledgers/spend.jsonl (210 MB) is in Git LFS
+git clone https://github.com/AmirDehkordi/NewsAction.git && cd NewsAction
+uv sync --locked --all-extras                      # the extras (spacy, torch) are needed for `make type`
+```
+
+**Works without the data:**
+- `make lint`, `make type`, `make test` (tests that need `work/` skip) and `make ledgers`;
+- `make paper-text` and `make paper-pdf`.
+
+To edit the paper, change `paper/sections/*.tex`. Every result number is a `\res{name}` macro, defined in
+`paper/numbers.yaml` and generated from `artifacts/NA-14`; do not type result numbers by hand.
+
+**Needs the data (operator's machine):**
+- `make paper`, which regenerates the figures and tables;
+- `make manifest`;
+- any chunk run;
+- any decision-model API call.
+
+**Making changes:**
+- Work on a branch (`feat/<topic>` or `fix/<topic>`) and open a pull request into `main`. The operator merges.
+- Never edit or append to `ledgers/*.jsonl` by hand. They are hash-chained and written only by the operator's runs.
+- After the NA-11 freeze, `docs/PREREG.md`, `configs/` and the analysis spec and targets code do not change. A
+  deviation is appended to the PREREG §15 log (CLAUDE.md rule 11).
+- The history was rewritten for the upload on 2026-10-30. Commit hashes cited in older documents and in the ledgers'
+  `git_sha` fields are the pre-upload ones; `docs/COMMIT_MAP.tsv` maps them to the current commits.
+
 ## Running a chunk
 
 1. Start from an up-to-date `main` and a **fresh** Claude Code session in this directory.

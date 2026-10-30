@@ -43,6 +43,8 @@ def _sha(path: Path) -> str:
 
 
 def _scratch(tmp: Path) -> Path:
+    if not (ROOT / "work" / "MANIFEST.json").is_file():
+        pytest.skip("work/ is absent (make paper needs NA-13's books)")
     root = tmp / "repo"
     for rel in LINKED:
         (root / rel).parent.mkdir(parents=True, exist_ok=True)
