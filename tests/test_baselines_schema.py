@@ -132,6 +132,8 @@ def outputs() -> list[str]:
 @pytest.fixture(scope="module")
 def real_states() -> dict[str, pd.DataFrame]:
     cfg = baselines_config()
+    if not (ROOT / "work" / cfg.state_files.call_a).is_file():
+        pytest.skip(f"work/{cfg.state_files.call_a} is absent (run the NA-04 build)")
     cols = ["event_id", "split", "session", "company_id"]
     return {
         "A": io.read_parquet(cfg.state_files.call_a, columns=cols),

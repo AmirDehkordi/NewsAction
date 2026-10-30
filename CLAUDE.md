@@ -38,6 +38,12 @@ The work is delivered as chunks NA-00…NA-15 in `NewsAction PRD.md`:
   - OpenRouter: **hard cap $30 total**, plus per-chunk caps from the PRD.
   - FMP: ≤ 17,000 requests (raised from 3,000 by the operator; PREREG §15, NA-10 rows), and only in NA-10.
   - Kaggle: free 2×T4 (NA-08).
+- **GitHub:** private `origin` https://github.com/AmirDehkordi/NewsAction (2026-10-30), shared with the team.
+  - It never holds `Data/`, `work/`, `cache/`, `.env` or NewsWitch text: `artifacts/NA-02/{spam_judgments,detector_eval}.csv`
+    are gitignored and stay on the operator's machine.
+  - `ledgers/spend.jsonl` is stored in Git LFS (it is over GitHub's 100 MB file limit).
+  - The history was rewritten for the upload. Commit hashes cited before 2026-10-30 (REPORTs, decisions, commit messages,
+    the ledgers' `git_sha`) are old ones; `docs/COMMIT_MAP.tsv` maps them to the current commits.
 - **Secrets** live in `.env` (gitignored): `OPENROUTER_API_KEY`, `ATOM_DB_PASSWORD`, `FMP_API_KEY`. Never print, log or commit them.
 
 ## Standard commands (created in NA-00)

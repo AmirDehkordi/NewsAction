@@ -44,12 +44,15 @@ ADI, ALL, COIN, COST, DE, EL, FE, GL, HOOD, IP, IT, MET, MS, PM, TSLA = (
 )  # fmt: skip
 
 
-@cache
-def aliases() -> dict[int, CompanyAliases]:
+def panel_companies(columns: list[str]) -> pd.DataFrame:
     if not (ROOT / "work" / "panel" / "companies.parquet").is_file():
         pytest.skip("work/panel/companies.parquet is absent")
-    comp = io.read_parquet("panel/companies.parquet", columns=["symbol_id", "company_id", "ticker", "name"])
-    return build_aliases(comp)
+    return io.read_parquet("panel/companies.parquet", columns=columns)
+
+
+@cache
+def aliases() -> dict[int, CompanyAliases]:
+    return build_aliases(panel_companies(["symbol_id", "company_id", "ticker", "name"]))
 
 
 @cache
@@ -63,7 +66,7 @@ ORDINARY = frozenset({"all", "now", "eyes", "keys", "cost"})
 
 @cache
 def companies() -> pd.DataFrame:
-    return io.read_parquet("panel/companies.parquet", columns=["company_id", "ticker", "name"])
+    return panel_companies(["company_id", "ticker", "name"])
 
 
 @cache
@@ -270,7 +273,7 @@ def test_name_variants() -> None:
 def test_empty_curated_list_leaks_and_the_scanner_sees_it() -> None:
     """Positive control: without the curated list, "Google" survives and the scanner counts it."""
     cfg = replace(load_alias_config(), companies={})
-    comp = io.read_parquet("panel/companies.parquet", columns=["symbol_id", "company_id", "ticker", "name"])
+    comp = panel_companies(["symbol_id", "company_id", "ticker", "name"])
     weak = Masker(build_aliases(comp, cfg=cfg), cfg=cfg)
     text = "Alphabet's Google unit beats estimates"
     leaked = weak.mask(text, GOOGL)
