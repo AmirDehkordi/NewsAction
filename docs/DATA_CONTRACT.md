@@ -4449,4 +4449,4 @@ sha256 on a rerun (labels and export were run twice: 8 of 8 files identical).
 - **Key:** one file
 - **Rows / coverage:** the arXiv source upload; `make paper-arxiv-check` compiles it with pdflatex (TeX Live, Docker)
 - **Availability:** after NA-14 (every number is a cell of NA-14's committed tables; nothing here reads the lock)
-- **sha256:** `5af60f6e6cdc1be07a632b091b69186dd8ee23cab87209ac18eac7d455c181c8`
+- **sha256:** `b99cc9da527dafadd4401489717f49245bcef225b0424ab7e4b45898cce9bd35`

@@ -1,4 +1,4 @@
-# Research plan: Paper 2, the companion to "The Market Reads the News First"
+# Research plan: Paper 2, the companion to "Thinking Fast, Trading Late"
 
 *Written 2026-10-29, after NA-12 to NA-14; updated after NA-13b's merge (F6–F7 added). Status: plan only; no forward data yet.*
 *Repository: `/Users/amir/Research/NewsAction`. Paper 1 is written in NA-16 (prompt in the session notes).*
