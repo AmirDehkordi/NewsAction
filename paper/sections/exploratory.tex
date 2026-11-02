@@ -16,7 +16,7 @@ Section~\ref{sec:validation} is therefore a fall on the other events. Even on ea
 at the open: d1-ultra's earnings-day IC on the test is \res{d1-earn-on-test} with $z_{on}$ and
 \res{d1-earn-id-test} with $z_{id}$.
 
-\paragraph{Selective prediction: the most confident calls carry most of the overnight signal.} We ranked events
+\paragraph{Selective prediction: the overnight signal concentrates in the most confident calls.} We ranked events
 post hoc by conviction, the size of $|\Nhat|$ against its val-A distribution, and kept only the top share of them,
 which traces a coverage curve \citep{geifman2017} (Figure~\ref{fig:selective}). d1-ultra's mean overnight move in
 the direction of its reading, $\mathrm{sign}(\Nhat)\cdot z_{on}$, is \res{sel-d1-on-10-test} typical moves in its
@@ -27,10 +27,11 @@ excludes zero at any coverage.
 \begin{figure}[tbp]
 \centering
 \includegraphics{\figdir/figA16_selective_coverage.pdf}
-\caption{\textbf{Exploratory (post hoc): d1-ultra's most confident tenth of pre-open readings carries most of
-the overnight signal in all three periods (mean signed overnight move \res{sel-d1-on-10-vala},
+\caption{\textbf{Exploratory (post hoc): the overnight signal concentrates in d1-ultra's most confident tenth of
+pre-open readings in all three periods (mean signed overnight move \res{sel-d1-on-10-vala},
 \res{sel-d1-on-10-valb} and \res{sel-d1-on-10-test} typical moves, against \res{sel-d1-on-all-vala},
-\res{sel-d1-on-all-valb} and \res{sel-d1-on-all-test} for all events), but not the move after the open.}
+\res{sel-d1-on-all-valb} and \res{sel-d1-on-all-test} for all events); the move after the open shows no such
+concentration.}
 Coverage curves: events ranked by conviction $|\Nhat|$ (lines) or by the stated confidence (circles), keeping the
 most confident share, with thresholds from val-A; 95\% intervals from the stationary bootstrap over sessions.
 (a) Mean $\mathrm{sign}(\Nhat)\cdot z_{on}$; (b) mean $\mathrm{sign}(\Nhat)\cdot z_{id}$; (c) the hit rate

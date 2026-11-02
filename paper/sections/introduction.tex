@@ -34,9 +34,10 @@ company names, tickers, people, dates and every mention of a price move. Before 
 \emph{pre-open reading}: how the stock will perform once the news is absorbed. At 10:00 and after the close it
 gives a \emph{post-reaction reading}: was the reaction so far too small or too large for the news? The primary
 instrument, Laya-Fin, is an open-weights decision model that we fine-tuned on 2024--2025 news and returns; we
-compare it with three commercial decision models, the untuned Laya model and standard baselines. Every hypothesis
-and selection rule was fixed before any outcome was computed, selection used two validation quarters of 2025, and
-the analysis plan was frozen by hash before the 2026 test outcomes were unblinded, once.
+compare it with three commercial decision models, the untuned Laya model and standard baselines. The hypotheses
+and selection rules were written down before any data were analyzed, and every later change is dated in an
+append-only log; selection used two validation quarters of 2025, and the analysis plan was frozen by hash before
+the 2026 test outcomes were unblinded, once.
 
 \needspace{8\baselineskip}
 \paragraph{Key findings.}
@@ -48,7 +49,7 @@ the analysis plan was frozen by hash before the 2026 test outcomes were unblinde
   which barely recognizes masked companies, shows the same split.
 \item \textbf{A validated signal did not survive the blinded test.} Laya-Fin's IC with the day's move was
   \res{lf-ic-valb} ($t = \res{lf-ic-valb-t1}$) in the final validation quarter and \res{lf-ic-test}
-  ($t = \res{lf-ic-test-t1}$) on the test. Every model whose validation IC was positive fell, none of the five
+  ($t = \res{lf-ic-test-t1}$) on the test. Every model whose validation IC was clearly positive fell, none of the five
   primary hypotheses is supported, and no pre-registered strategy survives costs and a deflated Sharpe ratio. In
   exploratory analyses, the signal that remained sat on earnings days, and conditions selected on two validation
   quarters, with in-sample Sharpe ratios up to \res{cb-valb-gross-max}, failed on the test.
@@ -72,5 +73,5 @@ explanation ladder of \citet{kelly2026}, which measures how much of a stock's ow
 
 Section~\ref{sec:related} reviews related work and Section~\ref{sec:design} describes the data and the design.
 Sections~\ref{sec:validation} to~\ref{sec:strategies} report the pre-registered results, nulls included.
-Section~\ref{sec:exploratory} reports exploratory analyses, labelled post hoc, and Section~\ref{sec:limits} the
+Section~\ref{sec:exploratory} reports exploratory analyses, labeled post hoc, and Section~\ref{sec:limits} the
 limitations and a pre-registered forward test on news published after the models' release.

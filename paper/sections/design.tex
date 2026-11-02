@@ -18,7 +18,8 @@ the name.}\label{tab:olivia}
 Safeguard & Guards against & In this study & A replication needs \\
 \midrule
 \textbf{O}ne-time unblinding & Repeated looks at the test period & The 2026 prices were sealed behind a lock that
-checks the frozen hash; it released the test outcomes once and logs every read & Sealed outcomes and a log of
+checks the frozen hash; it released the test outcomes only after the freeze, to the frozen analyses, and logs
+every read & Sealed outcomes and a log of
 every access \\
 \addlinespace
 \textbf{L}ook-ahead-free states & Inputs that were not public at the decision & Every input carries the time it
@@ -48,8 +49,9 @@ the first analysis \\
 \input{figures/design_timeline}
 \caption{\textbf{The design: every choice was made on 2025 validation data, the 2026 test was sealed until the
 plan was frozen, and every model was released after the sample ended.} (a) The calendar; the time axis changes
-scale at the break, from months to days. The test outcomes were released once, after the freeze. The forward
-test, pre-registered on 2026-10-29 and not yet run, uses news published from 2026-10-22 on. (b) One trading session. At D0 (09:15~ET) a
+scale at the break, from months to days. The test outcomes were released only after the freeze. The forward
+test, pre-registered on 2026-10-29 and not yet run, uses news published from 2026-10-22 on. (b) One trading
+session. At D0 (09:15~ET) a
 model reads the news published since the previous close; at D1 (10:00) and D2 (after the close) it also sees the
 reaction so far. The overnight move $z_{on}$ runs from the previous close to the open, so it includes after-hours
 and pre-market trading; the move after the open $z_{id}$ runs from the open to the close; and $y_2$ runs from the
@@ -66,7 +68,7 @@ ranks 101--250 and ranks 251--500. The sample is split by time into a training p
 2025-06-30), two validation quarters and a test period. The first validation quarter, val-A (2025-07-01 to
 2025-09-30), is used for search and for fitting calibration maps, temperatures and thresholds; the second, val-B
 (2025-10-01 to 2025-12-31), for confirmation and the final selection. The test period, 2026-01-02 to
-2026-07-31, was blinded until the analysis plan was frozen and was then used once. A target enters an
+2026-07-31, was blinded until the analysis plan was frozen and was then unblinded once. A target enters an
 evaluation only if its whole horizon ends inside its period, and the first five sessions of each evaluation
 period are left out.
 
@@ -92,7 +94,8 @@ the main one, $y_2$, runs from the next open to the close of $t+5$.
 
 \subsection{News, events and decision points}\label{sec:news}
 
-The news comes from a commercial company-news feed (titles and snippets with publication times). An article is
+The news comes from NewsWitch, a commercial company-news feed (titles and snippets with publication times). An
+article is
 available at its time stamp, or at the end of the hour or day when the stamp is rounded to the hour or carries
 only a date. We drop items marked as non-news, price commentary and promotion, automatic institutional-holdings
 reports, non-English articles, near-duplicates, and two kinds of item whose time stamp precedes its content:
@@ -154,21 +157,22 @@ is distinctive, and Section~\ref{sec:memorization} measures how often the models
 
 \paragraph{Laya-Fin, the primary instrument.} Laya is an open-weights decision model built on the
 ModernBERT-large encoder \citep{convaiinnovations2026,warner2025}. We fine-tuned it on the training period's states
-with three heads: the nine-level move (labelled with the realized five-day move), a five-level magnitude head (the
+with three heads: the nine-level move (labeled with the realized five-day move), a five-level magnitude head (the
 size of the same-day move) and, for the post-reaction reading, a three-class continuation head. It was trained
 once (one seed, one epoch) with AdamW \citep{loshchilov2019} and early stopping on val-A, and one temperature per
 head was fitted on val-A; the pre-registered second and third seeds are robustness runs
 (Section~\ref{sec:limits}).
 
-\paragraph{Commercial decision models.} Every eligible decision model in a public model router's catalogue, plus
+\paragraph{Commercial decision models.} Every eligible decision model in a public model router's catalog, plus
 the local Laya models, entered a two-stage zero-shot tournament on val-A. The six with the highest first-stage IC
 then faced four pre-registered screens: company identification on masked states, the share of counterfactual
 edits (beat or miss, raise or cut, upgrade or downgrade) that move the reading the right way, the IC gain from
 unmasking, and a shuffled-news control. No model passed: all six recognized the masked company far more often than
 the screen allowed (Section~\ref{sec:memorization}), and five also failed the counterfactual screen. By a decision
 logged before the freeze, the three with the highest second-stage IC, d1-ultra, span-02 and drex-v2.0, were
-carried to the test as \emph{screen-failing comparators}. We refer to them by short labels because the results
-concern the versions we tested; the replication package lists their catalogue identifiers and release dates. All
+carried to the test as \emph{screen-failing comparators} (the API models of the tables and figures). We refer to
+them by short labels because the results
+concern the versions we tested; the replication package lists their catalog identifiers and release dates. All
 three were released in October 2026, after the sample ended.
 
 \paragraph{The untuned model, the anchor and the baselines.} Laya zero-shot is the untuned Laya model answering
@@ -187,12 +191,14 @@ the fact; they are an upper bound that may carry look-ahead, not a benchmark.
 
 The pre-registration was written on 2026-10-24, before any panel, target or model output existed, and fixes the
 universe, the splits, the targets, the masking, the questions, every selection rule, the hypotheses with their
-families and corrections, the strategies and the inference. Three amendments were added the same day, before any
-data: convergence to the news-implied value, a wider question battery and the firm-level explanation analysis.
+families and corrections, the strategies and the inference. Three amendments were added the same day, also before any
+panel, target or model output existed: convergence to the news-implied value, a wider question battery and the
+firm-level explanation analysis.
 Later changes went only into an append-only, dated deviations log. On 2026-10-28, before any 2026 model call, a
 SHA-256 hash over the pre-registration, every configuration file and the analysis code was recorded and tagged in
-version control. The lock on the 2026 prices checks that hash; it was opened after the freeze to build the
-post-reaction states (reactions only), and once, in a single logged sequence, to release the test outcomes.
+version control. The lock on the 2026 prices checks that hash. After the freeze it was opened to build the
+post-reaction states (reactions only) and then to release the test outcomes to the frozen analyses, the hypothesis
+tests first and the strategies later the same day; every read is logged.
 
 \subsection{Inference}\label{sec:inference}
 

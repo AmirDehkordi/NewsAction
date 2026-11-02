@@ -52,6 +52,7 @@ phrases:
   - {text: "top 20\\%", why: "strategy quantile"}
   - {text: "5, 10 and 20 basis points", why: "cost levels"}
   - {text: "10 basis points", why: "cost level"}
+  - {text: "20 basis points per round trip", why: "Lopez-Lira and Tang's cost level, quoted from their paper"}
   - {text: "100 books", why: "placebo books"}
   - {text: "100 random-signal books", why: "placebo books"}
   - {text: "95th percentile", why: "placebo band"}

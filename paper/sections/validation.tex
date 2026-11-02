@@ -5,8 +5,9 @@ quarter used for the final selection, with its IC on the test period. Laya-Fin w
 instrument because its val-B IC, \res{lf-ic-valb} ($t = \res{lf-ic-valb-t}$), was the highest among the
 candidates eligible for that role; on val-A, which it was not trained on, its IC had been \res{lf-ic-vala}. On the
 test it fell to \res{lf-ic-test} ($t = \res{lf-ic-test-t}$), below the lower end of its val-B 95\% interval
-(\res{lf-ic-valb-lo}). The fall is not specific to the fine-tuned model. Every model whose val-B IC was positive
-fell: the commercial models' ICs roughly halved (d1-ultra's from \res{d1-ic-valb} to \res{d1-ic-test}), and the
+(\res{lf-ic-valb-lo}). The fall is not specific to the fine-tuned model. Every model whose val-B IC was clearly
+positive fell: the commercial models' ICs roughly halved (d1-ultra's from \res{d1-ic-valb} to \res{d1-ic-test}),
+and the
 generative LLM's fell from \res{llm-ic-valb} to \res{llm-ic-test} on its subsample. The clean price-only and
 embedding benchmarks are near zero in both periods. The highest test ICs belong to the two baselines built on
 vendor labels (\res{tags-ic-test} for the tag model); because the vendor produced those labels after the fact, we
@@ -18,11 +19,13 @@ away from earnings days.
 \begin{figure}[tbp]
 \centering
 \includegraphics{\figdir/fig1_validation_test.pdf}
-\caption{\textbf{Every validation IC that was positive fell on the blinded test: Laya-Fin's from
+\caption{\textbf{Every validation IC that was clearly positive fell on the blinded test: Laya-Fin's from
 \res{lf-ic-valb} to \res{lf-ic-test}, d1-ultra's from \res{d1-ic-valb} to \res{d1-ic-test}.} Daily IC of the
 pre-open reading $\Nhat$ with the close-to-close move $z_{cc}$ on (a) val-B (October--December 2025, the
 final-selection quarter) and (b) the test period (January--July 2026), with 95\% intervals ($\pm 1.96$
-Newey--West standard errors); the panels share one scale. The LLM baseline was run on a 2,000-event subsample.
+Newey--West standard errors); the panels share one scale. Colors mark the series that recur across the figures:
+Laya-Fin (blue), d1-ultra (orange) and the price-only benchmark (green). The LLM baseline was run on a
+2,000-event subsample.
 $^{\dagger}$Vendor-label baselines: the labels were produced after the fact, so their ICs are a possibly
 look-ahead-contaminated upper bound. $^{\ddagger}$See Appendix~\ref{app:prereg}.}\label{fig:validation-test}
 \end{figure}

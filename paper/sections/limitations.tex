@@ -9,7 +9,10 @@ months long (\res{test-d0-sessions} sessions with D0 events), so small ICs are h
 rested on two validation quarters of \res{valb-sessions} sessions each. The trained instruments were trained once,
 with one seed and one epoch; the anchor learned the size of moves but not their direction and is uninformative, so
 the study says nothing about what fine-tuning adds. The commercial models failed the pre-registered screens and
-were released after the sample, so contamination cannot be ruled out. The vendor-label baselines rest on labels
+were released after the sample, so contamination cannot be ruled out. Five of the authors wrote the earlier study
+\citep{kargarzadeh2026}, whose 2023--2026 sample overlaps our test period; none of its statistics is a test in
+this paper, but its authors had seen aggregate news reactions that include early 2026 before this design was
+fixed. The vendor-label baselines rest on labels
 produced after the fact. Masking leaves small residues of names and dates, below half a percent of states. The
 strategies charge flat costs per side and model no borrow costs or market impact, and the hedge removes market risk
 only. Some pre-registered items were not run or not completed: three robustness variants that needed new model
@@ -37,7 +40,8 @@ pipeline run unchanged. They are:
 \item \textbf{F7, conviction concentration:} the mean signed overnight move of the top tenth by conviction
   exceeds that of all events (Holm across four models).
 \end{itemize}
-F5, F6 and F7 turn the exploratory results of Sections~\ref{sec:calibration} and~\ref{sec:exploratory} into
-confirmatory tests. The forward test has not been run. The robustness runs of the anchor (seeds 17 and 23 and a
+F5 and F7 turn exploratory results of Section~\ref{sec:exploratory}, and F6 a descriptive comparison of
+Section~\ref{sec:calibration}, into confirmatory tests. The forward test has not been run. The robustness runs of
+the anchor (seeds 17 and 23 and a
 longer training run), fixed before unblinding, have not been run either; they are robustness only and cannot
 change any verdict here.
