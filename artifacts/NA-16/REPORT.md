@@ -19,8 +19,8 @@ Date: 2026-10-29 · Branch `feat/NA-16-paper` (main checkout, cut from main @ 83
   without "Call A/Call B", the deviations table by stage. `make paper` reproduces every digest; `make
   paper-preview` passes.
 - **`make verify`** exit 0: 2,208 passed, 3 skipped, 2 xfailed; manifest OK (487 artifacts); ledgers unchanged.
-- **Open:** the title choice and a final pdflatex check (Docker's TeX Live image) that needs your approval before
-  any image is pulled.
+- **Open:** a final pdflatex check (Docker's TeX Live image) that needs your approval before any image is
+  pulled. The title was chosen on 2026-11-02 (§3).
 
 ## 1. Scope
 
@@ -56,8 +56,10 @@ Date: 2026-10-29 · Branch `feat/NA-16-paper` (main checkout, cut from main @ 83
 
 ## 3. The paper
 
-- **Title (working):** "The Market Reads the News First: A Pre-Registered, Look-Ahead-Free Test of AI Decision
-  Models on Stock-Price Reactions". **Alternatives for your choice:**
+- **Title (chosen by the operator on 2026-11-02):** "The Market Reads the News First: A Pre-Registered, Blinded
+  Test of AI Decision Models on Stock-Price Reactions". It is the working title with "Blinded" in place of
+  "Look-Ahead-Free" in the subtitle (one hyphenated compound fewer before "Test", and a word readers know; the
+  main clause stays because the abstract and the conclusion end on it). **The alternatives offered were:**
   1. "Priced at the Open: A Pre-Registered Test of Whether AI Decision Models Can Read Financial News Before the
      Market";
   2. "Clean Validation, Null Test: AI Decision Models, Financial News and Stock-Price Reactions in a
@@ -202,6 +204,7 @@ no longer names Kaggle or mentions the data-request ledger. `make paper-pdf` pas
 - **STOP conditions:** none fired (no spend, no lock read, no frozen file changed; the freeze hash is unchanged).
 - **Owner decisions:**
   1. The title (working title or one of the two alternatives). *Recommendation:* the working title.
+     *Decided 2026-11-02:* the working title, with "Blinded" in place of "Look-Ahead-Free" in the subtitle.
   2. A final pdflatex check in a TeX Live container before submission (pulls an image of several GB).
      *Recommendation:* yes, once, with the bundle described in `arxiv/metadata.md`.
   3. The AI-use statement's wording. *Recommendation:* keep a short statement; many venues ask for one.
