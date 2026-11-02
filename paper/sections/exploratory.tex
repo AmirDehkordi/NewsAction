@@ -1,0 +1,56 @@
+\section{Exploratory analyses (post hoc): where the signal lives}\label{sec:exploratory}
+
+Everything in this section is exploratory. The analyses were requested after unblinding, they are outside every
+pre-registered family and they support no claim; they suggest where to look, and the forward test of
+Section~\ref{sec:limits} re-tests two of them as pre-registered hypotheses. Before this study was designed, the
+authors' AI research assistant had looked at two of the statistics below on the test period (hit rates and mean
+moves by conviction band, and the statistics of the 10:00 reading), and those looks shaped it. Every exploratory
+variant is logged as a trial: the ledger grew from \res{ntrials-strat} to \res{ntrials-total} trials.
+
+\paragraph{Earnings days carry the signal.} In a post hoc split, every signal's pre-open IC is concentrated on
+the \res{earn-n-test} test events with a scheduled earnings report, and there it held in all three periods.
+Laya-Fin's IC with $z_{cc}$ on earnings days was \res{lf-earn-vala}, \res{lf-earn-valb} and \res{lf-earn-test} on
+val-A, val-B and the test, against \res{lf-rest-test} on the other test events; d1-ultra's was
+\res{d1-earn-test} on the test ($t = \res{d1-earn-test-t}$). The fall from validation to test of
+Section~\ref{sec:validation} is therefore a fall on the other events. Even on earnings days the signal is priced
+at the open: d1-ultra's earnings-day IC on the test is \res{d1-earn-on-test} with $z_{on}$ and
+\res{d1-earn-id-test} with $z_{id}$.
+
+\paragraph{Selective prediction: the overnight signal concentrates in the most confident calls.} We ranked events
+post hoc by conviction, the size of $|\Nhat|$ against its val-A distribution, and kept only the top share of them,
+which traces a coverage curve \citep{geifman2017} (Figure~\ref{fig:selective}). d1-ultra's mean overnight move in
+the direction of its reading, $\mathrm{sign}(\Nhat)\cdot z_{on}$, is \res{sel-d1-on-10-test} typical moves in its
+top 10\% on the test, against \res{sel-d1-on-all-test} for all events, and the pattern held in both validation
+quarters. After the open, selectivity gains little: no test interval of the top share's mean move after the open
+excludes zero at any coverage.
+
+\begin{figure}[tbp]
+\centering
+\includegraphics{\figdir/figA16_selective_coverage.pdf}
+\caption{\textbf{Exploratory (post hoc): the overnight signal concentrates in d1-ultra's most confident tenth of
+pre-open readings in all three periods (mean signed overnight move \res{sel-d1-on-10-vala},
+\res{sel-d1-on-10-valb} and \res{sel-d1-on-10-test} typical moves, against \res{sel-d1-on-all-vala},
+\res{sel-d1-on-all-valb} and \res{sel-d1-on-all-test} for all events); the move after the open shows no such
+concentration.}
+Coverage curves: events ranked by conviction $|\Nhat|$ (lines) or by the stated confidence (circles), keeping the
+most confident share, with thresholds from val-A; 95\% intervals from the stationary bootstrap over sessions.
+(a) Mean $\mathrm{sign}(\Nhat)\cdot z_{on}$; (b) mean $\mathrm{sign}(\Nhat)\cdot z_{id}$; (c) the hit rate
+against $z_{cc}$. The dashed line marks the frozen confidence gate (the val-A 70th percentile).
+$^{\ddagger}$See Appendix~\ref{app:prereg}.}\label{fig:selective}
+\end{figure}
+
+\paragraph{Watching the open adds nothing.} In a post hoc comparison, the reading at 10:00, after the first
+half-hour bar, never predicts the rest of the day better than the pre-open reading on val-B or the test, and the
+revision from the pre-open to the 10:00 reading has a zero or negative IC with the move from 10:00 to the close
+(Laya-Fin \res{watch-lf-rev-test} on the test, $t = \res{watch-lf-rev-test-t}$). The models seem to over-update
+toward the first bar, but the comparison involves many statistics, so this exploratory pattern is weak evidence.
+
+\paragraph{Validation-to-test decay, the strongest instance.} A post hoc conditioning study asked whether the
+after-the-open signal $\mathrm{sign}(\Nhat)\cdot z_{id}$ is stronger under some condition (the type and timing of
+the news, the day, the stock, the models' internals, agreement between models and a cost hurdle) for
+\res{cond-pairs} (model, condition) pairs. A strict rule, fixed before its test run, selected the pairs positive
+with $t \ge 1$ in both validation quarters and a pooled $t \ge 2$, and \res{cond-selected} passed. On the test,
+\res{cond-reversed} of them changed sign and the other \res{cond-positive} are small (Appendix
+Figure~\ref{fig:a-conditioning}). Their tradable versions had in-sample gross Sharpe ratios up to
+\res{cb-valb-gross-max} on val-B; on the test, none reaches the 90th percentile of its placebo, and every one loses
+net of 10 basis points.

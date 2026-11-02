@@ -116,8 +116,8 @@ FIG1_ROWS: Final = (
 
 
 def fig1(src: sc.Sources) -> pd.DataFrame:
-    """Figure 1: the daily IC of N̂_W0 with z_cc on val-B and on test for each instrument and baseline, with
-    95% intervals from the Newey–West t (NA-12 t14)."""
+    """Figure 1: the daily IC of N̂_W0 with z_cc on val-B (panel a) and on test (panel b) for each instrument
+    and baseline, with 95% intervals from the Newey–West t (NA-12 t14)."""
     c = src.frame(T14)
     out = []
     for pos, (series, group, key) in enumerate(FIG1_ROWS):
@@ -127,7 +127,7 @@ def fig1(src: sc.Sources) -> pd.DataFrame:
                 sc.rows(
                     r,
                     T14,
-                    panel="a",
+                    panel="a" if split == "val_b" else "b",
                     series=f"={series}",
                     label=f"={group}",
                     role=f"={split}",
@@ -147,8 +147,8 @@ FIG2_MODELS: Final = ("laya_fin", "laya_zs", "d1_ultra", "span_02", "drex_v2")
 
 
 def fig2(src: sc.Sources) -> pd.DataFrame:
-    """Figure 2: (a) the daily IC of N̂_W0 with the overnight move z_on and with the move after the open z_id
-    (NA-12 t3, 95% bootstrap intervals); (b) H1, their difference (t1b, 95% bootstrap interval)."""
+    """Figure 2: the daily IC of N̂_W0 with (a) the overnight move z_on and (b) the move after the open z_id
+    (NA-12 t3, 95% bootstrap intervals); (c) H1, their difference (t1b, 95% bootstrap interval)."""
     t3, t1b = src.frame(T3), src.frame(T1B)
     out = []
     for pos, model in enumerate(FIG2_MODELS):
@@ -158,7 +158,7 @@ def fig2(src: sc.Sources) -> pd.DataFrame:
                 sc.rows(
                     r,
                     T3,
-                    panel="a",
+                    panel="a" if target == "z_on" else "b",
                     series=f"={model}",
                     role=f"={target}",
                     x=f"={target}",
@@ -174,7 +174,7 @@ def fig2(src: sc.Sources) -> pd.DataFrame:
             sc.rows(
                 r,
                 T1B,
-                panel="b",
+                panel="c",
                 series=f"={model}",
                 role="=H1",
                 x="=H1",

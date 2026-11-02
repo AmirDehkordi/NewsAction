@@ -1,0 +1,16 @@
+{
+ "bundle": "artifacts/NA-16/arxiv_source.tar.gz",
+ "bundle_sha256": "5af60f6e6cdc1be07a632b091b69186dd8ee23cab87209ac18eac7d455c181c8",
+ "engine": "This is pdfTeX, Version 3.141592653-2.6-1.40.25 (TeX Live 2023) (preloaded format=pdflatex 2025.3.10)  1 JAN 2026 00:00",
+ "errors": [],
+ "exit": 0,
+ "float_too_large": [],
+ "fonts": 59,
+ "fonts_not_embedded": [],
+ "image": "texlive/texlive:TL2023-historic",
+ "overfull": [],
+ "pages": 40,
+ "rerun": false,
+ "undefined": [],
+ "underfull": 0
+}

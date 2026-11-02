@@ -1,0 +1,37 @@
+\section{Conclusion}\label{sec:conclusion}
+
+AI decision models read financial news well enough to line up with how a stock opens, and not well enough to
+forecast what it does after that. A fine-tuned open-weights model that looked convincing on two validation
+quarters did not survive a blinded test. The commercial models kept a signal, but only in the overnight gap,
+where the market had already priced the news before anyone could trade on it at the open, as an efficient market
+would \citep{fama1970}. The models could not tell an overreaction from an underreaction, their calls of
+underreaction never caught up, and no pre-registered strategy survived costs and selection. Out of sample, news
+explains a fraction of a percent of a stock's own daily variance, and the commercial models' stated
+probabilities overstate their accuracy.
+
+Three recommendations follow for anyone who backtests language-model readings of news. First, split the return at
+the open: a pre-open signal can be traded only if it predicts the move after the open, and a close-to-close
+backtest credits it with a move nobody could trade. Second, measure recognition, not just masking: report how
+often the model names the masked company against a matched baseline, and where possible test on news published
+after the model's release, as our pre-registered forward test will. Third, freeze and count, as OLIVIA prescribes
+(Table~\ref{tab:olivia}): select
+on validation data only, freeze the plan by hash, and log every trial and deflate for them; the strongest
+exploratory pattern we
+found, with in-sample Sharpe ratios up to \res{cb-valb-gross-max}, reversed on the test. The market reads the news
+first.
+
+\section*{Acknowledgments and statements}
+\paragraph{Acknowledgments.} The NewsWitch news corpus was provided by Zanista AI Ltd, and the cleaned dataset was
+prepared at TailState Intelligence Ltd.
+
+\paragraph{Funding.} This research received no external funding.
+
+\paragraph{Competing interests.} Arman Khaledian and Navid Parvini are affiliated with Zanista AI Ltd, which
+develops NewsWitch, the commercial news feed used in this study, whose sentiment and topic labels are
+evaluated here as baselines. Alireza Kargarzadeh is affiliated with TailState Intelligence Ltd, which
+prepared the dataset. The other authors declare no competing interests. The views expressed are the
+authors' own and do not necessarily reflect those of their employers.
+
+\paragraph{Use of AI tools.} An AI coding and research assistant (Claude, by Anthropic, used through Claude Code)
+implemented and ran the pre-registered pipeline under the authors' direction and drafted this manuscript from the
+verified outputs. The authors take full responsibility for the content.

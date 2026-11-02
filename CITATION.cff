@@ -1,0 +1,87 @@
+# The arXiv identifier is added once arXiv assigns it.
+cff-version: 1.2.0
+message: >-
+  If you use this replication package, please cite the paper below.
+title: >-
+  NewsAction: replication package for "The Market Reads the News First: A Pre-Registered, Blinded Test of
+  AI Decision Models on Stock-Price Reactions"
+type: software
+license: MIT
+repository-code: "https://github.com/AmirDehkordi/NewsAction"
+authors:
+  - family-names: Dehkordi
+    given-names: Amir
+    affiliation: "Independent Researcher"
+    city: London
+    country: GB
+    email: amir.dehkordi98@gmail.com
+  - family-names: Kargarzadeh
+    given-names: Alireza
+    affiliation: "TailState Intelligence Ltd"
+    city: London
+    country: GB
+    email: alireza.kargarzadeh@tailstate.ai
+  - family-names: Khaledian
+    given-names: Nariman
+    affiliation: "Independent Researcher"
+    city: Antibes
+    country: FR
+    email: nariman.khaledian@gmail.com
+  - family-names: Parvini
+    given-names: Navid
+    affiliation: "Zanista AI Ltd"
+    city: London
+    country: GB
+    email: navid.parvini@zanista.ai
+  - family-names: Ghatak
+    given-names: Sid
+    affiliation: "Increase Alpha, LLC"
+    city: Miami
+    country: US
+    email: s.ghatak@increasealpha.com
+  - family-names: Khaledian
+    given-names: Arman
+    affiliation: "Zanista AI Ltd"
+    city: London
+    country: GB
+    email: arman.khaledian@zanista.ai
+keywords:
+  - large language models
+  - LLM
+  - AI decision models
+  - stock return prediction
+  - financial news
+  - look-ahead bias
+  - memorization
+  - data contamination
+  - backtest overfitting
+  - deflated Sharpe ratio
+  - pre-registration
+  - overnight returns
+  - market efficiency
+preferred-citation:
+  type: article
+  title: >-
+    The Market Reads the News First: A Pre-Registered, Blinded Test of AI Decision Models on Stock-Price
+    Reactions
+  authors:
+    - family-names: Dehkordi
+      given-names: Amir
+      affiliation: "Independent Researcher"
+    - family-names: Kargarzadeh
+      given-names: Alireza
+      affiliation: "TailState Intelligence Ltd"
+    - family-names: Khaledian
+      given-names: Nariman
+      affiliation: "Independent Researcher"
+    - family-names: Parvini
+      given-names: Navid
+      affiliation: "Zanista AI Ltd"
+    - family-names: Ghatak
+      given-names: Sid
+      affiliation: "Increase Alpha, LLC"
+    - family-names: Khaledian
+      given-names: Arman
+      affiliation: "Zanista AI Ltd"
+  year: 2026
+  notes: "Preprint; the arXiv identifier is to be added."

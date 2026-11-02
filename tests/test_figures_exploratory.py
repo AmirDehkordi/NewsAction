@@ -52,6 +52,11 @@ ROWS = {
     ("t20_strategies", FADE),
     ("t20_strategies", "validation|exploratory|ma_cross|fade_no_news|close_t+5"),
     ("t35_break_even", FADE.split("|", 1)[1]),
+    # NA-16: the conditioning study's counts the paper cites (exploratory, post hoc)
+    ("t30_derived", "conditioning:pairs"),
+    ("t30_derived", "conditioning:selected"),
+    ("t30_derived", "conditioning:selected_reversed"),
+    ("t30_derived", "conditioning:selected_positive"),
 }
 MONTH_EFFECT = (
     "A one-way test of the daily ICs on the calendar month finds no month effect "

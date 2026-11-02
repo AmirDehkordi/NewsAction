@@ -1,2 +1,9 @@
 key,value,formula,source
 laya_fin:rg_events,146,"Σ n_group of Laya-Fin's three RG classes (rg_class_signed, car_post0)",artifacts/NA-12/figure_data/fig1_rg_class_paths.csv
+tournament:models,21,rows of the zero-shot tournament (every model of stage 1),artifacts/NA-06/fig3_data.csv
+tournament:stage2,6,tournament rows with stage2 true,artifacts/NA-06/fig3_data.csv
+conditioning:pairs,75,"(model, condition) pairs of the conditioning study on the test (NA-13b, exploratory)",artifacts/NA-13b/tables/selection.csv
+conditioning:selected,8,pairs selected on validation (selected true),artifacts/NA-13b/tables/selection.csv
+conditioning:selected_reversed,5,selected pairs whose test difference is negative (the sign changed),artifacts/NA-13b/tables/selection.csv
+conditioning:selected_positive,3,selected pairs whose test difference is positive,artifacts/NA-13b/tables/selection.csv
+ablations:failed,210,"Σ (requests − ok) over NA-11's three ablations (rate-limited, not retried)",artifacts/NA-11/ablation_runs.json

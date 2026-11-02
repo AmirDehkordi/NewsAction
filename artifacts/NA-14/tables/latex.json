@@ -401,6 +401,7 @@
    "t20_strategies/test|vendor_sentiment|-|D0|sentiment|close_t|all/sharpe_gross",
    "t20_strategies/test|vendor_sentiment|-|D0|sentiment|close_t|all/sharpe_net_10",
    "t20_strategies/test|vendor_sentiment|-|D0|sentiment|close_t|all/turnover_daily",
+   "t22_spend/trials/value",
    "t35_break_even/S-CONV|d1_ultra|D2|u|close_t+5|all/break_even_bp",
    "t35_break_even/S-CONV|laya_fin|D2|u|close_t+5|all/break_even_bp",
    "t35_break_even/S-D0|d1_ultra|D0|n_tilde|close_t|all/break_even_bp",
@@ -7808,7 +7809,14 @@
    "artifacts/NA-14/tables/t30_derived.csv"
   ],
   "cells": [
-   "t30_derived/laya_fin:rg_events/value"
+   "t30_derived/ablations:failed/value",
+   "t30_derived/conditioning:pairs/value",
+   "t30_derived/conditioning:selected/value",
+   "t30_derived/conditioning:selected_positive/value",
+   "t30_derived/conditioning:selected_reversed/value",
+   "t30_derived/laya_fin:rg_events/value",
+   "t30_derived/tournament:models/value",
+   "t30_derived/tournament:stage2/value"
   ]
  },
  {
@@ -8149,7 +8157,8 @@
    "t34_prereg_deviations/row:66/chunk",
    "t34_prereg_deviations/row:66/date",
    "t34_prereg_deviations/row:66/freeze",
-   "t34_prereg_deviations/row:66/reason"
+   "t34_prereg_deviations/row:66/reason",
+   "t34_prereg_deviations/row:66/row"
   ]
  },
  {

@@ -7,6 +7,9 @@
 # NewsWitch text (NA-02 judged titles and sentences): on the operator's machine only, never on GitHub
 /artifacts/NA-02/spam_judgments.csv
 /artifacts/NA-02/detector_eval.csv
+# NewsWitch text in masked states (NA-04's examples, NA-05's canary set): on the operator's machine only
+/artifacts/NA-04/examples.md
+/artifacts/NA-05/canary_v1.jsonl
 
 # Secrets
 .env
@@ -36,3 +39,6 @@ htmlcov/
 
 # NA-14 preview build log (names the temporary build directory)
 /artifacts/NA-14/paper_preview.log
+
+# NA-16 paper build log (names the temporary build directory)
+/artifacts/NA-16/paper.log

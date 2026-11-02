@@ -35,9 +35,12 @@ All of it is committed except three NA-13 work files.
 | NA-13's stored test positions, daily books and placebo books | `work/strategy/{positions,books,placebo}_test.parquet`, registered in `work/MANIFEST.json` | no (gitignored) |
 
 The three work files feed two tables: t26 (the S-CONV / gap-fade overlap that NA-13's REPORT §4 states but no
-committed file holds) and t33 (the placebo's Sharpe quantiles, which NA-13's REPORT §7 quotes in part). Without
-them, rebuild NA-13 first (its REPORT §12 lists the commands; the test-period returns come through one
-`newsaction.lock` read after unblinding, as NA-13 did once).
+committed file holds) and t33 (the placebo's Sharpe quantiles, which NA-13's REPORT §7 quotes in part). They are
+derived from the licensed prices and are not in a clone of the repository: without them, `make paper` carries t26
+and t33 over as committed (it reports `absent_inputs` and `carried_over`), rebuilds every other output and checks
+it against its committed digest; any other missing input stops the run, and `--write-digests` needs every input.
+To recompute t26 and t33 themselves, rebuild NA-13 first (its REPORT §12 lists the commands; the test-period
+returns come through one `newsaction.lock` read after unblinding, as NA-13 did).
 
 `make paper` reads nothing else: no raw data (`Data/`), no ATOM snapshot, no decision-model cache, no API, no
 Kaggle, no FMP. It never imports the decision-model client, `newsaction.lock`, `panel.targets` or
@@ -76,6 +79,34 @@ The author's steps after a deliberate change: `python -m newsaction.figures.pape
 `python -m newsaction.figures.contract` (registers every NA-14 file in `work/MANIFEST.json`, drops the entries of
 NA-14 files that no longer exist, and rewrites the NA-14 section of `docs/DATA_CONTRACT.md`).
 
+## The manuscript (NA-16)
+
+The paper's sources are `paper/main.tex` and `paper/sections/*.tex`; it uses NA-14's figures and tables as they are
+(`\includegraphics` and `\input` from `artifacts/NA-14`), so `make paper` comes first.
+
+```bash
+make paper-text   # paper/generated/numbers.tex and arxiv/abstract.txt from artifacts/NA-14/tables/keys.json; source checks
+make paper-pdf    # paper-text, then tectonic --keep-logs on paper/main.tex: artifacts/NA-16/paper.pdf and the checks
+```
+
+- **Numbers.** Every result number in the text is `\res{name}`; `paper/numbers.yaml` maps each name to one cell of
+  `keys.json` (`table/key/column@spec`, NA-14's citation syntax) and `make paper-text` writes the macros. A name the
+  registry lacks stops the compile; a registry name the text does not use, a hand-typed result number (anything
+  with a digit outside the macros, references and the reasoned phrases and patterns of `paper/allowlist.yaml`), a
+  non-ASCII line, an exploratory sentence without "exploratory" or "post hoc", or an abstract outside 180-250 words
+  fails the check (`tests/test_paper_text.py`).
+- **Compile.** `make paper-pdf` fails on a TeX error, any overfull box, an undefined reference or citation, a float
+  taller than the page, a font that is not embedded, or a figure or table numbered out of the order of its first
+  mention. It writes `paper/generated/main.bbl`, which arXiv needs because it does not run BibTeX. The PDF's bytes
+  depend on tectonic's bundle, so its sha256 is reported, not enforced.
+- **arXiv.** The sources are ASCII only, load no `fontspec` and only standard TeX Live packages. `make paper-arxiv`
+  writes the upload, `artifacts/NA-16/arxiv_source.tar.gz` (deterministic: `main.tex` with `\pdfoutput=1` first
+  and its path macros pointing into the bundle, `main.bbl`, the sections, the generated macros and the figures and
+  tables the sources name). `make paper-arxiv-check` compiles that bundle with pdflatex in Docker's
+  `texlive/texlive:TL2023-historic` image (three passes, no network) and applies the checks above; its report is
+  `artifacts/NA-16/arxiv_check.json`. `arxiv/abstract.txt` is the plain-text abstract and `arxiv/metadata.md` the
+  submission's metadata.
+
 ## How every number traces
 
 - Each figure reads only its CSV (`render.read`; the figure modules read no file). A figure CSV holds one row per
@@ -99,8 +130,8 @@ The full list (inputs, outputs, figures) is `artifacts/NA-14/digests.json`. The 
 
 | File | sha256 |
 |---|---|
-| `fig1_validation_test.csv` | `3d3fa11d672f538f6ffc900ec1cefee5ba48766f7dcdb33b9e3880faff1bb069` |
-| `fig2_priced_at_open.csv` | `be9a29497719fce6cd167396fcfe77716c5c41c530648bdae051fb88e4cd92aa` |
+| `fig1_validation_test.csv` | `cea6875a9d36f35381c183587312fe9cfb1be88c89d3264a96ac267bdaa1fa35` |
+| `fig2_priced_at_open.csv` | `d9a566f040c884875fb7ef02802f1055080c6aced5524aa6abd05672b222de20` |
 | `fig3_convergence.csv` | `c258a042b0e8a856d29f17a253c16ba84642333966b64124ed9bbade3489c4b3` |
 | `fig4_over_under.csv` | `57cfc40e379a83ac114969a20f574ae20403ba5481c14b667055043b2a870e4f` |
 | `fig5_explaining_moves.csv` | `5efe9ce25a2ae7395425a44042d0cba0f796837907403043ae1e6b2a849ecb8a` |
@@ -160,11 +191,11 @@ The table CSVs:
 | `t28_filter_frontier.csv` | `33533b0056ffd67eeb6573d0f158c174229210ce1899276750ae0534c6e93d59` |
 | `t29_encoding.csv` | `e7d8605787cb62b341d2758c7a4daf8435b99bb7eeed0cb3b784dc138f7f1855` |
 | `t2_h2_over_under.csv` | `8bcb2c11f32a8574b4c70dbd21d211c31f5bf4884c731e4c99b6dafe0fe1306a` |
-| `t30_derived.csv` | `37d0df01b47124dc6db9624b982279ad279f4f5dcfd72b191d37f86f6b37477f` |
+| `t30_derived.csv` | `862b436120f84467d01e458ab70e37d4b64e0ee5ee6d356c6a5e307bb0a11c54` |
 | `t31_market_replication.csv` | `47e320d34232bd5932908a377f84b9135d627865c2846cb91bcf5e6d6f730cb5` |
 | `t32_val_b_ic.csv` | `b2ae900683c016a071001e7285abeb2913eeb5d7db5cd4990110b350237c695a` |
 | `t33_placebo_sharpe.csv` | `23f4be70017dead01d6c839cfcdad22fc8d17569105daaf2a3c4d1f9de0dd1a9` |
-| `t34_prereg_deviations.csv` | `21bed8d1c2d2f520d1f44866922aba1699d3093dd540691523634ae40d5e8cfd` |
+| `t34_prereg_deviations.csv` | `097630190f23e0b57e508b6ef8136c4f5beacba017aae2563e7f6c88aa8c7c87` |
 | `t35_break_even.csv` | `c58d8dd3a89d9fa84cc7118d8bc4aeefe38ccc2799bf0d0404b1181306922470` |
 | `t36_selective_coverage.csv` | `16154cc72359b8d414061f7ebb2e22f04c03ba298d85bee274bd6bf445448a27` |
 | `t37_watch_open.csv` | `9839242fef8e8a86c9d43ae5f3fbc7dea2b991776f8181aeccb7c3be75899729` |

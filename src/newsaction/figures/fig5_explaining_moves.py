@@ -3,7 +3,7 @@
     uv run python -m newsaction.figures.render fig5_explaining_moves
 
 (a) d1-ultra's out-of-sample R² of the stock-specific move z_cc by cut, stacked by step in the order of the
-legend: the ex-ante (D0) news, + the same-day news, + the explanation (Call B reads the move), in the muted
+legend: the ex-ante (D0) news, + the same-day news, + the explanation (it reads the move), in the muted
 component palette; each bar's total is written above its 95% bootstrap interval, and the two news steps,
 too thin to read, are written beside the bar after a swatch of their colour (the ex-ante step's R², then
 the same-day step's increment).
@@ -27,8 +27,8 @@ from newsaction.figures import render, style
 NAME = "fig5_explaining_moves"
 STEPS: Final = {
     "ex_ante": "ex-ante news (D0)",
-    "ex_post": "+ same-day news (Call A)",
-    "explanation": "+ explanation (Call B reads the move)",
+    "ex_post": "+ same-day news",
+    "explanation": "+ explanation (reads the move)",
 }
 CUTS: Final = {
     "all": "all days",

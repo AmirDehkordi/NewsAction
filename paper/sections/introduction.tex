@@ -1,0 +1,77 @@
+\section{Introduction}\label{sec:intro}
+
+Much company news is published before the stock market opens. Two questions follow. Can a model that reads that
+news anticipate how the price will react? And once part of the reaction is visible, can it tell whether the
+market moved too far or not far enough? Both are old questions in empirical finance. Prices react to firm news
+within minutes \citep{patell1984,busse2002}, media tone predicts short-horizon returns \citep{tetlock2007}, and
+moves that come with news tend to drift while moves without news tend to reverse \citep{chan2003}. Large
+language models (LLMs) now read news at scale, and several studies find that their readings predict returns
+\citep{lopezlira2026,chen2022}. We ask whether such predictability survives a test built to rule out the usual
+ways a backtest misleads: look-ahead in the data, memorization in the model and selection over many variants.
+
+We study \emph{AI decision models}. A decision model is a non-generative model that takes a \emph{state} (text
+plus structured context) and a set of typed questions (a choice among options, a score on an ordered scale, or
+a yes-or-no question) and returns probabilities over the answers instead of generating text
+\citep{zhu2026}. Decision models are close relatives of LLM-based classifiers and of probabilistic
+forecasting with language models \citep{kadavath2022,halawi2024,schoenegger2024}, and their vendors describe the
+probabilities as calibrated. They suit finance because they return the quantities a forecaster needs, such as
+a distribution over the size of the coming move, at a cost of a few cents per thousand decisions, and because
+open-weights versions can be fine-tuned.
+
+Language models also bring a specific threat. A model trained on text published after the period on which it
+is tested may know how events turned out, and even a model with an earlier training cutoff can recognize a
+company from the content of its news \citep{glasserman2024,sarkar2024,lopezlira2025}. A backtest of a
+language-model signal on historical news therefore mixes the model's ability to read news with its memory of
+what followed. A second threat is older: when many signals, filters and horizons are tried, the best backtest
+overstates what a strategy will earn \citep{harvey2016,bailey2014}. Pre-registration, fixing the analysis before
+the data are seen, is the standard remedy in other sciences and is still rare in empirical finance
+\citep{harvey2017,olken2015}.
+
+We combine these elements in OLIVIA, a protocol for testing language-model signals on financial news without
+look-ahead (Table~\ref{tab:olivia}), and apply it to the point-in-time S\&P 500 from July 2024 to July 2026
+(Figure~\ref{fig:design}). For each company and trading session we build the news state as of 09:15~ET and mask
+company names, tickers, people, dates and every mention of a price move. Before the open, each model gives a
+\emph{pre-open reading}: how the stock will perform once the news is absorbed. At 10:00 and after the close it
+gives a \emph{post-reaction reading}: was the reaction so far too small or too large for the news? The primary
+instrument, Laya-Fin, is an open-weights decision model that we fine-tuned on 2024--2025 news and returns; we
+compare it with three commercial decision models, the untuned Laya model and standard baselines. The hypotheses
+and selection rules were written down before any data were analyzed, and every later change is dated in an
+append-only log; selection used two validation quarters of 2025, and the analysis plan was frozen by hash before
+the 2026 test outcomes were unblinded, once.
+
+\needspace{8\baselineskip}
+\paragraph{Key findings.}
+\begin{enumerate}[label=(\arabic*), leftmargin=*, itemsep=3pt]
+\item \textbf{Pre-open news is priced at the open.} The commercial models' readings line up with the overnight
+  move from the previous close to the open (daily information coefficient, IC, \res{d1-ic-on-test} to
+  \res{drex-ic-on-test}) but not with the move after the open (about zero). No model predicts the move after the
+  open, which is the part a trader who reads the news before the open can still earn. The untuned Laya model,
+  which barely recognizes masked companies, shows the same split.
+\item \textbf{A validated signal did not survive the blinded test.} Laya-Fin's IC with the day's move was
+  \res{lf-ic-valb} ($t = \res{lf-ic-valb-t1}$) in the final validation quarter and \res{lf-ic-test}
+  ($t = \res{lf-ic-test-t1}$) on the test. Every model whose validation IC was clearly positive fell, none of the five
+  primary hypotheses is supported, and no pre-registered strategy survives costs and a deflated Sharpe ratio. In
+  exploratory analyses, the signal that remained sat on earnings days, and conditions selected on two validation
+  quarters, with in-sample Sharpe ratios up to \res{cb-valb-gross-max}, failed on the test.
+\item \textbf{The models cannot judge the reaction.} In the pre-registered over/under regression the news
+  coefficient is not positive (Laya-Fin $b = \res{lf-h2-b-d2}$, $p = \res{lf-h2-bp-d2}$), and the moves the
+  models call underreactions never catch up. Out of sample, same-day news explains \res{lf-ladder-post-pct}
+  (Laya-Fin) to \res{d1-ladder-post-pct} (d1-ultra) of a stock's own daily variance, and the commercial models'
+  stated probabilities overstate their accuracy.
+\item \textbf{Masking is not anonymity.} Given masked news, the commercial models pick the company out of four
+  same-sector candidates in \res{mem-min} to \res{mem-max} of cases, against a matched baseline of
+  \res{mem-baseline}; the open-weights Laya model does so in \res{mem-laya}.
+\end{enumerate}
+
+\paragraph{Contributions.} First, we give OLIVIA, a protocol of six safeguards (one-time unblinding,
+look-ahead-free states, identity masking, validation-only selection, an immutable plan and an audit trail), which
+Table~\ref{tab:olivia} lists as a checklist that other studies can adopt. Second, we give a test of whether a
+language-model news signal can be traded: splitting each day's move at the open shows that the predictable part of
+pre-open news is already in the opening price. Third, we add two measurement tools for language models in finance:
+a matched-distractor test of whether a model recognizes masked companies, and a firm-level version of the
+explanation ladder of \citet{kelly2026}, which measures how much of a stock's own daily move its news explains.
+
+Section~\ref{sec:related} reviews related work and Section~\ref{sec:design} describes the data and the design.
+Sections~\ref{sec:validation} to~\ref{sec:strategies} report the pre-registered results, nulls included.
+Section~\ref{sec:exploratory} reports exploratory analyses, labeled post hoc, and Section~\ref{sec:limits} the
+limitations and a pre-registered forward test on news published after the models' release.

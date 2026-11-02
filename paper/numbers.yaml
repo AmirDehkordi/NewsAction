@@ -1,0 +1,171 @@
+# Every result number of the paper: a macro name and the cell of NA-14's keys it shows.
+#
+# `make paper-text` (python -m newsaction.paper.numbers) renders each cell with NA-14's citation formatter
+# (newsaction.figures.keys: "table/key/column@spec"; specs f0..f4, pct0..pct2, int, abs2, signed2; no spec = the
+# tables' own format, e.g. p and q as "<0.001") and writes generated/numbers.tex, where \res{name} prints it.
+# A name the registry does not hold stops the compile; a name the text does not use fails the checks.
+numbers:
+  # --- the study ----------------------------------------------------------------------------------------------
+  ntrials-strat: t20_strategies/test|S-CONV|laya_fin|D2|u|close_t+5|all/n_trials@int
+  ntrials-total: t22_spend/trials/value@int
+  test-d0-events: t14_model_comparison/laya_fin/ic_test_n@int
+  test-d0-sessions: t3_ic/laya_fin:z_cc/n_days@int
+  test-d2-events: t2_h2_over_under/laya_fin:D2/nobs@int
+  valb-sessions: t32_val_b_ic/laya_fin/ic_z_cc_days@int
+  f5-recall: t28_filter_frontier/F5|0.3/recall_material@pct1
+  ablation-failed: t30_derived/ablations:failed/value@int
+
+  # --- validation against the test (Section 4, Table 1) --------------------------------------------------------
+  lf-ic-vala: t36_selective_coverage/laya_fin|conviction|1.0|val_a|z_cc/ic@f3
+  lf-ic-valb: t14_model_comparison/laya_fin/ic_val_b@f3
+  lf-ic-valb-t: t14_model_comparison/laya_fin/ic_val_b_t@f2
+  lf-ic-valb-t1: t14_model_comparison/laya_fin/ic_val_b_t@f1
+  lf-ic-valb-lo: t32_val_b_ic/laya_fin/ic_z_cc_ci_low@f3
+  lf-ic-test: t14_model_comparison/laya_fin/ic_test@f3
+  lf-ic-test-t: t14_model_comparison/laya_fin/ic_test_t@f2
+  lf-ic-test-t1: t14_model_comparison/laya_fin/ic_test_t@f1
+  d1-ic-valb: t14_model_comparison/d1_ultra/ic_val_b@f3
+  d1-ic-test: t14_model_comparison/d1_ultra/ic_test@f3
+  llm-ic-valb: t14_model_comparison/baseline:llm/ic_val_b@f3
+  llm-ic-test: t14_model_comparison/baseline:llm/ic_test@f3
+  tags-ic-test: t14_model_comparison/baseline:tags_gbm/ic_test@f3
+  lf-h1-holm: t1_primary/H1/primary_p_holm@f3
+  lf-h3-holm: t1_primary/H3/primary_p_holm@f3
+  lf-h3: t1_primary/H3/primary_estimate@f4
+  lf-h3-p: t1_primary/H3/primary_p@f3
+  lf-h4: t1_primary/H4/primary_estimate@f4
+  lf-h4-p: t1_primary/H4/primary_p@f3
+  lf-auc: t15_calibration/laya_fin:auc/auc@f2
+
+  # --- priced at the open (Section 5, Table 2) ------------------------------------------------------------------
+  d1-ic-on-test: t3_ic/d1_ultra:z_on/ic@f3
+  span-ic-on-test-t: t3_ic/span_02:z_on/ic_t@f2
+  drex-ic-on-test: t3_ic/drex_v2:z_on/ic@f3
+  drex-ic-on-test-t: t3_ic/drex_v2:z_on/ic_t@f2
+  d1-ic-id-test: t3_ic/d1_ultra:z_id/ic@f3
+  drex-ic-id-test: t3_ic/drex_v2:z_id/ic@f3
+  lz-ic-id-test: t3_ic/laya_zs:z_id/ic@f3
+  d1-h1: t1b_primary_by_model/d1_ultra:H1/estimate@f3
+  d1-h1-lo: t1b_primary_by_model/d1_ultra:H1/ci_low@f3
+  d1-h1-hi: t1b_primary_by_model/d1_ultra:H1/ci_high@f3
+  d1-h1-p: t1b_primary_by_model/d1_ultra:H1/p@f4
+  d1-qspread-on: t3_ic/d1_ultra:z_on/qspread@f2
+  d1-qspread-on-t: t3_ic/d1_ultra:z_on/qspread_t@f1
+  lz-h1: t1b_primary_by_model/laya_zs:H1/estimate@f3
+  lz-h1-p: t1b_primary_by_model/laya_zs:H1/p@f3
+  lf-ic-on-test: t3_ic/laya_fin:z_on/ic@f3
+  lf-ic-id-test: t3_ic/laya_fin:z_id/ic@f3
+  lf-ic-id-test-t: t3_ic/laya_fin:z_id/ic_t@f1
+  lf-ic-id-valb: t32_val_b_ic/laya_fin/ic_z_id@f3
+  lf-ic-id-valb-t: t32_val_b_ic/laya_fin/ic_z_id_t@f2
+  d1-ic-on-0815: t16_robustness/d1_ultra:D0:timing_08:00_09:15:raw/ic_z_on@f3
+  d1-ic-on-0815-t: t16_robustness/d1_ultra:D0:timing_08:00_09:15:raw/ic_z_on_t@f1
+  d1-ic-on-0408: t16_robustness/d1_ultra:D0:timing_04:00_08:00:raw/ic_z_on@f3
+  d1-ic-on-pre04: t16_robustness/d1_ultra:D0:timing_before_04:00:raw/ic_z_on@f3
+  d1-h1-pre04: t16_robustness/d1_ultra:D0:timing_before_04:00:raw/H1@f3
+  d1-h1-0815: t16_robustness/d1_ultra:D0:timing_08:00_09:15:raw/H1@f3
+  unmask-n: t16_robustness/d1_ultra:D0:a0_unmasked:masked/n@int
+  unmask-ic-masked: t16_robustness/d1_ultra:D0:a0_unmasked:masked/ic_z_cc@f3
+  unmask-ic-unmasked: t16_robustness/d1_ultra:D0:a0_unmasked:unmasked/ic_z_cc@f3
+
+  # --- over- and under-reaction (Section 6, Tables 3 and 4) -----------------------------------------------------
+  lf-h2-b-d2: t2_h2_over_under/laya_fin:D2/b@f3
+  lf-h2-bp-d2: t2_h2_over_under/laya_fin:D2/b_p@f2
+  lf-h2-c-d2: t2_h2_over_under/laya_fin:D2/c@f3
+  lf-h2-cp-d2: t2_h2_over_under/laya_fin:D2/c_p@f2
+  lf-h2-n-d2: t2_h2_over_under/laya_fin:D2/nobs@int
+  d1-h2-b-d2: t2_h2_over_under/d1_ultra:D2/b@f3
+  d1-h2-bp-d2: t2_h2_over_under/d1_ultra:D2/b_p@f2
+  het-q-min: t5_heterogeneity/laya_fin:tier_top100/q@f2
+  lf-kappa-ct: t6_convergence_ladder/laya_fin:ladder:C_t/kappa@f2
+  lf-kappa-t20: t6_convergence_ladder/laya_fin:ladder:C_t+20/kappa@f2
+  lf-kappa-incr-p: t6_convergence_ladder/laya_fin:ladder:increase/kappa_p@f2
+  d1-kappa-ct: t6_convergence_ladder/d1_ultra:ladder:C_t/kappa@f2
+  d1-kappa-t20: t6_convergence_ladder/d1_ultra:ladder:C_t+20/kappa@f2
+  d1-kappa-incr-p: t6_convergence_ladder/d1_ultra:ladder:increase/kappa_p@f2
+  d1-dec10-pre5: f1_v_decile_paths/d1_ultra|v_decile|10|car_pre5/mean@f2
+  d1-dec1-pre5: f1_v_decile_paths/d1_ultra|v_decile|1|car_pre5/mean@f2
+  lf-lambda-t1: t7_gap_closure/laya_fin:D2:all:C_t+1/lambda@f3
+  lf-lambda-t5: t7_gap_closure/laya_fin:D2:all:C_t+5/lambda@f3
+  lf-lambda-t5-p: t7_gap_closure/laya_fin:D2:all:C_t+5/lambda_p@f2
+  lf-lambda-t20: t7_gap_closure/laya_fin:D2:all:C_t+20/lambda@f3
+  lf-tracking-t20: t8_tracking_error/laya_fin:C_t+20/naive_ratio@f3
+  lf-tracking-t20-p: t8_tracking_error/laya_fin:C_t+20/naive_p@f2
+  rg-under-n: f1_rg_class_paths/d1_ultra|rg_class_signed|Under|car_post0/n_group@int
+  rg-under-t20: f1_rg_class_paths/d1_ultra|rg_class_signed|Under|car_post20/mean@f2
+  rg-under-v: f1_rg_class_paths/d1_ultra|rg_class_signed|Under|car_post0/mean_v@f2
+  rg-over-t0: f1_rg_class_paths/d1_ultra|rg_class_signed|Over|car_post0/mean@f2
+  rg-over-t20: f1_rg_class_paths/d1_ultra|rg_class_signed|Over|car_post20/mean@f2
+  drift-g3-medium: f2_drift_vs_g/d1_ultra|medium|[3, inf)/mean@f2
+  drift-g3-weak: f2_drift_vs_g/d1_ultra|weak|[3, inf)/mean@f2
+  lf-kappa-ct-top100: t9_convergence_cuts/laya_fin:tier:top100/kappa_ct@f2
+  lf-kappa-ct-mid: t9_convergence_cuts/laya_fin:tier:mid/kappa_ct@f2
+  lf-kappa-ct-rest: t9_convergence_cuts/laya_fin:tier:rest/kappa_ct@f2
+  d1-kappa-t20-numbers: t12_question_battery/d1_ultra:ladder:a0_label_quantified:numbers/kappa_t20@f2
+  d1-kappa-t20-numbers-p: t12_question_battery/d1_ultra:ladder:a0_label_quantified:numbers/kappa_t20_p@f3
+  d1-kappa-t20-narrative: t12_question_battery/d1_ultra:ladder:a0_label_quantified:narrative/kappa_t20@f2
+
+  # --- explaining moves and calibration (Section 7, Table 5) ----------------------------------------------------
+  roll-r2-pct: t10_explanation_ladder/roll_r2/r2@pct1
+  lf-ladder-post-pct: t10_explanation_ladder/laya_fin:all:ex_post/r2@pct2
+  d1-ladder-post-pct: t10_explanation_ladder/d1_ultra:all:ex_post/r2@pct2
+  d1-ladder-expl-pct: t10_explanation_ladder/d1_ultra:all:explanation/r2@pct1
+  d1-ladder-expl-event-pct: t10_explanation_ladder/d1_ultra:event_days:explanation/r2@pct1
+  lf-h5-q: t4_secondary/laya_fin:H5/q@f3
+  theta-d2: t11_explanation_share_theta/theta:d2/value@f3
+  theta-d2-p: t11_explanation_share_theta/theta:d2/p@f2
+  lf-ece: t15_calibration/laya_fin:e5/ece@f3
+  lf-llskill: t15_calibration/laya_fin:e5/log_loss_skill@f3
+  span-ece: t15_calibration/span_02:e5/ece@f3
+  drex-ece: t15_calibration/drex_v2:e5/ece@f3
+  d1-ece-before: t15_calibration/d1_ultra:temperature/ece_before@f3
+  d1-ece-after: t15_calibration/d1_ultra:temperature/ece_after@f3
+
+  # --- masked firms (Section 8) ---------------------------------------------------------------------------------
+  mem-n: t23_company_identification/liquid:d1-ultra/n@int
+  mem-baseline: t23_company_identification/liquid:d1-ultra/baseline_matched@pct0
+  mem-baseline-f2: t23_company_identification/liquid:d1-ultra/baseline_matched@f2
+  mem-baseline-na06: t23_company_identification/liquid:d1-ultra/baseline_na06_design@pct0
+  mem-min: t23_company_identification/inception:mercury-decide/accuracy@pct0
+  mem-max: t23_company_identification/liquid:d1-ultra/accuracy@pct0
+  mem-span: t23_company_identification/respan:span-02/accuracy@pct0
+  mem-drex: t23_company_identification/nace-ai:drex-v2.0/accuracy@pct0
+  mem-laya: t23_company_identification/local:laya-typed-decisions/accuracy@pct0
+  rel-laya: t21_release_dates/laya/date
+  rel-drex: t21_release_dates/drex_v2/date
+  rel-span: t21_release_dates/span_02/date
+
+  # --- strategies (Section 9, Table 6) --------------------------------------------------------------------------
+  sconv-ndays: t20_strategies/test|S-CONV|laya_fin|D2|u|close_t+5|all/n_days@int
+  sconv-shared: t26_sconv_overlap/laya_fin:D2:close_t+5/shared_share@pct0
+  sconv-corr: t26_sconv_overlap/laya_fin:D2:close_t+5/corr_gross@f2
+  sd0-gated-gross: t20_strategies/test|S-D0|laya_fin|D0|n_tilde|close_t+1|gated/sharpe_gross@f2
+  sd0-gated-be: t35_break_even/S-D0|laya_fin|D0|n_tilde|close_t+1|gated/break_even_bp@f1
+  sd0-turnover: t20_strategies/test|S-D0|laya_fin|D0|n_tilde|close_t|all/turnover_daily@f1
+  sd2j-pct: t20_strategies/test|S-D2|laya_fin|D2|j|close_t+5|all/placebo_pct_gross@f0
+  dsr-max: t20_strategies/test|S-D2|laya_fin|D2|rg|close_t+5|all/dsr_prob_net_10@f3
+  dsr-sr0: t20_strategies/test|S-CONV|laya_fin|D2|u|close_t+5|all/dsr_sr0_net_10@f2
+
+  # --- exploratory, post hoc (Section 10) -----------------------------------------------------------------------
+  earn-n-test: t24_exploratory_d0_signal/earnings:laya_fin:test:earnings/ic_z_cc_n@int
+  lf-earn-vala: t24_exploratory_d0_signal/earnings:laya_fin:val_a:earnings/ic_z_cc@f3
+  lf-earn-valb: t24_exploratory_d0_signal/earnings:laya_fin:val_b:earnings/ic_z_cc@f3
+  lf-earn-test: t24_exploratory_d0_signal/earnings:laya_fin:test:earnings/ic_z_cc@f3
+  lf-rest-test: t24_exploratory_d0_signal/earnings:laya_fin:test:rest/ic_z_cc@f3
+  d1-earn-test: t24_exploratory_d0_signal/earnings:d1_ultra:test:earnings/ic_z_cc@f3
+  d1-earn-test-t: t24_exploratory_d0_signal/earnings:d1_ultra:test:earnings/ic_z_cc_t@f1
+  d1-earn-on-test: t24_exploratory_d0_signal/earnings:d1_ultra:test:earnings/ic_z_on@f3
+  d1-earn-id-test: t24_exploratory_d0_signal/earnings:d1_ultra:test:earnings/ic_z_id@f3
+  sel-d1-on-10-vala: t36_selective_coverage/d1_ultra|conviction|0.1|val_a|z_on/signed@f2
+  sel-d1-on-10-valb: t36_selective_coverage/d1_ultra|conviction|0.1|val_b|z_on/signed@f2
+  sel-d1-on-10-test: t36_selective_coverage/d1_ultra|conviction|0.1|test|z_on/signed@f2
+  sel-d1-on-all-vala: t36_selective_coverage/d1_ultra|conviction|1.0|val_a|z_on/signed@f2
+  sel-d1-on-all-valb: t36_selective_coverage/d1_ultra|conviction|1.0|val_b|z_on/signed@f2
+  sel-d1-on-all-test: t36_selective_coverage/d1_ultra|conviction|1.0|test|z_on/signed@f2
+  watch-lf-rev-test: t37_watch_open/laya_fin|test|ic_revision/value@f3
+  watch-lf-rev-test-t: t37_watch_open/laya_fin|test|ic_revision/t@f1
+  cond-pairs: t30_derived/conditioning:pairs/value@int
+  cond-selected: t30_derived/conditioning:selected/value@int
+  cond-reversed: t30_derived/conditioning:selected_reversed/value@int
+  cond-positive: t30_derived/conditioning:selected_positive/value@int
+  cb-valb-gross-max: t39_conditioning_books/exploratory|selective|laya_fin|e9_division|close_t|val_b/sharpe_gross@f1

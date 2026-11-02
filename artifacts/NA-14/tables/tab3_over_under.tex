@@ -3,7 +3,7 @@
 \centering
 \small
 \begin{threeparttable}
-\caption{The over/under regression: the reversal coefficient $c$ has the predicted sign but is not significant, and the news coefficient $b$ is not positive at the close.}\label{tab:over-under}
+\caption{The over/under regression (H2): for Laya-Fin the news coefficient $b$ is $-$0.044 and the reversal coefficient $c$ is $-$0.015 ($p$ = 0.110): $c$ has the predicted sign but is not significant, and $b$ is not positive at the close.}\label{tab:over-under}
 \begin{tabular}{@{}lS[table-format=-1.3]S[table-format=1.3, table-space-text-pre=(, table-space-text-post=)]S[table-format=1.3]S[table-format=-1.3]S[table-format=1.3, table-space-text-pre=(, table-space-text-post=)]S[table-format=1.3]S[table-format=5.0]@{}}
 \toprule
 Decision point & {$b$} & {SE} & {$p_b$} & {$c$} & {SE} & {$p_c$} & {Events} \\
@@ -26,7 +26,7 @@ D0, open & 0.022 & {(}0.037{)} & 0.277 & {---} & {---} & {---} & 13439 \\
 \end{tabular}
 \begin{tablenotes}[flushleft]\footnotesize
 \item $y = a + b\,\hat N + c\,G$ with day $\times$ tier fixed effects, on the test period: at D2 $y = y_2$ (next open to $t{+}5$), $\hat N$ from the day's news and $G$ the day's move; at D1 the move after 10:00 on $\hat N$ from the pre-open news and the move to 10:00; at D0 $y = z_{id}$ and there is no $G$, so no $c$ (---). Two-way clustered (session, firm) standard errors in parentheses; $p_b$ tests $b > 0$ and $p_c$ tests $c < 0$, one-sided. H2 is the D2 row of Laya-Fin.
-\item The anchor's readings are uninformative (near-constant outputs after one epoch); its rows are reported, not read as nulls. The API models fail the \S8.3 contamination screens, so their results are model-specific (\S1.3).
+\item The anchor's readings are uninformative (near-constant outputs after one epoch); its rows are reported, not read as nulls. The API models fail the pre-registered contamination screens, so their results are model-specific.
 \item Significance: no stars are used; $p$ is one-sided unless stated.
 \end{tablenotes}
 \end{threeparttable}

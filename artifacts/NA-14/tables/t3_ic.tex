@@ -33,8 +33,8 @@ drex-v2.0, $z_{id}$ & 0.002 & [$-0.018$, $0.023$] & 0.18 & 13439 & -0.005 & 0.54
 \begin{tablenotes}[flushleft]\footnotesize
 \item Quintile spread: the mean target in the top quintile of $\hat N$ minus the bottom quintile, in typical daily moves, and its $p$; the IC's own test is its $t$.
 \item The anchor's readings are uninformative (near-constant outputs after one epoch); its rows are reported, not read as nulls.
-\item The API models fail the \S8.3 contamination screens, so their results are model-specific (\S1.3).
-\item $^{\ddagger}$span-02: the S5 canary fired a STOP after the freeze; the operator chose to proceed (PREREG \S15, post-freeze NA-11 row).
+\item The API models fail the pre-registered contamination screens, so their results are model-specific.
+\item $^{\ddagger}$span-02: after the freeze, a stability check that repeats earlier requests (the canary) fired for it; its build was unchanged, and production went ahead under a rule recorded in the deviations log.
 \end{tablenotes}
 \end{threeparttable}
 \end{table}

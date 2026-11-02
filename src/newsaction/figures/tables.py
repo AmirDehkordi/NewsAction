@@ -59,6 +59,7 @@ SMOKE_JSON: Final = "artifacts/NA-11/spec_smoke_val_b.json"
 NA12_INDEX: Final = f"{sc.NA12_TAB}/index.json"
 NA08_REPORT: Final = "artifacts/NA-08/REPORT.md"
 NA11_REPORT: Final = "artifacts/NA-11/REPORT.md"
+ABLATIONS: Final = "artifacts/NA-11/ablation_runs.json"
 POSITIONS: Final = "strategy/positions_test.parquet"
 BOOKS: Final = "strategy/books_test.parquet"
 PLACEBO: Final = "strategy/placebo_test.parquet"
@@ -93,6 +94,10 @@ EXPLORATORY_ROWS: Final[dict[str, tuple[Callable[[pd.DataFrame], pd.Series], str
     "t35_break_even": (
         lambda df: df["key"].astype(str).str.split("|").str[0] == "exploratory",
         "The exploratory MA-cross fade (post hoc) is in Table t25 and Figure A15.",
+    ),
+    "t30_derived": (
+        lambda df: df["key"].astype(str).str.startswith("conditioning:"),
+        "The counts of the conditioning study (NA-13b; exploratory, post hoc) are in this table's CSV only.",
     ),
 }
 # The paper section of every table (docs/paper_outline.md): 1–7 the main text, "appendix" the rest. A
@@ -563,9 +568,45 @@ OVERLAP: Final = (
 )
 
 
+def strategy_files_present(layout: Layout, *relpaths: str) -> bool:
+    """Whether NA-13's ``work/strategy`` files are in this checkout. They are derived from the licensed prices
+    and are not redistributed, so a clone of the repository lacks them."""
+    return all((layout.work / p).is_file() for p in relpaths)
+
+
+def committed_table(layout: Layout, name: str) -> pd.DataFrame:
+    """A table read back exactly as committed: pandas' default parser returns the floats ``to_csv`` wrote,
+    so ``write`` reproduces the committed bytes and keys (tested). A checkout without NA-13's
+    ``work/strategy`` files carries the two tables built from them over this way (``make paper`` reports
+    them)."""
+    return pd.read_csv(layout.root / sc.TABLES / f"{name}.csv")
+
+
 def sconv_overlap(layout: Layout) -> PaperTable:
     """How much S-CONV is the gap fade, from NA-13's stored test positions and daily books (NA-13 REPORT
-    §4)."""
+    §4); carried over as committed when those files are absent (``committed_table``)."""
+    name = "t26_sconv_overlap"
+    frame = (
+        _sconv_overlap_frame(layout)
+        if strategy_files_present(layout, POSITIONS, BOOKS)
+        else committed_table(layout, name)
+    )
+    return PaperTable(
+        name,
+        "S-CONV against the price-only gap fade on test: shared positions, same side, daily-return "
+        "correlation",
+        frame,
+        (
+            "Positions are (session, symbol) pairs of the book; shared_share = |book ∩ gap fade| / |book|; "
+            "same_side_share among the shared; corr_gross = Pearson correlation of the daily gross returns "
+            "(tier all) over common sessions. Recomputed from work/strategy (NA-13) because NA-13 REPORT §4 "
+            "states these numbers but no file held them.",
+        ),
+        (f"work/{POSITIONS}", f"work/{BOOKS}"),
+    )
+
+
+def _sconv_overlap_frame(layout: Layout) -> pd.DataFrame:
     pos = io.read_parquet(POSITIONS, columns=["rule", "session", "symbol_id", "side"], layout=layout)
     books = io.read_parquet(BOOKS, columns=["rule", "tier", "session", "gross"], layout=layout)
     books = books[books["tier"] == "all"]
@@ -598,39 +639,76 @@ def sconv_overlap(layout: Layout) -> PaperTable:
                 "n_days": len(common),
             }
         )
-    return PaperTable(
-        "t26_sconv_overlap",
-        "S-CONV against the price-only gap fade on test: shared positions, same side, daily-return "
-        "correlation",
-        _frame(rows),
-        (
-            "Positions are (session, symbol) pairs of the book; shared_share = |book ∩ gap fade| / |book|; "
-            "same_side_share among the shared; corr_gross = Pearson correlation of the daily gross returns "
-            "(tier all) over common sessions. Recomputed from work/strategy (NA-13) because NA-13 REPORT §4 "
-            "states these numbers but no file held them.",
-        ),
-        (f"work/{POSITIONS}", f"work/{BOOKS}"),
-    )
+    return _frame(rows)
 
 
 def derived(root: Path) -> PaperTable:
-    """The one sum a caption cites (Laya-Fin's RG events), with its formula."""
+    """The counts and sums of upstream cells that a caption or the paper's text cites, each with its formula:
+    Laya-Fin's RG events (a caption), and for the paper (NA-16) the tournament's models, the conditioning
+    study's
+    pairs and their outcome on the test (NA-13b, exploratory), and the ablation requests left unanswered."""
     rg = pd.read_csv(root / sc.RG_CLASSES)
     m = rg[(rg["model"] == "laya_fin") & (rg["figure"] == "rg_class_signed") & (rg["point"] == "car_post0")]
+    tour = pd.read_csv(root / sc.TOURNAMENT)
+    sel = pd.read_csv(root / sc.SELECTION)
+    test = sel[sel["split"] == "test"]
+    chosen = test[test["selected"].astype(bool)]
+    runs = _read_json(root, ABLATIONS)
+    rows = [
+        {
+            "key": "laya_fin:rg_events",
+            "value": int(m["n_group"].sum()),
+            "formula": "Σ n_group of Laya-Fin's three RG classes (rg_class_signed, car_post0)",
+            "source": sc.RG_CLASSES,
+        },
+        {
+            "key": "tournament:models",
+            "value": len(tour),
+            "formula": "rows of the zero-shot tournament (every model of stage 1)",
+            "source": sc.TOURNAMENT,
+        },
+        {
+            "key": "tournament:stage2",
+            "value": int(tour["stage2"].astype(bool).sum()),
+            "formula": "tournament rows with stage2 true",
+            "source": sc.TOURNAMENT,
+        },
+        {
+            "key": "conditioning:pairs",
+            "value": len(test),
+            "formula": "(model, condition) pairs of the conditioning study on the test (NA-13b, exploratory)",
+            "source": sc.SELECTION,
+        },
+        {
+            "key": "conditioning:selected",
+            "value": len(chosen),
+            "formula": "pairs selected on validation (selected true)",
+            "source": sc.SELECTION,
+        },
+        {
+            "key": "conditioning:selected_reversed",
+            "value": int((chosen["diff"] < 0).sum()),
+            "formula": "selected pairs whose test difference is negative (the sign changed)",
+            "source": sc.SELECTION,
+        },
+        {
+            "key": "conditioning:selected_positive",
+            "value": int((chosen["diff"] > 0).sum()),
+            "formula": "selected pairs whose test difference is positive",
+            "source": sc.SELECTION,
+        },
+        {
+            "key": "ablations:failed",
+            "value": int(sum(int(r["requests"]) - int(r["ok"]) for r in runs)),
+            "formula": "Σ (requests − ok) over NA-11's three ablations (rate-limited, not retried)",
+            "source": ABLATIONS,
+        },
+    ]
     return PaperTable(
         "t30_derived",
-        "Sums of figure-data cells cited in captions",
-        _frame(
-            [
-                {
-                    "key": "laya_fin:rg_events",
-                    "value": int(m["n_group"].sum()),
-                    "formula": "Σ n_group of Laya-Fin's three RG classes (rg_class_signed, car_post0)",
-                    "source": sc.RG_CLASSES,
-                }
-            ]
-        ),
-        sources=(sc.RG_CLASSES,),
+        "Counts and sums of upstream cells cited in captions and in the paper",
+        _frame(rows),
+        sources=(sc.RG_CLASSES, sc.TOURNAMENT, sc.SELECTION, ABLATIONS),
     )
 
 
@@ -713,12 +791,17 @@ def placebo_quantiles(placebo: pd.DataFrame) -> pd.DataFrame:
 
 def placebo_sharpe(layout: Layout) -> PaperTable:
     """Quantiles of the Sharpe ratios of NA-13's 100 random-signal books per test universe (NA-13 REPORT §7
-    states some; no committed file held them)."""
-    placebo = io.read_parquet(PLACEBO, columns=["universe", "seed", *PLACEBO_COLUMNS], layout=layout)
-    df = placebo_quantiles(placebo)
-    df["source"] = f"work/{PLACEBO}"
+    states some; no committed file held them); carried over as committed when the books are absent
+    (``committed_table``)."""
+    name = "t33_placebo_sharpe"
+    if strategy_files_present(layout, PLACEBO):
+        placebo = io.read_parquet(PLACEBO, columns=["universe", "seed", *PLACEBO_COLUMNS], layout=layout)
+        df = placebo_quantiles(placebo)
+        df["source"] = f"work/{PLACEBO}"
+    else:
+        df = committed_table(layout, name)
     return PaperTable(
-        "t33_placebo_sharpe",
+        name,
         "Random-signal placebo (NA-13): 5th, 50th and 95th percentile of the annualized Sharpe ratios of the "
         "100 placebo books of each test universe, gross and net of 5, 10 and 20 bp per side",
         df,

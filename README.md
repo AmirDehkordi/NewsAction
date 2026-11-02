@@ -9,6 +9,10 @@ reaction is visible, judge whether the market over- or under-reacted?
 - Work plan, chunks NA-00 … NA-15 with power and verification prompts: [`NewsAction PRD.md`](NewsAction%20PRD.md)
 - Every derived file and its sha256: [`docs/DATA_CONTRACT.md`](docs/DATA_CONTRACT.md)
 - Per-chunk decisions and self-audits: `docs/decisions/NA-xx.md`, `artifacts/NA-xx/REPORT.md`
+- The paper: sources in [`paper/`](paper), the PDF at
+  [`artifacts/NA-16/paper.pdf`](artifacts/NA-16/paper.pdf), the arXiv source bundle at
+  `artifacts/NA-16/arxiv_source.tar.gz`
+- License: MIT for the code ([`LICENSE`](LICENSE)); the data are not included
 
 ## Setup
 
@@ -27,14 +31,16 @@ Optional dependency groups are declared but not installed by default: `uv sync -
 
 ## Working from the GitHub copy
 
-The private GitHub repository holds the code, configs, docs, ledgers, committed artifacts and the paper sources.
-It does **not** hold any data. These stay on the operator's machine:
+The public GitHub repository is the paper's replication package: the code, configs, docs, ledgers, committed
+artifacts and the paper sources. It does **not** hold any data. These stay on the operator's machine:
 
 - `Data/`: NewsWitch news, prices and market files (raw, licensed);
 - `work/`: derived data;
 - `cache/`: decision-model responses;
 - `.env`: API keys;
-- `artifacts/NA-02/{spam_judgments,detector_eval}.csv`: judged NewsWitch titles and sentences (gitignored).
+- `artifacts/NA-02/{spam_judgments,detector_eval}.csv`: judged NewsWitch titles and sentences (gitignored);
+- `artifacts/NA-04/examples.md` and `artifacts/NA-05/canary_v1.jsonl`: masked states with NewsWitch headlines
+  and snippets (gitignored since 2026-11-02; their tests skip without them).
 
 ```bash
 brew install git-lfs tectonic && git lfs install   # once per machine; ledgers/spend.jsonl (210 MB) is in Git LFS
@@ -44,13 +50,18 @@ uv sync --locked --all-extras                      # the extras (spacy, torch) a
 
 **Works without the data:**
 - `make lint`, `make type`, `make test` (tests that need `work/` skip) and `make ledgers`;
-- `make paper-text` and `make paper-pdf`.
+- `make paper-text` and `make paper-pdf`;
+- `make paper`, which regenerates the figures and tables: the two tables built from NA-13's position-level
+  books (`work/strategy`, derived from the licensed prices) are carried over as committed, and every other
+  output must match its committed digest;
+- `make paper-arxiv` (the arXiv source bundle) and `make paper-arxiv-check` (the bundle compiled with pdflatex
+  in Docker's `texlive/texlive` image, as arXiv compiles it).
 
 To edit the paper, change `paper/sections/*.tex`. Every result number is a `\res{name}` macro, defined in
 `paper/numbers.yaml` and generated from `artifacts/NA-14`; do not type result numbers by hand.
 
 **Needs the data (operator's machine):**
-- `make paper`, which regenerates the figures and tables;
+- `make paper --write-digests` (recording new digests needs every input);
 - `make manifest`;
 - any chunk run;
 - any decision-model API call.
@@ -85,6 +96,9 @@ To edit the paper, change `paper/sections/*.tex`. Every result number is a `\res
 | `make manifest-deep` | as `manifest`, and re-hash every `Data/` input |
 | `make ledgers` | verify the hash chain of every `ledgers/*.jsonl` |
 | `make verify` | lint + type + test + manifest + ledgers |
+| `make paper` | NA-14: rebuild every paper table, figure and caption offline and compare the committed digests |
+| `make paper-text` / `make paper-pdf` | NA-16: the manuscript's number macros and checks / the PDF (tectonic) |
+| `make paper-arxiv` / `make paper-arxiv-check` | NA-16: the arXiv source bundle / its pdflatex compile (Docker) |
 
 ## Guards (`src/newsaction/`)
 

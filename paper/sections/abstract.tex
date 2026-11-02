@@ -1,0 +1,15 @@
+% The abstract. `make paper-text` also writes it as plain text to arxiv/abstract.txt (180 to 250 words).
+Large language models (LLMs) read company news at scale, and backtests suggest that their readings predict stock
+returns. We ask how much of that predictability survives a test that rules out look-ahead, memorization and
+selection. We propose OLIVIA, a protocol for such tests: point-in-time inputs with company identities masked,
+selection on validation data only, an analysis plan frozen by cryptographic hash, and a test period unblinded once
+through a logged lock. We apply it to AI decision models, non-generative language models that return
+probabilities for typed questions, reading news about S\&P 500 stocks: an open-weights model we fine-tuned on
+2024--2025 data, three commercial models and standard baselines. The fine-tuned model's signal replicated on two
+validation quarters (daily information coefficients \res{lf-ic-vala} and \res{lf-ic-valb}) but fell to
+\res{lf-ic-test} ($t = \res{lf-ic-test-t1}$) on the blinded January--July 2026 test. The commercial models'
+readings line up with the overnight move to the open (information coefficient \res{d1-ic-on-test} to
+\res{drex-ic-on-test}) but not with the move after it, so the news is priced by the time a trader can act on it at
+the open. No model can tell over- from under-reaction, and no pre-registered strategy survives costs and a deflated
+Sharpe ratio. Commercial models identify masked companies in \res{mem-min} to \res{mem-max} of cases against a
+\res{mem-baseline} baseline: masking hides names, not companies. The market reads the news first.

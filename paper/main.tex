@@ -1,0 +1,149 @@
+% The NewsAction paper: an arXiv preprint (article, 11 pt, US letter, 1-inch margins, one column).
+%
+%   make paper-text   writes generated/numbers.tex (every result number, from NA-14's table keys) and
+%                     ../arxiv/abstract.txt, and checks the sources (ASCII only, no hard-coded result number)
+%   make paper-pdf    compiles this file with tectonic and checks the log (no error, no overfull box, no
+%                     undefined reference or citation, figures and tables numbered in order of first mention)
+%
+% The sources are ASCII only and use standard TeX Live packages and no fontspec, so that arXiv's pdflatex
+% compiles them as well as tectonic (XeTeX). Figures and tables are NA-14's, used as they are.
+\documentclass[11pt,letterpaper]{article}
+
+\usepackage{iftex}
+\usepackage[T1]{fontenc}
+\ifPDFTeX
+  \usepackage[utf8]{inputenc}
+  \input{glyphtounicode}
+  \pdfgentounicode=1
+\fi
+\usepackage{lmodern}
+\usepackage[margin=1in]{geometry}
+\usepackage{amsmath,amssymb}
+\usepackage{graphicx}
+\usepackage{booktabs,array,longtable,threeparttable,threeparttablex,pdflscape}
+\usepackage{siunitx}
+\sisetup{group-separator={,},group-minimum-digits=4,group-digits=integer,%
+  table-align-text-before=false,table-align-text-after=false}
+\usepackage[font=small,labelfont=bf,skip=4pt]{caption}
+\usepackage{enumitem}
+\usepackage{needspace}
+\usepackage{placeins}
+\usepackage{xcolor}
+\usepackage{tikz}
+\usetikzlibrary{arrows.meta,decorations.pathreplacing,patterns}
+\usepackage[round,authoryear]{natbib}
+\usepackage{microtype}
+\usepackage{xurl}  % long URLs in the references break anywhere
+\usepackage[hyperfootnotes=false]{hyperref}
+\hypersetup{
+  pdftitle={The Market Reads the News First: A Pre-Registered, Blinded Test of AI Decision Models
+    on Stock-Price Reactions},
+  pdfauthor={Amir Dehkordi, Alireza Kargarzadeh, Nariman Khaledian, Navid Parvini, Sid Ghatak, Arman Khaledian},
+  pdfsubject={Large language models and AI decision models on financial news: a pre-registered,
+    look-ahead-free test of stock-price reactions},
+  pdfkeywords={large language models (LLMs); AI decision models; stock return prediction; financial news;
+    look-ahead bias; memorization; data contamination; backtest overfitting; deflated Sharpe ratio;
+    pre-registration; overnight returns; market efficiency; overreaction and underreaction; calibration},
+  colorlinks=true,
+  linkcolor={blue!50!black},
+  citecolor={blue!50!black},
+  urlcolor={blue!50!black}
+}
+\setlength{\LTcapwidth}{\textwidth}
+
+% Floats: let a text page carry more of them, and fill a float page before starting one.
+\renewcommand{\topfraction}{0.9}
+\renewcommand{\bottomfraction}{0.8}
+\renewcommand{\textfraction}{0.07}
+\renewcommand{\floatpagefraction}{0.75}
+\setcounter{topnumber}{3}
+\setcounter{bottomnumber}{2}
+\setcounter{totalnumber}{4}
+
+% Where NA-14's figures and tables live (the arXiv bundle rewrites these two lines).
+\newcommand{\figdir}{../artifacts/NA-14/figures}
+\newcommand{\tabdir}{../artifacts/NA-14/tables}
+
+% Every result number: \res{name}, defined in generated/numbers.tex from paper/numbers.yaml.
+\input{generated/numbers}
+
+% Notation used throughout.
+\newcommand{\Nhat}{\hat N}
+\newcommand{\Ntilde}{\tilde N}
+\newcommand{\IC}{\mathrm{IC}}
+\newcommand{\AR}{\mathrm{AR}}
+\newcommand{\CARlvl}{\mathrm{CAR}^{\mathrm{lvl}}}
+\newcommand{\Glvl}{G^{\mathrm{lvl}}}
+\newcommand{\ECE}{\mathrm{ECE}}
+
+% A visible marker for what the authors must still provide.
+\newcommand{\placeholder}[1]{\textcolor{red}{\textbf{[#1]}}}
+
+% Under an author's name on the title page: \authorinfo{affiliation}{place}{e-mail}. \authorrow starts a new row
+% of authors (\and continues the row).
+\newcommand{\authorinfo}[3]{\\{\small #1}\\{\small #2}\\{\small\href{mailto:#3}{#3}}}
+\newcommand{\authorrow}{\end{tabular}\par\vskip 1em\begin{tabular}[t]{c}}
+
+\title{The Market Reads the News First: A Pre-Registered, Blinded Test of AI Decision Models on
+  Stock-Price Reactions%
+  \thanks{Code availability: \url{https://github.com/AmirDehkordi/NewsAction}. The data are private
+  and are not redistributed (Appendix~\ref{app:replication}).}}
+\author{%
+  Amir Dehkordi\thanks{Corresponding author.}%
+  \authorinfo{Independent Researcher}{London, United Kingdom}{amir.dehkordi98@gmail.com}
+  \and Alireza Kargarzadeh%
+  \authorinfo{TailState Intelligence Ltd}{London, United Kingdom}{alireza.kargarzadeh@tailstate.ai}
+  \and Nariman Khaledian%
+  \authorinfo{Independent Researcher}{Antibes, France}{nariman.khaledian@gmail.com}
+  \authorrow Navid Parvini%
+  \authorinfo{Zanista AI Ltd}{London, United Kingdom}{navid.parvini@zanista.ai}
+  \and Sid Ghatak%
+  \authorinfo{Increase Alpha, LLC}{Miami, United States}{s.ghatak@increasealpha.com}
+  \and Arman Khaledian%
+  \authorinfo{Zanista AI Ltd}{London, United Kingdom}{arman.khaledian@zanista.ai}}
+\date{November 2026}
+
+\begin{document}
+
+\maketitle
+\thispagestyle{empty}
+
+\begin{abstract}
+\noindent\input{sections/abstract}
+\end{abstract}
+
+\noindent\textbf{Keywords:} large language models (LLMs); financial news; stock return prediction; look-ahead
+bias; memorization; pre-registration; overnight returns; market efficiency.
+
+\medskip
+\noindent\textbf{JEL codes:} G14, G12, C45, C52, C12.
+
+\clearpage
+
+\input{sections/introduction}
+\input{sections/related}
+\input{sections/design}
+\input{sections/validation}
+\input{sections/priced_open}
+\input{sections/over_under}
+\input{sections/explaining}
+\input{sections/memorization}
+\input{sections/strategies}
+\input{sections/exploratory}
+\input{sections/limitations}
+\input{sections/conclusion}
+
+\renewcommand{\bibfont}{\small}
+\setlength{\bibsep}{2pt plus 1pt}
+\bibliographystyle{plainnat}
+\bibliography{references}
+
+\clearpage
+\appendix
+\renewcommand{\thefigure}{A\arabic{figure}}\setcounter{figure}{0}
+\renewcommand{\thetable}{A\arabic{table}}\setcounter{table}{0}
+\renewcommand{\theequation}{A\arabic{equation}}\setcounter{equation}{0}
+
+\input{sections/appendix}
+
+\end{document}

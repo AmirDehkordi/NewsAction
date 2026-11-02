@@ -1,0 +1,52 @@
+\section{Pre-open news is priced at the open}\label{sec:priced}
+
+Equation~\eqref{eq:split} splits each day's move at the open. Figure~\ref{fig:priced-open} and
+Table~\ref{tab:ic-target} show on which side of the open the models' readings predict it. For the three
+commercial models the answer is clear. Their daily IC with the overnight move $z_{on}$ is \res{d1-ic-on-test} to
+\res{drex-ic-on-test} ($t$ from \res{span-ic-on-test-t} to \res{drex-ic-on-test-t}), and their IC with the move
+after the open, $z_{id}$, is about zero (\res{d1-ic-id-test} to \res{drex-ic-id-test}). H1, the difference, is
+\res{d1-h1} for d1-ultra (95\% interval \res{d1-h1-lo} to \res{d1-h1-hi}, $p = \res{d1-h1-p}$) and about the same
+for the other two. Sorted by d1-ultra's reading, the top quintile of a day's events moves \res{d1-qspread-on}
+typical daily moves more overnight than the bottom quintile ($t = \res{d1-qspread-on-t}$). The untuned Laya model,
+which barely recognizes masked companies (Section~\ref{sec:memorization}), shows the same pattern at a smaller
+scale (H1 $= \res{lz-h1}$, $p = \res{lz-h1-p}$).
+
+\begin{figure}[tbp]
+\centering
+\includegraphics{\figdir/fig2_priced_at_open.pdf}
+\caption{\textbf{The commercial models' pre-open readings line up with the overnight move (daily IC
+\res{d1-ic-on-test} to \res{drex-ic-on-test}), not with the move after the open (about zero).} Daily IC of the
+pre-open reading $\Nhat$ on the test period with (a) the overnight move $z_{on}$ (previous close to open) and
+(b) the move after the open $z_{id}$ (open to close), with 95\% bootstrap intervals; (c) H1, the difference of the
+two, with its bootstrap interval. The panels share one scale. Laya-Fin's ICs are small on both sides
+(\res{lf-ic-on-test} and \res{lf-ic-id-test}), so H1 and H1b are not supported for it (Holm
+$p = \res{lf-h1-holm}$). $^{\ddagger}$See Appendix~\ref{app:prereg}.}\label{fig:priced-open}
+\end{figure}
+
+No model predicts the move after the open. H1b, the IC with $z_{id}$, is not significant for any model on the
+test: \res{lf-ic-id-test} for Laya-Fin ($t = \res{lf-ic-id-test-t}$), and between \res{lz-ic-id-test} and
+\res{drex-ic-id-test} for the others. This matters for Laya-Fin, whose validation signal seemed to reach past
+the open: on val-B its IC with $z_{id}$ was \res{lf-ic-id-valb} ($t = \res{lf-ic-id-valb-t}$), as large as its
+IC with $z_{on}$. That is why H1b was added to the pre-registration before the freeze. On the test, both of
+Laya-Fin's ICs are small, and neither hypothesis is supported.
+
+\input{\tabdir/tab2_ic_by_target.tex}
+
+\paragraph{What the overnight IC measures.} The overnight move includes trading after the previous close and
+before the open, and pre-market trading starts at 04:00~ET. Part of $z_{on}$ has therefore already happened when
+the model reads the news at 09:15, so the overnight IC partly measures how well a reading lines up with a move
+the market is already making, not only a forecast of the move between 09:15 and the open. The pre-registered
+analysis scores the readings against the whole overnight move and does not split it at 09:15. Either way, the
+part of the news that the readings capture is in the price by the open, and nothing measurable is left for a
+trader who enters there.
+
+\paragraph{Robustness.} No pre-registered robustness variant changes these conclusions
+(Appendix Figure~\ref{fig:a-robustness}): dollar-volume tiers, dropping articles with date-only or
+hour-rounded time stamps, a non-overlapping sample, placebo-adjusted targets, a 60-session volatility, dropping
+delisting horizons and dropping text about price moves. Unmasking does not raise d1-ultra's IC: on
+\res{unmask-n} test events its IC with $z_{cc}$ is \res{unmask-ic-masked} with masked states and
+\res{unmask-ic-unmasked} with the same states unmasked. The timing of the news matters. d1-ultra's overnight IC
+is \res{d1-ic-on-0815} ($t = \res{d1-ic-on-0815-t}$) when the latest article arrives between 08:00 and 09:15,
+\res{d1-ic-on-0408} when it arrives between 04:00 and 08:00, and not significant when it precedes 04:00
+(\res{d1-ic-on-pre04}). The closer to the open the news arrives, the more of the overnight move the reading
+lines up with.

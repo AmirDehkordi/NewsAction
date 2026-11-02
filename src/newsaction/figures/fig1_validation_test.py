@@ -2,9 +2,10 @@
 
     uv run python -m newsaction.figures.render fig1_validation_test
 
-A dumbbell per instrument: the daily IC of N̂_W0 with z_cc on val-B (hollow) and on test (filled), joined by a
-segment, each with its 95% interval from the Newey–West t. Rows are grouped (trained, zero-shot, API models,
-baselines); the vendor-label baselines carry †. The anchor is uninformative and appears in the appendix.
+Two aligned panels, (a) val-B and (b) the test period, with one row per instrument and the same IC scale: each
+dot is the daily IC of N̂_W0 with z_cc, with its 95% interval from the Newey–West t, on its model's row. Rows
+are grouped (trained, zero-shot, API models, baselines); the vendor-label baselines carry †. The anchor is
+uninformative and appears in the appendix.
 """
 
 from __future__ import annotations
@@ -23,38 +24,31 @@ GROUPS: Final = (
     ("api", "API models"),
     ("baseline", "Baselines"),
 )
-OFFSET: Final = 0.17
+PANELS: Final = (
+    ("a", "val_b", "val-B: October to December 2025"),
+    ("b", "test", "Test: January to July 2026"),
+)
 
 
 def plot(df: pd.DataFrame) -> Figure:
-    fig, axes = style.new(style.WIDTH_HALF, 3.05)
-    ax = axes[0][0]
-    d = df[df["panel"] == "a"].sort_values("xv", kind="stable")
+    fig, axd = style.mosaic(style.WIDTH_FULL, 2.85, [["a", "b"]], sharex=True)
+    d = df.sort_values("xv", kind="stable")
     rows: list[tuple[str, str]] = []
     for group, head in GROUPS:
         rows.append(("head", head))
         rows += [(m, style.NAME[m]) for m in dict.fromkeys(d.loc[d["label"] == group, "series"])]
-    ys = style.row_axis(ax, rows)
-    for model, y in ys.items():
-        v = d[(d["series"] == model) & (d["role"] == "val_b")].iloc[0]
-        t = d[(d["series"] == model) & (d["role"] == "test")].iloc[0]
-        c = style.color(model)
-        ax.plot([v["y"], t["y"]], [y + OFFSET, y - OFFSET], color=c, linewidth=style.LINE_HAIR, zorder=2)
-        style.dots(ax, [v["y"]], [y + OFFSET], [v["lo"]], [v["hi"]], color=c, hollow=True, horizontal=True)
-        style.dots(ax, [t["y"]], [y - OFFSET], [t["lo"]], [t["hi"]], color=c, horizontal=True)
-    style.zero_line(ax, horizontal=False)
-    ax.set_xlabel(r"daily IC of $\hat N$ with $z_{cc}$")
-    ax.set_xlim(-0.07, 0.155)
-    ax.set_xticks([-0.05, 0.0, 0.05, 0.10, 0.15])
-    style.legend(
-        ax,
-        [style.key(style.INK_2, hollow=True), style.key(style.INK_2)],
-        ["val-B", "test"],
-        loc="lower left",
-        bbox_to_anchor=(0.0, 1.0),
-        ncols=2,
-        borderaxespad=0.1,
-    )
+    for letter, role, text in PANELS:
+        ax = axd[letter]
+        ys = style.row_axis(ax, rows)
+        for model, y in ys.items():
+            r = d[(d["series"] == model) & (d["role"] == role)].iloc[0]
+            style.dots(ax, [r["y"]], [y], [r["lo"]], [r["hi"]], color=style.color(model), horizontal=True)
+        style.zero_line(ax, horizontal=False)
+        style.title(ax, letter, text)
+        ax.set_xlabel(r"daily IC of $\hat N$ with $z_{cc}$")
+    axd["b"].tick_params(labelleft=False)
+    axd["a"].set_xlim(-0.07, 0.155)
+    axd["a"].set_xticks([-0.05, 0.0, 0.05, 0.10, 0.15])
     return fig
 
 
