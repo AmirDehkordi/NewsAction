@@ -1,12 +1,12 @@
-# Placeholder: the authors complete the license and the arXiv identifier before release.
+# The arXiv identifier is added once arXiv assigns it.
 cff-version: 1.2.0
 message: >-
-  If you use this replication package, please cite the paper below. This file is a placeholder: the license and
-  the arXiv identifier are to be added by the authors.
+  If you use this replication package, please cite the paper below.
 title: >-
   NewsAction: replication package for "The Market Reads the News First: A Pre-Registered, Blinded Test of
   AI Decision Models on Stock-Price Reactions"
 type: software
+license: MIT
 repository-code: "https://github.com/AmirDehkordi/NewsAction"
 authors:
   - family-names: Dehkordi

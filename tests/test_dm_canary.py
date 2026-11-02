@@ -79,6 +79,8 @@ def test_build_reproduces_the_file(tmp_path: Path) -> None:
 
 
 def test_a_tampered_line_is_refused(tmp_path: Path) -> None:
+    if not (ROOT / CANARY_FILE).is_file():
+        pytest.skip("canary_v1 holds NewsWitch text and is not in a clone of the repository")
     lines = (ROOT / CANARY_FILE).read_text(encoding="utf-8").splitlines()
     lines[3] = lines[3].replace("the company", "the firm", 1)
     bad = tmp_path / "bad.jsonl"
