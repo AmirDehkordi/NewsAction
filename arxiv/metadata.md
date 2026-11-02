@@ -15,7 +15,8 @@ Fields for the arXiv submission form. The abstract is `arxiv/abstract.txt` (writ
 - **MSC / ACM classes:** none
 - **Journal reference:** none
 - **DOI:** none
-- **License:** [to be chosen by the authors]
+- **License:** [to be chosen by the authors on the form; arXiv's perpetual non-exclusive license keeps every
+  journal option open] (the code is MIT: `LICENSE`)
 - **Keywords (title page):** large language models (LLMs); financial news; stock return prediction; look-ahead
   bias; memorization; pre-registration; overnight returns; market efficiency
 - **Keywords (PDF metadata):** large language models (LLMs); AI decision models; stock return prediction;
@@ -25,14 +26,15 @@ Fields for the arXiv submission form. The abstract is `arxiv/abstract.txt` (writ
 
 ## Source bundle
 
-arXiv compiles with pdflatex and does not run BibTeX. The bundle holds `main.tex`, `sections/*.tex`,
-`generated/numbers.tex`, `main.bbl` (from `paper/generated/main.bbl`), the figures and tables of
-`artifacts/NA-14` that the paper uses (PDF figures, `.tex` tables) in `figures/` and `tables/`, the TikZ source of
-Figure 1 (`paper/figures/design_timeline.tex`, which `sections/design.tex` inputs as `figures/design_timeline`, so it
-goes into the same `figures/` folder), and `main.tex`'s two path macros set to those folders (`\figdir` and
-`\tabdir`). Every source file is ASCII and loads no `fontspec`; TikZ (`arrows.meta`, `decorations.pathreplacing`,
-`patterns`) is in every TeX Live. The page, figure and table counts above are those of `artifacts/NA-16/paper.pdf`;
-update them if the paper changes.
+Upload `artifacts/NA-16/arxiv_source.tar.gz` as is: `make paper-arxiv` writes it (deterministically) from the
+manuscript sources, and `make paper-arxiv-check` compiles it with pdflatex in Docker's TeX Live 2023 image, as
+arXiv does (report: `artifacts/NA-16/arxiv_check.json`; 2026-11-02: 0 errors, 0 overfull or underfull boxes, 0
+undefined references, 40 pages, every font embedded). arXiv compiles with pdflatex and does not run BibTeX, so the
+bundle holds `main.tex` with `\pdfoutput=1` on its first line and its two path macros (`\figdir`, `\tabdir`) set to
+the bundle's own `figures/` and `tables/`, `main.bbl`, `sections/*.tex`, `generated/numbers.tex`, the TikZ source of
+Figure 1 (`figures/design_timeline.tex`) and the NA-14 figures and tables the paper uses; nothing else. Check
+arXiv's compiled preview before submitting. The page, figure and table counts above are those of the pdflatex
+build; update them if the paper changes.
 
 ## SSRN submission (ready to paste)
 

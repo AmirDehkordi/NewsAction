@@ -19,8 +19,8 @@ Date: 2026-10-29 · Branch `feat/NA-16-paper` (main checkout, cut from main @ 83
   without "Call A/Call B", the deviations table by stage. `make paper` reproduces every digest; `make
   paper-preview` passes.
 - **`make verify`** exit 0: 2,208 passed, 3 skipped, 2 xfailed; manifest OK (487 artifacts); ledgers unchanged.
-- **Open:** a final pdflatex check (Docker's TeX Live image) that needs your approval before any image is
-  pulled. The title was chosen on 2026-11-02 (§3).
+- **Open:** only steps the authors must take before and on arXiv (§15). The title was chosen on 2026-11-02 (§3);
+  the pdflatex check passed on 2026-11-02 (§15).
 
 ## 1. Scope
 
@@ -36,7 +36,7 @@ Date: 2026-10-29 · Branch `feat/NA-16-paper` (main checkout, cut from main @ 83
 | 5 Findability | done | terms in title, abstract, keywords and headings; hyperref metadata; T1 + lmodern + glyphtounicode; `arxiv/abstract.txt`, `arxiv/metadata.md`, `CITATION.cff`; nothing hidden |
 | 6 References | done | `paper/references.bib` (66); log in `docs/decisions/NA-16.md` |
 | 7 Traceable numbers | done | `paper/numbers.yaml`, `paper/generated/numbers.tex`, `paper/allowlist.yaml`, `tests/test_paper_text.py` |
-| 8 Build and checks | done (pdflatex pending your approval) | `make paper-text`, `make paper-pdf`, `newsaction.paper.{numbers,build,contract}` |
+| 8 Build and checks | done (pdflatex: §15) | `make paper-text`, `make paper-pdf`, `newsaction.paper.{numbers,build,contract}` |
 | 9 REPORT, decisions | done | this file; `docs/decisions/NA-16.md` |
 
 ## 2. Self-audit
@@ -183,12 +183,12 @@ pdfTeX (`iftex`); packages all in TeX Live (geometry, amsmath, amssymb, graphicx
 threeparttable, threeparttablex, pdflscape, siunitx, caption, enumitem, needspace, placeins, xcolor, natbib,
 microtype, hyperref); figures are PDF; the `.bbl` is shipped, since arXiv does not run BibTeX; the figure and table
 paths are two macros (`\figdir`, `\tabdir`) that an arXiv bundle sets to its own folders (`arxiv/metadata.md`).
-NA-14's tables use siunitx v3 options (TeX Live 2021 or later). **Not yet run: a real pdflatex compile.** It needs
-a TeX Live image (for example Docker's `texlive/texlive`); the prompt asks for your approval before any pull.
+NA-14's tables use siunitx v3 options (TeX Live 2021 or later). **pdflatex: run on 2026-11-02**
+(`make paper-arxiv-check`, TeX Live 2023 in Docker; §15).
 
 ## 10. Open placeholders
 
-The license and the arXiv identifier (`CITATION.cff`); the title choice (§3).
+The arXiv identifier (`CITATION.cff`), once arXiv assigns it. The title (§3) and the license (MIT, §15) are settled.
 
 Filled on 2026-11-02 at the operator's direction: the six authors' affiliations and e-mails; the code URL
 (https://github.com/AmirDehkordi/NewsAction) and the statement that the data are private; acknowledgments,
@@ -206,9 +206,10 @@ no longer names Kaggle or mentions the data-request ledger. `make paper-pdf` pas
   1. The title (working title or one of the two alternatives). *Recommendation:* the working title.
      *Decided 2026-11-02:* the working title, with "Blinded" in place of "Look-Ahead-Free" in the subtitle.
   2. A final pdflatex check in a TeX Live container before submission (pulls an image of several GB).
-     *Recommendation:* yes, once, with the bundle described in `arxiv/metadata.md`.
+     *Recommendation:* yes, once, with the bundle described in `arxiv/metadata.md`. *Done 2026-11-02 (§15).*
   3. The AI-use statement's wording. *Recommendation:* keep a short statement; many venues ask for one.
   4. Whether to name the news vendor in the data statement. *Recommendation:* decide with the license terms.
+     *Settled:* the statements name NewsWitch and Zanista AI, and Section 3.2 names NewsWitch (§15).
 
 ## 12. Files and `make verify`
 
@@ -293,3 +294,56 @@ run, FMP request or lock read; NA-14's generator and artifacts untouched.
 - **Open for the operator:** moving four floats that repeat a neighbour to the appendix (Tables 3 and 5,
   Figure 8 and the exploratory Figure 9) would take the main text to about 21 pages; it was not in the approved
   list.
+
+## 15. Pre-submission review and fixes (2026-11-02)
+
+A last review checked the paper against its own tables, the public ledgers, the cited papers and arXiv's
+requirements; the operator asked for every finding to be fixed (reasons and evidence: `docs/decisions/NA-16.md`,
+"Pre-submission review and fixes"). Operator decisions: the masked NewsWitch text that was on GitHub is untracked
+now, while the operator asks Zanista AI whether the copies in git history may stay; the code is MIT-licensed; the
+TeX Live image may be pulled. No number, definition, hypothesis or verdict changed; no API call, Kaggle run, FMP
+request or lock read.
+
+| Item | Before | After |
+|---|---|---|
+| "Every validation IC that was positive fell" (5 places) | false for the embedding baseline (0.0022 to 0.0041) | "clearly positive" |
+| Introduction: "fixed before any outcome was computed" | H1b was added after val-B | "written down before any data were analyzed", later changes dated |
+| Appendix A: forward test "before any forward-period data existed" | window from 2026-10-22, pre-registered 2026-10-29 | Section 11's wording |
+| Section 3.4: amendments "before any data" | commit 18:18 UTC after NA-01's export 17:45 UTC | "before any panel, target or model output existed" |
+| Lock released outcomes "once, in a single logged sequence" | two outcome reads (19:18 and 22:54 UTC) | tests first, strategies later the same day, every read logged |
+| Lopez-Lira and Tang | pre-open headlines; "cannot be traded"; "which they trade" | overnight news; insider or early access; unprofitable at 20 bp per round trip |
+| Abstract | val-B IC under "two validation quarters" | both ICs, 0.055 and 0.065 |
+| OLIVIA mentions | three (the conclusion's was lost in §14) | four |
+| Earlier study's 2023-2026 sample | not disclosed | one sentence in Section 11 |
+| Figure 9, Section 10: "most of the overnight signal" | the top tenth holds 68%, 50%, 51% | "concentrates" |
+| Figure 5, Section 6.3: "only moves of three or more reverse" | contradicted by its own caption | "in every tercile", two of three intervals include zero |
+| Tables A2, 5, A4 (NA-14 generator) | false caption; "($q$ 0.10)"; undefined "A3.4", empty rows unexplained | fixed in `figures/latex.py` |
+| Spelling, terms, colors, vendor name, bibliography | mixed; "API models" undefined; Figure 2's colors unexplained; vendor unnamed in 3.2; lowercased "return"; BibTeX warning; 5 underfull lines | American; defined; explained; named; fixed; none; none (`xurl`, `\bibsep` 2pt) |
+
+- **arXiv build.** New `newsaction.paper.bundle`: `make paper-arxiv` writes `artifacts/NA-16/arxiv_source.tar.gz`
+  (39 members, deterministic, in the contract); `make paper-arxiv-check` compiles it with pdflatex in Docker's
+  `texlive/texlive:TL2023-historic` (8.4 GB, three passes, no network): exit 0, 0 errors, 0 overfull and 0 underfull
+  boxes, 0 undefined references, no rerun, **40 pages**, 59 fonts all embedded (`artifacts/NA-16/arxiv_check.json`).
+  Every page of the pdflatex PDF was rendered and looked at. tectonic also gives 40 pages.
+- **`make paper` in a clone.** It stopped on NA-13's three `work/strategy` files (licensed-price derivatives, not
+  redistributed). Now the two tables built from them (t26, t33) are carried over as committed when the files are
+  absent, only those inputs may be absent, and `--write-digests` needs every input; Appendix F says so.
+- **Repository.** `LICENSE` (MIT); `CITATION.cff` `license: MIT`; README and CLAUDE.md say public;
+  `artifacts/NA-04/examples.md` and `artifacts/NA-05/canary_v1.jsonl` untracked and gitignored (kept locally);
+  `docs/REPLICATION.md` and `arxiv/metadata.md` updated.
+- **Tests added:** `tests/test_paper_bundle.py` (10) and four in `tests/test_figures_paper.py`; the seven new guards
+  were each mutation-checked in a sandbox (removing the guard fails its test). `tests/test_repo.py` covers the two
+  untracked files; the canary test that read the file without a guard skips without it.
+- **Checks:** `make paper-text` 0 problems (149 numbers, abstract 221 words); `make paper-pdf` 0 errors, 0 overfull,
+  0 underfull, float order OK, 40 pages; `make paper` all equal (127 outputs, 52 figures); `make paper-arxiv-check`
+  OK; `make verify` exit 0: ruff and format clean (325 files), mypy --strict clean (184 files), 2,227 passed, 3 skipped, 2 xfailed in 259 s;
+  manifest OK (488 artifacts); ledgers OK and unchanged (trials 1,620, test access 29).
+- **Open: only the authors can do these.**
+  1. Run the independent verification of NA-16, then merge `feat/NA-16-paper` into `main` and push: until then the
+     public `main` lacks the paper, the license and the README fixes, and still carries the two news-text files.
+  2. Every co-author approves the final PDF, the author order and the competing-interests text.
+  3. Zanista's answer on the masked text in git history (if they object: a history rewrite and a force-push).
+  4. The arXiv form: the license (recommended: arXiv's perpetual non-exclusive license), an endorsement for cs.AI
+     if the submitter has not posted there before (an author of arXiv 2608.14014 can endorse), the metadata from
+     `arxiv/metadata.md`; then check arXiv's compiled preview before submitting.
+  5. After arXiv assigns the identifier: `CITATION.cff` and the SSRN posting (`arxiv/metadata.md`).

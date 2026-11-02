@@ -35,9 +35,12 @@ All of it is committed except three NA-13 work files.
 | NA-13's stored test positions, daily books and placebo books | `work/strategy/{positions,books,placebo}_test.parquet`, registered in `work/MANIFEST.json` | no (gitignored) |
 
 The three work files feed two tables: t26 (the S-CONV / gap-fade overlap that NA-13's REPORT §4 states but no
-committed file holds) and t33 (the placebo's Sharpe quantiles, which NA-13's REPORT §7 quotes in part). Without
-them, rebuild NA-13 first (its REPORT §12 lists the commands; the test-period returns come through one
-`newsaction.lock` read after unblinding, as NA-13 did once).
+committed file holds) and t33 (the placebo's Sharpe quantiles, which NA-13's REPORT §7 quotes in part). They are
+derived from the licensed prices and are not in a clone of the repository: without them, `make paper` carries t26
+and t33 over as committed (it reports `absent_inputs` and `carried_over`), rebuilds every other output and checks
+it against its committed digest; any other missing input stops the run, and `--write-digests` needs every input.
+To recompute t26 and t33 themselves, rebuild NA-13 first (its REPORT §12 lists the commands; the test-period
+returns come through one `newsaction.lock` read after unblinding, as NA-13 did).
 
 `make paper` reads nothing else: no raw data (`Data/`), no ATOM snapshot, no decision-model cache, no API, no
 Kaggle, no FMP. It never imports the decision-model client, `newsaction.lock`, `panel.targets` or
@@ -96,8 +99,12 @@ make paper-pdf    # paper-text, then tectonic --keep-logs on paper/main.tex: art
   taller than the page, a font that is not embedded, or a figure or table numbered out of the order of its first
   mention. It writes `paper/generated/main.bbl`, which arXiv needs because it does not run BibTeX. The PDF's bytes
   depend on tectonic's bundle, so its sha256 is reported, not enforced.
-- **arXiv.** The sources are ASCII only, load no `fontspec` and only standard TeX Live packages, so pdflatex compiles
-  them as well as tectonic (XeTeX); `arxiv/abstract.txt` is the plain-text abstract and `arxiv/metadata.md` the
+- **arXiv.** The sources are ASCII only, load no `fontspec` and only standard TeX Live packages. `make paper-arxiv`
+  writes the upload, `artifacts/NA-16/arxiv_source.tar.gz` (deterministic: `main.tex` with `\pdfoutput=1` first
+  and its path macros pointing into the bundle, `main.bbl`, the sections, the generated macros and the figures and
+  tables the sources name). `make paper-arxiv-check` compiles that bundle with pdflatex in Docker's
+  `texlive/texlive:TL2023-historic` image (three passes, no network) and applies the checks above; its report is
+  `artifacts/NA-16/arxiv_check.json`. `arxiv/abstract.txt` is the plain-text abstract and `arxiv/metadata.md` the
   submission's metadata.
 
 ## How every number traces

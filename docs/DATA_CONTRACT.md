@@ -2654,7 +2654,7 @@ sha256 on a rerun (labels and export were run twice: 8 of 8 files identical).
 - **Key:** one file
 - **Rows / coverage:** the paper preview; `make paper-preview` compiles it with tectonic (the PDF's digest is reported, not registered)
 - **Availability:** after NA-12, NA-13 and NA-13b (test-period results are their stored outputs; nothing here reads the lock)
-- **sha256:** `8f5b78ea66846e1220480192d8fdffbcfe8fec27a6a0a632bf6cc19cd7af8666`
+- **sha256:** `f114f6c435f53b435674578692ce6369dfcdfa557987b2cdc71e7e7d0ab1dd9f`
 
 ### `artifacts/NA-14/captions.yaml`
 - **Producer:** NA-14 (author)
@@ -2663,7 +2663,7 @@ sha256 on a rerun (labels and export were run twice: 8 of 8 files identical).
 - **Key:** one entry per figure
 - **Rows / coverage:** the caption templates; `python -m newsaction.figures.captions` checks every number
 - **Availability:** after NA-12, NA-13 and NA-13b (test-period results are their stored outputs; nothing here reads the lock)
-- **sha256:** `7bfcc9bdfb6b24f5cec4b17eb8326ee5650e5d74127c8799f354c33661dc5b2f`
+- **sha256:** `2692c1bc9d871b41b12c44474518e1409733d2b120e015a75c0ff43f59599984`
 
 ### `artifacts/NA-14/captions.md`
 - **Producer:** `newsaction.figures.captions`
@@ -2672,7 +2672,7 @@ sha256 on a rerun (labels and export were run twice: 8 of 8 files identical).
 - **Key:** one file
 - **Rows / coverage:** the rendered captions
 - **Availability:** after NA-12, NA-13 and NA-13b (test-period results are their stored outputs; nothing here reads the lock)
-- **sha256:** `967675de275d70aefa5a6afe805dbac19d777187557425399302e706aa723c06`
+- **sha256:** `16ed17f2eec20d1a4ce3872a64e77a5cf4e8c0a069cb9d7ec3ab7cef8f4f3fe1`
 
 ### `artifacts/NA-14/digests.json`
 - **Producer:** `newsaction.figures.paper --write-digests`
@@ -2681,7 +2681,7 @@ sha256 on a rerun (labels and export were run twice: 8 of 8 files identical).
 - **Key:** one file
 - **Rows / coverage:** what `make paper` must reproduce
 - **Availability:** after NA-12, NA-13 and NA-13b (test-period results are their stored outputs; nothing here reads the lock)
-- **sha256:** `59d146667a512f0795d114b732038f7a9bdd5eeb949dc4113e2b8eebfdcfe885`
+- **sha256:** `3cc5b4474c61cecaa887b54ace163b845a8e71a80b240e1baf09fbd989ac4ac5`
 
 ### `artifacts/NA-14/figures/fig1_validation_test.csv`
 - **Producer:** `newsaction.figures.data` (`fig1`)
@@ -3887,7 +3887,7 @@ sha256 on a rerun (labels and export were run twice: 8 of 8 files identical).
 - **Key:** one file
 - **Rows / coverage:** main table tab:explaining (24 cited cells)
 - **Availability:** after NA-12, NA-13 and NA-13b (test-period results are their stored outputs; nothing here reads the lock)
-- **sha256:** `6155e01bf1b0e3b15c41885e14e00e472a5b48da009e8a8eacb79c4722f83291`
+- **sha256:** `26e02ae86496ac496d73a6c2dca32dbcc153eeda8601d972dd29b0fb4c4b18b7`
 
 ### `artifacts/NA-14/tables/tab6_strategies.tex`
 - **Producer:** `newsaction.figures.latex`
@@ -3905,7 +3905,7 @@ sha256 on a rerun (labels and export were run twice: 8 of 8 files identical).
 - **Key:** one file
 - **Rows / coverage:** appendix table tab:a-model-comparison (74 cited cells)
 - **Availability:** after NA-12, NA-13 and NA-13b (test-period results are their stored outputs; nothing here reads the lock)
-- **sha256:** `db50c873a2e0dbb54b199fff787919bd33454e3b5f5c3135155c986687c2189e`
+- **sha256:** `1562769d6016855a7ab3b6aaf00fd000d37d65368689d48f8b578202640823a2`
 
 ### `artifacts/NA-14/tables/t27_tournament.tex`
 - **Producer:** `newsaction.figures.latex`
@@ -4013,7 +4013,7 @@ sha256 on a rerun (labels and export were run twice: 8 of 8 files identical).
 - **Key:** one file
 - **Rows / coverage:** appendix table tab:a-secondary (88 cited cells)
 - **Availability:** after NA-12, NA-13 and NA-13b (test-period results are their stored outputs; nothing here reads the lock)
-- **sha256:** `82a85b792d8d06683a77f8f231a7f4ab17a942f0104ce1ec3c96cedc03aeea31`
+- **sha256:** `dcf9e21de8d78aac3b20bb4c54edf064dec2823a9c1a61cfe125c0b0c07048f8`
 
 ### `artifacts/NA-14/tables/t5_heterogeneity.tex`
 - **Producer:** `newsaction.figures.latex`
@@ -4431,7 +4431,7 @@ sha256 on a rerun (labels and export were run twice: 8 of 8 files identical).
 - **Key:** one file
 - **Rows / coverage:** the abstract for arXiv's abstract field (180 to 250 words), its numbers resolved
 - **Availability:** after NA-14 (every number is a cell of NA-14's committed tables; nothing here reads the lock)
-- **sha256:** `1219ed718c0591b9babb373f6f697e6c99b86c06cc261bf0c87a24624b267c28`
+- **sha256:** `cc536080d040e6a82b3aef3d4fc3e746f4487fd1a81895bf1e30eb1de499fdaf`
 
 ### `paper/generated/main.bbl`
 - **Producer:** `newsaction.paper.build` (`make paper-pdf`: tectonic's BibTeX on `paper/references.bib`)
@@ -4440,4 +4440,13 @@ sha256 on a rerun (labels and export were run twice: 8 of 8 files identical).
 - **Key:** one file
 - **Rows / coverage:** the bibliography arXiv needs (it does not run BibTeX)
 - **Availability:** after NA-14 (every number is a cell of NA-14's committed tables; nothing here reads the lock)
-- **sha256:** `a34389ce53fd6cb318070ffda43bae95351997db76b8b6e294beb00e1762697e`
+- **sha256:** `da0f8b3aec37ae977bb6f4b40349e1db6176e91fdbe517c54d6693af82ee4120`
+
+### `artifacts/NA-16/arxiv_source.tar.gz`
+- **Producer:** `newsaction.paper.bundle` (`make paper-arxiv`)
+- **Inputs:** `paper/main.tex`, `paper/sections/*.tex`, `paper/generated/{numbers.tex,main.bbl}`, `paper/figures/design_timeline.tex`, the NA-14 figures and tables the sources name
+- **Schema:** deterministic gzip tar: `main.tex` (`\pdfoutput=1` first, path macros into the bundle), `main.bbl`, `sections/`, `generated/`, `figures/`, `tables/`
+- **Key:** one file
+- **Rows / coverage:** the arXiv source upload; `make paper-arxiv-check` compiles it with pdflatex (TeX Live, Docker)
+- **Availability:** after NA-14 (every number is a cell of NA-14's committed tables; nothing here reads the lock)
+- **sha256:** `5af60f6e6cdc1be07a632b091b69186dd8ee23cab87209ac18eac7d455c181c8`
