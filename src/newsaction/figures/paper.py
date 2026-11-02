@@ -6,7 +6,9 @@
    positions and
    books, the operator's input file, the captions, two configs and the ledgers) must have the sha256
    recorded in
-   ``artifacts/NA-14/digests.json``; a changed input stops the run before anything is rebuilt.
+   ``artifacts/NA-14/digests.json``; a changed input stops the run before anything is rebuilt. A clone of the
+   repository lacks NA-13's books (derived from the licensed prices, not redistributed): the two tables built
+   from them are then carried over as committed and reported, and any other missing input stops the run.
 2. **Rebuild.** The tables (``tables``), their LaTeX (``latex``), the figure CSVs (``data``), every figure
    (``render``), the captions (``captions``, which first checks every cited number against its table cell) and
    the LaTeX preview (``preview``; ``make paper-preview`` compiles it).
@@ -49,6 +51,11 @@ FORBIDDEN: Final = (
 TEXT_SUFFIXES: Final = (".csv", ".tex", ".json", ".md")
 FIGURE_SUFFIXES: Final = (".pdf", ".png")
 LEDGERS: Final = ("spend.jsonl", "fmp_requests.jsonl", "trials.jsonl", "test_access.jsonl")
+# NA-13's stored test books: derived from the licensed prices, so a clone of the repository lacks them.
+# Without them the two tables built from them are carried over as committed (tables.committed_table);
+# every other input must be present.
+STRATEGY_INPUTS: Final = (f"work/{tables.POSITIONS}", f"work/{tables.BOOKS}", f"work/{tables.PLACEBO}")
+CARRIED_OVER: Final = ("t26_sconv_overlap", "t33_placebo_sharpe")
 
 
 def inputs() -> list[str]:
@@ -105,6 +112,16 @@ def digest(root: Path, paths: Iterable[str]) -> dict[str, str]:
     return {p: _sha(root / p) for p in paths}
 
 
+def absent_inputs(root: Path) -> list[str]:
+    """The inputs this checkout lacks. Only NA-13's books (``STRATEGY_INPUTS``) may be absent; any other
+    missing input raises, so a partial checkout cannot pass as a full one."""
+    missing = [p for p in inputs() if not (root / p).is_file()]
+    other = [p for p in missing if p not in STRATEGY_INPUTS]
+    if other:
+        raise FileNotFoundError(f"make paper inputs missing: {other}")
+    return missing
+
+
 def _diff(want: Mapping[str, str], got: Mapping[str, str]) -> list[str]:
     out = [f"missing {p}" for p in sorted(set(want) - set(got))]
     out += [f"new {p}" for p in sorted(set(got) - set(want))]
@@ -139,9 +156,17 @@ def run(lay: Layout, *, write_digests: bool = False) -> tuple[int, dict[str, Any
     report: dict[str, Any] = {"root": str(root)}
     ledgers_before = digest(root, [f"ledgers/{n}" for n in LEDGERS])
     committed = json.loads((root / DIGESTS).read_text(encoding="utf-8")) if (root / DIGESTS).is_file() else {}
-    have_in = digest(root, inputs())
+    absent = absent_inputs(root)
+    if absent:
+        report["absent_inputs"] = absent
+        report["carried_over"] = [f"{sc.TABLES}/{name}.csv" for name in CARRIED_OVER]
+        if write_digests:
+            report["error"] = "digests need every input; NA-13's books are absent"
+            return 1, report
+    have_in = digest(root, [p for p in inputs() if p not in absent])
     if not write_digests:
-        bad_in = _diff(committed.get("inputs", {}), have_in)
+        want_in = {p: h for p, h in committed.get("inputs", {}).items() if p not in absent}
+        bad_in = _diff(want_in, have_in)
         if bad_in:
             report["inputs"] = bad_in
             return 1, report

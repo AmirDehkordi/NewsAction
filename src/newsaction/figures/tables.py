@@ -568,9 +568,45 @@ OVERLAP: Final = (
 )
 
 
+def strategy_files_present(layout: Layout, *relpaths: str) -> bool:
+    """Whether NA-13's ``work/strategy`` files are in this checkout. They are derived from the licensed prices
+    and are not redistributed, so a clone of the repository lacks them."""
+    return all((layout.work / p).is_file() for p in relpaths)
+
+
+def committed_table(layout: Layout, name: str) -> pd.DataFrame:
+    """A table read back exactly as committed: pandas' default parser returns the floats ``to_csv`` wrote,
+    so ``write`` reproduces the committed bytes and keys (tested). A checkout without NA-13's
+    ``work/strategy`` files carries the two tables built from them over this way (``make paper`` reports
+    them)."""
+    return pd.read_csv(layout.root / sc.TABLES / f"{name}.csv")
+
+
 def sconv_overlap(layout: Layout) -> PaperTable:
     """How much S-CONV is the gap fade, from NA-13's stored test positions and daily books (NA-13 REPORT
-    §4)."""
+    §4); carried over as committed when those files are absent (``committed_table``)."""
+    name = "t26_sconv_overlap"
+    frame = (
+        _sconv_overlap_frame(layout)
+        if strategy_files_present(layout, POSITIONS, BOOKS)
+        else committed_table(layout, name)
+    )
+    return PaperTable(
+        name,
+        "S-CONV against the price-only gap fade on test: shared positions, same side, daily-return "
+        "correlation",
+        frame,
+        (
+            "Positions are (session, symbol) pairs of the book; shared_share = |book ∩ gap fade| / |book|; "
+            "same_side_share among the shared; corr_gross = Pearson correlation of the daily gross returns "
+            "(tier all) over common sessions. Recomputed from work/strategy (NA-13) because NA-13 REPORT §4 "
+            "states these numbers but no file held them.",
+        ),
+        (f"work/{POSITIONS}", f"work/{BOOKS}"),
+    )
+
+
+def _sconv_overlap_frame(layout: Layout) -> pd.DataFrame:
     pos = io.read_parquet(POSITIONS, columns=["rule", "session", "symbol_id", "side"], layout=layout)
     books = io.read_parquet(BOOKS, columns=["rule", "tier", "session", "gross"], layout=layout)
     books = books[books["tier"] == "all"]
@@ -603,19 +639,7 @@ def sconv_overlap(layout: Layout) -> PaperTable:
                 "n_days": len(common),
             }
         )
-    return PaperTable(
-        "t26_sconv_overlap",
-        "S-CONV against the price-only gap fade on test: shared positions, same side, daily-return "
-        "correlation",
-        _frame(rows),
-        (
-            "Positions are (session, symbol) pairs of the book; shared_share = |book ∩ gap fade| / |book|; "
-            "same_side_share among the shared; corr_gross = Pearson correlation of the daily gross returns "
-            "(tier all) over common sessions. Recomputed from work/strategy (NA-13) because NA-13 REPORT §4 "
-            "states these numbers but no file held them.",
-        ),
-        (f"work/{POSITIONS}", f"work/{BOOKS}"),
-    )
+    return _frame(rows)
 
 
 def derived(root: Path) -> PaperTable:
@@ -767,12 +791,17 @@ def placebo_quantiles(placebo: pd.DataFrame) -> pd.DataFrame:
 
 def placebo_sharpe(layout: Layout) -> PaperTable:
     """Quantiles of the Sharpe ratios of NA-13's 100 random-signal books per test universe (NA-13 REPORT §7
-    states some; no committed file held them)."""
-    placebo = io.read_parquet(PLACEBO, columns=["universe", "seed", *PLACEBO_COLUMNS], layout=layout)
-    df = placebo_quantiles(placebo)
-    df["source"] = f"work/{PLACEBO}"
+    states some; no committed file held them); carried over as committed when the books are absent
+    (``committed_table``)."""
+    name = "t33_placebo_sharpe"
+    if strategy_files_present(layout, PLACEBO):
+        placebo = io.read_parquet(PLACEBO, columns=["universe", "seed", *PLACEBO_COLUMNS], layout=layout)
+        df = placebo_quantiles(placebo)
+        df["source"] = f"work/{PLACEBO}"
+    else:
+        df = committed_table(layout, name)
     return PaperTable(
-        "t33_placebo_sharpe",
+        name,
         "Random-signal placebo (NA-13): 5th, 50th and 95th percentile of the annualized Sharpe ratios of the "
         "100 placebo books of each test universe, gross and net of 5, 10 and 20 bp per side",
         df,

@@ -7,7 +7,9 @@
   ``panel.reactions``;
 - a changed input stops the run before anything is rebuilt;
 - a build that appends to a ledger fails the run (the guard is not vacuous);
-- ``docs/REPLICATION.md`` lists the committed CSV digests and the ledgers' spend.
+- ``docs/REPLICATION.md`` lists the committed CSV digests and the ledgers' spend;
+- a clone without NA-13's books (``work/strategy``) carries the two tables built from them over as committed,
+  rebuilds every other output with its committed digest, and no other input may be absent.
 """
 
 from __future__ import annotations
@@ -156,3 +158,68 @@ def test_replication_doc_lists_the_committed_digests_and_spend() -> None:
     spend = pd.read_csv(ROOT / sc.TABLES / "t22_spend.csv").set_index("key")["value"]
     assert f"${spend['openrouter_total']:.2f}" in doc and f"{int(spend['fmp_requests']):,} requests" in doc
     assert f"{spend['kaggle_total_gpu_hours']:.2f} GPU-hours" in doc
+
+
+# --- a clone without NA-13's books (work/strategy: derived from the licensed prices, not redistributed) ---
+
+
+def _clone_without_books(tmp: Path) -> Path:
+    """A scratch copy as a clone of the repository has it: every committed input and the two committed tables
+    built from NA-13's books, but no ``work/``."""
+    root = tmp / "repo"
+    for rel in LINKED:
+        (root / rel).parent.mkdir(parents=True, exist_ok=True)
+        (root / rel).symlink_to(ROOT / rel)
+    na14 = root / sc.ARTIFACTS
+    na14.mkdir(parents=True)
+    for name in NA14_INPUTS:
+        src = ROOT / sc.ARTIFACTS / name
+        if src.is_dir():
+            shutil.copytree(src, na14 / name)
+        else:
+            shutil.copy2(src, na14 / name)
+    (root / sc.TABLES).mkdir(parents=True)
+    for name in paper.CARRIED_OVER:
+        shutil.copy2(ROOT / sc.TABLES / f"{name}.csv", root / sc.TABLES / f"{name}.csv")
+    return root
+
+
+def test_a_clone_without_the_books_rebuilds_every_other_output(tmp_path: Path) -> None:
+    root = _clone_without_books(tmp_path)
+    code, report = _run(root)
+    assert code == 0, report
+    assert report["outputs"] == "all equal" and report["figures"] == "all equal"
+    assert report["absent_inputs"] == sorted(paper.STRATEGY_INPUTS)
+    assert report["carried_over"] == [f"{sc.TABLES}/{n}.csv" for n in paper.CARRIED_OVER]
+    for name in paper.CARRIED_OVER:
+        rel = f"{sc.TABLES}/{name}.csv"
+        assert _sha(root / rel) == _sha(ROOT / rel), rel
+
+
+def test_carried_over_tables_read_back_exactly(tmp_path: Path) -> None:
+    from newsaction.figures import tables
+
+    for name in paper.CARRIED_OVER:
+        out = tmp_path / f"{name}.csv"
+        tables.committed_table(Layout(ROOT), name).to_csv(out, index=False, lineterminator="\n")
+        assert out.read_bytes() == (ROOT / sc.TABLES / f"{name}.csv").read_bytes(), name
+
+
+def test_only_the_books_may_be_absent(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
+    monkeypatch.setattr(paper, "inputs", lambda: ["configs/splits.yaml", *paper.STRATEGY_INPUTS])
+    (tmp_path / "configs").mkdir()
+    (tmp_path / "configs" / "splits.yaml").write_text("x\n", encoding="utf-8")
+    assert paper.absent_inputs(tmp_path) == list(paper.STRATEGY_INPUTS)
+    (tmp_path / "configs" / "splits.yaml").unlink()
+    with pytest.raises(FileNotFoundError, match=r"splits\.yaml"):
+        paper.absent_inputs(tmp_path)
+
+
+def test_digests_need_every_input(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
+    (tmp_path / "ledgers").mkdir()
+    for name in paper.LEDGERS:
+        (tmp_path / "ledgers" / name).write_text('{"event":"x"}\n', encoding="utf-8")
+    monkeypatch.setattr(paper, "inputs", lambda: list(paper.STRATEGY_INPUTS))
+    code, report = paper.run(Layout(tmp_path), write_digests=True)
+    assert code == 1 and "error" in report
+    assert not (tmp_path / paper.DIGESTS).exists()

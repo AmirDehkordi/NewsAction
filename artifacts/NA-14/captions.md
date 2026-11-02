@@ -2,7 +2,7 @@
 
 Rendered from `captions.yaml` by `python -m newsaction.figures.captions`; every number is a table cell (`tables/keys.json`); notation is LaTeX math. Figures 1–7 are the paper's; A1–A19 the appendix's. Section numbers follow `docs/paper_outline.md`.
 
-## fig1_validation_test: Every validation IC that is positive falls on test
+## fig1_validation_test: Every validation IC that is clearly positive falls on test
 
 *Section 1. Files: `figures/fig1_validation_test.pdf`, `figures/fig1_validation_test.png`, data `figures/fig1_validation_test.csv`.*
 

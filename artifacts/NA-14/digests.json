@@ -87,7 +87,7 @@
   "artifacts/NA-13b/tables/output_summary.csv": "a186b3713f04c6882579a2f67b69277442a667f388f5ddaade0cc87a08fc63c7",
   "artifacts/NA-13b/tables/selection.csv": "a3734abb257babb3f0968c104d3d4384482d9083f332026cc564d5893b5c78c4",
   "artifacts/NA-13b/tables/watch_open.csv": "9839242fef8e8a86c9d43ae5f3fbc7dea2b991776f8181aeccb7c3be75899729",
-  "artifacts/NA-14/captions.yaml": "7bfcc9bdfb6b24f5cec4b17eb8326ee5650e5d74127c8799f354c33661dc5b2f",
+  "artifacts/NA-14/captions.yaml": "2692c1bc9d871b41b12c44474518e1409733d2b120e015a75c0ff43f59599984",
   "artifacts/NA-14/inputs/operator.yaml": "b094fec1f71c7a2648acb069ae371d8cc4490240d6875d2ec7157ac885e05f43",
   "artifacts/NA-14/inputs/prereg_deviations.yaml": "8e57715e17e53202fc18ac99450db523c594f839b306edfd5d64f40ba0c9123d",
   "configs/project.yaml": "8098fbc7c5deaac6ccb8ae408d99238e118f7681526eaf8b2bda4b33ed7bbecc",
@@ -102,7 +102,7 @@
   "work/strategy/positions_test.parquet": "203b8668b53955618238a76d602e778018f84776394e7c38d4498c9b67b0e9e6"
  },
  "outputs": {
-  "artifacts/NA-14/captions.md": "967675de275d70aefa5a6afe805dbac19d777187557425399302e706aa723c06",
+  "artifacts/NA-14/captions.md": "16ed17f2eec20d1a4ce3872a64e77a5cf4e8c0a069cb9d7ec3ab7cef8f4f3fe1",
   "artifacts/NA-14/figures/fig1_validation_test.csv": "cea6875a9d36f35381c183587312fe9cfb1be88c89d3264a96ac267bdaa1fa35",
   "artifacts/NA-14/figures/fig2_priced_at_open.csv": "d9a566f040c884875fb7ef02802f1055080c6aced5524aa6abd05672b222de20",
   "artifacts/NA-14/figures/fig3_convergence.csv": "c258a042b0e8a856d29f17a253c16ba84642333966b64124ed9bbade3489c4b3",
@@ -129,7 +129,7 @@
   "artifacts/NA-14/figures/figA7_convergence_detail.csv": "e34466fb446a83d07e655b06ba9d515f05b5c61c7a7625f48c4601e22659995e",
   "artifacts/NA-14/figures/figA8_drift_laya_fin.csv": "9ef5f06a1f3e1f6ddb7b28dd0b8a5eed807d79b58526e6828f99c702cd77655d",
   "artifacts/NA-14/figures/figA9_shapley.csv": "1b5cd0b736710082d02f341607fe5dae145a6199826308c0695242b8bb49a827",
-  "artifacts/NA-14/paper_preview.tex": "8f5b78ea66846e1220480192d8fdffbcfe8fec27a6a0a632bf6cc19cd7af8666",
+  "artifacts/NA-14/paper_preview.tex": "f114f6c435f53b435674578692ce6369dfcdfa557987b2cdc71e7e7d0ab1dd9f",
   "artifacts/NA-14/tables/f1_rg_class_paths.csv": "a838f7cebc529dddae31a7ac7726e38370383daa84287af41b9e78f0f0d83ae9",
   "artifacts/NA-14/tables/f1_v_decile_paths.csv": "db32683874d6ed03813810f73c9e3810786eb14bec245e73a43a0706f39ca210",
   "artifacts/NA-14/tables/f2_drift_vs_g.csv": "2d82575553eaa79ce26fe05b9859470222255a81b0f030f53aa33d31e3e0551e",
@@ -149,7 +149,7 @@
   "artifacts/NA-14/tables/t13_shapley.csv": "a4fec4309891b7241386a7ce95059e736c2d4b87e7aa58cf6a5ccb0b43bb2992",
   "artifacts/NA-14/tables/t13_shapley.tex": "a1550093eeb16e25b3dcd3cb6683532cf89bd82bda5883cb0fc9f9ace5787f04",
   "artifacts/NA-14/tables/t14_model_comparison.csv": "1f09db3d94b5046e4ab761cd55bd32dccef063534d8ed4d2d0d2935adf63c0dd",
-  "artifacts/NA-14/tables/t14_model_comparison.tex": "db50c873a2e0dbb54b199fff787919bd33454e3b5f5c3135155c986687c2189e",
+  "artifacts/NA-14/tables/t14_model_comparison.tex": "1562769d6016855a7ab3b6aaf00fd000d37d65368689d48f8b578202640823a2",
   "artifacts/NA-14/tables/t15_calibration.csv": "c7fa83ab91049a6a328f397ebff93fe19fa9aa892b81ae08af04cebf55acefdc",
   "artifacts/NA-14/tables/t15_calibration.tex": "af82d956ef1b2f819c5c11ec7da4ed3e8f3cd7c8b2d50c79d17019a1b71c2dc1",
   "artifacts/NA-14/tables/t16_robustness.csv": "5f2017bd953fc130ea3fb542f57612ab4c2fd6a4d7192612b42c0e0853ca8485",
@@ -212,7 +212,7 @@
   "artifacts/NA-14/tables/t43_band_disclosure.csv": "ce108532ca82e063a29424137a518bd2bcd898657480546bc1326ea7c1b59d33",
   "artifacts/NA-14/tables/t43_band_disclosure.tex": "e12d1098b312bcd1131ce5b48fb984cb580d90b5d6f57608f15ba12b45bb9cd6",
   "artifacts/NA-14/tables/t4_secondary.csv": "c474f9c40628f2da101a9c92ed41aec9b53012837fed16bc7a15c81f6f5b3067",
-  "artifacts/NA-14/tables/t4_secondary.tex": "82a85b792d8d06683a77f8f231a7f4ab17a942f0104ce1ec3c96cedc03aeea31",
+  "artifacts/NA-14/tables/t4_secondary.tex": "dcf9e21de8d78aac3b20bb4c54edf064dec2823a9c1a61cfe125c0b0c07048f8",
   "artifacts/NA-14/tables/t5_heterogeneity.csv": "126066b207041c66d4e0b83cee5d8fec1bd6165a705e6578243e60c9562ba178",
   "artifacts/NA-14/tables/t5_heterogeneity.tex": "47f6534ae9b89ecbff2aee254e1c9797c374e0a8be1f0af08b42a0955fb1cb3d",
   "artifacts/NA-14/tables/t6_convergence_ladder.csv": "e2b1ff300300b610b187c12c5ea019d89e9fd13c69600306979245b296db7901",
@@ -227,7 +227,7 @@
   "artifacts/NA-14/tables/tab2_ic_by_target.tex": "0c64fcf6a252caa49d0af569ac7cab0c98d131e28a5c153181478d94fa66632a",
   "artifacts/NA-14/tables/tab3_over_under.tex": "3ff9137cc9cb3ce67ea1320f9331a6b62e18e852d357d4aea4bd77bd5361786a",
   "artifacts/NA-14/tables/tab4_convergence.tex": "d47eb43310574850d48370d71000917f76898c9dabbba0cb49efdf8678238d2a",
-  "artifacts/NA-14/tables/tab5_explaining_moves.tex": "6155e01bf1b0e3b15c41885e14e00e472a5b48da009e8a8eacb79c4722f83291",
+  "artifacts/NA-14/tables/tab5_explaining_moves.tex": "26e02ae86496ac496d73a6c2dca32dbcc153eeda8601d972dd29b0fb4c4b18b7",
   "artifacts/NA-14/tables/tab6_strategies.tex": "024743597f9df5c6c36db446aaa6b07b5025e497210ef82527e66e432b051821"
  }
 }

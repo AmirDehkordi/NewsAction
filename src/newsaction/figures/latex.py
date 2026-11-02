@@ -1046,7 +1046,7 @@ def main_explaining() -> Table:
             r"the post-reaction reading's explanation answer, which only d1-ultra gives; it reads the "
             r"realized move, so it is "
             r"not a "
-            r"prediction. H5 is the only secondary test that survives Benjamini--Hochberg ($q$ 0.10) for "
+            r"prediction. H5 is the only secondary test that survives Benjamini--Hochberg ($q = 0.10$) for "
             r"Laya-Fin. ---: not applicable (the first step has no increment; only d1-ultra answers the "
             r"explanation question; the share and Panel B have one value per model). $R^2$, $\Delta R^2$ and "
             r"the share in \% to two decimals; $p$ and $q$ to three.",
@@ -1297,7 +1297,7 @@ def _rule_label(row: Mapping[str, Any]) -> str:
 VIEWS: Final[tuple[View, ...]] = (
     View(
         "t14_model_comparison",
-        "Model comparison: every val-B IC with $z_{cc}$ that is positive falls on the test (Laya-Fin "
+        "Model comparison: every val-B IC with $z_{cc}$ that is clearly positive falls on the test (Laya-Fin "
         "{{t14_model_comparison/laya_fin/ic_val_b@f3}} to {{t14_model_comparison/laya_fin/ic_test@f3}}); the "
         "cost and the latency.",
         ("model",),
@@ -1565,6 +1565,9 @@ VIEWS: Final[tuple[View, ...]] = (
             "BH at $q = 0.10$ within each instrument; the pooled family adds d1-ultra's H6 and A3.4 to "
             "Laya-Fin's. The anchor's H7 is reported outside its family, so it has no $q$. Each test has "
             "either an SE or a 95\\% CI, as the frozen analysis reports it.",
+            "A3.4: the pre-registered regression of next-week persistence on the explanation answer. Empty "
+            "rows: H6 needs the tone and materiality answers and A3.4 the explanation answer, which the "
+            "trained models do not give; H7 compares a trained model with Laya zero-shot.",
             NOTE_ANCHOR,
             NOTE_API,
         ),

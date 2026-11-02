@@ -6,7 +6,7 @@
 
 fig1_validation_test:
   section: 1
-  title: Every validation IC that is positive falls on test
+  title: Every validation IC that is clearly positive falls on test
   caption: >-
     Daily IC of the pre-open news reading $\hat N$ with the close-to-close move $z_{cc}$, on (a) val-B and (b) the
     test period, on the same scale and one row per model, each with its 95% interval ($\pm$[[1.96]] Newey–West SE), for the instruments and the
