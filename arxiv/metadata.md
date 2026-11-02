@@ -3,8 +3,7 @@
 Fields for the arXiv submission form. The abstract is `arxiv/abstract.txt` (written by `make paper-text` from
 `paper/sections/abstract.tex`, so the two never differ). Items in [brackets] are placeholders the authors must fill.
 
-- **Title:** The Market Reads the News First: A Pre-Registered, Blinded Test of AI Decision Models on
-  Stock-Price Reactions
+- **Title:** Thinking Fast, Trading Late: System One Decision Models vs the Market
 - **Authors:** Amir Dehkordi (Independent Researcher), Alireza Kargarzadeh (TailState Intelligence Ltd),
   Nariman Khaledian (Independent Researcher), Navid Parvini (Zanista AI Ltd), Sid Ghatak (Increase Alpha, LLC),
   Arman Khaledian (Zanista AI Ltd)

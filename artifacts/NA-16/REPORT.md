@@ -56,10 +56,12 @@ Date: 2026-10-29 · Branch `feat/NA-16-paper` (main checkout, cut from main @ 83
 
 ## 3. The paper
 
-- **Title (chosen by the operator on 2026-11-02):** "The Market Reads the News First: A Pre-Registered, Blinded
-  Test of AI Decision Models on Stock-Price Reactions". It is the working title with "Blinded" in place of
-  "Look-Ahead-Free" in the subtitle (one hyphenated compound fewer before "Test", and a word readers know; the
-  main clause stays because the abstract and the conclusion end on it). **The alternatives offered were:**
+- **Title (chosen by the operator on 2026-11-02):** "Thinking Fast, Trading Late: System One Decision Models vs
+  the Market". The operator's own title, given after asking for a short one with decision models in it. It
+  replaced, later the same day, the first choice "The Market Reads the News First: A Pre-Registered, Blinded Test
+  of AI Decision Models on Stock-Price Reactions" (the working title with "Blinded" in place of "Look-Ahead-Free").
+  The abstract still ends on "The market reads the news first." The body does not use "System One" or "thinking
+  fast"; the title alone makes the allusion. **The alternatives offered for the first choice were:**
   1. "Priced at the Open: A Pre-Registered Test of Whether AI Decision Models Can Read Financial News Before the
      Market";
   2. "Clean Validation, Null Test: AI Decision Models, Financial News and Stock-Price Reactions in a
@@ -204,7 +206,9 @@ no longer names Kaggle or mentions the data-request ledger. `make paper-pdf` pas
 - **STOP conditions:** none fired (no spend, no lock read, no frozen file changed; the freeze hash is unchanged).
 - **Owner decisions:**
   1. The title (working title or one of the two alternatives). *Recommendation:* the working title.
-     *Decided 2026-11-02:* the working title, with "Blinded" in place of "Look-Ahead-Free" in the subtitle.
+     *Decided 2026-11-02:* the working title, with "Blinded" in place of "Look-Ahead-Free" in the subtitle;
+     later that day the operator replaced it with "Thinking Fast, Trading Late: System One Decision Models vs the
+     Market" (§3).
   2. A final pdflatex check in a TeX Live container before submission (pulls an image of several GB).
      *Recommendation:* yes, once, with the bundle described in `arxiv/metadata.md`. *Done 2026-11-02 (§15).*
   3. The AI-use statement's wording. *Recommendation:* keep a short statement; many venues ask for one.
@@ -266,7 +270,7 @@ peak RSS                          about 8.0 GB
 
 The operator asked for a review of the paper and approved a numbered list of changes; the decisions file
 (`docs/decisions/NA-16.md`, "Revision of 2026-11-02") records each change and why. Operator decisions: an arXiv +
-SSRN working paper; the title stays; the commercial models keep their short labels; the earlier paper's overlap
+SSRN working paper; the title stays (it changed later that day, §3); the commercial models keep their short labels; the earlier paper's overlap
 with the test period is left as it is. No number, definition, hypothesis or verdict changed; no API call, Kaggle
 run, FMP request or lock read; NA-14's generator and artifacts untouched.
 
