@@ -58,6 +58,16 @@ ENTRIES: Final = (
         "one file",
         "the bibliography arXiv needs (it does not run BibTeX)",
     ),
+    Entry(
+        "artifacts/NA-16/arxiv_source.tar.gz",
+        "`newsaction.paper.bundle` (`make paper-arxiv`)",
+        "`paper/main.tex`, `paper/sections/*.tex`, `paper/generated/{numbers.tex,main.bbl}`, "
+        "`paper/figures/design_timeline.tex`, the NA-14 figures and tables the sources name",
+        "deterministic gzip tar: `main.tex` (`\\pdfoutput=1` first, path macros into the bundle), "
+        "`main.bbl`, `sections/`, `generated/`, `figures/`, `tables/`",
+        "one file",
+        "the arXiv source upload; `make paper-arxiv-check` compiles it with pdflatex (TeX Live, Docker)",
+    ),
 )
 
 

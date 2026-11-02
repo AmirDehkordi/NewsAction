@@ -3,7 +3,7 @@ UV ?= $(shell command -v uv 2>/dev/null || echo $(HOME)/.local/bin/uv)
 RUN := $(UV) run --locked
 PY_DIRS := src tests scripts
 
-.PHONY: sync lint format type test manifest manifest-deep ledgers verify paper paper-preview paper-text paper-pdf
+.PHONY: sync lint format type test manifest manifest-deep ledgers verify paper paper-preview paper-text paper-pdf paper-arxiv paper-arxiv-check
 
 sync:            ## install the locked environment
 	$(UV) sync --locked
@@ -44,3 +44,9 @@ paper-text:      ## NA-16: write paper/generated/numbers.tex and arxiv/abstract.
 
 paper-pdf: paper-text  ## NA-16: compile paper/main.tex with tectonic (--keep-logs) and check the log and the PDF
 	$(RUN) python -m newsaction.paper.build
+
+paper-arxiv: paper-pdf  ## NA-16: write the arXiv source bundle artifacts/NA-16/arxiv_source.tar.gz and check it
+	$(RUN) python -m newsaction.paper.bundle
+
+paper-arxiv-check: paper-pdf  ## NA-16: the bundle, compiled with pdflatex in Docker's TeX Live (texlive/texlive)
+	$(RUN) python -m newsaction.paper.bundle --pdflatex
