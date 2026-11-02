@@ -1,4 +1,4 @@
-\begin{thebibliography}{66}
+\begin{thebibliography}{68}
 \providecommand{\natexlab}[1]{#1}
 \providecommand{\url}[1]{\texttt{#1}}
 \expandafter\ifx\csname urlstyle\endcsname\relax
@@ -20,6 +20,13 @@ Nicholas Barberis, Andrei Shleifer, and Robert Vishny.
   307--343, 1998.
 \newblock \doi{10.1016/S0304-405X(98)00027-0}.
 
+\bibitem[Barclay and Hendershott(2003)]{barclay2003}
+Michael~J. Barclay and Terrence Hendershott.
+\newblock Price discovery and trading after hours.
+\newblock \emph{Review of Financial Studies}, 16\penalty0 (4):\penalty0
+  1041--1073, 2003.
+\newblock \doi{10.1093/rfs/hhg030}.
+
 \bibitem[Barlow et~al.(1972)Barlow, Bartholomew, Bremner, and
   Brunk]{barlow1972}
 Richard~E. Barlow, D.~J. Bartholomew, J.~M. Bremner, and H.~D. Brunk.
@@ -36,6 +43,14 @@ Yoav Benjamini and Yosef Hochberg.
 \newblock \emph{Journal of the Royal Statistical Society: Series B
   (Methodological)}, 57\penalty0 (1):\penalty0 289--300, 1995.
 \newblock \doi{10.1111/j.2517-6161.1995.tb02031.x}.
+
+\bibitem[Berkman et~al.(2012)Berkman, Koch, Tuttle, and Zhang]{berkman2012}
+Henk Berkman, Paul~D. Koch, Laura Tuttle, and Ying~Jenny Zhang.
+\newblock Paying attention: Overnight returns and the hidden cost of buying at
+  the open.
+\newblock \emph{Journal of Financial and Quantitative Analysis}, 47\penalty0
+  (4):\penalty0 715--741, 2012.
+\newblock \doi{10.1017/S0022109012000270}.
 
 \bibitem[Bernard and Thomas(1989)]{bernard1989}
 Victor~L. Bernard and Jacob~K. Thomas.
@@ -202,12 +217,6 @@ Danny Halawi, Fred Zhang, Chen Yueh-Han, and Jacob Steinhardt.
 \newblock URL
   \url{https://proceedings.neurips.cc/paper_files/paper/2024/hash/5a5acfd0876c940d81619c1dc60e7748-Abstract-Conference.html}.
 
-\bibitem[Hansen et~al.(2011)Hansen, Lunde, and Nason]{hansen2011}
-Peter~R. Hansen, Asger Lunde, and James~M. Nason.
-\newblock The model confidence set.
-\newblock \emph{Econometrica}, 79\penalty0 (2):\penalty0 453--497, 2011.
-\newblock \doi{10.3982/ECTA5771}.
-
 \bibitem[Harvey(2017)]{harvey2017}
 Campbell~R. Harvey.
 \newblock Presidential address: The scientific outlook in financial economics.
@@ -372,6 +381,20 @@ Dong Lou, Christopher Polk, and Spyros Skouras.
   192--213, 2019.
 \newblock \doi{10.1016/j.jfineco.2019.03.011}.
 
+\bibitem[Ludwig et~al.(2026)Ludwig, Mullainathan, and Rambachan]{ludwig2026}
+Jens Ludwig, Sendhil Mullainathan, and Ashesh Rambachan.
+\newblock Large language models: An applied econometric framework.
+\newblock \emph{Annual Review of Economics}, 18\penalty0 (1):\penalty0
+  283--316, 2026.
+\newblock \doi{10.1146/annurev-economics-120925-105620}.
+\newblock Earlier versions: NBER Working Paper 33344 and arXiv:2412.07031.
+
+\bibitem[McLean and Pontiff(2016)]{mclean2016}
+R.~David McLean and Jeffrey Pontiff.
+\newblock Does academic research destroy stock return predictability?
+\newblock \emph{Journal of Finance}, 71\penalty0 (1):\penalty0 5--32, 2016.
+\newblock \doi{10.1111/jofi.12365}.
+
 \bibitem[Newey and West(1987)]{newey1987}
 Whitney~K. Newey and Kenneth~D. West.
 \newblock A simple, positive semi-definite, heteroskedasticity and
@@ -451,14 +474,6 @@ Philipp Schoenegger, Indre Tuminauskaite, Peter~S. Park, Rafael Valdece~Sousa
   rival human crowd accuracy.
 \newblock \emph{Science Advances}, 10\penalty0 (45):\penalty0 eadp1528, 2024.
 \newblock \doi{10.1126/sciadv.adp1528}.
-
-\bibitem[Shapley(1953)]{shapley1953}
-L.~S. Shapley.
-\newblock A value for {$n$}-person games.
-\newblock In Harold~William Kuhn and Albert~William Tucker, editors,
-  \emph{Contributions to the Theory of Games, Volume {II}}, number~28 in Annals
-  of Mathematics Studies, pages 307--318. Princeton University Press, 1953.
-\newblock \doi{10.1515/9781400881970-018}.
 
 \bibitem[Tetlock(2007)]{tetlock2007}
 Paul~C. Tetlock.

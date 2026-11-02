@@ -1,0 +1,102 @@
+% Figure 1 (fig:design), drawn in TikZ: (a) the study's calendar, (b) one trading session.
+% A hand-drawn schematic, ASCII only (arXiv compiles with pdflatex); \input by sections/design.tex inside its
+% figure environment, which holds the caption. The dated milestones it marks, with their sources, are listed in
+% design_timeline.csv. Colours are the chart chrome of NA-14's figures (newsaction.figures.style: ink, ink-2,
+% muted, band grey, grid grey); no series colour is used, because no model is shown. Texture marks the sealed
+% test period and a dashed outline the forward window, which has not been run.
+\definecolor{figink}{HTML}{0B0B0B}
+\definecolor{figinktwo}{HTML}{52514E}
+\definecolor{figmuted}{HTML}{898781}
+\definecolor{figband}{HTML}{D6D5CE}
+\definecolor{figgrid}{HTML}{E1E0D9}
+\begin{tikzpicture}[x=1cm, y=1cm, font=\scriptsize, line cap=butt,
+    axis/.style={draw=figinktwo, line width=0.5pt},
+    tick/.style={draw=figinktwo, line width=0.5pt},
+    lead/.style={draw=figmuted, line width=0.4pt},
+    lab/.style={text=figink, inner sep=1pt},
+    sub/.style={text=figinktwo, inner sep=1pt},
+    brk/.style={draw=figmuted, line width=0.5pt},
+    brace/.style={decorate, decoration={brace, mirror, amplitude=3pt}, draw=figinktwo, line width=0.5pt}]
+%
+% ======================= (a) the calendar =======================
+\node[anchor=west, font=\footnotesize, inner sep=0] at (0,2.75) {\textbf{(a)} The calendar};
+% Leader lines of the events first, so that the forward-test band covers the feet of the two inside it.
+% Days from 2026-09-10 at 0.075 cm a day, starting at x = 10.8.
+\draw[lead] (11.40,-0.12) -- (11.40,0.95);   % 2026-09-18: Laya released
+\node[lab, anchor=east] at (11.35,0.95) {Laya released (18 Sep)};
+\draw[figinktwo, line width=2pt] (13.20,-0.12) -- (13.50,-0.12);   % 2026-10-12 to 2026-10-16
+\draw[lead] (13.20,-0.12) -- (13.20,1.40);
+\node[lab, anchor=east] at (13.15,1.40) {commercial models released (12--16 Oct)};
+\draw[lead] (14.10,0.5) -- (14.10,1.85);      % 2026-10-24: pre-registration
+\node[lab, anchor=east] at (14.05,1.85) {pre-registration written (24 Oct)};
+\draw[lead] (14.40,0.5) -- (14.40,2.30);      % 2026-10-28: freeze, then unblinding
+\node[lab, anchor=east] at (14.35,2.30) {plan frozen, then test unblinded once (28 Oct)};
+% The sample: 0.4 cm a month from 2024-07-01; small gaps between adjacent periods.
+\fill[figband] (0.00,0) rectangle (4.78,0.5);
+\fill[figband] (4.82,0) rectangle (5.98,0.5);
+\fill[figband] (6.02,0) rectangle (7.18,0.5);
+\fill[white] (7.22,0) rectangle (10.0,0.5);
+\fill[pattern=north east lines, pattern color=figband] (7.22,0) rectangle (10.0,0.5);
+\draw[figinktwo, line width=0.5pt] (7.22,0) rectangle (10.0,0.5);
+\node[lab] at (2.39,0.25) {training};
+\node[lab] at (5.40,0.25) {val-A};
+\node[lab] at (6.60,0.25) {val-B};
+\node[lab, fill=white, inner sep=1.5pt] at (8.61,0.25) {test, sealed};
+% The forward-test window: news from 2026-10-22 on, for three months or more (not yet run).
+\fill[white] (13.95,0) rectangle (16.15,0.5);
+\draw[figinktwo, line width=0.5pt, dash pattern=on 2pt off 1.5pt] (16.15,0.5) -- (13.95,0.5) -- (13.95,0) -- (16.15,0);
+\draw[figinktwo, line width=0.5pt, -{Stealth[length=3.5pt]}] (16.0,0.25) -- (16.4,0.25);
+\node[lab] at (15.05,0.25) {forward test};
+% The time axis: months on the left, days on the right, with a break between them.
+\draw[axis] (0,-0.12) -- (10.0,-0.12);
+\draw[axis] (10.8,-0.12) -- (16.15,-0.12);
+\draw[brk] (10.27,-0.24) -- (10.37,0.0);
+\draw[brk] (10.43,-0.24) -- (10.53,0.0);
+\foreach \x in {0,2.4,4.8,7.2,9.6,12.375,14.70} \draw[tick] (\x,-0.12) -- (\x,-0.21);
+\node[sub, anchor=north west] at (0,-0.23) {Jul 2024};
+\node[sub, anchor=north] at (2.4,-0.23) {Jan 2025};
+\node[sub, anchor=north] at (4.8,-0.23) {Jul 2025};
+\node[sub, anchor=north] at (7.2,-0.23) {Jan 2026};
+\node[sub, anchor=north] at (9.6,-0.23) {Jul 2026};
+\node[sub, anchor=north] at (12.375,-0.23) {1 Oct 2026};
+\node[sub, anchor=north] at (14.70,-0.23) {1 Nov 2026};
+%
+% ======================= (b) one trading session =======================
+\node[anchor=west, font=\footnotesize, inner sep=0] at (0,-1.2) {\textbf{(b)} One trading session (not to scale)};
+\begin{scope}[yshift=-3.05cm]
+% The news a pre-open reading uses.
+\fill[figgrid] (0,0.92) rectangle (5.0,1.27);
+\node[lab] at (2.5,1.095) {news read at D0};
+\draw[lead] (5.0,0.92) -- (5.0,0.42);
+% Extended-hours trading, part of the overnight move.
+\fill[figband] (0,-0.07) rectangle (1.2,0.07);
+\fill[figband] (3.0,-0.07) rectangle (6.0,0.07);
+\node[sub, anchor=south west] at (0,0.1) {after-hours};
+\node[sub, anchor=south west] at (3.0,0.1) {pre-market};
+% The time axis, with breaks before the next day and before t+20.
+\draw[axis] (0,0) -- (10.4,0);
+\draw[axis] (10.7,0) -- (14.3,0);
+\draw[axis] (14.6,0) -- (16.0,0);
+\draw[brk] (10.47,-0.12) -- (10.57,0.12);
+\draw[brk] (14.37,-0.12) -- (14.47,0.12);
+\foreach \x in {0,3.0,5.0,6.0,7.2,10.0,11.0,13.3,15.6} \draw[tick] (\x,0) -- (\x,-0.1);
+\node[sub, anchor=north west, align=left] at (0,-0.14) {$C_{t-1}$\\16:00};
+\node[sub, anchor=north] at (3.0,-0.14) {04:00};
+\node[sub, anchor=north] at (5.0,-0.14) {09:15};
+\node[sub, anchor=north, align=center] at (6.0,-0.14) {$O_t$\\09:30};
+\node[sub, anchor=north] at (7.2,-0.14) {10:00};
+\node[sub, anchor=north, align=center] at (10.0,-0.14) {$C_t$\\16:00};
+\node[sub, anchor=north] at (11.0,-0.14) {$O_{t+1}$};
+\node[sub, anchor=north] at (13.3,-0.14) {$C_{t+5}$};
+\node[sub, anchor=north] at (15.6,-0.14) {$C_{t+20}$};
+% The decision points.
+\foreach \x/\d in {5.0/D0, 7.2/D1, 10.0/D2} {
+  \fill[figink] (\x,0) circle (0.07);
+  \node[lab, anchor=south, font=\scriptsize\bfseries] at (\x,0.12) {\d};
+}
+% The returns the readings are scored against.
+\draw[brace] (0,-0.86) -- (6.0,-0.86) node[midway, below=4pt, lab] {overnight move $z_{on}$};
+\draw[brace] (6.0,-0.86) -- (10.0,-0.86) node[midway, below=4pt, lab] {move after the open $z_{id}$};
+\draw[brace] (11.0,-0.86) -- (13.3,-0.86) node[midway, below=4pt, lab] {next week $y_2$};
+\end{scope}
+\end{tikzpicture}

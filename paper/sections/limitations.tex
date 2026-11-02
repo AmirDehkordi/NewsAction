@@ -1,20 +1,21 @@
 \section{Limitations and the forward test}\label{sec:limits}
 
 \paragraph{Limitations.} The sample is the S\&P 500, the largest and most closely followed US stocks; smaller
-stocks, where news may diffuse more slowly \citep{hong2000}, may behave differently. The horizon is daily, with
-one intraday decision point at 10:00 built from 30-minute bars whose first bar starts at the first trade, not at
-the opening auction. The test period is seven months long (\res{test-d0-sessions} sessions with D0 events), so
-small ICs are hard to detect, and the selection rested on two validation quarters of
-\res{valb-sessions} sessions each. The trained instruments were trained once, with one seed and one epoch, on a
-free GPU budget; the anchor learned the size of moves but not their direction and is uninformative, so the
-study says nothing about what fine-tuning adds. The commercial models failed the pre-registered screens and were
-released after the sample, so their results are model-specific and contamination cannot be ruled out. The
-vendor-label baselines rest on labels produced after the fact. Masking leaves small residues of names and dates,
-below half a percent of states. The strategies charge flat costs per side and model no borrow costs or market
-impact, and the hedge removes market risk only. Some pre-registered items were not run or not completed: three
-robustness variants that needed new model calls (a summary-text variant, vendor tags in the text and a 09:30
-news cutoff; the 08:00 cutoff is approximated), the second and third training seeds, and
-\res{ablation-failed} rate-limited requests of the ablations, which were not retried.
+stocks, where news may diffuse more slowly \citep{hong2000}, may behave differently. The horizon is daily, with one
+intraday decision point at 10:00 built from 30-minute bars whose first bar starts at the first trade, not at the
+opening auction. The analysis scores the pre-open readings against the whole overnight move and does not split it
+at the 09:15 reading, so it cannot say how much of that move happened before the reading. The test period is seven
+months long (\res{test-d0-sessions} sessions with D0 events), so small ICs are hard to detect, and the selection
+rested on two validation quarters of \res{valb-sessions} sessions each. The trained instruments were trained once,
+with one seed and one epoch; the anchor learned the size of moves but not their direction and is uninformative, so
+the study says nothing about what fine-tuning adds. The commercial models failed the pre-registered screens and
+were released after the sample, so contamination cannot be ruled out. The vendor-label baselines rest on labels
+produced after the fact. Masking leaves small residues of names and dates, below half a percent of states. The
+strategies charge flat costs per side and model no borrow costs or market impact, and the hedge removes market risk
+only. Some pre-registered items were not run or not completed: three robustness variants that needed new model
+calls (a summary-text variant, vendor tags in the text and a 09:30 news cutoff; the 08:00 cutoff is approximated),
+the second and third training seeds, and \res{ablation-failed} rate-limited requests of the ablations, which were
+not retried.
 
 \paragraph{The forward test.} The cleanest test of memorization uses news published after every model's
 release. Seven hypotheses for such a test were pre-registered on 2026-10-29, before any news from the forward

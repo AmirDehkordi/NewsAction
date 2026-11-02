@@ -1,0 +1,22 @@
+panel,item,start,end,source
+a,training period,2024-07-01,2025-06-30,configs/splits.yaml
+a,val-A (search and calibration),2025-07-01,2025-09-30,configs/splits.yaml
+a,val-B (confirmation and final selection),2025-10-01,2025-12-31,configs/splits.yaml
+a,test period (sealed until the freeze),2026-01-02,2026-07-31,configs/splits.yaml
+a,Laya released (open weights),2026-09-18,2026-09-18,artifacts/NA-14/tables/t21_release_dates.csv
+a,commercial models released (drex-v2.0 2026-10-12; d1-ultra 2026-10-15; span-02 2026-10-16),2026-10-12,2026-10-16,artifacts/NA-14/tables/t21_release_dates.csv
+a,pre-registration written,2026-10-24,2026-10-24,docs/PREREG.md
+a,analysis plan frozen (10:38 UTC),2026-10-28,2026-10-28,artifacts/NA-11/freeze.json (ts)
+a,test outcomes unblinded once (19:19 UTC),2026-10-28,2026-10-28,ledgers/test_access.jsonl; artifacts/NA-12/REPORT.md
+a,forward-test window (news from the first session after 2026-10-21; three months or more; not yet run),2026-10-22,,docs/PREREG.md section 15 (forward-test rows)
+b,previous close C_{t-1},16:00 ET (t-1),,newsaction.calendar
+b,after-hours trading,16:00 ET (t-1),20:00 ET (t-1),exchange extended hours
+b,pre-market trading,04:00 ET,09:30 ET,exchange extended hours
+b,D0 pre-open reading (news since the previous close),09:15 ET,,PREREG section 2
+b,open O_t (D0 trade entry),09:30 ET,,newsaction.calendar
+b,D1 reading after the first 30-minute bar (trade entry),10:00 ET,,PREREG section 15 (NA-10 rows)
+b,close C_t (D2 reading; its trade enters at the next open),16:00 ET,,newsaction.calendar
+b,overnight move z_on,C_{t-1},O_t,PREREG section 5.1
+b,move after the open z_id,O_t,C_t,PREREG section 5.1
+b,next week y_2,O_{t+1},C_{t+5},PREREG section 5
+b,convergence ladder (last rung),C_{t-1},C_{t+20},PREREG section 15 (A1)

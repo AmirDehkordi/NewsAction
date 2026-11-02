@@ -2,9 +2,9 @@
 
 - the committed macros and the arXiv abstract equal what the registry and NA-14's keys produce now;
 - the committed sources break no rule (ASCII, every macro registered and used, no hand-typed result number,
-  exploratory sentences labelled, an abstract of 180 to 250 words);
+  exploratory paragraphs labelled, an abstract of 180 to 250 words);
 - each check catches a planted violation: a typed number in text or math, an unknown or unused macro, an
-  unlabelled exploratory sentence, a non-ASCII character;
+  unlabelled exploratory paragraph, a non-ASCII character in a section or a figure source;
 - values render as ASCII LaTeX that works in text and in math;
 - the float-order check catches a figure numbered out of the order of its first mention, and one never cited.
 """
@@ -90,19 +90,34 @@ def test_unknown_and_unused_macros_are_reported(tmp_path: Path) -> None:
     assert "unused-name is not used by the text" in found
 
 
-def test_an_unlabelled_exploratory_sentence_and_a_non_ascii_line_are_reported(tmp_path: Path) -> None:
+def test_an_unlabelled_exploratory_paragraph_and_a_non_ascii_line_are_reported(tmp_path: Path) -> None:
     root = _copy(tmp_path)
     explo = root / nb.EXPLORATORY_TEX
     explo.write_text(
         explo.read_text(encoding="utf-8")
-        + "\nThe top decile moved \\res{sel-d1-on-10-test} typical moves.\n",
+        + "\n\nThe top decile moved \\res{sel-d1-on-10-test} typical moves.\n",
         encoding="utf-8",
     )
     concl = root / nb.SECTIONS / "conclusion.tex"
     concl.write_text(concl.read_text(encoding="utf-8") + "\nA caf\u00e9.\n", encoding="utf-8")
+    figure = root / nb.FIGURES / "design_timeline.tex"
+    figure.write_text(figure.read_text(encoding="utf-8") + "\n% caf\u00e9\n", encoding="utf-8")
     found = "\n".join(nb.problems(root))
-    assert "without 'exploratory' or 'post hoc'" in found
+    assert "a paragraph cites a number without 'exploratory' or 'post hoc'" in found
     assert "non-ASCII line conclusion.tex" in found
+    assert "non-ASCII line design_timeline.tex" in found
+
+
+def test_a_labelled_exploratory_paragraph_passes(tmp_path: Path) -> None:
+    root = _copy(tmp_path)
+    explo = root / nb.EXPLORATORY_TEX
+    explo.write_text(
+        explo.read_text(encoding="utf-8")
+        + "\n\nPost hoc, the top decile moved \\res{sel-d1-on-10-test} typical moves."
+        + " It moved \\res{sel-d1-on-all-test} on all events.\n",
+        encoding="utf-8",
+    )
+    assert nb.unlabelled_exploratory(explo.read_text(encoding="utf-8")) == []
 
 
 def test_an_allowlist_entry_needs_a_reason(tmp_path: Path) -> None:

@@ -16,7 +16,9 @@ LaTeX macro. ``\\res`` of a name the registry lacks stops the compile.
 - no hard-coded result number: after the macros, references, citations, file names and the phrases of
   ``paper/allowlist.yaml`` (dates, section numbers, design constants, each with its reason) are removed, no
   token with a digit may remain unless an allowlist pattern matches it;
-- every sentence of the exploratory section that cites a number says "exploratory" or "post hoc";
+- every paragraph of the exploratory section that cites a number says "exploratory" or "post hoc" (the
+  section title says so too, so a paragraph-level label keeps every number visibly post hoc without
+  repeating the label in each sentence);
 - ``arxiv/abstract.txt`` is the abstract in plain text, 180 to 250 words.
 
 Nothing here reads data, calls an API or imports the lock: only the committed NA-14 keys.
@@ -45,6 +47,7 @@ MAIN: Final = f"{PAPER}/main.tex"
 SECTIONS: Final = f"{PAPER}/sections"
 ABSTRACT_TEX: Final = f"{SECTIONS}/abstract.tex"
 EXPLORATORY_TEX: Final = f"{SECTIONS}/exploratory.tex"
+FIGURES: Final = f"{PAPER}/figures"  # hand-drawn figure sources (TikZ), ASCII-checked but not number-scanned
 ARXIV: Final = "arxiv"
 ABSTRACT_TXT: Final = f"{ARXIV}/abstract.txt"
 KEYS: Final = "artifacts/NA-14/tables/keys.json"
@@ -256,20 +259,18 @@ def non_ascii(paths: Iterable[Path]) -> list[str]:
     return out
 
 
-_SENTENCE: Final = re.compile(r"(?<=[.!?])\s+(?=[A-Z\\])")
-
-
 def unlabelled_exploratory(tex: str) -> list[str]:
-    """Sentences of the exploratory section that cite a number without saying "exploratory" or "post hoc"."""
+    """Paragraphs of the exploratory section that cite a number without saying "exploratory" or "post hoc"
+    anywhere in the paragraph (figure environments carry their own label in the caption)."""
     text = body(tex)
     out = []
     for para in re.split(r"\n\s*\n", text):
         if "\\begin{figure}" in para:
             continue
-        for sentence in _SENTENCE.split(" ".join(para.split())):
-            low = sentence.lower()
-            if RES.search(sentence) and "exploratory" not in low and "post hoc" not in low:
-                out.append(sentence[:100])
+        flat = " ".join(para.split())
+        low = flat.lower()
+        if RES.search(flat) and "exploratory" not in low and "post hoc" not in low:
+            out.append(flat[:100])
     return out
 
 
@@ -295,6 +296,7 @@ def problems(root: Path) -> list[str]:
             )
     ascii_files = [
         *sources,
+        *sorted((root / FIGURES).glob("*.tex")),
         *sorted((root / PAPER).glob("*.bib")),
         *sorted((root / PAPER).glob("*.yaml")),
         *sorted(p for p in (root / ARXIV).glob("*") if p.suffix in (".txt", ".md", ".tex")),
@@ -305,7 +307,7 @@ def problems(root: Path) -> list[str]:
     explo = root / EXPLORATORY_TEX
     if explo.is_file():
         for s in unlabelled_exploratory(explo.read_text(encoding="utf-8")):
-            out.append(f"{explo.name}: a sentence cites a number without 'exploratory' or 'post hoc': {s!r}")
+            out.append(f"{explo.name}: a paragraph cites a number without 'exploratory' or 'post hoc': {s!r}")
     n = words(abstract_text(root))
     if not ABSTRACT_WORDS[0] <= n <= ABSTRACT_WORDS[1]:
         out.append(f"the abstract has {n} words (expected {ABSTRACT_WORDS[0]} to {ABSTRACT_WORDS[1]})")

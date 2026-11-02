@@ -10,9 +10,6 @@ phrases:
   - {text: "span-02", why: "model name"}
   - {text: "drex-v2.0", why: "model name"}
   - {text: "SHA-256", why: "hash function name"}
-  - {text: "T4 GPUs", why: "GPU model name"}
-  - {text: "cs.AI", why: "arXiv category"}
-  - {text: "q-fin.ST", why: "arXiv category"}
   - {text: "G14, G12, C45, C52, C12", why: "JEL codes"}
   # --- the design: universe, tiers, splits (pre-registration sections 3 and 4)
   - {text: "the 100 largest, ranks 101--250 and ranks 251--500", why: "size tiers"}
@@ -36,14 +33,9 @@ phrases:
   - {text: "15 equal-width bins", why: "ECE bins"}
   - {text: "15 bins", why: "ECE bins"}
   # --- selection and screens (section 8)
-  - {text: "700 states", why: "tournament stage 1 sample"}
-  - {text: "3,000 states", why: "tournament stage 2 sample"}
-  - {text: "40\\% or less, against 25\\% by\nchance", why: "screen threshold and chance"}
-  - {text: "70\\% or more", why: "screen threshold"}
   - {text: "40\\%", why: "screen threshold"}
   - {text: "30\\% of covered company-days", why: "filter budget"}
   - {text: "2,000-event", why: "LLM baseline subsample"}
-  - {text: "one seed (13)", why: "training seed"}
   - {text: "seeds 17 and 23", why: "robustness seeds"}
   # --- inference (section 11)
   - {text: "10,000 draws", why: "bootstrap draws"}
@@ -68,10 +60,7 @@ phrases:
   - {text: "90th percentile", why: "placebo threshold"}
   - {text: "70th percentile", why: "frozen confidence gate"}
   - {text: "top 10\\%", why: "conviction decile"}
-  - {text: "10~basis points", why: "cost level"}
   # --- the exploratory overlay and the forward test
-  - {text: "20- and 50-day averages", why: "moving-average windows"}
-  - {text: "the 20- and 50-day averages", why: "moving-average windows"}
   - {text: "within 20 trading days", why: "the ladder's last rung, t+20"}
   - {text: "within 20 sessions", why: "the ladder's last rung, t+20"}
   - {text: "0.5 to 2 typical days", why: "bin edges of the size of the move"}
@@ -79,7 +68,6 @@ phrases:
   - {text: "30-minute bars", why: "intraday bar length"}
   - {text: "60-session volatility", why: "robustness variant"}
   - {text: "first half-hour bar", why: "intraday bar"}
-  - {text: "\\$30", why: "API budget cap"}
 patterns:
   - {re: "(19|20)\\d\\d", why: "a year"}
   - {re: "20\\d\\d-\\d\\d-\\d\\d", why: "a date"}

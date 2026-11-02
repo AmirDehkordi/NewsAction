@@ -4422,7 +4422,7 @@ sha256 on a rerun (labels and export were run twice: 8 of 8 files identical).
 - **Key:** the registry name
 - **Rows / coverage:** every result number the manuscript prints, rendered from NA-14's table keys
 - **Availability:** after NA-14 (every number is a cell of NA-14's committed tables; nothing here reads the lock)
-- **sha256:** `e124fc6d90e4d8bac1d007334c7fe117c4f0a7a63bbfd047c1dea117bb4db992`
+- **sha256:** `193a1e3b99722f471648a1ef849200a24cbc7feb724f3926b54d1d76e8177238`
 
 ### `arxiv/abstract.txt`
 - **Producer:** `newsaction.paper.numbers` (`make paper-text`)
@@ -4431,7 +4431,7 @@ sha256 on a rerun (labels and export were run twice: 8 of 8 files identical).
 - **Key:** one file
 - **Rows / coverage:** the abstract for arXiv's abstract field (180 to 250 words), its numbers resolved
 - **Availability:** after NA-14 (every number is a cell of NA-14's committed tables; nothing here reads the lock)
-- **sha256:** `a8f0a08a3a307e3e1915c253725a4e12c8c7c6d680e8141189d47e9c146b4f68`
+- **sha256:** `1219ed718c0591b9babb373f6f697e6c99b86c06cc261bf0c87a24624b267c28`
 
 ### `paper/generated/main.bbl`
 - **Producer:** `newsaction.paper.build` (`make paper-pdf`: tectonic's BibTeX on `paper/references.bib`)
@@ -4440,4 +4440,4 @@ sha256 on a rerun (labels and export were run twice: 8 of 8 files identical).
 - **Key:** one file
 - **Rows / coverage:** the bibliography arXiv needs (it does not run BibTeX)
 - **Availability:** after NA-14 (every number is a cell of NA-14's committed tables; nothing here reads the lock)
-- **sha256:** `1efdbaab22f5f72acbe9da1c4428d4bb3cae60dab81d37a1fcc98d920c522ca6`
+- **sha256:** `a34389ce53fd6cb318070ffda43bae95351997db76b8b6e294beb00e1762697e`

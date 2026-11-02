@@ -33,13 +33,15 @@ states in which each model names the company among four candidates, sorted, with
 against the matched baseline (a guess that uses no reading; solid line) and the pre-registered screening
 threshold (40\%; dashed line). The three commercial models carried to the test are in the comparator colour,
 the other commercial models and Laya zero-shot in gray. Every model was released after the sample ended.
-Identifying a company is not the same as remembering its returns. $^{\ddagger}$span-02: see
-Figure~\ref{fig:validation-test}.}\label{fig:memorization}
+Identifying a company is not the same as remembering its returns. $^{\ddagger}$See
+Appendix~\ref{app:prereg}.}\label{fig:memorization}
 \end{figure}
 
-Recognition is not the same as remembering returns, and two results suggest that it did not drive the
-commercial models' signal: unmasking the states does not raise d1-ultra's IC (Section~\ref{sec:priced}), and
-their ICs fell from validation to test as the other signals' did, which is not what an advantage from having
-seen the test period would produce. Neither is a test of memorization. The result is, however, a warning for
+Recognition is not the same as remembering returns, and three results suggest that it did not drive the
+commercial models' overnight signal. The open-weights Laya model, which recognizes masked companies barely more
+often than the baseline, shows the same split between the overnight move and the move after the open
+(Section~\ref{sec:priced}); unmasking the states does not raise d1-ultra's IC; and the commercial models' ICs fell
+from validation to test as the other signals' did, which is not what an advantage from having seen the test
+period would produce. None of the three is a test of memorization. The result is, however, a warning for
 backtests of language models on historical news: masking hides names, not companies. The pre-registered forward
 test (Section~\ref{sec:limits}) asks the question directly, on news published after the models were released.

@@ -19,8 +19,8 @@ Date: 2026-10-29 · Branch `feat/NA-16-paper` (main checkout, cut from main @ 83
   without "Call A/Call B", the deviations table by stage. `make paper` reproduces every digest; `make
   paper-preview` passes.
 - **`make verify`** exit 0: 2,208 passed, 3 skipped, 2 xfailed; manifest OK (487 artifacts); ledgers unchanged.
-- **Open:** affiliations, e-mail, the data and code statement and URL, the title choice, the AI-use statement,
-  and a final pdflatex check (Docker's TeX Live image) that needs your approval before any image is pulled.
+- **Open:** the title choice and a final pdflatex check (Docker's TeX Live image) that needs your approval before
+  any image is pulled.
 
 ## 1. Scope
 
@@ -63,7 +63,11 @@ Date: 2026-10-29 · Branch `feat/NA-16-paper` (main checkout, cut from main @ 83
   2. "Clean Validation, Null Test: AI Decision Models, Financial News and Stock-Price Reactions in a
      Pre-Registered, Look-Ahead-Free Design".
 - **Authors** (operator, 2026-10-29: these three for now): Amir Dehkordi (corresponding), Arman Khaledian,
-  Nariman Khaledian; affiliations and e-mail are red placeholders.
+  Nariman Khaledian. On 2026-11-02 the operator set the final list: Amir Dehkordi (corresponding; Independent
+  Researcher, London, United Kingdom), then the five authors of Kargarzadeh et al. (arXiv 2608.14014v2) in that
+  paper's order and with its affiliations and e-mails: Alireza Kargarzadeh (TailState Intelligence Ltd, London),
+  Nariman Khaledian (Independent Researcher, Antibes), Navid Parvini (Zanista AI Ltd, London), Sid Ghatak
+  (Increase Alpha, LLC, Miami), Arman Khaledian (Zanista AI Ltd, London).
 - **Abstract:** 221 words, from the prompt's draft with every number checked and four edits: "return
   probabilities" (not "calibrated probabilities", since the commercial models are overconfident); "where the
   models predict anything, it is the overnight gap" (Laya-Fin's test ICs are small on both sides); "survives
@@ -163,7 +167,7 @@ paper (arXiv 2608.14014, v2) is summarized from its verified abstract.
 ## 8. Build and the look at every page
 
 `make paper-text` then `make paper-pdf` (about 30 s). The build copies `main.bbl` to `paper/generated/` for arXiv.
-PDF sha256 `393c734cf8fce69025025e704b3cc04902bf8c6c74c0b46c3c27607126030d72` (after §13's changes) (tectonic's bundle decides the bytes; reported, not enforced). Every page was rendered at
+PDF sha256 `6139e5f09220ceb3908de64b9f31c98830ec660ef26cd30a4bc1de314992def5` (after §13's changes) (tectonic's bundle decides the bytes; reported, not enforced). Every page was rendered at
 72 and 115 dpi and inspected. Fixes made from the look: the two title footnote marks overlapped (now separated);
 an inline list of level midpoints ran into the margin (now a display); "Key findings" sat alone at a page foot
 (`needspace`); three tables sat alone on half-empty float pages (float fractions loosened); the notation table
@@ -182,10 +186,12 @@ a TeX Live image (for example Docker's `texlive/texlive`); the prompt asks for y
 
 ## 10. Open placeholders
 
-Affiliations of the three authors; the corresponding author's e-mail; the data and code statement
-and the replication-package URL (title footnote, Appendix F, `arxiv/metadata.md`, `CITATION.cff`); the data
-availability statement; acknowledgments, funding and conflicts; the AI-use statement (suggested wording in the
-paper, to confirm); the license and the arXiv identifier (`CITATION.cff`); the title choice (§3).
+The license and the arXiv identifier (`CITATION.cff`); the title choice (§3).
+
+Filled on 2026-11-02 at the operator's direction: the six authors' affiliations and e-mails; the code URL
+(https://github.com/AmirDehkordi/NewsAction) and the statement that the data are private; acknowledgments,
+funding, competing interests (operator's wording) and the AI-use statement. At the operator's request the paper
+no longer names Kaggle or mentions the data-request ledger. `make paper-pdf` passes; the paper is now 42 pages.
 
 ## 11. Spend, look-ahead, deviations, STOPs, owner decisions
 
@@ -235,7 +241,8 @@ peak RSS                          about 8.0 GB
   Figure 2 (a) overnight, (b) after the open, (c) H1. The plotted numbers are unchanged; only the CSVs' `panel`
   column changed (Figure 1: val-B a, test b; Figure 2: z_on a, z_id b, H1 c). Captions in
   `artifacts/NA-14/captions.yaml` and the manuscript no longer say "hollow" or "filled".
-- **Authors:** Amir Dehkordi, Arman Khaledian and Nariman Khaledian, for now (`paper/main.tex`, `CITATION.cff`,
+- **Authors:** Amir Dehkordi, Alireza Kargarzadeh, Nariman Khaledian, Navid Parvini, Sid Ghatak and Arman
+  Khaledian, with affiliations and e-mails (operator, 2026-11-02; `paper/main.tex`, `CITATION.cff`,
   `arxiv/metadata.md`).
 - **Findability:** keywords widened (LLMs, stock return prediction, data contamination, backtest overfitting,
   deflated Sharpe ratio, overnight returns, calibration) in the paper, the PDF metadata, `arxiv/metadata.md` and
@@ -244,3 +251,42 @@ peak RSS                          about 8.0 GB
 - Rebuilt: `make paper` (all digests equal after `--write-digests`), `figures.contract`, the two figure-CSV
   digests in `docs/REPLICATION.md`, `make paper-preview`, `make paper-pdf` (0 errors, 0 overfull, 41 pages),
   `paper.contract`; `make verify` exit 0 (2,208 passed, 3 skipped, 2 xfailed; manifest and ledgers OK).
+- **The protocol is named OLIVIA** (operator, 2026-11-02), after the initials of its six parts: one-time
+  unblinding, look-ahead-free states, identity masking, validation-only selection, an immutable plan and an
+  audit trail. The name is in the abstract (228 words), the contributions paragraph, the opening of Section 3
+  and the conclusion. No number or claim changed, and no definition of the pre-registration. Rebuilt:
+  `make paper-text` (0 problems), `paper.contract`, `make paper-pdf` (0 errors, 0 overfull, 42 pages);
+  `make verify` exit 0 (2,210 passed, 3 skipped, 2 xfailed; manifest and ledgers OK).
+
+## 14. Revision of 2026-11-02: tighter and more citable
+
+The operator asked for a review of the paper and approved a numbered list of changes; the decisions file
+(`docs/decisions/NA-16.md`, "Revision of 2026-11-02") records each change and why. Operator decisions: an arXiv +
+SSRN working paper; the title stays; the commercial models keep their short labels; the earlier paper's overlap
+with the test period is left as it is. No number, definition, hypothesis or verdict changed; no API call, Kaggle
+run, FMP request or lock read; NA-14's generator and artifacts untouched.
+
+| Measure | Before | After |
+|---|---|---|
+| Pages (main text, appendix) | 42 (24, 13) | 40 (23, 12) |
+| Result numbers cited in the main-text prose and captions | 342 | 177 |
+| "model-specific" in the sources | 15 | 3 |
+| Registry macros / allowlist phrases | 270 / 69 | 149 / 57 |
+| Main-text source words (with the new Table 1 and Figure 1) | about 10,900 | 9,976 |
+| Figures / tables | 11 / 12 | 12 / 12 (new Figure 1 and Table 1; Table A1, the 66 deviations, out; Table 4 to the appendix as Table A5) |
+| References (all cited) | 66 | 68 (four added and verified on Crossref; two no longer cited removed) |
+
+- **New:** Table 1, the OLIVIA checklist; Figure 1, a TikZ schematic of the calendar and one trading session
+  (`paper/figures/design_timeline.tex`, milestones and sources in `design_timeline.csv`); Appendix D.1 (the
+  errors-in-variables reading of the ladder and gap closure, moved from Section 6); an SSRN block in
+  `arxiv/metadata.md`.
+- **Build rules:** the exploratory-label check is per paragraph (mutation-tested: the planted unlabelled paragraph
+  is caught, and the test fails when the guard is removed); the ASCII check covers `paper/figures/*.tex`.
+- **Checks:** `make paper-text` 0 problems (149 numbers, abstract 222 words); `make paper-pdf` 0 errors, 0 overfull
+  boxes, 0 undefined references, float order OK, 40 pages, every font embedded; every page rendered (PDFKit) and
+  looked at; `make paper` "all equal" (127 outputs, 52 figures; ledgers unchanged); `paper.contract` (3 NA-16
+  artifacts re-registered); `make verify` exit 0 (ruff and format clean, mypy --strict clean on 183 files, 2,211
+  passed, 3 skipped, 2 xfailed; manifest OK, 487 artifacts; ledgers OK, trials 1,620, test access 29).
+- **Open for the operator:** moving four floats that repeat a neighbour to the appendix (Tables 3 and 5,
+  Figure 8 and the exploratory Figure 9) would take the main text to about 21 pages; it was not in the approved
+  list.

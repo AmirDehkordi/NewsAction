@@ -29,13 +29,15 @@
 \usepackage{needspace}
 \usepackage{placeins}
 \usepackage{xcolor}
+\usepackage{tikz}
+\usetikzlibrary{arrows.meta,decorations.pathreplacing,patterns}
 \usepackage[round,authoryear]{natbib}
 \usepackage{microtype}
 \usepackage[hyperfootnotes=false]{hyperref}
 \hypersetup{
   pdftitle={The Market Reads the News First: A Pre-Registered, Look-Ahead-Free Test of AI Decision Models
     on Stock-Price Reactions},
-  pdfauthor={Amir Dehkordi, Arman Khaledian, Nariman Khaledian},
+  pdfauthor={Amir Dehkordi, Alireza Kargarzadeh, Nariman Khaledian, Navid Parvini, Sid Ghatak, Arman Khaledian},
   pdfsubject={Large language models and AI decision models on financial news: a pre-registered,
     look-ahead-free test of stock-price reactions},
   pdfkeywords={large language models (LLMs); AI decision models; stock return prediction; financial news;
@@ -76,16 +78,29 @@
 % A visible marker for what the authors must still provide.
 \newcommand{\placeholder}[1]{\textcolor{red}{\textbf{[#1]}}}
 
+% Under an author's name on the title page: \authorinfo{affiliation}{place}{e-mail}. \authorrow starts a new row
+% of authors (\and continues the row).
+\newcommand{\authorinfo}[3]{\\{\small #1}\\{\small #2}\\{\small\href{mailto:#3}{#3}}}
+\newcommand{\authorrow}{\end{tabular}\par\vskip 1em\begin{tabular}[t]{c}}
+
 \title{The Market Reads the News First: A Pre-Registered, Look-Ahead-Free Test of AI Decision Models on
   Stock-Price Reactions%
-  \thanks{Intended arXiv categories: cs.AI (primary); cross-lists q-fin.ST, cs.LG and cs.CL.}%
-  \textsuperscript{,}\thanks{Data and code availability: \placeholder{data and code statement and the URL of the replication
-  package, to be provided by the authors}.}}
+  \thanks{Code availability: \url{https://github.com/AmirDehkordi/NewsAction}. The data are private
+  and are not redistributed (Appendix~\ref{app:replication}).}}
 \author{%
-  Amir Dehkordi\thanks{Corresponding author. \placeholder{affiliation and e-mail address to be provided}}
-  \and Arman Khaledian\thanks{\placeholder{affiliation to be provided}}
-  \and Nariman Khaledian\thanks{\placeholder{affiliation to be provided}}}
-\date{October 2026}
+  Amir Dehkordi\thanks{Corresponding author.}%
+  \authorinfo{Independent Researcher}{London, United Kingdom}{amir.dehkordi98@gmail.com}
+  \and Alireza Kargarzadeh%
+  \authorinfo{TailState Intelligence Ltd}{London, United Kingdom}{alireza.kargarzadeh@tailstate.ai}
+  \and Nariman Khaledian%
+  \authorinfo{Independent Researcher}{Antibes, France}{nariman.khaledian@gmail.com}
+  \authorrow Navid Parvini%
+  \authorinfo{Zanista AI Ltd}{London, United Kingdom}{navid.parvini@zanista.ai}
+  \and Sid Ghatak%
+  \authorinfo{Increase Alpha, LLC}{Miami, United States}{s.ghatak@increasealpha.com}
+  \and Arman Khaledian%
+  \authorinfo{Zanista AI Ltd}{London, United Kingdom}{arman.khaledian@zanista.ai}}
+\date{November 2026}
 
 \begin{document}
 
@@ -96,9 +111,8 @@
 \noindent\input{sections/abstract}
 \end{abstract}
 
-\noindent\textbf{Keywords:} large language models (LLMs); AI decision models; stock return prediction;
-financial news; look-ahead bias; memorization; data contamination; backtest overfitting; deflated Sharpe ratio;
-pre-registration; overnight returns; market efficiency; overreaction and underreaction; calibration.
+\noindent\textbf{Keywords:} large language models (LLMs); financial news; stock return prediction; look-ahead
+bias; memorization; pre-registration; overnight returns; market efficiency.
 
 \medskip
 \noindent\textbf{JEL codes:} G14, G12, C45, C52, C12.
