@@ -1,4 +1,7 @@
-# arXiv submission metadata (draft)
+# arXiv submission metadata
+
+**Published:** arXiv:2611.03985 [cs.AI] (cross-lists cs.CL, cs.LG, q-fin.ST), v1 submitted 2 November 2026,
+https://arxiv.org/abs/2611.03985, DOI 10.48550/arXiv.2611.03985. arXiv compiled the committed bundle (sha256 b99cc9da...).
 
 Fields for the arXiv submission form. The abstract is `arxiv/abstract.txt` (written by `make paper-text` from
 `paper/sections/abstract.tex`, so the two never differ). Items in [brackets] are placeholders the authors must fill.
@@ -37,8 +40,8 @@ build; update them if the paper changes.
 
 ## SSRN submission (ready to paste)
 
-SSRN's form takes the same title, authors and abstract as arXiv. Post the arXiv PDF once arXiv has assigned its
-identifier, so that the SSRN record can cite it.
+SSRN's form takes the same title, authors and abstract as arXiv. Post the arXiv PDF
+(https://arxiv.org/pdf/2611.03985v1) and link the arXiv page, so that the SSRN record cites it.
 
 - **Title:** as above.
 - **Abstract:** `arxiv/abstract.txt` (222 words, plain text).
@@ -46,4 +49,4 @@ identifier, so that the SSRN record can cite it.
   pre-registration; overnight returns; market efficiency
 - **JEL classification:** G14, G12, C45, C52, C12
 - **Date written:** November 2026
-- **Paper link:** the arXiv abstract page, once assigned; code at https://github.com/AmirDehkordi/NewsAction
+- **Paper link:** https://arxiv.org/abs/2611.03985 (DOI 10.48550/arXiv.2611.03985); code at https://github.com/AmirDehkordi/NewsAction

@@ -9,7 +9,8 @@ reaction is visible, judge whether the market over- or under-reacted?
 - Work plan, chunks NA-00 … NA-15 with power and verification prompts: [`NewsAction PRD.md`](NewsAction%20PRD.md)
 - Every derived file and its sha256: [`docs/DATA_CONTRACT.md`](docs/DATA_CONTRACT.md)
 - Per-chunk decisions and self-audits: `docs/decisions/NA-xx.md`, `artifacts/NA-xx/REPORT.md`
-- The paper: sources in [`paper/`](paper), the PDF at
+- The paper: [arXiv:2611.03985](https://arxiv.org/abs/2611.03985) (DOI [10.48550/arXiv.2611.03985](https://doi.org/10.48550/arXiv.2611.03985)); sources in
+  [`paper/`](paper), the PDF at
   [`artifacts/NA-16/paper.pdf`](artifacts/NA-16/paper.pdf), the arXiv source bundle at
   `artifacts/NA-16/arxiv_source.tar.gz`
 - License: MIT for the code ([`LICENSE`](LICENSE)); the data are not included

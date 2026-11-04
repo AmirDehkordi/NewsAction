@@ -351,3 +351,16 @@ request or lock read.
      if the submitter has not posted there before (an author of arXiv 2608.14014 can endorse), the metadata from
      `arxiv/metadata.md`; then check arXiv's compiled preview before submitting.
   5. After arXiv assigns the identifier: `CITATION.cff` and the SSRN posting (`arxiv/metadata.md`).
+
+## 16. Publication (2026-11-04)
+
+- **arXiv:2611.03985v1** [cs.AI; cross-lists cs.CL, cs.LG, q-fin.ST], "Thinking Fast, Trading Late: System One Decision
+  Models vs the Market", six authors, submitted 2 November 2026; https://arxiv.org/abs/2611.03985; DOI 10.48550/arXiv.2611.03985
+  (DataCite, findable). arXiv compiled the committed bundle (sha256 b99cc9da...) with pdflatex on TeX Live 2023:
+  40 pages, no error, no overfull or underfull box.
+- arXiv's file check had marked every figure and table for deletion (it does not expand `\figdir` and `\tabdir`);
+  "Keep All" cleared it. Moderation put the submission on hold once, because the account's earlier arXiv paper
+  carries the submitter's other name form; the submitter keeps "Amir Dehkordi" (the account's first and last name
+  fields already said so) and resubmitted the same submission.
+- Recorded: `CITATION.cff` (preferred citation: arXiv preprint, DOI, URL), the README and `arxiv/metadata.md`.
+- Still open: the SSRN posting (`arxiv/metadata.md`), Zanista's answer on the masked text in git history.
