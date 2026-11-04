@@ -364,6 +364,6 @@ request or lock read.
   fields already said so) and resubmitted the same submission.
 - Recorded: `CITATION.cff` (preferred citation: arXiv preprint, DOI, URL), the README and `arxiv/metadata.md`.
 - The README was rewritten for readers who come from the paper: findings, Figures 1 to 3, the OLIVIA safeguards
-  with the code that enforces each, the replication commands, the stages and a BibTeX entry. The operator's sections
+  with the code that enforces each, the replication commands and a BibTeX entry. The operator's sections
   are kept and collapsed. `docs/assets/design.png` is Figure 1 cropped from `artifacts/NA-16/paper.pdf`.
 - Still open: the SSRN posting (`arxiv/metadata.md`), Zanista's answer on the masked text in git history.

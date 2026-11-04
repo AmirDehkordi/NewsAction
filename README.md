@@ -177,49 +177,6 @@ traces every number to its source and lists the expected digests.
 | `make paper`, `make paper-text`, `make paper-pdf` | `python -m newsaction.figures.paper --write-digests` (recording new digests needs every input) |
 | `make paper-arxiv`, `make paper-arxiv-check` (the arXiv bundle compiled with pdflatex in Docker's TeX Live 2023, as arXiv compiles it) | Any stage run and any decision-model API call |
 
-## How the study was built
-
-The study is organized in 18 stages ("chunks"). The work plan, [`NewsAction PRD.md`](NewsAction%20PRD.md), gives
-each planned chunk (NA-00 to NA-15) a **power prompt**, which builds and runs it in a fresh AI coding session, and a
-**verification prompt**, which checks it in a separate, independent session: one that is read-only, works from the
-response cache, spends nothing and mutates each guard to confirm that its test fails. NA-13b and NA-16 were added
-along the way. Each chunk that has run has its own branch, report and decision log, and
-[`CLAUDE.md`](CLAUDE.md) holds the rules every session followed. In the paper's words: "An AI coding and
-research assistant (Claude, by Anthropic, used through Claude Code) implemented and ran the pre-registered pipeline
-under the authors' direction and drafted this manuscript from the verified outputs. The authors take full
-responsibility for the content."
-
-| Stage | What it did |
-|---|---|
-| [NA-00](artifacts/NA-00/REPORT.md) | Repository scaffold; time, blinding and ledger primitives; pre-registration v0 |
-| [NA-01](artifacts/NA-01/REPORT.md) | Point-in-time S&P 500 universe, adjusted daily panel and size tiers; 2026 prices sealed |
-| [NA-02](artifacts/NA-02/REPORT.md) | News timing audit, symbol mapping, cleaning, re-embedding and point-in-time novelty |
-| [NA-03](artifacts/NA-03/REPORT.md) | Importance filters, the material label and events |
-| [NA-04](artifacts/NA-04/REPORT.md) | Model states: context, the numbers-as-words codebook, masking and the question battery |
-| [NA-05](artifacts/NA-05/REPORT.md) | The decision-model client: cache, budget guard, model catalog, canary set, local Laya and a pilot |
-| [NA-06](artifacts/NA-06/REPORT.md) | Zero-shot decision-model tournament and contamination probes |
-| [NA-07](artifacts/NA-07/REPORT.md) | Encoding ("numbers as words") and anchoring study |
-| [NA-08](artifacts/NA-08/REPORT.md) | Laya-Fin and the ModernBERT anchor, trained on Kaggle's free 2×T4 GPUs |
-| [NA-09](artifacts/NA-09/REPORT.md) | Baselines, including a generative LLM at matched cost |
-| [NA-10](artifacts/NA-10/REPORT.md) | 30-minute bars for the 10:00 decision; the 2026 bars sealed |
-| [NA-11](artifacts/NA-11/REPORT.md) | Final selection on val-B, the analysis spec, **the freeze**, production runs and ablations |
-| [NA-12](artifacts/NA-12/REPORT.md) | Unblinding, once, and the pre-registered analyses |
-| [NA-13](artifacts/NA-13/REPORT.md) | Strategies and economic significance |
-| [NA-13b](artifacts/NA-13b/REPORT.md) | When does the signal work? (exploratory, post hoc) |
-| [NA-14](artifacts/NA-14/REPORT.md) | The paper's figures and tables and the replication build |
-| NA-15 | Forward test on news published after the models' release: pre-registered, not yet run |
-| [NA-16](artifacts/NA-16/REPORT.md) | The manuscript and the arXiv source bundle |
-
-The whole study used:
-
-| Resource | Used | Cap |
-|---|---|---|
-| Decision-model API calls (OpenRouter) | $15.73 | $30 |
-| GPU time (Kaggle's free 2×T4) | 25.38 GPU-hours | 30 hours a week |
-| 30-minute price bars (FMP) | 15,858 requests | 17,000 |
-| Evaluated variants, every one logged | 1,620 | |
-| Accesses to test-period data, every one logged | 29 | |
-
 ## For contributors
 
 <details>
